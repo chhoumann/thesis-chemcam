@@ -2,7 +2,7 @@ name: "Build LaTeX Document"
 on: 
   push:
     branches:
-      - master
+      - main
 permissions:
     contents: write
 defaults:
