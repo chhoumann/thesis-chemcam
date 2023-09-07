@@ -1,0 +1,40 @@
+name: "Build LaTeX Document"
+on: 
+  push:
+    branches:
+      - master
+permissions:
+    contents: write
+defaults:
+    run:
+        working-directory: report
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - uses: actions/cache@v3
+              name: Tectonic Cache
+              with:
+                  path: ~/.cache/tectonic
+                  key: ${{ runner.os }}-tectonic-${{ hashFiles('**/*.tex') }}
+                  restore-keys: |
+                      ${{ runner.os }}-tectonic-
+            - uses: wtfjoke/setup-tectonic@v2
+              with:
+                  github-token: ${{ secrets.github_token }}
+            - name: Run Tectonic
+              run: tectonic -X build
+            - name: Generate release tag
+              id: generate_release_tag
+              uses: amitsingh-007/next-release-tag@v3.0.0
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Release
+              uses: ncipollo/release-action@v1
+              with:
+                  artifacts: "report/build/default/default.pdf"
+                  name: ${{ github.event.head_commit.message }}
+                  tag: ${{ steps.generate_release_tag.outputs.release_tag }}
