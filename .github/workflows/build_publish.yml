@@ -35,6 +35,6 @@ jobs:
             - name: Release
               uses: ncipollo/release-action@v1
               with:
-                  artifacts: "report/build/default/default.pdf"
+                  artifacts: "report/build/report/report.pdf"
                   name: ${{ github.event.head_commit.message }}
                   tag: ${{ steps.generate_release_tag.outputs.release_tag }}
