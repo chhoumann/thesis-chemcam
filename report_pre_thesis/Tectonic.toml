@@ -3,5 +3,5 @@ name = "P9 Pre-Thesis"
 bundle = "https://data1.fullyjustified.net/tlextras-2022.0r0.tar"
 
 [[output]]
-name = "report"
+name = "p9_report"
 type = "pdf"
