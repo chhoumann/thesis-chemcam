@@ -1,4 +1,4 @@
-name: "Build LaTeX Document"
+name: "Build Pre-Thesis Document"
 on: 
   push:
     branches:
@@ -37,6 +37,6 @@ jobs:
             - name: Release
               uses: ncipollo/release-action@v1
               with:
-                  artifacts: "report/build/report/report.pdf"
-                  name: ${{ github.event.head_commit.message }}
+                  artifacts: "report_pre_thesis/build/report/report.pdf"
+                  name: ${{ github.event.head_commit.message }} (Pre-Thesis)
                   tag: ${{ steps.generate_release_tag.outputs.release_tag }}
