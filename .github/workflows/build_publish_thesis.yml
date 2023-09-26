@@ -37,6 +37,6 @@ jobs:
             - name: Release
               uses: ncipollo/release-action@v1
               with:
-                  artifacts: "report_thesis/build/report/report.pdf"
+                  artifacts: "report_thesis/build/thesis/thesis.pdf"
                   name: ${{ github.event.head_commit.message }} (Thesis)
                   tag: ${{ steps.generate_release_tag.outputs.release_tag }}
