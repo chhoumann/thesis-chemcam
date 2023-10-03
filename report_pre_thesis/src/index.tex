@@ -14,7 +14,32 @@ Objectives of the first part of the project.
 The whole story – longer version but still short, also motivates
 
 \section{Background}
-Background / Preliminaries (what you need to know in order to understand the story)
+% Background / Preliminaries (what you need to know in order to understand the story)
+
+The NASA ChemCam (Chemistry and Camera) is an advanced instrument developed by NASA in collaboration with the French national space agency (CNES).
+It is a remote-sensing laser instrument designed to analyze the chemical composition of rocks and soil on Mars\cite{chemcam_nasa_website}.
+The instrument is mounted on the Curiosity rover and is used to collect data in the Gale Crater on Mars\cite{curiosity_nasa_website}.
+It leverages the ChemCam-LIBS model, which uses machine learning models to analyze the spectral data obtained from ChemCam.\cite{andersonImprovedAccuracyQuantitative2017}\cite{cleggRecalibrationMarsScience2017}
+
+The use of LIBS (Laser-Induced Breakdown Spectroscopy) technology in planetary exploration has proven to be effective in analyzing soil and rock samples \cite{knight_characterization_2000}.
+
+Initially, a laser is fired multiple times to ablate and remove any surface contaminants, such as dust and weathering layers, to expose the underlying material.
+Afterwards, the laser generates a plasma plume from the now-exposed sample material.
+This plasma plume emits light, which, when collected and analyzed, reveals the elemental composition of the sample by correlating the intensity of emitted light with specific wavelengths in a LIBS spectrum.
+The LIBS technique enables remote analyses of materials without the need for sample preparation.
+It allows for rapid analyses because of the immediate spectrum collection from the subsequent plasma, while maintaining a high spatial resolution due to its small observation footprints.
+This high resolution is essential for pinpointing and investigating small features. \cite{wiens_chemcam_2012}
+
+In 2013, \citeauthor{wiens_pre-flight_2013} published a paper describing the pre-flight calibration and initial data processing for the ChemCam LIBS instrument.
+This paper introduces methods for preprocessing spectra samples and a regression model based on Partial Least Squares (PLS2) used to predict the composition of geological samples on Mars.
+
+% Introduce the problem - what are they actually trying to do with ChemCam, the LIBS data and their ML models?
+    % Describe how ChemCam is just a part of the whole rover with a dedicated team
+    % Describe how our interest/field is only a part of the ChemCam process (because instrument calibration is not part of the CS domain)
+% Talk about the original pre-flight calibration paper (2013)
+% Discuss the conclusions of this paper (the need for a larger dataset as well as a different approach that does not use PLS2)
+% Talk about the 2017 paper (the new approach that uses PLS1 and ICA) and how it improves on the previous model
+% Discuss where we are today (MOC).
 
 \subsection{Domain Background}
 Describes the non-CS part of the domain/terminology that is necessary to understand the problem.
