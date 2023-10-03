@@ -1,15 +1,16 @@
 flowchart TD
     subgraph DP["Data Preprocessing"]
-    BS[Background subtraction]--> 
-    CER[Continuum emission removal]--> 
-    AIRF["Applying instrument response functions (IRF)"]
+        BS[Background subtraction] --> 
+        WO["Denoise via undecimated wavelet transformation"] -->
+        WC["Apply wavelength calibration"] -->
+        CER["Continuum removal"] -->|"Reduced Data Record (RDR)"| IRF["Apply Instrumental Response Function (IRF)"]
     end
 
-    db[(LIBS Data)] --> DP
+    db[(LIBS Data)] -->|"Experimental data record (EDR)"| DP
 
-    DP -->|Preprocessed data| QC
+    DP -->|"Cleaned, calibrated spectra (CCS)"| C
 
-    subgraph QC["Quantitative Calibration"]
+    subgraph C["Calibration"]
         Input --> NOSM["`Normalize
         (Norm 1 or Norm 3)`"] --> F
         F[Full Model] --> |"Initial Estimate"| H[Submodel Selection]
@@ -40,4 +41,4 @@ flowchart TD
         (_weigted average_)`"]
     end
     
-    QC --> K["Multivariate Oxide Composition (MOC) Derivation"]
+    C --> K["Multivariate Oxide Composition (MOC) Derivation"]
