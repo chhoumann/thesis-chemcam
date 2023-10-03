@@ -1,0 +1,43 @@
+flowchart TD
+    subgraph DP["Data Preprocessing"]
+    BS[Background subtraction]--> 
+    CER[Continuum emission removal]--> 
+    AIRF["Applying instrument response functions (IRF)"]
+    end
+
+    db[(LIBS Data)] --> DP
+
+    DP -->|Preprocessed data| QC
+
+    subgraph QC["Quantitative Calibration"]
+        Input --> NOSM["`Normalize
+        (Norm 1 or Norm 3)`"] --> F
+        F[Full Model] --> |"Initial Estimate"| H[Submodel Selection]
+        
+        SM["Submodel (Low, Mid, High)"]
+        BR["`Overlap range of submodels
+        (Low-Mid; Mid-High)`"]
+
+        H -.->|In submodel range| SM
+        H -.-|Within overlap range| BR
+
+        BR --> BO["`Blend
+        (*Linear weighted sum*)`"]
+
+        SM -->|Model output| J
+        BO -->|Blended output| J
+
+        Input --> WE["Weigh by inverse IRF"] --> NOI["`Normalize
+        (Norm 1 or Norm 3)`"] --> I
+
+
+        
+        I["`ICA with Joint Approximate Diagonalization of Eigenmatrices (JADE)`"]
+        I -->|Components & Mixing matrix| J
+
+
+        J["`Combine PLS & ICA
+        (_weigted average_)`"]
+    end
+    
+    QC --> K["Multivariate Oxide Composition (MOC) Derivation"]
