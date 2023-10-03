@@ -1,0 +1,9 @@
+{
+  "name": "report_pre_thesis",
+  "scripts": {
+    "pipeline": "mmdc -i pipeline.mmd -o src/images/pipeline.png -t neutral -b transparent"
+  },
+  "dependencies": {
+    "@mermaid-js/mermaid-cli": "^10.4.0"
+  }
+}
