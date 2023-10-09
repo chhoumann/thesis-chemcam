@@ -3,7 +3,7 @@ flowchart TD
         BS[Background subtraction] --> 
         WO["Denoise via undecimated wavelet transformation"] -->
         WC["Apply wavelength calibration"] -->
-        CER["Continuum removal"] -->|"Reduced Data Record (RDR)"| IRF["Apply Instrumental Response Function (IRF)"]
+        CER["Continuum removal"] -->|"Reduced Data Record (RDR)"| IRF["Apply Instrumental Response Function (IRF)"] -->M["Masking"]
     end
 
     db[(LIBS Data)] -->|"Experimental data record (EDR)"| DP
@@ -25,14 +25,17 @@ flowchart TD
         BR --> BO["`Blend
         (*Linear weighted sum*)`"]
 
-        SM -->|Model output| J
-        BO -->|Blended output| J
+        PLS_SM_OUT[ ]:::empty
+        classDef empty width:0px,height:0px;
+
+        SM ---|Model output| PLS_SM_OUT
+        BO ---|Blended output| PLS_SM_OUT
+
+        PLS_SM_OUT --> J
 
         Input --> WE["Weigh by inverse IRF"] --> NOI["`Normalize
         (Norm 1 or Norm 3)`"] --> I
 
-
-        
         I["`ICA with Joint Approximate Diagonalization of Eigenmatrices (JADE)`"]
         I -->|Components & Mixing matrix| J
 
