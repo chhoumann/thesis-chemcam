@@ -11,6 +11,7 @@ flowchart TD
     DP -->|"Cleaned, calibrated spectra (CCS)"| C
 
     subgraph C["Calibration"]
+        %% PLS-SM
         Input --> NOSM["`Normalize
         (Norm 1 or Norm 3)`"] --> F
         F[Full Model] --> |"Initial Estimate"| H[Submodel Selection]
@@ -37,7 +38,8 @@ flowchart TD
         (Norm 1 or Norm 3)`"] --> I
 
         I["`ICA with Joint Approximate Diagonalization of Eigenmatrices (JADE)`"]
-        I -->|Components & Mixing matrix| J
+        I -->|"Components & Mixing matrix"| CIS["`Component identification & selection`"]
+        CIS -->|Component for each element| CS["Compute scores"] -->|Scores| TRM["Regression models"] -->|"Element compositions"| J
 
 
         J["`Combine PLS & ICA
