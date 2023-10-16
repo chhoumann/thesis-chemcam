@@ -6,8 +6,6 @@ Hvad er den (lige nu?)
 % Acknowledgments
 % - Acknowledge any contributions, support, or guidance from individuals, organizations, or institutions.
 
-% TODO: Convert to IEEE format
-
 % MSL: What is the mission? Why?
 % ChemCam: How does it contribute to the mission? How?
 % -> This leads us to the predictioin of composition of major oxides
@@ -20,7 +18,6 @@ Hvad er den (lige nu?)
 % MSL: What is the mission? Why?
 In November 2011, NASA launched the Mars Science Laboratory (MSL) mission, which landed the Curiosity rover on Mars in August 2012 inside Gale Crater. Its purpose is to investigate the Martian climate and geology, as well as the potential for life on Mars.
 Early in the mission, Curiosity found chemical and mineral evidence that Mars once had the conditions necessary to support life.
-As it explores Gale Crater, it acquires various samples of rock, soil, and air for onboard analysis.
 
 The rover itself is about the size of a car.
 It has various instruments and cameras, including a laser instrument called ChemCam (Chemistry and Camera), which is used to analyze the chemical composition of rocks and soil on Mars.
@@ -28,19 +25,47 @@ The primary interest are rocks that either formed in water or show indications o
 
 % ChemCam: How does it contribute to the mission? How?
 ChemCam is a remote-sensing laser instrument developed by NASA in collaboration with the French national space agency (CNES).
-It is used to determine the elemental composition of geological samples on Mars.
+The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars.
+This data is then used to determine the elemental composition of these samples.
 
 The ChemCam team uses a model called the Multivariate Oxide Composition (MOC) model to predict the composition of major oxides in geological samples.
 
 % -> This leads us to the predictioin of composition of major oxides
 % There exists a model for this, but it has some limitations
-The MOC model is based on Partial Least Squares (PLS) regression, which is a statistical method used to model the relationship between two datasets. It also uses Independent Component Analysis (ICA) to reduce the dimensionality of the data. The model is trained on a calibration dataset consisting of 408 rock samples from Earth, which were created in a laboratory to simulate the conditions of the Martian surface.
+The MOC model uses a series of submodels, each of which predicts the concentration of a single oxide. It combines the output of these with regression models based on ICA scores to predict the composition of major oxides in geological samples.
+The model is trained on a calibration dataset consisting of 408 rock samples from Earth, which were created in a laboratory to simulate the conditions of the Martian surface.
 
 % We narrow down to limitations that in any way inhibit the precision & accuracy of the model
 % // _Any_ improvements to the model will be beneficial to the mission
 % We want to investigate these limitations and propose improvements
+Given the mission's significance, improving the model's prediction of major oxides, even when faced with spectral interference in the data, would help further the MSL research.
+Consequently, there is an urgent need to not only identify and examine the model's limitations but also to understand precisely why improvements would be beneficial and how they can be effectively implemented.
 
 \subsection{Problem Statement Proposal}
+% , enhancing the model's precision and robustness is important. Any improvements to these metrics will be beneficial to the mission.
+% The MOC model, as it stands, may not provide optimal accuracy in predicting the composition of major oxides.
+% Furthermore, its robustness—its consistent performance across diverse data scenarios, especially in the presence of noise or outliers—might be questionable.
+
+% The Mars Science Laboratory  mission, through the Curiosity rover and its ChemCam instrument, relies heavily on the Multivariate Oxide Composition model to determine the elemental composition of Martian geological samples. Given the mission's pivotal aim to investigate Martian geology and the potential for life on Mars, the precision and robustness of this model are paramount. However, the current MOC model, trained on Earth-based rock samples, may not achieve optimal accuracy in predicting the composition of major oxides on Mars. Furthermore, its resilience to consistently perform across varied data scenarios, particularly in the face of spectral interference, remains uncertain.
+
+% This raises a critical question: How can the MOC model be refined to enhance its accuracy and robustness, ensuring more reliable predictions that can better support the objectives of the MSL mission?
+
+In this work, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
+
+Given a set of LIBS data \( L = \{ l_1, l_2, \dots, l_m \} \) from Martian geological samples and the predictions from the MOC model trained on a calibration dataset \( C = \{ c_1, c_2, \dots, c_n \} \) of 408 Earth-based rock samples, predict a set of major oxide compositions \( O = \{ o_1, o_2, \dots, o_p \} \) such that the predictions match the true compositions as closely as possible when faced with potential spectral interference in the data. In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
+
+% -- Introduction
+% Introduce the problem and why it is interesting. The problem is the accurate and robustness of the MOC model.
+% Our approach to the problem is to investigate the limitations of the current model and propose improvements.
+% -- Methodology
+% We'll do that by analyzing the data used to train the model and the model itself.
+% In particular, we focus on aspects that may inhibit the robustness and accuracy of the model. That is, how accurately it predicts the composition of major oxides, as well as how well it generalizes to new data.
+% This is done by first re-creating the current model and then reproducing the results of the original papers.
+% After this, we'll investigate the limitations of the model and propose improvements.
+% -- Results
+% 
+% -- Discussion
+% 
 
 
 \section{Background}
