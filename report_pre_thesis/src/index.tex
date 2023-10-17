@@ -28,11 +28,17 @@ ChemCam is a remote-sensing laser instrument developed by NASA in collaboration 
 The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars.
 This data is then used to determine the elemental composition of these samples.
 
-The ChemCam team uses a model called the Multivariate Oxide Composition (MOC) model to predict the composition of major oxides in geological samples.
+An issue with LIBS data is that the spectra are often noisy and contain outliers.
+This is due to the nature of the LIBS technique, which is sensitive to the surface conditions of the sample, such as dust and weathering layers.
+In addition, the LIBS technique is sensitive to the distance between the instrument and the sample, which can vary depending on the terrain and the rover's position.
+This can lead to spectral interference, which can affect the accuracy of the model's predictions.
+Spectral interference occurs when the spectra of two or more elements overlap, making it difficult to distinguish between them.
+
+The ChemCam team uses a model called the Multivariate Oxide Composition (MOC) model to predict the composition of major oxides in geological samples. As part of their preprocessing, they use various techniques to remove noise and outliers from the data.
 
 % -> This leads us to the predictioin of composition of major oxides
 % There exists a model for this, but it has some limitations
-The MOC model uses a series of submodels, each of which predicts the concentration of a single oxide. It combines the output of these with regression models based on ICA scores to predict the composition of major oxides in geological samples.
+The MOC model itself uses a series of submodels, each of which predicts the concentration of a single oxide. It combines the output of these with regression models based on ICA scores to predict the composition of major oxides in geological samples.
 The model is trained on a calibration dataset consisting of 408 rock samples from Earth, which were created in a laboratory to simulate the conditions of the Martian surface.
 
 % We narrow down to limitations that in any way inhibit the precision & accuracy of the model
