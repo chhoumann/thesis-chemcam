@@ -17,37 +17,47 @@ Hvad er den (lige nu?)
 \section{Introduction}
 % MSL: What is the mission? Why?
 In November 2011, NASA launched the Mars Science Laboratory (MSL) mission, which landed the Curiosity rover on Mars in August 2012 inside Gale Crater. Its purpose is to investigate the Martian climate and geology, as well as the potential for life on Mars.
-Early in the mission, Curiosity found chemical and mineral evidence that Mars once had the conditions necessary to support life.
+Early in the mission, Curiosity found chemical and mineral evidence that Mars once had the conditions necessary to support life.\cite{chemcam_nasa_website}
 
 The rover itself is about the size of a car.
 It has various instruments and cameras, including a laser instrument called ChemCam (Chemistry and Camera), which is used to analyze the chemical composition of rocks and soil on Mars.
-The primary interest are rocks that either formed in water or show indications of organic materials.
+The primary interest are rocks that either formed in water or show indications of organic materials.\cite{chemcam_nasa_website}
 
 % ChemCam: How does it contribute to the mission? How?
 ChemCam is a remote-sensing laser instrument developed by NASA in collaboration with the French national space agency (CNES).
-The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars.
-This data is then used to determine the elemental composition of these samples.
+The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars. The data itself consists of a series of spectral readings, each forming a spectrum. These spectra represent the emitted light from a plasma created when the laser interacts with the target sample. Captured over a range of wavelengths, each spectrum is composed of various emission lines. Each emission line is associated with a specific element, and its intensity reflects the concentration of that element in the sample. Consequently, the collection of spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological formations.
+This data is then used to determine the elemental composition of these samples.\cite{cleggRecalibrationMarsScience2017}
 
-An issue with LIBS data is that the spectra are often noisy and contain outliers.
-This is due to the nature of the LIBS technique, which is sensitive to the surface conditions of the sample, such as dust and weathering layers.
-In addition, the LIBS technique is sensitive to the distance between the instrument and the sample, which can vary depending on the terrain and the rover's position.
-This can lead to spectral interference, which can affect the accuracy of the model's predictions.
-Spectral interference occurs when the spectra of two or more elements overlap, making it difficult to distinguish between them.
+% These are computationally challenging problems because...
+% Multicollinearity: In computational terms, multicollinearity represents a challenge for feature selection and model interpretability. Traditional regression algorithms struggle when variables (features) are highly correlated because they cannot easily isolate the contribution of each variable to the prediction (output). This hampers the model's ability to generalize well to new data and makes it difficult to understand which features are most important for the prediction task. Advanced techniques like ridge regression or feature extraction methods may be required to handle this.
+% 
+% Matrix Effects: These constitute a challenge in data preprocessing and normalization. In machine learning terms, matrix effects introduce a form of 'class imbalance' or 'data skew.' The model can be misled by the dominant features (in this case, spectral lines influenced by matrix effects) and fail to generalize well. Dealing with this requires sophisticated preprocessing techniques or specialized algorithms capable of handling imbalanced or skewed data.
 
-The ChemCam team uses a model called the Multivariate Oxide Composition (MOC) model to predict the composition of major oxides in geological samples. As part of their preprocessing, they use various techniques to remove noise and outliers from the data.
+However, the interpretation of LIBS data poses significant computational challenges.
+First, a high degree of multicollinearity exists within the spectral data, rendering traditional linear analysis methods less effective.
+The multicollinearity arises due to the correlation among different spectral channels, influenced both by the multi-line emission characteristics of individual elements and by geochemical correlations between elements.\cite{andersonImprovedAccuracyQuantitative2017}
+
+Secondly, the complexity of LIBS spectra is worsened by multiple interacting physical processes.
+These interactions, collectively referred to as 'matrix effects,' introduce variability into the emission line intensities independent of the elements' concentrations.
+Such variability complicates the direct interpretation of the spectra and poses challenges for computational models aiming for accurate elemental quantification.\cite{andersonImprovedAccuracyQuantitative2017}
+
+The ChemCam team uses a model called the Multivariate Oxide Composition (MOC) model to predict the composition of major oxides in geological samples. As part of their preprocessing, they use various techniques to remove noise and outliers from the data.\cite{cleggRecalibrationMarsScience2017}
 
 % -> This leads us to the predictioin of composition of major oxides
 % There exists a model for this, but it has some limitations
 The MOC model itself uses a series of submodels, each of which predicts the concentration of a single oxide. It combines the output of these with regression models based on ICA scores to predict the composition of major oxides in geological samples.
-The model is trained on a calibration dataset consisting of 408 rock samples from Earth, which were created in a laboratory to simulate the conditions of the Martian surface.
+The model is trained on a calibration dataset consisting of LIBS data from 408 terrestrial rock samples, which were created in a laboratory to simulate the conditions of the Martian surface.\cite{cleggRecalibrationMarsScience2017}
 
 % We narrow down to limitations that in any way inhibit the precision & accuracy of the model
 % // _Any_ improvements to the model will be beneficial to the mission
 % We want to investigate these limitations and propose improvements
-Given the mission's significance, improving the model's prediction of major oxides, even when faced with spectral interference in the data, would help further the MSL research.
-Consequently, there is an urgent need to not only identify and examine the model's limitations but also to understand precisely why improvements would be beneficial and how they can be effectively implemented.
+Improving the predictions of the chemical compositions of LIBS data has the potential to advancing the Mars Science Laboratory's scientific objectives.
+Enhanced accuracy in elemental quantification can give us more detailed information about Mars' geology and habitability, thereby amplifying the mission's overall scientific yield. 
+
+Consequently, there is a need to not only identify and examine the existing model's limitations but also to understand precisely why improvements would be beneficial and how they can be effectively implemented.
 
 \subsection{Problem Statement Proposal}
+% \subsection{comment-start}
 % , enhancing the model's precision and robustness is important. Any improvements to these metrics will be beneficial to the mission.
 % The MOC model, as it stands, may not provide optimal accuracy in predicting the composition of major oxides.
 % Furthermore, its robustness—its consistent performance across diverse data scenarios, especially in the presence of noise or outliers—might be questionable.
@@ -55,10 +65,11 @@ Consequently, there is an urgent need to not only identify and examine the model
 % The Mars Science Laboratory  mission, through the Curiosity rover and its ChemCam instrument, relies heavily on the Multivariate Oxide Composition model to determine the elemental composition of Martian geological samples. Given the mission's pivotal aim to investigate Martian geology and the potential for life on Mars, the precision and robustness of this model are paramount. However, the current MOC model, trained on Earth-based rock samples, may not achieve optimal accuracy in predicting the composition of major oxides on Mars. Furthermore, its resilience to consistently perform across varied data scenarios, particularly in the face of spectral interference, remains uncertain.
 
 % This raises a critical question: How can the MOC model be refined to enhance its accuracy and robustness, ensuring more reliable predictions that can better support the objectives of the MSL mission?
+% \subsection{comment-end}
 
 In this work, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
 
-Given a set of LIBS data \( L = \{ l_1, l_2, \dots, l_m \} \) from Martian geological samples and the predictions from the MOC model trained on a calibration dataset \( C = \{ c_1, c_2, \dots, c_n \} \) of 408 Earth-based rock samples, predict a set of major oxide compositions \( O = \{ o_1, o_2, \dots, o_p \} \) such that the predictions match the true compositions as closely as possible when faced with potential spectral interference in the data. In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
+Given a set of LIBS data \( L = \{ l_1, l_2, \dots, l_m \} \) from Martian geological samples and the predictions from the MOC model trained on a calibration dataset \( C = \{ c_1, c_2, \dots, c_n \} \) of 408 Earth-based rock samples, predict a set of major oxide compositions \( O = \{ o_1, o_2, \dots, o_p \} \) such that the predictions match the true compositions as closely as possible. In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
 
 % -- Introduction
 % Introduce the problem and why it is interesting. The problem is the accurate and robustness of the MOC model.
