@@ -72,7 +72,16 @@ Consequently, there is a need to not only identify and examine the existing mode
 
 In this work, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
 
-Given a set of LIBS data \( L = \{ l_1, l_2, \dots, l_m \} \) from Martian geological samples and the predictions from the MOC model trained on a calibration dataset \( C = \{ c_1, c_2, \dots, c_n \} \) of 408 Earth-based rock samples, predict a set of major oxide compositions \( O = \{ o_1, o_2, \dots, o_p \} \) such that the predictions match the true compositions as closely as possible. In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
+Given:
+\begin{itemize}
+    \item A set of LIBS (Laser-Induced Breakdown Spectroscopy) data obtained from Martian geological samples. \( L = \{ l_1, l_2, \dots, l_m \} \), where each \( l_i \) represents individual sample data,
+    \item a calibration dataset consisting of 408 Earth-based rock samples used to train the MOC model \( C = \{ c_1, c_2, \dots, c_n \} \), where each \( c_i \) represents individual calibration data,
+    \item a set of predictions for major oxide compositions \( O = \{ o_1, o_2, \dots, o_p \} \), where each \( o_i \) is a predicted oxide composition,
+    \item the set of model's output predictions \( \mathbf{\hat{y}} \),
+    \item and the set of expected true compositions, \( \mathbf{y} \),
+\end{itemize}
+
+predict a set of major oxide compositions $O$ such that the predictions match the true compositions as closely as possible. In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
 
 % -- Introduction
 % Introduce the problem and why it is interesting. The problem is the accurate and robustness of the MOC model.
