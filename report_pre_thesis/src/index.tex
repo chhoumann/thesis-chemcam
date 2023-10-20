@@ -59,18 +59,28 @@ Enhanced accuracy in elemental quantification can give us more detailed informat
 
 Consequently, there is a need to not only identify and examine the existing model's limitations but also to understand precisely why improvements would be beneficial and how they can be effectively implemented.
 
-\subsection{Problem Statement Proposal}
-% \subsection{comment-start}
-% , enhancing the model's precision and robustness is important. Any improvements to these metrics will be beneficial to the mission.
-% The MOC model, as it stands, may not provide optimal accuracy in predicting the composition of major oxides.
-% Furthermore, its robustness—its consistent performance across diverse data scenarios, especially in the presence of noise or outliers—might be questionable.
+As such, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
 
-% The Mars Science Laboratory  mission, through the Curiosity rover and its ChemCam instrument, relies heavily on the Multivariate Oxide Composition model to determine the elemental composition of Martian geological samples. Given the mission's pivotal aim to investigate Martian geology and the potential for life on Mars, the precision and robustness of this model are paramount. However, the current MOC model, trained on Earth-based rock samples, may not achieve optimal accuracy in predicting the composition of major oxides on Mars. Furthermore, its resilience to consistently perform across varied data scenarios, particularly in the face of spectral interference, remains uncertain.
+\section{Related Work}
 
-% This raises a critical question: How can the MOC model be refined to enhance its accuracy and robustness, ensuring more reliable predictions that can better support the objectives of the MSL mission?
-% \subsection{comment-end}
+\section{Definition}
+% Dataset
+% calibration set
+% Major oxides
 
-In this work, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
+Consider a set of all possible elements $E$ and a set of all possible compositions of elements $K$, where \(K \in \mathbb{P}(E) \).
+
+\begin{definition}
+    A LIBS data set $L$ is a set of observed compositions $l$ where \(l \subset K \)    
+\end{definition}
+
+\begin{definition}
+    A calibration set $C$ is a set of distinct compositions $c$, where \(c \subset K\) and \(C \neq L\)
+\end{definition}
+
+\begin{definition}
+    A prediction set \( \mathbf{\hat{y}} = w_PLS * Y_PLS + w_ICA * Y_ICA \) where \mathbf{\hat{y}} is the predicted value of the weighted average, $w_PLS$ is the weight assigned to the PLS model, $Y_PLS$ is the prediction from the PLS model, $w_ICA$ is the weight assigned to the ICA model and $Y_ICA$ is the prediction from the ICA model.
+\end{definition}
 
 Given:
 \begin{itemize}
@@ -83,6 +93,21 @@ Given:
 
 recreate and train the MOC model using the calibration set $C$ to predict a set of major oxide compositions $O$ such that the predictions match the true compositions $\mathbf{y}$ as closely as possible.
 In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
+
+\subsection{Problem Statement Proposal}
+% \subsection{comment-start}
+% , enhancing the model's precision and robustness is important. Any improvements to these metrics will be beneficial to the mission.
+% The MOC model, as it stands, may not provide optimal accuracy in predicting the composition of major oxides.
+% Furthermore, its robustness—its consistent performance across diverse data scenarios, especially in the presence of noise or outliers—might be questionable.
+
+% The Mars Science Laboratory  mission, through the Curiosity rover and its ChemCam instrument, relies heavily on the Multivariate Oxide Composition model to determine the elemental composition of Martian geological samples. Given the mission's pivotal aim to investigate Martian geology and the potential for life on Mars, the precision and robustness of this model are paramount. However, the current MOC model, trained on Earth-based rock samples, may not achieve optimal accuracy in predicting the composition of major oxides on Mars. Furthermore, its resilience to consistently perform across varied data scenarios, particularly in the face of spectral interference, remains uncertain.
+
+% This raises a critical question: How can the MOC model be refined to enhance its accuracy and robustness, ensuring more reliable predictions that can better support the objectives of the MSL mission?
+% \subsection{comment-end}
+
+
+
+
 
 % -- Introduction
 % Introduce the problem and why it is interesting. The problem is the accurate and robustness of the MOC model.
