@@ -76,11 +76,11 @@ As such, we aim to identify potential limitations and areas of improvement in th
 Given a set $E$ of elements detectable using LIBS, and considering \(\mathbb{P}(E)\) as the power set of $E$ which represents all possible combinations of these elements, we define \(K \subseteq \mathbb{P}(E) \) as the set of compositions of these elements that can be subjected to LIBS. Additionally, let $S$ be the set of all possible spectra emitted from these compositions.
 
 \begin{definition}
-    A LIBS data set $L$ for Martian geological samples is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(L = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_m , s_m) \). Each pair $(k_i , s_i)$ in $L$ represents the spectral data for an individual Martian geological sample, where $k_i$ is the sample's composition and $s_i$ is its emitted spectrum produced via laser-induced breakdown.
+    A LIBS data set $L$ for Martian geological samples is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(L = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_m , s_m) \} \). Each pair $(k_i , s_i)$ in $L$ represents the spectral data for an individual Martian geological sample, where $k_i$ is the sample's composition and $s_i$ is its emitted spectrum produced via laser-induced breakdown.
 \end{definition}
 
 \begin{definition}
-    A Calibration Set $C$ is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(C = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_n , s_n) \). Each pair $(k_i , s_i)$ in $C$ represents a known composition \(k_i \in K' \) from Earth's rock standards and its corresponding emitted spectrum \(s_i \in S \). Additionally, denoting the set of compositions associated with $L$ as $K_L$, then \( \forall(k,s) \in C, k \notin K_L \).
+    A Calibration Set $C$ is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(C = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_n , s_n)\} \). Each pair $(k_i , s_i)$ in $C$ represents a known composition \(k_i \in K' \) from Earth's rock standards and its corresponding emitted spectrum \(s_i \in S \). Additionally, denoting the set of compositions associated with $L$ as $K_L$, then \( \forall(k,s) \in C, k \notin K_L \).
 \end{definition}
 
 \begin{definition}
