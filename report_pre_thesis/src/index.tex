@@ -73,7 +73,9 @@ As such, we aim to identify potential limitations and areas of improvement in th
 % \subsection{comment-end}
 
 \section{Definition}
-Given a set $E$ of elements detectable using LIBS, and considering \(\mathbb{P}(E)\) as the power set of $E$ which represents all possible combinations of these elements, we define \(K \subseteq \mathbb{P}(E) \) as the set of compositions of these elements that can be subjected to LIBS. Additionally, let $S$ be the set of all possible spectra emitted from these compositions.
+Given a set $E$ of elements detectable using LIBS, and considering \(\mathbb{P}(E)\) as the power set of $E$ which represents all possible combinations of these elements, we define \(K \subseteq \mathbb{P}(E) \) as the set of compositions of these elements that can be subjected to LIBS.
+
+Let $S$ be the set of all possible spectra, where each spectrum is a multidimensional vector in $\mathbb{R}^n$ where $n$ being the number of wavelengths captured by the LIBS spectrometer. For any spectrum $s_i$, it holds that \(s_i \in S \).
 
 \begin{definition}
     A LIBS data set $L$ for Martian geological samples is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(L = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_m , s_m) \} \). Each pair $(k_i , s_i)$ in $L$ represents the spectral data for an individual Martian geological sample, where $k_i$ is the sample's composition and $s_i$ is its emitted spectrum produced via laser-induced breakdown.
@@ -84,15 +86,7 @@ Given a set $E$ of elements detectable using LIBS, and considering \(\mathbb{P}(
 \end{definition}
 
 \begin{definition}
-    A prediction set $\mathbf{\hat{y}}$ is the weigthed average of the predictions from the PLS and ICA models defined by:
-
-    \( \mathbf{\hat{y}} = w_{PLS} \times Y_{PLS} + w_{ICA} \times Y_{ICA} \)
-
-    Let:
-    \begin{itemize}
-        \item $Y_{PLS}$ and $Y_{ICA}$ be the prediction sets from the PLS and ICA models, respectively.
-        \item $w_{PLS}$ and $w_{ICA}$ be the weights assigned to the PLS and ICA models, respectively, such that \(w_{PLS} + w_{ICA} = 1 \), ensuring a weighted average.
-    \end{itemize}
+    let \(h: S \rightarrow \mathbb{R}^m \) be a hypothesis function, where for each spectrum \(s \in S\), $h(s)$ produces a prediction \(\mathbf{\hat{y}} \in \mathbb{R}^m \). Here, $m$ denotes the dimensions of the composition predictions, and the structure and content of $\mathbf{\hat{y}}$ are analogous to a composition $k$. The function $h$ is determined by the model's learned parameters and the hyperparameters of the algorithm.
  %We should probably introduce these models at the end of introduction.
 \end{definition}
 
