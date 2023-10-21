@@ -102,28 +102,6 @@ where $g(\mathbf{\hat{y}}, \mathbf{y})$ can be any metric that measures the diff
 % R^+ denotes the postiive real numbers
 
 
-% ----------------------------------
-
-% Given a set \(E\) of eight major oxides detectable using LIBS, \(E = \{SiO_2, TiO_2, Al_2 O_3, FeOT, MgO, CaO, Na_2O, K_2O\}\), and considering \(\mathcal{P}(E)\) as the power set of \(E\) which represents all possible combinations of these oxides, we define \(K \subseteq \mathcal{P}(E) \) as the set of oxide compositions detected by LIBS.
-
-% Let $S$ be the set of all possible spectra, where each spectrum $\mathbf{s} \in S$ is a multidimensional vector in $\mathbb{R}^n$ with $n$ being the number of wavelengths captured by the LIBS spectrometer for a single laser pulse. $\mathbf{s}$ holds the intensities of light emitted from the plasma that is created from the laser ablation process.
-
-% \begin{definition}
-%     A LIBS data set $L$ for Martian geological samples is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(L = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_m , s_m) \} \). Each pair $(k_i , s_i)$ in $L$ represents the spectral data for an individual Martian geological sample, where $k_i$ is the sample's composition and $s_i$ is its emitted spectrum produced via laser-induced breakdown.
-% \end{definition}
-
-% \begin{definition}
-%     A Calibration Set $C$ is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(C = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_n , s_n)\} \). Each pair $(k_i , s_i)$ in $C$ represents a known composition \(k_i \in K' \) from Earth's rock standards and its corresponding emitted spectrum \(s_i \in S \). Additionally, denoting the set of compositions associated with $L$ as $K_L$, then \( \forall(k,s) \in C, k \notin K_L \).
-% \end{definition}
-
-% \begin{definition}
-%     Let \(h: S \rightarrow \mathbb{R}^m \) be a hypothesis function, where for each spectrum \(s \in S\), $h(s)$ produces a prediction \(\mathbf{\hat{y}} \in \mathbb{R}^m \). Here, $m$ denotes the dimensions of the composition predictions, and the structure and content of $\mathbf{\hat{y}}$ are analogous to a composition $k \in K$. The function $h$ is determined by the model's learned parameters and the hyperparameters of the algorithm.
-%  %We should probably introduce these models at the end of introduction.
-% \end{definition}
-
-%recreate and train the MOC model using the calibration set $C$ to predict a set of major oxide compositions $O$ such that the predictions match the true compositions $\mathbf{y}$ as closely as possible.
-%In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
-
 % -- Introduction
 % Introduce the problem and why it is interesting. The problem is the accurate and robustness of the MOC model.
 % Our approach to the problem is to investigate the limitations of the current model and propose improvements.
