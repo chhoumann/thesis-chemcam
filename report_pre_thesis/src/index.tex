@@ -93,6 +93,12 @@ Given a set $E$ of the eight major oxides, \(E = \{SiO_2, TiO_2, Al_2 O_3, FeOT,
 A model to predict the composition of major oxides in geological samples is a function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$.
 The output of the function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
 
+We define a function $g$ that measures the difference between the predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$.
+$$
+g: \mathbb{R}^k \times \mathbb{R}^k \rightarrow \mathbb{R}^{+}
+$$
+where $g(\mathbf{\hat{y}}, \mathbf{y})$ can be any metric that measures the difference between the two vectors. This function is used to evaluate the performance of the model.
+
 
 % ----------------------------------
 
