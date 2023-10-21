@@ -61,7 +61,7 @@ Consequently, there is a need to not only identify and examine the existing mode
 
 As such, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
 
-\subsection{Problem Statement Proposal}
+\section{Related work}
 % \subsection{comment-start}
 % , enhancing the model's precision and robustness is important. Any improvements to these metrics will be beneficial to the mission.
 % The MOC model, as it stands, may not provide optimal accuracy in predicting the composition of major oxides.
@@ -72,31 +72,32 @@ As such, we aim to identify potential limitations and areas of improvement in th
 % This raises a critical question: How can the MOC model be refined to enhance its accuracy and robustness, ensuring more reliable predictions that can better support the objectives of the MSL mission?
 % \subsection{comment-end}
 
-Consider a set of all possible elements $E$ and a set of all possible compositions of elements $K$, where \(K \in \mathbb{P}(E) \).
+\section{Definition}
+Given a set $E$ of elements detectable using LIBS, and considering \(\mathbb{P}(E)\) as the power set of $E$ which represents all possible combinations of these elements, we define \(K \subseteq \mathbb{P}(E) \) as the set of compositions of these elements that can be subjected to LIBS. Additionally, let $S$ be the set of all possible spectra emitted from these compositions.
 
 \begin{definition}
-    A LIBS data set $L$ is a set of observed compositions $l$ where \(l \subset K \)    
+    A LIBS data set $L$ for Martian geological samples is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(L = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_m , s_m) \). Each pair $(k_i , s_i)$ in $L$ represents the spectral data for an individual Martian geological sample, where $k_i$ is the sample's composition and $s_i$ is its emitted spectrum produced via laser-induced breakdown.
 \end{definition}
 
 \begin{definition}
-    A calibration set $C$ is a set of distinct compositions $c$, where \(c \subset K\) and \(C \neq L\)
+    A Calibration Set $C$ is a subset of \(K' \times S \) where \(K' \subseteq K \), defined as \(C = \{(k_1, s_1 , (k_2 , s_2)) \dots (k_n , s_n) \). Each pair $(k_i , s_i)$ in $C$ represents a known composition \(k_i \in K' \) from Earth's rock standards and its corresponding emitted spectrum \(s_i \in S \). Additionally, denoting the set of compositions associated with $L$ as $K_L$, then \( \forall(k,s) \in C, k \notin K_L \).
 \end{definition}
 
 \begin{definition}
-    A prediction set \( \mathbf{\hat{y}} = w_PLS * Y_PLS + w_ICA * Y_ICA \) where \mathbf{\hat{y}} is the predicted value of the weighted average, $w_PLS$ is the weight assigned to the PLS model, $Y_PLS$ is the prediction from the PLS model, $w_ICA$ is the weight assigned to the ICA model and $Y_ICA$ is the prediction from the ICA model. %We should probably introduce these models at the end of introduction.
+    A prediction set $\mathbf{\hat{y}}$ is the weigthed average of the predictions from the PLS and ICA models defined by:
+
+    \( \mathbf{\hat{y}} = w_{PLS} \times Y_{PLS} + w_{ICA} \times Y_{ICA} \)
+
+    Let:
+    \begin{itemize}
+        \item $Y_{PLS}$ and $Y_{ICA}$ be the prediction sets from the PLS and ICA models, respectively.
+        \item $w_{PLS}$ and $w_{ICA}$ be the weights assigned to the PLS and ICA models, respectively, such that \(w_{PLS} + w_{ICA} = 1 \), ensuring a weighted average.
+    \end{itemize}
+ %We should probably introduce these models at the end of introduction.
 \end{definition}
 
-Given:
-\begin{itemize}
-    \item A set of LIBS data obtained from Martian geological samples. \( L = \{ l_1, l_2, \dots, l_m \} \), where each \( l_i \) represents individual sample data,
-    \item a calibration dataset consisting of 408 Earth-based rock samples used to train the MOC model \( C = \{ c_1, c_2, \dots, c_n \} \), where each \( c_i \) represents individual calibration data,
-    \item a set of predictions for major oxide compositions \( O = \{ o_1, o_2, \dots, o_p \} \), where each \( o_i \) is a predicted oxide composition,
-    \item the set of model's output predictions \( \mathbf{\hat{y}} \),
-    \item and the set of expected true compositions, \( \mathbf{y} \),
-\end{itemize}
-
-recreate and train the MOC model using the calibration set $C$ to predict a set of major oxide compositions $O$ such that the predictions match the true compositions $\mathbf{y}$ as closely as possible.
-In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
+%recreate and train the MOC model using the calibration set $C$ to predict a set of major oxide compositions $O$ such that the predictions match the true compositions $\mathbf{y}$ as closely as possible.
+%In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
 
 % -- Introduction
 % Introduce the problem and why it is interesting. The problem is the accurate and robustness of the MOC model.
