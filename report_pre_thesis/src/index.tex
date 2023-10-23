@@ -59,7 +59,9 @@ Enhanced accuracy in elemental quantification can give us more detailed informat
 
 Consequently, there is a need to not only identify and examine the existing model's limitations but also to understand precisely why improvements would be beneficial and how they can be effectively implemented.
 
-\subsection{Problem Statement Proposal}
+As such, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
+
+\section{Related work}
 % \subsection{comment-start}
 % , enhancing the model's precision and robustness is important. Any improvements to these metrics will be beneficial to the mission.
 % The MOC model, as it stands, may not provide optimal accuracy in predicting the composition of major oxides.
@@ -70,9 +72,31 @@ Consequently, there is a need to not only identify and examine the existing mode
 % This raises a critical question: How can the MOC model be refined to enhance its accuracy and robustness, ensuring more reliable predictions that can better support the objectives of the MSL mission?
 % \subsection{comment-end}
 
-In this work, we aim to identify potential limitations and areas of improvement in the Multivariate Oxide Composition model's predictive accuracy and robustness in predicting the composition of major oxides in Martian geological samples using Earth-based calibration data.
+\section{Definition}
+Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities.
+The dataset $D$ is given by:
 
-Given a set of LIBS data \( L = \{ l_1, l_2, \dots, l_m \} \) from Martian geological samples and the predictions from the MOC model trained on a calibration dataset \( C = \{ c_1, c_2, \dots, c_n \} \) of 408 Earth-based rock samples, predict a set of major oxide compositions \( O = \{ o_1, o_2, \dots, o_p \} \) such that the predictions match the true compositions as closely as possible. In addition, systematically identify areas where the model's predictions $\mathbf{\hat{y}}$ diverge from expected values $\mathbf{y}$ and propose potential improvements or modifications to address these identified areas.
+\begin{equation}
+    D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}
+\end{equation}
+
+Each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
+This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
+
+Given a set of major oxides $E$ where $k=|E|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
+The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
+
+We introduce a general loss function $g$ that quantifies the disparity between predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$:
+
+\begin{equation}
+g: \mathbb{R}^k \times \mathbb{R}^k \rightarrow \mathbb{R}^+
+\end{equation}
+
+where $g(\mathbf{\hat{y}}, \mathbf{y})$ denotes the magnitude of error between the two vectors.
+The precise form of $g$ can vary based on the specific metric chosen to measure the difference. The function $g$ serves as a benchmark to assess the model's predictive accuracy.
+
+% R^+ denotes the postiive real numbers
+
 
 % -- Introduction
 % Introduce the problem and why it is interesting. The problem is the accurate and robustness of the MOC model.
