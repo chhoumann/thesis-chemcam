@@ -1,0 +1,24 @@
+\section{Definition}\label{sec:definition}
+Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities.
+The dataset $D$ is given by:
+
+\begin{equation}
+    D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}
+\end{equation}
+
+Each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
+This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
+
+Given a set of major oxides $E$ where $k=|E|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
+The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
+
+We introduce a general loss function $g$ that quantifies the disparity between predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$:
+
+\begin{equation}
+g: \mathbb{R}^k \times \mathbb{R}^k \rightarrow \mathbb{R}^+
+\end{equation}
+
+where $g(\mathbf{\hat{y}}, \mathbf{y})$ denotes the magnitude of error between the two vectors.
+The precise form of $g$ can vary based on the specific metric chosen to measure the difference. The function $g$ serves as a benchmark to assess the model's predictive accuracy.
+
+% R^+ denotes the postiive real numbers
