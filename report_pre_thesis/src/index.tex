@@ -86,11 +86,14 @@ This vector captures the intensity values at $\lambda_i$ for each of the $m$ sho
 Given a set of major oxides $E$ where $k=|E|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
 The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
 
-We define a function $g$ that measures the difference between the predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$.
-$$
-g: \mathbb{R}^k \times \mathbb{R}^k \rightarrow \mathbb{R}^{+}
-$$
-where $g(\mathbf{\hat{y}}, \mathbf{y})$ can be any metric that measures the difference between the two vectors. This function is used to evaluate the performance of the model.
+We introduce a general loss function \( g \) that quantifies the disparity between predicted weight percentages \(\mathbf{\hat{y}}\) and the true weight percentages \(\mathbf{y}\):
+
+\begin{equation}
+g: \mathbb{R}^k \times \mathbb{R}^k \rightarrow \mathbb{R}^+
+\end{equation}
+
+where \( g(\mathbf{\hat{y}}, \mathbf{y}) \) denotes the magnitude of error between the two vectors.
+The precise form of \( g \) can vary based on the specific metric chosen to measure the difference. The function \( g \) serves as a benchmark to assess the model's predictive accuracy.
 
 % R^+ denotes the postiive real numbers
 
