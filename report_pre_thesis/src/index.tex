@@ -73,25 +73,18 @@ As such, we aim to identify potential limitations and areas of improvement in th
 % \subsection{comment-end}
 
 \section{Definition}
-Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ is the set of possible wavelengths and $\mathbb{R}^m$ is the $m$-dimensional space representing intensities.
+Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities.
+The dataset $D$ is given by:
 
-$$
-D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}
-$$
-where:
-\begin{itemize}
-    \item $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ is a pair of wavelength and intensity vectors
-    \item $\lambda_i$ is the wavelength at the $i^{th}$ measurement point in \textit{nanometers}, $\lambda_i \in \Lambda$.
-    \item $\vec{I}_i$ is an $m$-dimensional vector $[\ I_{i1}, I_{i2}, \ldots, I_{im}\ ]$ representing the intensity values in units of photons per channel at $\lambda_i$ for each of the $m$ shots, $\vec{I}_i \in \mathbb{R}^m$.
-\end{itemize}
+\begin{equation}
+    D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}
+\end{equation}
 
-$\Lambda$ is a subset of the real numbers, $\Lambda \subseteq \mathbb{R}$, and it specifies the set of wavelengths in nanometers that the LIBS data captures.
+Each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
+This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
 
-This project focuses on the prediction of 8 major oxides.
-Given a set $E$ of the eight major oxides, \(E = \{SiO_2, TiO_2, Al_2 O_3, FeOT, MgO, CaO, Na_2O, K_2O\}\), we set $k = |E|$.
-
-A model to predict the composition of major oxides in geological samples is a function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$.
-The output of the function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
+Given a set of major oxides $E$ where $k=|E|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
+The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
 
 We define a function $g$ that measures the difference between the predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$.
 $$
