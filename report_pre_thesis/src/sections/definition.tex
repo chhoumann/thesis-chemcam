@@ -11,6 +11,9 @@ This vector captures the intensity values at $\lambda_i$ for each of the $m$ sho
 
 Given a set of major oxides $E$ where $k=|E|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
 The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
+The sum of the predicted weight percentages is not necessarily equal to 100\%.
+The samples may contain other elements that are not considered major oxides, which would account for the difference.
+If the sum of the predicted weight percentages is greater than 100\%, the model is overestimating the weight percentages, and represents a physical impossibility.
 
 We introduce a general loss function $g$ that quantifies the disparity between predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$:
 

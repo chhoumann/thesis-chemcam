@@ -4,20 +4,20 @@
 % What is the purpose of the MSL mission? What is the purpose of the ChemCam instrument?
 
 The NASA ChemCam (Chemistry and Camera) is an advanced instrument developed by NASA in collaboration with the French national space agency (CNES).
-It is a remote-sensing laser instrument designed to analyze the chemical composition of rocks and soil on Mars\cite{chemcam_nasa_website}.
-The instrument is mounted on the Curiosity rover and is used to collect data in the Gale Crater on Mars\cite{curiosity_nasa_website}.
-It leverages the ChemCam-LIBS model, which uses machine learning models to analyze the spectral data obtained from ChemCam.\cite{andersonImprovedAccuracyQuantitative2017}\cite{cleggRecalibrationMarsScience2017}
+It is a remote-sensing laser instrument designed to analyze the chemical composition of rocks and soil on Mars\cite{chemcamNasaWebsite}.
+The instrument is mounted on the Curiosity rover and is used to collect data in the Gale Crater on Mars\cite{curiosityNasaWebsite}.
+It leverages the ChemCam-LIBS model, which uses machine learning models to analyze the spectral data obtained from ChemCam.\cite{andersonImprovedAccuracyQuantitative2017, cleggRecalibrationMarsScience2017}
 
-The use of LIBS (Laser-Induced Breakdown Spectroscopy) technology in planetary exploration has proven to be effective in analyzing soil and rock samples \cite{knight_characterization_2000}.
+The use of LIBS (Laser-Induced Breakdown Spectroscopy) technology in planetary exploration has proven to be effective in analyzing soil and rock samples \citep{knight2000}.
 
 A laser pulses to ablate and remove any surface contaminants, such as dust and weathering layers, to expose the underlying material.
 The laser generates a plasma plume from the now-exposed sample material.
 This plasma plume emits light, which, when collected and analyzed, reveals the elemental composition of the sample by correlating the intensity of emitted light with specific wavelengths in a LIBS spectrum.
 The LIBS technique enables remote analyses of materials without the need for sample preparation.
 It allows for rapid analyses because of the immediate spectrum collection from the subsequent plasma, while maintaining a high spatial resolution due to its small observation footprints.
-This high resolution is essential for pinpointing and investigating small features. \cite{wiens_chemcam_2012}
+This high resolution is essential for pinpointing and investigating small features. \cite{wiensChemcam2012}
 
-In 2013, \citeauthor{wiens_pre-flight_2013} published a paper describing the pre-flight calibration and initial data processing for the ChemCam LIBS instrument.
+In 2013, \citet{wiensPreFlight3} published a paper describing the pre-flight calibration and initial data processing for the ChemCam LIBS instrument.
 This paper introduces methods for preprocessing spectra samples and a regression model based on Partial Least Squares (PLS2) used to predict the composition of geological samples on Mars.
 The model was trained on a dataset of 69 rock samples from Earth, which were created in a laboratory to simulate the conditions of the Martian surface.
 This dataset is often referred to as the calibration dataset.
@@ -28,7 +28,7 @@ Two key conclusions were drawn from this paper:
     \item The PLS2 model is not ideal for this type of data, and an argument is made for using PLS1 instead because of its ability to optimize each element separately, which in can improve the accuracy although it suffers slower run times.
 \end{enumerate}
 
-Based on this work, \citeauthor{cleggRecalibrationMarsScience2017} published a paper in 2017 describing a new approach to the ChemCam LIBS calibration model.
+Based on this work, \citet{cleggRecalibrationMarsScience2017} published a paper in 2017 describing a new approach to the ChemCam LIBS calibration model.
 This paper introduces a new model based on PLS1 with a sub-model approach (PLS-SM) and Independent Component Analysis (ICA).
 In addition, a much larger calibration dataset was used, consisting of 408 samples.
 Using this, the team was able to improve the predictions by employing a \textit{submodel} PLS approach in tandem with ICA.
