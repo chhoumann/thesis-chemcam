@@ -12,24 +12,14 @@ ChemCam is a remote-sensing laser instrument developed by NASA in collaboration 
 The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars. The data itself consists of a series of spectral readings, each forming a spectrum. These spectra represent the emitted light from a plasma created when the laser interacts with the target sample. Captured over a range of wavelengths, each spectrum is composed of various emission lines. Each emission line is associated with a specific element, and its intensity reflects the concentration of that element in the sample. Consequently, the collection of spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological formations.
 This data is then used to determine the elemental composition of these samples.\cite{cleggRecalibrationMarsScience2017}
 
-% These are computationally challenging problems because...
-% Multicollinearity: In computational terms, multicollinearity represents a challenge for feature selection and model interpretability. Traditional regression algorithms struggle when variables (features) are highly correlated because they cannot easily isolate the contribution of each variable to the prediction (output). This hampers the model's ability to generalize well to new data and makes it difficult to understand which features are most important for the prediction task. Advanced techniques like ridge regression or feature extraction methods may be required to handle this.
-% 
-% Matrix Effects: These constitute a challenge in data preprocessing and normalization. In machine learning terms, matrix effects introduce a form of 'class imbalance' or 'data skew.' The model can be misled by the dominant features (in this case, spectral lines influenced by matrix effects) and fail to generalize well. Dealing with this requires sophisticated preprocessing techniques or specialized algorithms capable of handling imbalanced or skewed data.
+The ChemCam team uses an analytical system called the Multivariate Oxide Composition (MOC) model to predict the composition of major oxides in geological samples. As part of their preprocessing, they use various techniques to remove noise and outliers from the data.\cite{cleggRecalibrationMarsScience2017}
 
-% However, the interpretation of LIBS data poses significant computational challenges.
-% First, a high degree of multicollinearity exists within the spectral data, rendering traditional linear analysis methods less effective.
-% The multicollinearity arises due to the correlation among different spectral channels, influenced both by the multi-line emission characteristics of individual elements and by geochemical correlations between elements.
-% Secondly, the complexity of LIBS spectra is increased by multiple interacting physical processes.
-% These interactions, collectively referred to as 'matrix effects,' introduce variability into the emission line intensities independent of the elements' concentrations.
-% Such variability complicates the direct interpretation of the spectra and poses challenges for computational models aiming for accurate elemental quantification.\cite{andersonImprovedAccuracyQuantitative2017}
-
-The ChemCam team uses a model called the Multivariate Oxide Composition (MOC) model to predict the composition of major oxides in geological samples. As part of their preprocessing, they use various techniques to remove noise and outliers from the data.\cite{cleggRecalibrationMarsScience2017}
-
-% -> This leads us to the predictioin of composition of major oxides
+% -> This leads us to the prediction of composition of major oxides
 % There exists a model for this, but it has some limitations
-The MOC model itself uses a series of submodels, each of which predicts the concentration of a single oxide. It combines the output of these with regression models based on ICA scores to predict the composition of major oxides in geological samples.
-The model is trained on a calibration dataset consisting of LIBS data from 408 terrestrial rock samples, which were created in a laboratory to simulate the conditions of the Martian surface.\cite{cleggRecalibrationMarsScience2017}
+The MOC model is trained on a calibration dataset consisting of LIBS data from 408 terrestrial rock samples, simulated to mimic Martian conditions\cite{cleggRecalibrationMarsScience2017}.
+This system is comprised of various components, each responsible for a specific task in predicting the composition of major oxides in geological samples.
+In this context, a 'component' refers to a distinct, isolatable process or model affecting the system's overall predictive function.
+It utilizes a series of submodels to predict individual oxide concentrations, which are then combined with regression models based on ICA scores.
 
 % We narrow down to limitations that in any way inhibit the precision & accuracy of the model
 % // _Any_ improvements to the model will be beneficial to the mission
@@ -37,7 +27,14 @@ The model is trained on a calibration dataset consisting of LIBS data from 408 t
 The Mars Science Laboratory has made notable progress in planetary exploration, largely relying on models like the Multivariate Oxide Composition (MOC) to interpret Laser-Induced Breakdown Spectroscopy (LIBS) data from Martian geological samples.
 Despite its utility, the existing MOC model shows limitations in predictive accuracy and robustness.
 Enhancing the predictive accuracy and robustness of the MOC model is crucial for achieving more reliable composition predictions, thereby furthering the scientific objectives of the Mars Science Laboratory in understanding Martian geology and potential habitability.
-This research will identify and rectify the limitations of the existing MOC model, focusing on data obtained from Martian geological samples, to improve both its predictive accuracy and robustness.
+Accuracy, in this context, is measured as Root Mean Squared Error (RMSE).
+Robustness refers to the model's ability to handle the variations in the data.
+We use a term 'matrix effects' to refer to these variations.
+The complexity of LIBS spectra is increased by multiple interacting physical processes.
+These interactions, collectively referred to as 'matrix effects,' introduce variability into the emission line intensities independent of the elements' concentrations.
+Such variability complicates the direct interpretation of the spectra and poses challenges for computational models aiming for accurate elemental quantification.\cite{andersonImprovedAccuracyQuantitative2017}
+
+In this work, we aim to identify and propose improvements to the specific components of the current MOC model that limit its predictive accuracy and robustness against matrix effects.
 
 The remainder of this paper is organized as follows:
 Section~\ref{sec:background} sets the context, while Section~\ref{sec:related_works} reviews existing literature.
