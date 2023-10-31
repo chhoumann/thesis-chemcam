@@ -9,44 +9,69 @@ The dataset $D$ is given by:
 Each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
 This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
 
-Given a set of major oxides $E$ where $k=|E|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
-The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
+Given a set of major oxides $O$ where $k=|O|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
+The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{8}]$ where $\hat{y}_{i}$ is the predicted weight percentage of the major oxide $o_i \in O$.
 The sum of the predicted weight percentages is not necessarily equal to 100\%.
 The samples may contain other elements that are not considered major oxides, which would account for the difference.
 If the sum of the predicted weight percentages is greater than 100\%, the model is overestimating the weight percentages, and represents a physical impossibility.
 
-We introduce a general error function $g$ that quantifies the disparity between predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$:
+We define a function $E$ to measure the error of a model $M$ based on the RMSE of the predictions for each oxide $\mathbf{\hat{y}}$ and actual values $\mathbf{y}$:
 
 \begin{equation}
-g: \mathbb{R}^k \times \mathbb{R}^k \rightarrow \mathbb{R}^+
+    E(M) = \frac{1}{k} \sum_{i=1}^{k} \sqrt{\frac{1}{m} \sum_{j=1}^{m} (\hat{y}_{ij} - y_{ij})^2}
 \end{equation}
 
-where $g(\mathbf{\hat{y}}, \mathbf{y})$ denotes the magnitude of error between the two vectors.
-The precise form of $g$ can vary based on the specific metric chosen to measure the difference. The function $g$ serves as a benchmark to assess the model's predictive accuracy.
+Where \( \hat{y}_{ij} \) is the \( i^{th} \) component of the output vector \( \hat{y} \) for the \( j^{th} \) sample in the dataset \( D \), as produced by the hypothesis function \( f \) of model \( M \). Similarly, \( y_{ij} \) is the actual weight percentage of the \( i^{th} \) major oxide \( o_i \in O \) for the \( j^{th} \) sample.
 
+Let $C = \{C_1, C_2, \ldots, C_n\}$ be the set of components that comprise a model $M$.
+Given such a model and the set of its components, we define an experiment $X$ to be a change to the model $M$ that affects a subset $S(X) \subseteq C$ of its components.
+The effect of an experiment $X$ on the model $M$ results in a new model $M\underset{X}{\rightarrow}M'$ and is measured by the change in the error before and after the experiment, denoted by $\Delta E = E(M) - E(M')$.
+$\Delta E > 0$ indicates an improvement in the model error, $\Delta E < 0$ indicates a deterioration in the model error, and $\Delta E = 0$ indicates no change in the model error.
+We add the model $M'$ to a set $\mathcal{M}$, which is the set of models that result from the experiments.
+This leads us to the following challenge:
 
-Let $C$ be the set of components that comprise the model $M$.
-Each component $c_j \in C$ is responsible for a specific task in predicting the composition of major oxides in geological samples.
-The overall error $E$ of the model \( M \) is quantified by the loss function \( g \) as:
+\textbf{Problem}: Given the set $\mathcal{M}$ 
+% The primary goal of the experiments is to minimize the overall model error $E(M)$ for a model $M\in\mathcal{M}$, where $\mathcal{M}$ denotes the set of models from the experiments, while improving the model's robustness against matrix effects.
+% The objective function can be formulated as:
+
+% \[
+% \min_{M \in \mathcal{M}} E(M)
+% \]
+
+We aim to rank \( C \) in terms of their contribution to \( E(M) \) by observing \( \Delta E \) through various experiments \( X \).
+
+The ranking \( R \) can be formulated as:
 
 \[
-E = g(\mathbf{\hat{y}}, \mathbf{y})
+R = \text{sort}\left( \frac{\Delta E}{|S(X)|} \right) \quad \text{for each } X
 \]
 
-To measure the contribution of each component \( c_j \) to this overall error, we introduce a term \( \Delta g_j \) which is defined as:
+Hver M' har en error E(M') = dependent variable
+Ranger alle M' baseret på den error
+Independent variable = deres componenter
+Destructure M' og kig på dens componenter
 
-\[
-\Delta g_j = g(\mathbf{\hat{y}}, \mathbf{y}) - g(F_j(\mathbf{\hat{y}}), F_j(\mathbf{y}))
-\]
+M' har C' som componenter, hvor C' er en subset af C, og hver component i C' har en error E(C') = indepedent variable, som E(M') er afhængig af
 
-Here, \( F_j(\mathbf{\hat{y}}) \) and \( F_j(\mathbf{y}) \) are the predicted and true vectors with the influence of component \( c_j \) controlled for. To control for \( c_j \), we modify it in a way that neutralizes its effect on the overall prediction, thereby isolating its contribution to the overall error.
-Then, we aim to address the following problem in this work:
+Let $C = \{C_1, C_2, \ldots, C_n\}$ be the set of components that comprise a model $M$.
 
-\textbf{Problem:} For each component \( c_j \in C \), calculate \( \Delta g_j \) to quantify its contribution to the overall error \( g(\mathbf{\hat{y}}, \mathbf{y}) \). Subsequently, rank the components in order of their \( \Delta g_j \) values to identify the most critical elements affecting the model's predictive accuracy.
-
-In the next paragraphs, we provide insights into the specific components of the MOC model and their respective tasks in predicting the composition of major oxides in geological samples.
+M = C1 + C2 .. 
+M' = C1' + C2' ...
 
 
+
+
+
+Identify specific components = destructure hver M'
+% In this work, we aim to identify and propose improvements to the specific components of the current MOC model that limit its predictive accuracy and robustness against matrix effects.
+%Her skriver jeg
+
+
+\subsection{Model Improvement}
+After identifying the high-ranking components in \( R \), we focus on proposing and implementing improvements to them, and measure the resulting \( \Delta E \) to validate the effectiveness of the improvements.
+
+
+% \subsection{comment}
 % In this work, we aim to identify and propose improvements to the specific components of the current MOC model that limit its predictive accuracy and robustness against matrix effects.
 % We have a model which is comprised of various components. Each component contributes to the overall error in some way.
 % By identifying the specific components that contribute the most to the overall error, we can focus our efforts on improving these components.
@@ -63,3 +88,20 @@ In the next paragraphs, we provide insights into the specific components of the 
 % We can then rank the components in order of their contribution to the overall error.
 % The components that contribute the most to the overall error are the ones that we should focus on improving.
 % We can then propose improvements to these components and measure the effect of these improvements on the overall error.
+% \subsection{comment-end}
+
+% Let's introduce the following notations:
+% \begin{itemize}
+% \item \( E(M) \): The overall error of the model \( M \)
+% \item \( E(C_i) \): The error contributed by component \( C_i \)
+% \item \( \Delta E \): Change in overall error \( E(M) \) due to an experiment
+% \item \( X \): A specific experiment (e.g., ablation study, hyperparameter tuning, etc.)
+% \item \( S(X) \): The subset of components affected by experiment \( X \)
+% \end{itemize}
+
+\subsection{Objective Function}
+The primary goal is to minimize the overall error \( E(M) \) while improving the model's robustness against matrix effects. The objective function can be formulated as:
+
+\[
+\min_{C \in M} E(M)
+\]
