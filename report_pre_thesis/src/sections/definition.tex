@@ -25,83 +25,22 @@ Where \( \hat{y}_{ij} \) is the \( i^{th} \) component of the output vector \( \
 
 Let $C = \{C_1, C_2, \ldots, C_n\}$ be the set of components that comprise a model $M$.
 Given such a model and the set of its components, we define an experiment $X$ to be a change to the model $M$ that affects a subset $S(X) \subseteq C$ of its components.
+Let $\mathcal{X} = \{X_1, X_2, \ldots, X_k\}$ be the set of experiments, where each $X_i$ is a function mapping from a model $M$ to a new model $M'$, defined as:
+
+$$
+X_i: M \mapsto M\underset{X_i}{\rightarrow}M'
+$$
+
+Further, associate with each experiment $X_i$ a corresponding change set $S(X_i)$:
+
+$$
+S(X_i) \subseteq C
+$$
+
 The effect of an experiment $X$ on the model $M$ results in a new model $M\underset{X}{\rightarrow}M'$ and is measured by the change in the error before and after the experiment, denoted by $\Delta E = E(M) - E(M')$.
-$\Delta E > 0$ indicates an improvement in the model error, $\Delta E < 0$ indicates a deterioration in the model error, and $\Delta E = 0$ indicates no change in the model error.
-We add the model $M'$ to a set $\mathcal{M}$, which is the set of models that result from the experiments.
+$\Delta E > 0$ indicates an improvement in the model error, $\Delta E < 0$ indicates a deterioration in the model error, and  $\Delta E = 0$ indicates no change in the model error.
+We add the model $M'$ to a set  $\mathcal{M}$, which is the set of models that result from the experiments.
+
 This leads us to the following challenge:
 
-\textbf{Problem}: Given the set $\mathcal{M}$ 
-% The primary goal of the experiments is to minimize the overall model error $E(M)$ for a model $M\in\mathcal{M}$, where $\mathcal{M}$ denotes the set of models from the experiments, while improving the model's robustness against matrix effects.
-% The objective function can be formulated as:
-
-% \[
-% \min_{M \in \mathcal{M}} E(M)
-% \]
-
-We aim to rank \( C \) in terms of their contribution to \( E(M) \) by observing \( \Delta E \) through various experiments \( X \).
-
-The ranking \( R \) can be formulated as:
-
-\[
-R = \text{sort}\left( \frac{\Delta E}{|S(X)|} \right) \quad \text{for each } X
-\]
-
-Hver M' har en error E(M') = dependent variable
-Ranger alle M' baseret på den error
-Independent variable = deres componenter
-Destructure M' og kig på dens componenter
-
-M' har C' som componenter, hvor C' er en subset af C, og hver component i C' har en error E(C') = indepedent variable, som E(M') er afhængig af
-
-Let $C = \{C_1, C_2, \ldots, C_n\}$ be the set of components that comprise a model $M$.
-
-M = C1 + C2 .. 
-M' = C1' + C2' ...
-
-
-
-
-
-Identify specific components = destructure hver M'
-% In this work, we aim to identify and propose improvements to the specific components of the current MOC model that limit its predictive accuracy and robustness against matrix effects.
-%Her skriver jeg
-
-
-\subsection{Model Improvement}
-After identifying the high-ranking components in \( R \), we focus on proposing and implementing improvements to them, and measure the resulting \( \Delta E \) to validate the effectiveness of the improvements.
-
-
-% \subsection{comment}
-% In this work, we aim to identify and propose improvements to the specific components of the current MOC model that limit its predictive accuracy and robustness against matrix effects.
-% We have a model which is comprised of various components. Each component contributes to the overall error in some way.
-% By identifying the specific components that contribute the most to the overall error, we can focus our efforts on improving these components.
-% In order to figure out which components contribute the most to the overall error, we need to be able to measure the error of each component.
-% To some extent, some components can be isolated while others have a high degree of interdependence.
-
-% First, we have to create a baseline to compare against - this would be a reproduction of the current MOC model.
-% The next step is to perform different experiments (ablation study, hyperparameter tuning, pre-processing, normalization, ensemble models etc.).
-% The goal is to measure the effect of each experiment on the overall error.
-% These experiments serve as an indirect measure of the contribution of each component to the error.
-% Each experiment will only affect a localized subset of the components.
-% By measuring the effect of each experiment on the overall error, we can infer the contribution of each component to the overall error.
-% The inference is based on the assumption that the components that are most affected by the experiments are the ones that contribute the most to the overall error.
-% We can then rank the components in order of their contribution to the overall error.
-% The components that contribute the most to the overall error are the ones that we should focus on improving.
-% We can then propose improvements to these components and measure the effect of these improvements on the overall error.
-% \subsection{comment-end}
-
-% Let's introduce the following notations:
-% \begin{itemize}
-% \item \( E(M) \): The overall error of the model \( M \)
-% \item \( E(C_i) \): The error contributed by component \( C_i \)
-% \item \( \Delta E \): Change in overall error \( E(M) \) due to an experiment
-% \item \( X \): A specific experiment (e.g., ablation study, hyperparameter tuning, etc.)
-% \item \( S(X) \): The subset of components affected by experiment \( X \)
-% \end{itemize}
-
-\subsection{Objective Function}
-The primary goal is to minimize the overall error \( E(M) \) while improving the model's robustness against matrix effects. The objective function can be formulated as:
-
-\[
-\min_{C \in M} E(M)
-\]
+\textbf{Problem}: Given a set of experiments $\mathcal{X}$ and the resulting set of models $\mathcal{M}$, identify the components $C \in M$ that contribute the most to the overall error $E(M)$. 
