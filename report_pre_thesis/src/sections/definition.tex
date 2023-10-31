@@ -9,19 +9,38 @@ The dataset $D$ is given by:
 Each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
 This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
 
-Given a set of major oxides $E$ where $k=|E|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
-The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [o_{1}, o_{2}, \ldots, o_{8}]$ where $o_{i}$ is the predicted value of the weight percentage of the $i^{th}$ major oxide.
+Given a set of major oxides $O$ where $k=|O|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
+The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{8}]$ where $\hat{y}_{i}$ is the predicted weight percentage of the major oxide $o_i \in O$.
 The sum of the predicted weight percentages is not necessarily equal to 100\%.
 The samples may contain other elements that are not considered major oxides, which would account for the difference.
 If the sum of the predicted weight percentages is greater than 100\%, the model is overestimating the weight percentages, and represents a physical impossibility.
 
-We introduce a general loss function $g$ that quantifies the disparity between predicted weight percentages $\mathbf{\hat{y}}$ and the true weight percentages $\mathbf{y}$:
+We define a function $E$ to measure the error of a model $M$ based on the RMSE of the predictions for each oxide $\mathbf{\hat{y}}$ and actual values $\mathbf{y}$:
 
 \begin{equation}
-g: \mathbb{R}^k \times \mathbb{R}^k \rightarrow \mathbb{R}^+
+    E(M) = \frac{1}{k} \sum_{i=1}^{k} \sqrt{\frac{1}{m} \sum_{j=1}^{m} (\hat{y}_{ij} - y_{ij})^2}
 \end{equation}
 
-where $g(\mathbf{\hat{y}}, \mathbf{y})$ denotes the magnitude of error between the two vectors.
-The precise form of $g$ can vary based on the specific metric chosen to measure the difference. The function $g$ serves as a benchmark to assess the model's predictive accuracy.
+Where \( \hat{y}_{ij} \) is the \( i^{th} \) component of the output vector \( \hat{y} \) for the \( j^{th} \) sample in the dataset \( D \), as produced by the hypothesis function \( f \) of model \( M \). Similarly, \( y_{ij} \) is the actual weight percentage of the \( i^{th} \) major oxide \( o_i \in O \) for the \( j^{th} \) sample.
 
-% R^+ denotes the postiive real numbers
+Let $C = \{C_1, C_2, \ldots, C_n\}$ be the set of components that comprise a model $M$.
+Given such a model and the set of its components, we define an experiment $X$ to be a change to the model $M$ that affects a subset $S(X) \subseteq C$ of its components.
+Let $\mathcal{X} = \{X_1, X_2, \ldots, X_k\}$ be the set of experiments, where each $X_i$ is a function mapping from a model $M$ to a new model $M'$, defined as:
+
+$$
+X_i: M \mapsto M\underset{X_i}{\rightarrow}M'
+$$
+
+Further, associate with each experiment $X_i$ a corresponding change set $S(X_i)$:
+
+$$
+S(X_i) \subseteq C
+$$
+
+The effect of an experiment $X$ on the model $M$ results in a new model $M\underset{X}{\rightarrow}M'$ and is measured by the change in the error before and after the experiment, denoted by $\Delta E = E(M) - E(M')$.
+$\Delta E > 0$ indicates an improvement in the model error, $\Delta E < 0$ indicates a deterioration in the model error, and  $\Delta E = 0$ indicates no change in the model error.
+We add the model $M'$ to a set  $\mathcal{M}$, which is the set of models that result from the experiments.
+
+This leads us to the following challenge:
+
+\textbf{Problem}: Given a set of experiments $\mathcal{X}$ and the resulting set of models $\mathcal{M}$, identify the components $C \in M$ that contribute the most to the overall error $E(M)$. 
