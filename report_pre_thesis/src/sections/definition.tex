@@ -1,11 +1,17 @@
 \section{Definition}\label{sec:definition}
-Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities.
+This section introduces the LIBS dataset and the hypothesis function for predicting the composition of major oxides, establishing the foundation for model evaluation and optimization in our study.
 
-The dataset $D$ is given by $D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}$, where each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
-This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
+\begin{definition}\label{def:dataset}
+    Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities.
 
-Given a set of major oxides $O$ where $k=|O|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
-The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{8}]$ where $\hat{y}_{i}$ is the predicted weight percentage of the major oxide $o_i \in O$.
+    The dataset $D$ is given by $D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}$, where each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
+    This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
+\end{definition}
+
+\begin{definition}\label{def:hypothesis_function}
+    Given a set of major oxides $O$ where $k=|O|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
+    The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{8}]$ where $\hat{y}_{i}$ is the predicted weight percentage of the major oxide $o_i \in O$.
+\end{definition}
 The sum of the predicted weight percentages is not necessarily equal to 100\%, but is not expected to surpass 100\%.
 The samples may contain other elements that are not considered major oxides, which would account for the difference.
 If the sum of the predicted weight percentages is greater than 100\%, the model is overestimating the weight percentages, and represents a physical impossibility.
@@ -13,7 +19,7 @@ If the sum of the predicted weight percentages is greater than 100\%, the model 
 There are various methods to evaluate the performance of a model.
 We use the average RMSE of the predictions for each oxide $\mathbf{\hat{y}}$ and actual values $\mathbf{y}$, denoted $E$, as the error metric for the model:
 
-\begin{equation}
+\begin{equation}\label{eq:avg_rmse_metric}
     E(M) = \frac{1}{k} \sum_{i=1}^{k} \sqrt{\frac{1}{m} \sum_{j=1}^{m} (\hat{y}_{ij} - y_{ij})^2}
 \end{equation}
 
