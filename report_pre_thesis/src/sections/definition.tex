@@ -1,21 +1,17 @@
 \section{Definition}\label{sec:definition}
 Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities.
-The dataset $D$ is given by:
 
-\begin{equation}
-    D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}
-\end{equation}
-
-Each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
+The dataset $D$ is given by $D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}$, where each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point, measured in nanometers, and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
 This vector captures the intensity values at $\lambda_i$ for each of the $m$ shots, measured in units of photons per channel.
 
 Given a set of major oxides $O$ where $k=|O|$, define a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$ to predict the composition of the $k$ major oxides in geological samples.
 The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{8}]$ where $\hat{y}_{i}$ is the predicted weight percentage of the major oxide $o_i \in O$.
-The sum of the predicted weight percentages is not necessarily equal to 100\%.
+The sum of the predicted weight percentages is not necessarily equal to 100\%, but is not expected to surpass 100\%.
 The samples may contain other elements that are not considered major oxides, which would account for the difference.
 If the sum of the predicted weight percentages is greater than 100\%, the model is overestimating the weight percentages, and represents a physical impossibility.
 
-We define a function $E$ to measure the error of a model $M$ based on the RMSE of the predictions for each oxide $\mathbf{\hat{y}}$ and actual values $\mathbf{y}$:
+There are various methods to evaluate the performance of a model.
+We use the average RMSE of the predictions for each oxide $\mathbf{\hat{y}}$ and actual values $\mathbf{y}$, denoted $E$, as the error metric for the model:
 
 \begin{equation}
     E(M) = \frac{1}{k} \sum_{i=1}^{k} \sqrt{\frac{1}{m} \sum_{j=1}^{m} (\hat{y}_{ij} - y_{ij})^2}
@@ -23,24 +19,13 @@ We define a function $E$ to measure the error of a model $M$ based on the RMSE o
 
 Where \( \hat{y}_{ij} \) is the \( i^{th} \) component of the output vector \( \hat{y} \) for the \( j^{th} \) sample in the dataset \( D \), as produced by the hypothesis function \( f \) of model \( M \). Similarly, \( y_{ij} \) is the actual weight percentage of the \( i^{th} \) major oxide \( o_i \in O \) for the \( j^{th} \) sample.
 
-Let $C = \{C_1, C_2, \ldots, C_n\}$ be the set of components that comprise a model $M$.
-Given such a model and the set of its components, we define an experiment $X$ to be a change to the model $M$ that affects a subset $S(X) \subseteq C$ of its components.
-Let $\mathcal{X} = \{X_1, X_2, \ldots, X_k\}$ be the set of experiments, where each $X_i$ is a function mapping from a model $M$ to a new model $M'$, defined as:
-
-$$
-X_i: M \mapsto M\underset{X_i}{\rightarrow}M'
-$$
-
-Further, associate with each experiment $X_i$ a corresponding change set $S(X_i)$:
-
-$$
-S(X_i) \subseteq C
-$$
-
-The effect of an experiment $X$ on the model $M$ results in a new model $M\underset{X}{\rightarrow}M'$ and is measured by the change in the error before and after the experiment, denoted by $\Delta E = E(M) - E(M')$.
-$\Delta E > 0$ indicates an improvement in the model error, $\Delta E < 0$ indicates a deterioration in the model error, and  $\Delta E = 0$ indicates no change in the model error.
-We add the model $M'$ to a set  $\mathcal{M}$, which is the set of models that result from the experiments.
+Let $M_{MOC}$ be the baseline model recreated based on the original MOC model. $M_{MOC}$ is comprised of various components.
+Our plan is to perform a series of experiments on $M_{MOC}$ by making changes to a select number of these components.
+By doing so, we transform the original model $M_{MOC}$ into a new model $M$, which retains most of the original components and structure of $M_{MOC}$, with the exception of the modified components.
+We will conduct several different experiments, each targeting different components of the model.
+For every experiment, we will note which specific parts of the model were altered.
+The goal is to measure how each experiment affects the model's performance by looking at the difference in errors before and after the changes.
 
 This leads us to the following challenge:
 
-\textbf{Problem}: Given a set of experiments $\mathcal{X}$ and the resulting set of models $\mathcal{M}$, identify the components $C \in M$ that contribute the most to the overall error $E(M)$. 
+\textbf{Problem}: Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error $E(M)$. 
