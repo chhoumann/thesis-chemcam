@@ -22,16 +22,32 @@ There is no agreed-upon state of the art method for quantitative analysis of LIB
 
 Since then, there have been several studies that have tried to address the limitations of the approach used by Anderson et al. 2017.
 
-Takashi et al. reviewed evaluated methods for correcting matrix effects and self-absorption in the quantitative analysis of solid compositions via LIBS.
+\citeauthor{takahashi_quantitative_2017} \cite{takahashi_quantitative_2017} evaluated methods for correcting matrix effects and self-absorption in the quantitative analysis of solid compositions via LIBS.
 They found that while traditional calibration methods for LIBS face challenges with complex in-situ samples, CF-LIBS is limited by the need for prior sample knowledge.
 Multivariate analysis techniques like PCR and PLS handle matrix effects well but struggle with non-linearities like self-absorption.
 Despite limited research into the use of ANNs for quantitative analysis of solid samples, they found that ANN showed potential to overcome these issues because ANNs are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.
 However, ANNs is limited by the need for a large number of training samples.
 They conclude that simpler matrices favor theory-based methods, and more complex samples benefit from flexible statistical approaches, with computational advancements promising further improvements in LIBS analysis.
 
-Lepore et al. examine how dividing LIBS spectra into submodels, as presented in Anderson, impacts the prediction of major element compositions.
-Their findings highlight that, although submodeling is a promising approach, lower Root Mean Square Errors of Prediction (RMSEP) are often obtained when using the entire spectrum, indicating that a comprehensive dataset generally leads to more accurate geochemical analysis.
+\citeauthor{lepore_quantitative_2022} \cite{lepore_quantitative_2022} examine how dividing LIBS spectra into submodels, as presented in Anderson, impacts the prediction of major element compositions.
+Their findings highlight that, although submodeling is a promising approach, lower Root Mean Square Errors of Prediction (RMSE-P) are often obtained when using the entire spectrum, indicating that a comprehensive dataset generally leads to more accurate geochemical analysis.
 
+\citeauthor{bai_application_2023} \cite{bai_application_2023} explored elastic net regression for analyzing Mars-analog LIBS data and demonstrated that it efficiently balances feature selection with model stability.
+This technique was proficient in detecting relevant spectral lines, which is crucial for interpreting multivariate data.
+The elastic net model was trained with three normalization methods (Norm 1, Norm 3, and Standard Normal Variate\todo{Explain Norm 1, Norm 3 and SNV somewhere, refer back to it here}) and their findings suggest Norm 3 as the optimal normalization technique for this context.
+The elastic net provided reliable SiO2 estimates in Martian soil analogs, often aligning closely with or surpassing traditional ChemCam team models.
+Across a vast dataset of over 23,000 Mars spectra, the elastic net showed strong correlations with established models, though some challenges in iron oxide predictions were noted.\cite{bai_application_2023}
+
+\citeauthor{dyar_effect_2021} \cite{dyar_effect_2021} found that accuracy in geochemical quantification with LIBS improves as the training set size increases, specifically a minimum of 31\% improvement for 65 elements.
+They highlighted that a larger training set more significantly influences accuracy than spectral resolution or detector sensitivity.
+They concluded that Root Mean Square Error of Prediction (RMSE-P) is the most accurate measure for large datasets, while Root Mean Square Error of Cross Validation  (RMSE-CV) is better than Root Mean Square Error of Calibration (RMSE-C), especially for smaller datasets where holding out a test set is impractical.
+The research suggests a balance between dataset size and practicality, indicating that while more data improves accuracy, the returns diminish against the costs of data acquisition.
+
+\citeauthor{castorena_deep_2021} \cite{castorena_deep_2021} developed a deep spectral convolutional neural network (CNN) for processing and analyzing laser-induced breakdown spectroscopy (LIBS) signals.
+Their CNN is designed to first remove uncertainties from sensor data and then assess the chemical content qualitatively and quantitatively from a sample's LIBS signal.
+Their experiments showed that their method surpasses existing ones used by the Mars Science Laboratory for pre-processing and calibration.
+Notably, their CNN operates in real-time and does not require additional information like dark current, system response, temperature, or range.
+For chemical content estimation, their CNN matches current techniques' performance and even exceeds them when utilizing an end-to-end learning approach, all the while reducing prior information requirements and being ready for immediate deployment.
 
 - Decision Tree regression
 - Back propagration neural networks
@@ -52,11 +68,11 @@ Their findings highlight that, although submodeling is a promising approach, low
 	\item Which limitations do they face? (e.g. matrix effects).
 	\item Related work since 2017 that has tried to address these limitations/suggest improvements.
 	\begin{itemize}
-		\item Kate et al.'s work
-		\item CNN approach
-		\item Elastic net
-		\item Larger dataset
-		\item Compensation of matrix effects (https://www.scopus.com/record/display.uri?eid=2-s2.0-85031935321&origin=resultslist&sort=plf-f&cite=2-s2.0-85010886895&src=s&nlo=&nlr=&nls=&imp=t&sid=80e7a93fa62b9ee1c75d5f3366219938&sot=cite&sdt=a&sl=0&relpos=63&citeCnt=104&searchTerm=)
+		\item Kate et al.'s work ✅
+		\item CNN approach ✅
+		\item Elastic net ✅
+		\item Larger dataset ✅
+		\item Compensation of matrix effects ✅
 	\end{itemize}
 	\item Other fields
 \end{itemize}
