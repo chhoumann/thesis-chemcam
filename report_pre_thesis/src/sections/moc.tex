@@ -10,20 +10,10 @@ We illustrate the data processing and calibration steps for LIBS data leading to
 
 \subsection{Data Preprocessing}\label{sec:data_preprocessing}
 
-The initial phase of processing the raw emission data records (EDR) involves a series of steps to clean up the spectra for subsequent analysis.
-The pipeline, as illustrated in Figure \ref{fig:libs_data_processing}, commences with the subtraction of the dark spectrum.
-This step is crucial to isolate the signal emanating solely from the plasma, thereby removing the effects of ambient light and reflected sunlight that are present when the laser is not employed.
+The raw emission data records for LIBS analysis undergo preprocessing to remove noise and other interferences, starting with dark spectrum subtraction and applying an undecimated wavelet transform and wavelength calibration.
+The process proceeds with the removal of irrelevant continuum emissions and finishes with a photon count calibration to produce clean and calibrated spectra ready for compositional analysis.
+The data format resulting from preprocessing is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
 
-To further refine the spectra, an undecimated wavelet transform is applied.
-This advanced signal processing technique effectively reduces noise while preserving the essential features of the spectrum.
-The subsequent wavelength calibration ensures the precise alignment of spectra by compensating for wavelength shifts as a function of temperature across every pixel.
-
-A critical step in preprocessing is the removal of the continuum, which predominantly arises from Bremsstrahlung emission and ion recombination.
-The continuum is subtracted because it carries minimal information pertinent to the target material's composition.
-The processed data, at this stage, is referred to as the reduced data record (RDR).
-
-The final step in data preparation involves the conversion of the spectral data from counts to photons by applying an instrument response function (IRF) correction.
-This yields a set of cleaned and calibrated spectra (CCS), primed for the subsequent compositional analysis.
 
 \subsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
 
