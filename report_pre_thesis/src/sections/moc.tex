@@ -13,6 +13,7 @@ We illustrate the data processing and calibration steps for LIBS data leading to
 The raw emission data records for LIBS analysis undergo preprocessing to remove noise and other interferences, starting with dark spectrum subtraction and applying an undecimated wavelet transform and wavelength calibration.
 The process proceeds with the removal of irrelevant continuum emissions and finishes with a photon count calibration to produce clean and calibrated spectra ready for compositional analysis.
 The data format resulting from preprocessing is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
+This format is a matrix of intensity values for each wavelength, with each row representing the intensities for a given shot.
 
 
 \subsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
