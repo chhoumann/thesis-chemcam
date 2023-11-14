@@ -1,5 +1,5 @@
 \subsection{The Multivariate Oxide Composition Model}\label{sec:moc}
-\begin{figure}[H]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.45\textwidth]{images/pipeline.png}
     \caption{Flowchart illustrating MOC derivation via the ChemCam team's MOC model: data processing and calibration steps given LIBS data.}
@@ -8,15 +8,30 @@
 
 We illustrate the data processing and calibration steps for LIBS data leading to the derivation of Multivariate Oxide Composition (MOC) in Figure \ref{fig:libs_data_processing}. The MOC model is described in details by \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}, but we provide a brief overview here, which will serve as a foundation for the subsequent discussion of our work.
 
-\subsection{Data Preprocessing}\label{sec:data_preprocessing}
+\subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
 
-The raw emission data records for LIBS analysis undergo preprocessing to remove noise and other interferences, starting with dark spectrum subtraction and applying an undecimated wavelet transform and wavelength calibration.
-The process proceeds with the removal of irrelevant continuum emissions and finishes with a photon count calibration to produce clean and calibrated spectra ready for compositional analysis.
-The data format resulting from preprocessing is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
-This format is a matrix of intensity values for each wavelength, with each row representing the intensities for a given shot.
+Since we do not consider the data preprocessing phase, we omit detailing the process. However, it is important to note that the preprocessing phase occurs before the data is fed into the MOC model.
+The resulting data format is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
+This format is a matrix of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength. An example of this data format is shown in Table~\ref{tab:example_data}. There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample. The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
+
+\begin{table}[ht]
+\centering
+\caption{Exemplary Data of Wavelengths and Shots}
+\label{tab:example_data}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+Wavelength & Shot 1   & Shot 2 & \ldots & Shot 50  \\ \hline
+240.81     & 6.40e+15 & 4.04e+15 & \ldots& 1.75e+15 \\ \hline
+240.86     & 3.85e+12 & 2.29e+12& \ldots & 7.28e+11 \\ \hline
+\ldots     & \ldots & \ldots & \ldots & \ldots \\ \hline
+905.38     & 1.88e+8 & 5.85e+7 & \ldots & 5.21e+9 \\ \hline
+905.57     & 1.98e+10 & 1.29e+10& \ldots & 1.22e+10 \\ \hline
+\end{tabular}
+\end{table}
 
 
-\subsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
+
+\subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
 
 The multivariate analysis employs a composite approach integrating partial least squares regression with submodels (PLS-SM) and independent component analysis (ICA) to derive the Multivariate Oxide Composition (MOC).
 The PLS-SM approach utilizes tailored sub-models for distinct composition ranges, enhancing accuracy at the boundaries of these ranges.
