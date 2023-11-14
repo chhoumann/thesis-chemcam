@@ -1,0 +1,85 @@
+\subsection{The Multivariate Oxide Composition Model}\label{sec:moc}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/pipeline.png}
+    \caption{Flowchart illustrating MOC derivation via the ChemCam team's MOC model: data processing and calibration steps given LIBS data.}
+    \label{fig:libs_data_processing}
+\end{figure}
+
+We illustrate the data processing and calibration steps for LIBS data leading to the derivation of Multivariate Oxide Composition (MOC) in Figure \ref{fig:libs_data_processing}. The MOC model is described in details by \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}, but we provide a brief overview here, which will serve as a foundation for the subsequent discussion of our work.
+
+\subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
+
+Since we do not consider the data preprocessing phase, we omit detailing the process. However, it is important to note that the preprocessing phase occurs before the data is fed into the MOC model.
+The resulting data format is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
+This format is a matrix of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength. An example of this data format is shown in Table~\ref{tab:example_data}. There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample. The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
+
+\begin{table}[ht]
+\centering
+\caption{Exemplary Data of Wavelengths and Shots}
+\label{tab:example_data}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+Wavelength & Shot 1   & Shot 2 & \ldots & Shot 50  \\ \hline
+240.81     & 6.40e+15 & 4.04e+15 & \ldots& 1.75e+15 \\ \hline
+240.86     & 3.85e+12 & 2.29e+12& \ldots & 7.28e+11 \\ \hline
+\ldots     & \ldots & \ldots & \ldots & \ldots \\ \hline
+905.38     & 1.88e+8 & 5.85e+7 & \ldots & 5.21e+9 \\ \hline
+905.57     & 1.98e+10 & 1.29e+10& \ldots & 1.22e+10 \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+\subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
+
+The multivariate analysis employs a composite approach integrating partial least squares regression with submodels (PLS-SM) and independent component analysis (ICA) to derive the Multivariate Oxide Composition (MOC).
+The PLS-SM approach utilizes tailored sub-models for distinct composition ranges, enhancing accuracy at the boundaries of these ranges.
+Independent Component Analysis assists in distinguishing elemental emission lines, contributing to a refined multivariate model.
+
+Two normalization methods are employed in the analysis: Norm 1 and Norm 3.
+Norm 1 standardizes the full spectrum across all three spectrometers such that the sum total is unity.
+In contrast, Norm 3 conducts normalization on a per-spectrometer basis, culminating in a full normalized spectrum summing to three.
+The optimal normalization technique is selected based on its efficacy in model performance for the specific analysis task at hand.
+
+\subsubsection{Outlier Removal}\label{sec:outlier_removal}
+
+In their analysis, \citet{andersonImprovedAccuracyQuantitative2017} employed a methodical outlier removal process to enhance model accuracy in multivariate regression. To detect outliers, they utilized influence plots, leveraging statistical measures that reflect each data point's deviation from the model's predictions and their influence on the model due to their position in the predictor space.
+
+% The process involves using influence plots, which display points by their spectral residual, or $Q$ statistic, and leverage, $h_{T}$. Leverage is computed as $h_{t} = \text{diag}\left[ t(t^{T}t)^{-1}t^{T} \right]$, reflecting the distance of an observation's predictors from those of other observations. High leverage points are prospective outliers with respect to independent variables. The relationship between leverage and Hotelling's $T^{2}$ statistic indicates that leverage can serve as a measure of spectral distance from the center of space defined by the latent variables of the model.
+% The residual $Q$ is a metric of fit, quantifying the sum of the squared differences between the observed spectrum $X$ and the model-reconstructed spectrum using scores $t$ and loadings $P$, with $e = X - tP'$ and $Q_{i} = e_{i}e_{i}'$. By marking each spectrum from the training dataset on an influence plot with coordinates based on leverage and residual $Q$, outliers stand out distinctly from the cloud of points either along the leverage, residual, or both axes.
+
+Outlier removal is performed iteratively; an initial PLS model is conceived with cross-validation to determine the optimum number of latent variables, followed by an inspection of the influence plot to pinpoint outliers. Identified outliers are removed, and the model is re-evaluated. This procedure is repeated as needed, ensuring that any removals do not degrade the model's general performance.
+
+
+\subsubsection{Partial Least Squares Sub-Models}\label{sec:pls_submodels}
+
+\citet{andersonImprovedAccuracyQuantitative2017} proposed an approach referred to as the Partial Least Squares Sub-Models (PLS1-SM).
+The inherent variability of LIBS spectral responses to different element concentrations necessitates a nuanced analysis. High element concentrations tend to obscure the spectral signal, and the presence of other elements further complicates the spectral response. A single regression model typically falls short in accounting for such variations, leading to compromises in predictive precision for specific samples.
+
+They deployed multiple regression models, each tailored to subsets of the entire composition range, targeting "low," "mid," and "high" concentrations along with a comprehensive "full model." This led to the formation of 32 distinct models, with selected sub-model ranges that prioritize both a robust dataset and precise compositional response.
+
+Each sub-model was subjected to training, cross-validation, and optimization phases, which included the iterative outlier removal strategy mentioned in section~\ref{sec:outlier_removal}. The full model's preliminary composition estimation of unknown targets dictates the choice of subsequent sub-model(s) for refined prediction.
+
+PLS1-SM blends predictions from sub-models with overlapping concentration ranges. The predictions are linearly combined for a cohesive prediction. The full model projection $y_{\text{full}}$, if within a blend-ready range, determines the final prediction $y_{\text{final}}$ through a weighted sum of overlapping sub-model predictions:
+
+\begin{align*}
+w_{\text{mid}} &= \frac{y_{\text{full}}-y_{\text{blend range, min}}}{y_{\text{blend range, max}} - y_{\text{blend range, min}}} \\
+w_{\text{low}} &= 1 - w_{\text{mid}} \\
+y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}} 
+\end{align*}
+
+This applies analogously for predictions in the "mid-high" range to prevent prediction discontinuities.
+
+The exact delineations of the blending ranges are adjustable, with optimization performed using the Broyden-Fletcher-Goldfarb-Shannon (BFGS) algorithm. This process, aimed at minimizing the RMSE for the full model dataset, established optimal ranges. Initial blend boundaries were predicated on sub-model intersections, with exceptional outliers managed distinctly due to their deviation from expected value ranges.
+
+\subsubsection{Independent Component Analysis}\label{sec:ica}
+\citet{cleggRecalibrationMarsScience2017} and \cite{forniIndependentComponentAnalysis2013} proposed the use of Independent Component Analysis (ICA) to identify the elemental emission lines in LIBS spectra. Independent Component Analysis (ICA) is a computational method used to separate a multivariate signal into additive, statistically independent components, particularly useful in scenarios where the signal sources overlap, such as in LIBS data.
+
+ICA yields independent source components and the affiliated mixing matrix which illustrates how the independent sources are combined to form the observed spectral data.
+
+After the extraction of independent components, the key task is to associate each independent component with a single elemental emission line. This involves examining the elements' emission lines and determining the ICA scores, which are then utilized to derive a calibration curve relating the ICA score to the composition.
+
+To ascertain the accuracy of this calibration, a regression analysis is performed using multiple regression functions. The function that provides the most reliable fit (often assessed through chi-square values) is used to predict the composition for each element.
+
+Model refinement is facilitated by techniques such as normalization, outlier removal (via Median Absolute Deviation), and k-fold cross-validation. These methods ensure the robustness and reliability of the predictive model constructed through ICA.
