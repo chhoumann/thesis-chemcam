@@ -10,7 +10,7 @@ flowchart TD
 
     DP -->|"Cleaned, calibrated spectra (CCS)"| C
 
-    subgraph C["Calibration"]
+    subgraph C["Calibration for each oxide (8x)"]
         %% PLS-SM
         Input --> NOSM["`Normalize
         (Norm 1 or Norm 3)`"] --> F
