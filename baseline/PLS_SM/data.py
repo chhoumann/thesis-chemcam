@@ -1,3 +1,4 @@
+from sklearn.base import BaseEstimator, TransformerMixin
 import pandas as pd
 from pathlib import Path
 from typing import Optional
@@ -75,7 +76,8 @@ def load_data(
 
     Parameters:
     - dataset_loc (str): The location of the dataset.
-    - num_samples (Optional[int]): The number of samples to load. If None, load all samples.
+    - num_samples (Optional[int]): The number of samples to load.
+    If None, load all samples.
 
     Returns:
     - Dataset: The loaded dataset.
@@ -94,8 +96,181 @@ def load_data(
     return sample_data
 
 
-def split_data(
-    dataset: pd.DataFrame, split: float = 0.8
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    # Add your implementation here
-    pass
+# def split_data(
+#     dataset: pd.DataFrame, split: float = 0.8
+# ) -> tuple[pd.DataFrame, pd.DataFrame]:
+#     # Add your implementation here
+#     pass
+
+
+class WavelengthMaskTransformer(BaseEstimator, TransformerMixin):
+    """
+    Transformer to remove values in specified wavelength masks from input data.
+
+    Parameters:
+    -----------
+    masks : list
+        List of tuples representing the wavelength masks.
+        Each tuple should contain two values:
+        the lower and upper bounds of the mask.
+
+    Methods:
+    --------
+    fit(X, y=None)
+        Fit the transformer to the data.
+
+    transform(X)
+        Transform the input data by removing values within the
+        specified wavelength masks.
+
+    """
+
+    def __init__(self, masks):
+        self.masks = masks
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Apply transformation to the input data.
+
+        Parameters:
+        X (pd.DataFrame): The input data to be transformed.
+
+        Returns:
+        pd.DataFrame: The transformed data.
+        """
+        if not isinstance(X, pd.DataFrame):
+            raise ValueError("Input should be a pandas DataFrame.")
+
+        for mask in self.masks:
+            X = X.loc[~((X["wave"] >= mask[0]) & (X["wave"] <= mask[1]))]
+
+        return X
+
+
+def transform_samples(
+    sample_data: dict[str, list[pd.DataFrame]],
+    transformer: WavelengthMaskTransformer,
+) -> dict[str, list[pd.DataFrame]]:
+    """
+    Transform the input data by removing values within the specified
+    wavelength masks.
+
+    Parameters:
+    -----------
+    X_dict : dict
+        Dictionary with keys as sample names and values as lists of pandas
+        DataFrames, each item representing the data for a shot on the sample.
+
+    Returns:
+    --------
+    transformed_data : dict
+        Dictionary with keys as sample names and values as lists of
+        pandas DataFrames.
+    """
+    if not isinstance(sample_data, dict):
+        raise ValueError(
+            "Input should be a dictionary with keys as sample names and"
+            + " values as lists of pandas DataFrames."
+        )
+
+    transformed_data = {}
+    for sample_name, dfs in sample_data.items():
+        transformed_dfs = [transformer.transform(df) for df in dfs]
+        transformed_data[sample_name] = transformed_dfs
+
+    return transformed_data
+
+
+class SpectralDataReshaper(BaseEstimator, TransformerMixin):
+    def __init__(
+        self,
+        intensity_feature_name: str,
+        wavelength_feature_name: str,
+    ):
+        self.intensity_feature_name = intensity_feature_name
+        self.wave_feature_name = wavelength_feature_name
+        self.sample_size_ = None
+
+    def fit(self, X, y=None):
+        if not isinstance(X, pd.DataFrame):
+            raise ValueError("Input should be a pandas DataFrame.")
+
+        self.sample_size_ = len(X) // len(X[self.wave_feature_name].unique())
+        return self
+
+    def transform(self, X):
+        if self.sample_size_ is None:
+            raise RuntimeError(
+                "Transformer must be fitted before calling transform."
+            )
+
+        reshaped_values = X[self.intensity_feature_name].values.reshape(
+            self.sample_size_, -1
+        )
+        transformed_df = pd.DataFrame(
+            reshaped_values, columns=X[self.wave_feature_name].unique()
+        )
+
+        return transformed_df
+
+
+def attach_major_oxides(
+    transformed_df: pd.DataFrame,
+    sample_composition: pd.DataFrame,
+    major_oxides: list[str],
+):
+    oxides = sample_composition[major_oxides].iloc[0]
+    transformed_df = transformed_df.assign(**oxides)
+
+    return transformed_df
+
+
+class CompositionData:
+    def __init__(self, composition_data_loc: str):
+        self.composition_data = self.load_composition_data(
+            composition_data_loc
+        )
+
+    @staticmethod
+    def load_composition_data(composition_data_loc: str) -> pd.DataFrame:
+        return pd.read_csv(composition_data_loc)
+
+    def get_composition_for_sample(self, sample_name) -> pd.DataFrame:
+        sample_name_lower = sample_name.lower()
+        match_condition = (
+            (
+                self.composition_data["Spectrum Name"].str.lower()
+                == sample_name_lower
+            )
+            | (
+                self.composition_data["Target"].str.lower()
+                == sample_name_lower
+            )
+            | (
+                self.composition_data["Sample Name"].str.lower()
+                == sample_name_lower
+            )
+        )
+        composition = self.composition_data.loc[match_condition]
+
+        if composition.empty:
+            raise ValueError(
+                f"Could not find composition for sample: {sample_name}"
+            )
+
+        return composition
+
+    def create_sample_compositions_dict(
+        self, sample_names
+    ) -> dict[str, pd.DataFrame]:
+        sample_compositions = {}
+        for sample_name in sample_names:
+            comp = self.get_composition_for_sample(sample_name)
+            if comp.empty:
+                print(f"Could not find {sample_name} in labels")
+                continue
+            sample_compositions[sample_name] = comp
+        return sample_compositions
