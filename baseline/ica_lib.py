@@ -5,6 +5,7 @@ from numpy.linalg import eig, pinv
 from pathlib import Path
 import pandas as pd
 from reproduction import masks
+import matplotlib.pyplot as plt
 
 
 def check_input(X_input, num_sources=None, verbose=True):
@@ -45,7 +46,7 @@ def check_input(X_input, num_sources=None, verbose=True):
 
     return X_input, input_data_type, num_sources, num_samples
 
-def perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, verbose=False):
+def perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, verbose=True):
     """
     Perform Principal Component Analysis (PCA) and whitening on the given preprocessed data.
 
@@ -100,21 +101,29 @@ def perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, ve
     # Transpose the matrix so each row represents a principal component
     principal_components = principal_components.T
 
+    if verbose:
+        print("Shape of principal_components:", principal_components.shape)
+
     # Whitening: Scale the principal components to have unit variance
     # The scaling factor for each principal component is the inverse of the square root of its corresponding eigenvalue
     scaling_factors = np.sqrt(sorted_eigenvalues[:num_components])
-    whitening_matrix = np.diag(1. / scaling_factors) * principal_components.T
+    whitening_matrix = np.diag(1. / scaling_factors)
+    whitened_data = whitening_matrix @ principal_components @ preprocessed_data
 
+    if verbose:
+        print("Shape of whitening_matrix:", whitening_matrix.shape)
+        print("Shape of whitened_data:", whitened_data.shape)
     if verbose:
         print("jade -> PCA and whitening completed")
 
-    return principal_components, sorted_eigenvalues, whitening_matrix
+    return principal_components, sorted_eigenvalues, whitened_data
 
-def initialize_cumulant_matrices_storage(num_components):
+def initialize_cumulant_matrices_storage(num_samples, num_components):
     """
     Initialize the storage for cumulant matrices.
 
     Parameters:
+    num_samples (int): Number of samples in the dataset.
     num_components (int): Number of principal components.
 
     Returns:
@@ -123,25 +132,25 @@ def initialize_cumulant_matrices_storage(num_components):
     """
 
     # Validate input
+    if not isinstance(num_samples, int) or num_samples <= 0:
+        raise ValueError("num_samples must be a positive integer.")
     if not isinstance(num_components, int) or num_components <= 0:
         raise ValueError("num_components must be a positive integer.")
 
-    # Calculate the number of elements in a symmetric matrix of size num_components
-    # A symmetric matrix has (n * (n + 1)) / 2 unique elements.
-    dim_symmetric_matrices = (num_components * (num_components + 1)) / 2
-
-    # The number of cumulant matrices is equal to the number of unique elements
-    # in a symmetric matrix of size num_components.
-    num_cumulant_matrices = int(dim_symmetric_matrices)
+    # The number of cumulant matrices is equal to the number of components.
+    num_cumulant_matrices = num_components
 
     # Initialize a zero matrix for storing cumulant matrices.
-    # The size is num_components x (num_components * num_cumulant_matrices)
+    # The size is num_samples x (num_samples * num_cumulant_matrices)
     # This structure allows storing each cumulant matrix as a column block.
-    cumulant_matrices_storage = np.matrix(np.zeros([num_components, num_components * num_cumulant_matrices], dtype=np.float64))
+    cumulant_matrices_storage = np.matrix(np.zeros([num_samples, num_samples * num_cumulant_matrices], dtype=np.float64))
+    print("Shape of cumulant matrices storage {}", cumulant_matrices_storage.shape)
 
     # Ensure that the matrix has the correct dimensions
-    assert cumulant_matrices_storage.shape == (num_components, num_components * num_cumulant_matrices), \
-        "Cumulant matrices storage has incorrect dimensions."
+    expected_shape = (num_samples, num_samples * num_cumulant_matrices)
+    print("Expected shape of cumulant matrices storage {}", expected_shape)
+    assert cumulant_matrices_storage.shape == expected_shape, \
+        f"Cumulant matrices storage has incorrect dimensions. Expected: {expected_shape}, Got: {cumulant_matrices_storage.shape}"
 
     return cumulant_matrices_storage, num_cumulant_matrices
 
@@ -175,16 +184,23 @@ def compute_cumulant_matrix(preprocessed_data, num_samples, component_index, num
     # Extract the signal corresponding to the specified component index
     component_signal = preprocessed_data[:, component_index]
 
-    # Compute the square of the component signal
-    component_signal_squared = np.multiply(component_signal, component_signal)
+    # Initialize the cumulant matrix
+    cumulant_matrix = np.zeros((preprocessed_data.shape[0], preprocessed_data.shape[0]))
 
-    # Calculate the cumulant matrix
-    cumulant_matrix = np.multiply(component_signal_squared, preprocessed_data).T * preprocessed_data / float(num_samples)
+    # Vectorize computation for the cumulant matrix
+    for i in range(preprocessed_data.shape[0]):
+        Xii = component_signal[i] * component_signal[i]  # Square of the ith component
+        for j in range(i, preprocessed_data.shape[0]):
+            Xjj = component_signal[j] * component_signal[j]  # Square of the jth component
+            Xij = component_signal[i] * component_signal[j]  # Product of ith and jth components
 
-    # Validate the shape of the computed cumulant matrix
-    num_signals = preprocessed_data.shape[0]
-    if cumulant_matrix.shape != (num_signals, num_signals):
-        raise ValueError("Computed cumulant matrix has incorrect dimensions.")
+            # Compute the cumulant
+            cumulant = np.mean(Xii * Xjj) - 3 * np.mean(Xij) ** 2
+
+            # Assign cumulant value (exploiting symmetry)
+            cumulant_matrix[i, j] = cumulant
+            if i != j:
+                cumulant_matrix[j, i] = cumulant
 
     return cumulant_matrix
 
@@ -318,22 +334,25 @@ def sort_separating_matrix(separating_matrix):
         raise TypeError("separating_matrix must be a 2-dimensional numpy matrix.")
 
     # Compute the pseudo-inverse (mixing matrix) of the separating matrix
-    # The mixing matrix represents the inverse transformation of the separating matrix
     mixing_matrix = np.linalg.pinv(separating_matrix)
 
     # Calculate the energy of each component in the mixing matrix
-    # Energy is computed as the sum of squares of the elements in each column
     energy_per_component = np.sum(np.square(mixing_matrix), axis=0)
+    energy_per_component = np.asarray(energy_per_component).ravel()  # Convert to 1D array
 
     # Determine the order of components based on their energy (descending order)
     energy_order = np.argsort(energy_per_component)[::-1]
 
+    # Convert separating_matrix to a numpy array for proper indexing
+    separating_matrix = np.asarray(separating_matrix)
+
     # Sort the separating matrix rows according to the energy order
-    # This places the most energetic components at the top
     sorted_matrix = separating_matrix[energy_order, :]
 
+    # Convert the sorted array back to a matrix
+    sorted_matrix = np.matrix(sorted_matrix)
+
     # Return the sorted matrix with the most energetic components first
-    # The reversal is done to align with the standard convention in ICA
     return sorted_matrix[::-1, :]
 
 def fix_matrix_signs(separating_matrix):
@@ -418,3 +437,208 @@ def transform_dataframe(df):
     transformed_df.columns = wavelengths
 
     return transformed_df
+
+def plot_separated_signals(separated_signals, save_path='separated_signals.png'):
+    """
+    Plot each of the separated signals from the JADE model and save to a file.
+
+    Parameters:
+    separated_signals (numpy.ndarray): The separated signals as a 2D NumPy array.
+    save_path (str): Path to save the plot image.
+    """
+    num_signals = separated_signals.shape[0]
+
+    plt.figure(figsize=(15, 10))
+
+    for i in range(num_signals):
+        plt.subplot(num_signals, 1, i + 1)
+        plt.plot(separated_signals[i], label=f'Signal {i + 1}')
+        plt.xlabel('Sample')
+        plt.ylabel('Intensity')
+        plt.title(f'Separated Signal {i + 1}')
+        plt.legend()
+
+    plt.tight_layout()
+    plt.savefig(save_path)
+    plt.close()
+
+def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
+    """
+    Parameters:
+
+        mixed_signal_matrix -- an nxT data matrix (n sensors, T samples). May be a numpy array or
+             matrix.
+
+        num_components -- output matrix B has size mxn so that only m sources are
+             extracted.  This is done by restricting the operation of jadeR
+             to the m first principal components. Defaults to None, in which
+             case m=n.
+
+        verbose -- print info on progress. Default is True.
+
+    Returns:
+
+        An m*n matrix B (NumPy matrix type), such that Y=B*X are separated
+        sources extracted from the n*T data matrix X. If m is omitted, B is a
+        square n*n matrix (as many sources as sensors). The rows of B are
+        ordered such that the columns of pinv(B) are in order of decreasing
+        norm; this has the effect that the `most energetically significant`
+        components appear first in the rows of Y=B*X.
+    """
+
+    # GB: we do some checking of the input arguments and copy data to new
+    # variables to avoid messing with the original input. We also require double
+    # precision (float64) and a numpy matrix type for preprocessed_data.
+
+    # Original code had: X, origtype, m, n, T
+
+    preprocessed_data, input_data_type, num_components, num_samples = check_input(mixed_signal_matrix, num_components, verbose)
+
+    # whitening & PCA
+    principal_components, sorted_eigenvalues, whitened_data = perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, verbose)
+
+    # Clean up by deleting variables that are no longer needed to free up memory
+    del principal_components, sorted_eigenvalues
+
+    if verbose:
+        print("jade -> Estimating cumulant matrices")
+
+    # Initialize the storage for cumulant matrices
+    cumulant_matrices_storage, num_cumulant_matrices = initialize_cumulant_matrices_storage(num_samples, num_components)
+    
+    # Compute and store cumulant matrices
+    for component_index in range(num_components):
+        cumulant_matrix = compute_cumulant_matrix(whitened_data.T, num_samples, component_index, num_cumulant_matrices)
+        print("Shape of cumulant matrix {}", cumulant_matrix.shape)
+
+        # Store the computed cumulant matrix in the appropriate location
+        storage_start_index = component_index * num_samples
+        storage_end_index = storage_start_index + num_samples
+        cumulant_matrices_storage[:, storage_start_index:storage_end_index] = cumulant_matrix
+
+
+    rotation_matrix = joint_diagonalization(cumulant_matrices_storage, num_components, num_cumulant_matrices, num_samples)
+    print("Rotation matrix {}", rotation_matrix.shape)
+
+    separating_matrix = rotation_matrix.T
+    print("Separating matrix {}", separating_matrix.shape)
+
+    # Apply the sorting and sign fixing
+    if verbose:
+        print("jade -> Sorting the components")
+    separating_matrix = sort_separating_matrix(separating_matrix)
+    print("Separating matrix after sort separating matrix function {}", separating_matrix.shape)
+    print("Separating matrix type after sort separating matrix function {}", type(separating_matrix))
+
+    if verbose:
+        print("jade -> Fixing the signs")
+    separating_matrix = fix_matrix_signs(separating_matrix)
+    print("Separating matrix after fix matrix signs function {}", separating_matrix)
+
+    return separating_matrix.astype(input_data_type)
+
+class JADE:
+    def __init__(self, num_components=4):
+        self.num_components = num_components
+        self.unmixing_matrix = None
+        self.ica_jade_loadings = None
+        self.ica_jade_corr = None
+        self.ica_jade_ids = None
+
+    def fit(self, mixed_signal_matrix):
+        """
+        Fit the JADE model to the data.
+
+        Parameters:
+        mixed_signal_matrix (numpy.ndarray): The mixed signal data matrix.
+
+        Returns:
+        numpy.ndarray: The unmixing matrix after applying JADE.
+        """
+        mixed_signal_matrix = np.array(mixed_signal_matrix)
+        unmixing_matrix = jadeR(mixed_signal_matrix, num_components=self.num_components)
+        print("shape of unmixing matrix ", unmixing_matrix.shape)
+
+        # Adjust the sign of each row for better interpretability
+        for i in range(unmixing_matrix.shape[0]):
+            if np.abs(np.max(unmixing_matrix[i, :])) < np.abs(np.min(unmixing_matrix[i, :])):
+                unmixing_matrix[i, :] *= -1
+
+        self.unmixing_matrix = unmixing_matrix
+        return unmixing_matrix
+
+    def transform(self, mixed_signal_matrix):
+        print("Shape of mixed signal matrix in transform ", mixed_signal_matrix.shape)
+
+        if self.unmixing_matrix is None:
+            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
+
+        # Transpose if necessary
+        if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[1]:
+            mixed_signal_matrix = mixed_signal_matrix.T
+
+        # Ensure the matrix is still in the correct shape after transpose
+        if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[1]:
+            raise ValueError("Mismatch in matrix shapes for transformation.")
+
+        return np.dot(self.unmixing_matrix, mixed_signal_matrix).T
+
+    def correlate_loadings(self, df, corrcols, icacols):
+        """
+        Find the correlation between loadings and a set of columns.
+
+        Parameters:
+        df (pandas.DataFrame): The DataFrame containing data.
+        corrcols (list): List of columns to correlate.
+        icacols (list): List of ICA columns.
+
+        Updates:
+        self.ica_jade_corr: DataFrame of correlations.
+        self.ica_jade_ids: Identifiers for the correlated loadings.
+        """
+        if self.unmixing_matrix is None:
+            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
+
+        corrdf = df.corr().drop(icacols, axis=1).drop(corrcols, axis=0)
+        ica_jade_ids = []
+        for i in corrdf.loc['ICA-JADE'].index:
+            tmp = corrdf.loc[('ICA-JADE', i)]
+            max_corr = np.max(tmp)
+            match = tmp.values == max_corr
+            matched_col = corrcols[np.where(match)[0][0]]
+            ica_jade_ids.append(f"{matched_col} (r={np.round(max_corr, 1)})")
+
+        self.ica_jade_corr = corrdf
+        self.ica_jade_ids = ica_jade_ids
+
+def main():
+    file_path = "/home/iho/projects/thesis-chemcam/baseline/data/data/calib/calib_2015/1600mm/pls/cadillac/2013_08_06_200120_ccs.csv"
+
+    debug = True  # Set this to True for debugging with a smaller dataset
+
+    if debug:
+        # Load and preprocess data
+        debug_data, debug_columns = preprocess_LIBS_data(file_path, debug=True)
+        print("Columns after cleaning:", debug_columns)
+
+        # Select a small subset of the data for debugging
+        # For example, select the first 100 rows and 100 columns
+        subset_data = debug_data.iloc[:4, :50]
+        print("Subset data shape:", subset_data.shape)
+
+        # Proceed with your JADE model fitting on the subset
+        jade_model = JADE(num_components=4)
+        jade_model.fit(subset_data.values.T)
+        separated_signals = jade_model.transform(subset_data.values)
+
+        plot_separated_signals(separated_signals)
+
+    else:
+        # Normal processing with the full dataset
+        preprocessed_data = preprocess_LIBS_data(file_path, debug=False)
+        jade_model = JADE(num_components=4)
+        jade_model.fit(preprocessed_data.values)
+        separated_signals = jade_model.transform(preprocessed_data.values)
+
+if __name__ == "__main__":
+    main()
