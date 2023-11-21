@@ -274,3 +274,38 @@ class CompositionData:
                 continue
             sample_compositions[sample_name] = comp
         return sample_compositions
+
+
+class CustomSpectralPipeline:
+    def __init__(
+        self,
+        masks,
+        composition_data_loc,
+        major_oxides,
+        intensity_feature_name="shot_avg",
+        wavelength_feature_name="wave",
+    ):
+        self.mask_transformer = WavelengthMaskTransformer(masks)
+        self.data_reshaper = SpectralDataReshaper(
+            intensity_feature_name, wavelength_feature_name
+        )
+        self.composition_data = CompositionData(composition_data_loc)
+        self.major_oxides = major_oxides
+
+    def process_sample(self, sample_df, sample_name):
+        masked_df = self.mask_transformer.transform(sample_df)
+        reshaped_df = self.data_reshaper.fit_transform(masked_df)
+        sample_composition = self.composition_data.get_composition_for_sample(
+            sample_name
+        )
+        final_df = attach_major_oxides(
+            pd.DataFrame(reshaped_df), sample_composition, self.major_oxides
+        )
+        return final_df
+
+    def fit_transform(self, sample_data: dict[str, list[pd.DataFrame]]):
+        transformed_samples = []
+        for sample_name, sample_dfs in sample_data.items():
+            transformed_df = self.process_sample(sample_dfs[0], sample_name)
+            transformed_samples.append(transformed_df)
+        return pd.concat(transformed_samples, ignore_index=True)
