@@ -292,20 +292,29 @@ class CustomSpectralPipeline:
         self.composition_data = CompositionData(composition_data_loc)
         self.major_oxides = major_oxides
 
-    def process_sample(self, sample_df, sample_name):
+    def process_sample(
+        self,
+        sample_df: pd.DataFrame,
+        sample_name: str,
+    ):
         masked_df = self.mask_transformer.transform(sample_df)
         reshaped_df = self.data_reshaper.fit_transform(masked_df)
+
         sample_composition = self.composition_data.get_composition_for_sample(
             sample_name
         )
         final_df = attach_major_oxides(
             pd.DataFrame(reshaped_df), sample_composition, self.major_oxides
         )
+
+        final_df["Sample Name"] = sample_name
+
         return final_df
 
     def fit_transform(self, sample_data: dict[str, list[pd.DataFrame]]):
         transformed_samples = []
         for sample_name, sample_dfs in sample_data.items():
-            transformed_df = self.process_sample(sample_dfs[0], sample_name)
-            transformed_samples.append(transformed_df)
+            for _, sample_df in enumerate(sample_dfs):
+                transformed_df = self.process_sample(sample_df, sample_name)
+                transformed_samples.append(transformed_df)
         return pd.concat(transformed_samples, ignore_index=True)
