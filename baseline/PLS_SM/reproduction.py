@@ -43,7 +43,6 @@ major_oxides = [
     "TiO2",
     "Al2O3",
     "FeOT",
-    "MnO",
     "MgO",
     "CaO",
     "Na2O",
