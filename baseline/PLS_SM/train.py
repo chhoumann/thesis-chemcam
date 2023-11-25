@@ -1,7 +1,6 @@
 import ray
 import typer
 
-
 app = typer.Typer()
 
 

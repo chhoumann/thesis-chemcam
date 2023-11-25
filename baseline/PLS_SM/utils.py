@@ -1,10 +1,8 @@
-from sklearn.model_selection import KFold, train_test_split
 import pandas as pd
+from sklearn.model_selection import KFold, train_test_split
 
 
-def custom_kfold_cross_validation(
-    data, k: int, group_by: str, random_state=None
-):
+def custom_kfold_cross_validation(data, k: int, group_by: str, random_state=None):
     """
     Perform custom k-fold cross-validation on the given data.
 
@@ -40,9 +38,7 @@ def custom_kfold_cross_validation(
         yield train_data, test_data
 
 
-def custom_train_test_split(
-    data, group_by: str, test_size=0.2, random_state=None
-):
+def custom_train_test_split(data, group_by: str, test_size=0.2, random_state=None):
     """
     Custom train-test split function that splits the data based on
     a specified grouping variable.

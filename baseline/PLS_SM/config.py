@@ -61,5 +61,6 @@ logging_config = {
 }
 
 # Logger
+
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger()

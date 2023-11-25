@@ -1,15 +1,14 @@
-from sklearn.base import BaseEstimator, TransformerMixin
-import pandas as pd
 from pathlib import Path
 from typing import Optional
+
+import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def get_location_dataset_paths_for_sample(sample_name: str, data_path: Path):
     """Get the (five) location datasets for a sample."""
     sample_path = data_path / sample_name
-    return [
-        f for f in sample_path.iterdir() if f.is_file() and f.suffix == ".csv"
-    ]
+    return [f for f in sample_path.iterdir() if f.is_file() and f.suffix == ".csv"]
 
 
 def get_dataset_frame(dataset_path):
@@ -33,9 +32,7 @@ def get_preprocessed_sample_data(
 
     wavelengths = pd.Series()
 
-    sample_dataset_paths = get_location_dataset_paths_for_sample(
-        sample_name, data_path
-    )
+    sample_dataset_paths = get_location_dataset_paths_for_sample(sample_name, data_path)
     sample_spectra = []
 
     for i, sample_set in enumerate(sample_dataset_paths):
@@ -203,9 +200,7 @@ class SpectralDataReshaper(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         if self.sample_size_ is None:
-            raise RuntimeError(
-                "Transformer must be fitted before calling transform."
-            )
+            raise RuntimeError("Transformer must be fitted before calling transform.")
 
         reshaped_values = X[self.intensity_feature_name].values.reshape(
             self.sample_size_, -1
@@ -230,9 +225,7 @@ def attach_major_oxides(
 
 class CompositionData:
     def __init__(self, composition_data_loc: str):
-        self.composition_data = self.load_composition_data(
-            composition_data_loc
-        )
+        self.composition_data = self.load_composition_data(composition_data_loc)
 
     @staticmethod
     def load_composition_data(composition_data_loc: str) -> pd.DataFrame:
@@ -241,31 +234,18 @@ class CompositionData:
     def get_composition_for_sample(self, sample_name) -> pd.DataFrame:
         sample_name_lower = sample_name.lower()
         match_condition = (
-            (
-                self.composition_data["Spectrum Name"].str.lower()
-                == sample_name_lower
-            )
-            | (
-                self.composition_data["Target"].str.lower()
-                == sample_name_lower
-            )
-            | (
-                self.composition_data["Sample Name"].str.lower()
-                == sample_name_lower
-            )
+            (self.composition_data["Spectrum Name"].str.lower() == sample_name_lower)
+            | (self.composition_data["Target"].str.lower() == sample_name_lower)
+            | (self.composition_data["Sample Name"].str.lower() == sample_name_lower)
         )
         composition = self.composition_data.loc[match_condition]
 
         if composition.empty:
-            raise ValueError(
-                f"Could not find composition for sample: {sample_name}"
-            )
+            raise ValueError(f"Could not find composition for sample: {sample_name}")
 
         return composition
 
-    def create_sample_compositions_dict(
-        self, sample_names
-    ) -> dict[str, pd.DataFrame]:
+    def create_sample_compositions_dict(self, sample_names) -> dict[str, pd.DataFrame]:
         sample_compositions = {}
         for sample_name in sample_names:
             comp = self.get_composition_for_sample(sample_name)
