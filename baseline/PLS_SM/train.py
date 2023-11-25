@@ -3,11 +3,12 @@ import pandas as pd
 import typer
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error
+from tqdm import tqdm
 
 from .config import logger
 from .data import CustomSpectralPipeline, load_data
-from .reproduction import major_oxides, masks, oxide_ranges
-from .utils import custom_train_test_split
+from .reproduction import major_oxides, masks, oxide_ranges, paper_rmses_full_model
+from .utils import custom_kfold_cross_validation
 
 # Initialize MLflow
 # mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
@@ -57,78 +58,93 @@ def train_loop_per_worker():
 def train_model(
     experiment_name: str, dataset_loc: str, calib_loc: str, take_samples=None
 ):
-    logger.debug("Loading data from location: %s", dataset_loc)
+    logger.info("Loading data from location: %s", dataset_loc)
     data = load_data(dataset_loc, take_samples)
-    logger.debug("Data loaded successfully.")
+    logger.info("Data loaded successfully.")
 
-    logger.debug("Initializing CustomSpectralPipeline.")
+    logger.info("Initializing CustomSpectralPipeline.")
     pipeline = CustomSpectralPipeline(
         masks=masks,
         composition_data_loc=calib_loc,
         major_oxides=major_oxides,
     )
-    logger.debug("Pipeline initialized. Fitting and transforming data.")
+    logger.info("Pipeline initialized. Fitting and transforming data.")
     processed_data = pipeline.fit_transform(data)
-    logger.debug("Data processing complete.")
-
-    logger.debug("Splitting dataset into train and test sets.")
-    train_data, test_data = custom_train_test_split(
-        processed_data, group_by="Sample Name", test_size=0.2
-    )
-    logger.debug(
-        "Dataset split complete. Train size: %d, Test size: %d",
-        len(train_data),
-        len(test_data),
-    )
+    logger.info("Data processing complete.")
 
     compositional_range = "Full"
+    k_folds = 5
+    random_state = 42
+    best_model = None
+    best_rmse = float("inf")
+    n_components = 8
 
-    for oxide in major_oxides:
-        logger.debug(
+    for oxide in tqdm(major_oxides, desc="Processing oxides"):
+        logger.info(
             "Starting MLflow run for compositional range: %s, oxide: %s",
             compositional_range,
             oxide,
         )
         with mlflow.start_run(run_name=f"{experiment_name}_{oxide}"):
-            logger.debug("Filtering train data.")
-            train_data_filtered = filter_data_by_compositional_range(
-                train_data, compositional_range, oxide
-            )
-            logger.debug("Filtering test data.")
-            test_data_filtered = filter_data_by_compositional_range(
-                test_data, compositional_range, oxide
+            mlflow.log_param("n_components", n_components)
+            mlflow.log_param("random_state", random_state)
+            logger.info("Filtering data by compositional range.")
+            data_filtered = filter_data_by_compositional_range(
+                processed_data, compositional_range, oxide
             )
 
-            logger.debug("Defining PLSRegression model.")
-            pls = PLSRegression(n_components=2)  # Adjust n_components as needed
+            logger.info("Performing custom k-fold cross-validation.")
+            kf = custom_kfold_cross_validation(
+                data_filtered,
+                k=k_folds,
+                group_by="Sample Name",
+                random_state=random_state,
+            )
 
-            logger.debug("Extracting features and target for training.")
-            X_train = train_data_filtered.drop(columns=major_oxides + ["Sample Name"])
-            y_train = train_data_filtered[oxide]
-            logger.debug("Extracting features and target for testing.")
-            X_test = test_data_filtered.drop(columns=major_oxides + ["Sample Name"])
-            y_test = test_data_filtered[oxide]
+            fold_rmse = []
+            for i, (train_data, test_data) in enumerate(kf):
+                logger.info("Defining PLSRegression model.")
+                pls = PLSRegression(
+                    n_components=n_components
+                )  # Adjust n_components as needed
 
-            logger.debug("Training the model.")
-            pls.fit(X_train, y_train)
-            logger.debug("Model training complete.")
+                logger.info("Extracting features and target for training.")
+                X_train = train_data.drop(columns=major_oxides + ["Sample Name"])
+                y_train = train_data[oxide]
+                logger.info("Extracting features and target for testing.")
+                X_test = test_data.drop(columns=major_oxides + ["Sample Name"])
+                y_test = test_data[oxide]
 
-            logger.debug("Predicting on test data.")
-            y_pred = pls.predict(X_test)
-            rmse = mean_squared_error(y_test, y_pred, squared=False)
-            logger.debug("Prediction complete. RMSE: %f", rmse)
+                logger.info("Training the model.")
+                pls.fit(X_train, y_train)
+                logger.info("Model training complete.")
 
-            logger.debug("Logging parameters, metrics, and model to MLflow.")
+                logger.info("Predicting on test data.")
+                y_pred = pls.predict(X_test)
+                rmse = mean_squared_error(y_test, y_pred, squared=False)
+                fold_rmse.append(rmse)
+                logger.info("Fold RMSE: %f", rmse)
+
+                if rmse < best_rmse:
+                    best_rmse = rmse
+                    best_model = pls
+
+            avg_rmse = sum(fold_rmse) / k_folds
+            logger.info("Logging parameters, metrics, and model to MLflow.")
             mlflow.log_param("compositional_range", compositional_range)
             mlflow.log_param("oxide", oxide)
-            mlflow.log_metric("rmse", float(rmse))
-            mlflow.sklearn.log_model(pls, "model")
+            mlflow.log_param("k_folds", k_folds)
+            mlflow.log_metric("avg_rmse", float(avg_rmse))
+            mlflow.log_metric("paper_rmse", paper_rmses_full_model[oxide])
+            mlflow.sklearn.log_model(
+                best_model, "model", registered_model_name=f"Best_{oxide}_full_model"
+            )
 
             logger.info(
-                "Compositional Range: %s, Oxide: %s, RMSE: %f",
+                "Compositional Range: %s, Oxide: %s, Average RMSE: %f",
                 compositional_range,
                 oxide,
-                rmse,
+                avg_rmse,
             )
 
 
@@ -138,8 +154,8 @@ if __name__ == "__main__":
     # ray.init()
     # app()  # initialize Typer app
     train_model(
-        "full_model",
+        "full_models_k_fold",
         "data/data/calib/calib_2015/1600mm/pls",
         "data/data/calib/ccam_calibration_compositions.csv",
-        100,
+        # 100,
     )

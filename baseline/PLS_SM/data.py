@@ -3,6 +3,7 @@ from typing import Optional
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from tqdm import tqdm
 
 
 def get_location_dataset_paths_for_sample(sample_name: str, data_path: Path):
@@ -79,13 +80,14 @@ def load_data(
     Returns:
     - Dataset: The loaded dataset.
     """
+
     sample_data: dict[str, list[pd.DataFrame]] = {}
     data_path = Path(dataset_loc).resolve(strict=True)
     sample_names = [f.name for f in data_path.iterdir() if f.is_dir()]
 
     take_amount = num_samples if num_samples else len(sample_names)
 
-    for _sample_name in sample_names[:take_amount]:
+    for _sample_name in tqdm(sample_names[:take_amount], desc="Loading data"):
         sample_data[_sample_name] = get_preprocessed_sample_data(
             _sample_name, data_path
         )
@@ -288,7 +290,7 @@ class CustomSpectralPipeline:
 
     def fit_transform(self, sample_data: dict[str, list[pd.DataFrame]]):
         transformed_samples = []
-        for sample_name, sample_dfs in sample_data.items():
+        for sample_name, sample_dfs in tqdm(sample_data.items(), desc="Transforming samples"):
             for _, sample_df in enumerate(sample_dfs):
                 if self.composition_data.get_composition_for_sample(sample_name).empty:
                     continue

@@ -48,3 +48,15 @@ major_oxides = [
     "Na2O",
     "K2O",
 ]
+
+
+paper_rmses_full_model = {
+    "SiO2": 5.66,
+    "TiO2": 0.51,
+    "Al2O3": 2.79,
+    "FeOT": 3.34,
+    "MgO": 1.43,
+    "CaO": 1.8,
+    "Na2O": 0.6,
+    "K2O": 0.78,
+}
