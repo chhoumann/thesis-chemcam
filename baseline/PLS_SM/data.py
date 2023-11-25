@@ -93,13 +93,6 @@ def load_data(
     return sample_data
 
 
-# def split_data(
-#     dataset: pd.DataFrame, split: float = 0.8
-# ) -> tuple[pd.DataFrame, pd.DataFrame]:
-#     # Add your implementation here
-#     pass
-
-
 class WavelengthMaskTransformer(BaseEstimator, TransformerMixin):
     """
     Transformer to remove values in specified wavelength masks from input data.
@@ -217,6 +210,8 @@ def attach_major_oxides(
     sample_composition: pd.DataFrame,
     major_oxides: list[str],
 ):
+    if sample_composition.empty:
+        raise ValueError("sample_composition is empty, cannot attach major oxides")
     oxides = sample_composition[major_oxides].iloc[0]
     transformed_df = transformed_df.assign(**oxides)
 
@@ -240,8 +235,8 @@ class CompositionData:
         )
         composition = self.composition_data.loc[match_condition]
 
-        if composition.empty:
-            raise ValueError(f"Could not find composition for sample: {sample_name}")
+        # if composition.empty:
+        #     raise ValueError(f"Could not find composition for sample: {sample_name}")
 
         return composition
 
@@ -295,6 +290,9 @@ class CustomSpectralPipeline:
         transformed_samples = []
         for sample_name, sample_dfs in sample_data.items():
             for _, sample_df in enumerate(sample_dfs):
+                if self.composition_data.get_composition_for_sample(sample_name).empty:
+                    continue
                 transformed_df = self.process_sample(sample_df, sample_name)
                 transformed_samples.append(transformed_df)
-        return pd.concat(transformed_samples, ignore_index=True)
+        df_out = pd.concat(transformed_samples, ignore_index=True).rename(columns=str)
+        return df_out
