@@ -411,24 +411,6 @@ def preprocess_LIBS_data(file_path, debug=False):
 
     return df
 
-
-
-def transform_dataframe(df):
-    """
-    Transforms the DataFrame into a format where each row represents a shot
-    and each column represents a wavelength.
-    """
-    # Extract wavelengths and use them as column headers
-    wavelengths = df.iloc[:, 0]  # assuming the first column is 'wave'
-    df = df.drop(df.columns[0], axis=1)  # drop the wavelength column
-
-    # The remaining columns are shots, transpose them
-    transformed_df = df.transpose()
-    transformed_df.columns = wavelengths
-
-    return transformed_df
-
-
 def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     """
     Parameters:
