@@ -378,40 +378,39 @@ def get_dataset_frame(dataset_path):
         # Read CSV from that line - columns also start with "#"
         return pd.read_csv(dataset_path, skiprows=i-1)
 
-
 def preprocess_LIBS_data(file_path, debug=False):
-    """
-    Preprocess a single LIBS dataset file for ICA JADE algorithm.
-
-    Parameters:
-    file_path (str): Path to the dataset file.
-
-    Returns:
-    pd.DataFrame: Preprocessed data suitable for ICA JADE algorithm.
-    """
-    # Load the dataset using the get_dataset_frame function
     df = get_dataset_frame(file_path)
 
     # Clean up column names
     df.columns = df.columns.str.strip()
     df.columns = df.columns.str.replace("# ", "")
 
-    if debug:
-        return df, df.columns
-    else:
-        # Drop columns not needed
-        exclude = ["mean", "median"]
-        first_five_shots = [f"shot{i}" for i in range(1, 6)]
-        df.drop(exclude + first_five_shots, axis=1, inplace=True)
+    exclude = ["mean", "median"]
+    first_five_shots = [f"shot{i}" for i in range(1, 6)]
+    df.drop(exclude + first_five_shots, axis=1, inplace=True)
 
-        # Apply masks to remove noisy wavelength ranges
-        for mask in masks:
-            df = df.loc[~((df["wave"] >= mask[0]) & (df["wave"] <= mask[1]))]
+    for mask in masks:
+        df = df.loc[~((df["wave"] >= mask[0]) & (df["wave"] <= mask[1]))]
+    print("Number of wavelengths before threshold:", df.shape[0])
 
-        # Transform the DataFrame
-        transformed_df = transform_dataframe(df)
+    # Set 'wave' as the index and transpose the DataFrame
+    df = df.set_index('wave').transpose()
 
-        return transformed_df
+    # Recalculate variances and threshold on the transposed DataFrame
+    variances = df.var(axis=0)
+    print("Variances:", variances)
+    threshold = variances.mean()
+    print("Threshold:", threshold)
+
+    selected_wavelengths = variances[variances > threshold].index
+    print("Selected wavelengths", selected_wavelengths)
+
+    df = df[selected_wavelengths]
+    
+    print("Number of wavelengths after threshold:", df.shape[1])
+
+    return df
+
 
 
 def transform_dataframe(df):
@@ -588,8 +587,7 @@ def main():
 
     if debug:
         # Load and preprocess data
-        debug_data, debug_columns = preprocess_LIBS_data(file_path, debug=True)
-        print("Columns after cleaning:", debug_columns)
+        debug_data = preprocess_LIBS_data(file_path, debug=True)
 
         # Select a small subset of the data for debugging
         # For example, select the first 100 rows and 100 columns
