@@ -8,7 +8,7 @@ from reproduction import masks
 import matplotlib.pyplot as plt
 
 
-def check_input(X_input, num_sources=None, verbose=True):
+def check_input(X_input, num_components=None, verbose=True):
     # Check if X is a NumPy ndarray
     assert isinstance(X_input, np.ndarray), \
         "X (input data matrix) is of the wrong type (%s)" % type(X_input)
@@ -30,40 +30,38 @@ def check_input(X_input, num_sources=None, verbose=True):
     num_signals, num_samples = X_input.shape
 
     # Set the number of sources to the number of sensors if not specified
-    if num_sources is None:
-        num_sources = num_signals
+    if num_components is None:
+        num_components = num_signals
     # Check if the number of sources does not exceed the number of sensors
-    assert num_sources <= num_signals, \
-        "jade -> Do not ask more sources (%d) than sensors (%d) here!!!" % (num_sources, num_signals)
+    assert num_components <= num_signals, \
+        "jade -> Do not ask more sources (%d) than sensors (%d) here!!!" % (num_components, num_signals)
 
     # Verbose output
     if verbose:
-        print("jade -> Looking for " + str(num_sources) + " sources")
+        print("jade -> Looking for " + str(num_components) + " sources")
         print("jade -> Removing the mean value")
     
     # Remove the mean value from X
     X_input -= X_input.mean(1)
 
-    return X_input, input_data_type, num_sources, num_samples
+    return X_input, input_data_type, num_components, num_samples
 
-def perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, verbose=True):
+def perform_whitening(preprocessed_data, num_samples, verbose=True):
     """
-    Perform Principal Component Analysis (PCA) and whitening on the given preprocessed data.
+    Perform whitening on the given preprocessed data.
 
     Parameters:
     preprocessed_data (numpy.matrix): The data matrix after preprocessing.
-    num_components (int): The number of principal components to extract.
     num_samples (int): The number of samples in each signal.
     verbose (bool): If True, additional information is printed.
 
     Returns:
-    numpy.matrix: The matrix of principal components. Each column is a principal component.
-    numpy.array: The array of sorted eigenvalues corresponding to the principal components.
+    numpy.matrix: The whitened data matrix.
     numpy.matrix: The whitening matrix.
     """
 
     if verbose:
-        print("jade -> Performing PCA and whitening the data")
+        print("jade -> Performing whitening on the data")
 
     # Validate input data
     if not isinstance(preprocessed_data, np.matrix):
@@ -72,13 +70,6 @@ def perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, ve
     if preprocessed_data.ndim != 2:
         raise ValueError("preprocessed_data must be a 2-dimensional matrix.")
     
-    num_signals, _ = preprocessed_data.shape
-    if num_components is None or not isinstance(num_components, int):
-        raise TypeError("num_components must be an integer.")
-    
-    if num_components < 1 or num_components > num_signals:
-        raise ValueError("num_components must be between 1 and the number of signals (rows) in preprocessed_data.")
-
     if num_samples is None or not isinstance(num_samples, int):
         raise TypeError("num_samples must be an integer.")
     
@@ -88,35 +79,27 @@ def perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, ve
     # Compute the covariance matrix of the data
     covariance_matrix = (preprocessed_data * preprocessed_data.T) / float(num_samples)
 
-    # Perform eigenvalue decomposition to find the principal components
+    # Perform eigenvalue decomposition on the covariance matrix
     eigenvalues, eigenvectors = eig(covariance_matrix)
 
     # Sort eigenvalues in descending order and get the sorted indices
     sorted_indices = eigenvalues.argsort()[::-1]
     sorted_eigenvalues = eigenvalues[sorted_indices]
 
-    # Extract the principal components corresponding to the most significant eigenvalues
-    principal_components = eigenvectors[:, sorted_indices[:num_components]]
+    # Whitening: Create the whitening matrix
+    # The scaling factor for each eigenvalue is the inverse of the square root
+    scaling_factors = np.sqrt(sorted_eigenvalues)
+    whitening_matrix = eigenvectors[:, sorted_indices] @ np.diag(1. / scaling_factors) @ eigenvectors[:, sorted_indices].T
 
-    # Transpose the matrix so each row represents a principal component
-    principal_components = principal_components.T
-
-    if verbose:
-        print("Shape of principal_components:", principal_components.shape)
-
-    # Whitening: Scale the principal components to have unit variance
-    # The scaling factor for each principal component is the inverse of the square root of its corresponding eigenvalue
-    scaling_factors = np.sqrt(sorted_eigenvalues[:num_components])
-    whitening_matrix = np.diag(1. / scaling_factors)
-    whitened_data = whitening_matrix @ principal_components @ preprocessed_data
+    # Apply the whitening matrix to the data
+    whitened_data = whitening_matrix @ preprocessed_data
 
     if verbose:
         print("Shape of whitening_matrix:", whitening_matrix.shape)
         print("Shape of whitened_data:", whitened_data.shape)
-    if verbose:
-        print("jade -> PCA and whitening completed")
+        print("jade -> Whitening completed")
 
-    return principal_components, sorted_eigenvalues, whitened_data
+    return whitened_data, whitening_matrix
 
 def initialize_cumulant_matrices_storage(num_samples, num_components):
     """
@@ -438,30 +421,6 @@ def transform_dataframe(df):
 
     return transformed_df
 
-def plot_separated_signals(separated_signals, save_path='separated_signals.png'):
-    """
-    Plot each of the separated signals from the JADE model and save to a file.
-
-    Parameters:
-    separated_signals (numpy.ndarray): The separated signals as a 2D NumPy array.
-    save_path (str): Path to save the plot image.
-    """
-    num_signals = separated_signals.shape[0]
-
-    plt.figure(figsize=(15, 10))
-
-    for i in range(num_signals):
-        plt.subplot(num_signals, 1, i + 1)
-        plt.plot(separated_signals[i], label=f'Signal {i + 1}')
-        plt.xlabel('Sample')
-        plt.ylabel('Intensity')
-        plt.title(f'Separated Signal {i + 1}')
-        plt.legend()
-
-    plt.tight_layout()
-    plt.savefig(save_path)
-    plt.close()
-
 def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     """
     Parameters:
@@ -495,10 +454,10 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     preprocessed_data, input_data_type, num_components, num_samples = check_input(mixed_signal_matrix, num_components, verbose)
 
     # whitening & PCA
-    principal_components, sorted_eigenvalues, whitened_data = perform_PCA_and_whitening(preprocessed_data, num_components, num_samples, verbose)
+    whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_samples, verbose)
 
     # Clean up by deleting variables that are no longer needed to free up memory
-    del principal_components, sorted_eigenvalues
+    del whitened_matrix
 
     if verbose:
         print("jade -> Estimating cumulant matrices")
@@ -630,8 +589,7 @@ def main():
         jade_model = JADE(num_components=4)
         jade_model.fit(subset_data.values.T)
         separated_signals = jade_model.transform(subset_data.values)
-
-        plot_separated_signals(separated_signals)
+        print(separated_signals)
 
     else:
         # Normal processing with the full dataset
