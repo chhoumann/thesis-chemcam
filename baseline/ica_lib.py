@@ -12,7 +12,7 @@ def check_input(X_input, num_components=None, verbose=True):
     # Check if X is a NumPy ndarray
     assert isinstance(X_input, np.ndarray), \
         "X (input data matrix) is of the wrong type (%s)" % type(X_input)
-    
+
     # Remember the original data type of X
     input_data_type = X_input.dtype
 
@@ -21,7 +21,7 @@ def check_input(X_input, num_components=None, verbose=True):
 
     # Check if X is a 2-dimensional matrix
     assert X_input.ndim == 2, "X_input has %d dimensions, should be 2" % X_input.ndim
-    
+
     # Check if the verbose parameter is either True or False
     assert isinstance(verbose, bool), \
         "verbose parameter should be either True or False"
@@ -40,11 +40,12 @@ def check_input(X_input, num_components=None, verbose=True):
     if verbose:
         print("jade -> Looking for " + str(num_components) + " sources")
         print("jade -> Removing the mean value")
-    
+
     # Remove the mean value from X
     X_input -= X_input.mean(1)
 
     return X_input, input_data_type, num_components, num_samples
+
 
 def perform_whitening(preprocessed_data, num_samples, verbose=True):
     """
@@ -66,13 +67,13 @@ def perform_whitening(preprocessed_data, num_samples, verbose=True):
     # Validate input data
     if not isinstance(preprocessed_data, np.matrix):
         raise TypeError("preprocessed_data must be a numpy matrix.")
-    
+
     if preprocessed_data.ndim != 2:
         raise ValueError("preprocessed_data must be a 2-dimensional matrix.")
-    
+
     if num_samples is None or not isinstance(num_samples, int):
         raise TypeError("num_samples must be an integer.")
-    
+
     if num_samples < 1:
         raise ValueError("num_samples must be a positive integer.")
 
@@ -100,6 +101,7 @@ def perform_whitening(preprocessed_data, num_samples, verbose=True):
         print("jade -> Whitening completed")
 
     return whitened_data, whitening_matrix
+
 
 def initialize_cumulant_matrices_storage(num_samples, num_components):
     """
@@ -187,6 +189,7 @@ def compute_cumulant_matrix(preprocessed_data, num_samples, component_index, num
 
     return cumulant_matrix
 
+
 def initialize_diagonalization(num_components, num_cumulant_matrices):
     """
     Initialize matrices and variables for the diagonalization process.
@@ -225,6 +228,7 @@ def initialize_diagonalization(num_components, num_cumulant_matrices):
 
     return rotation_matrix, on_diagonal, off_diagonal
 
+
 def joint_diagonalization(cumulant_matrices, num_principal_components, total_cumulant_matrices, sample_count):
     """
     Perform joint diagonalization on the cumulant matrices.
@@ -242,7 +246,7 @@ def joint_diagonalization(cumulant_matrices, num_principal_components, total_cum
     # Input validation
     if not isinstance(cumulant_matrices, np.matrix) or cumulant_matrices.ndim != 2:
         raise TypeError("cumulant_matrices must be a 2-dimensional numpy matrix.")
-    
+
     if not isinstance(num_principal_components, int) or num_principal_components <= 0:
         raise ValueError("num_principal_components must be a positive integer.")
 
@@ -272,7 +276,7 @@ def joint_diagonalization(cumulant_matrices, num_principal_components, total_cum
                 index_q = np.arange(component_q, num_principal_components * total_cumulant_matrices, num_principal_components)
 
                 # Compute Givens rotation angles
-                givens_vector = np.concatenate([cumulant_matrices[component_p, index_p] - cumulant_matrices[component_q, index_q], 
+                givens_vector = np.concatenate([cumulant_matrices[component_p, index_p] - cumulant_matrices[component_q, index_q],
                                                 cumulant_matrices[component_p, index_q] + cumulant_matrices[component_q, index_p]])
                 givens_dot_product = np.dot(givens_vector, givens_vector.T)
                 tonality = givens_dot_product[0, 0] - givens_dot_product[1, 1]
@@ -292,7 +296,7 @@ def joint_diagonalization(cumulant_matrices, num_principal_components, total_cum
                     rotation_matrix[:, component_pair] *= givens_matrix
                     cumulant_matrices[component_pair, :] = givens_matrix.T * cumulant_matrices[component_pair, :]
                     cumulant_matrices[:, np.concatenate([index_p, index_q])] = \
-                        np.append(cosine_theta * cumulant_matrices[:, index_p] + sine_theta * cumulant_matrices[:, index_q], 
+                        np.append(cosine_theta * cumulant_matrices[:, index_p] + sine_theta * cumulant_matrices[:, index_q],
                                   -sine_theta * cumulant_matrices[:, index_p] + cosine_theta * cumulant_matrices[:, index_q], axis=1)
                     on_diagonal_sum += rotation_gain
                     off_diagonal_sum -= rotation_gain
@@ -300,6 +304,7 @@ def joint_diagonalization(cumulant_matrices, num_principal_components, total_cum
         total_updates += current_sweep_updates
 
     return rotation_matrix
+
 
 def sort_separating_matrix(separating_matrix):
     """
@@ -338,6 +343,7 @@ def sort_separating_matrix(separating_matrix):
     # Return the sorted matrix with the most energetic components first
     return sorted_matrix[::-1, :]
 
+
 def fix_matrix_signs(separating_matrix):
     """
     Adjust the signs of the rows of the separating matrix.
@@ -372,6 +378,7 @@ def get_dataset_frame(dataset_path):
         # Read CSV from that line - columns also start with "#"
         return pd.read_csv(dataset_path, skiprows=i-1)
 
+
 def preprocess_LIBS_data(file_path, debug=False):
     """
     Preprocess a single LIBS dataset file for ICA JADE algorithm.
@@ -403,8 +410,9 @@ def preprocess_LIBS_data(file_path, debug=False):
 
         # Transform the DataFrame
         transformed_df = transform_dataframe(df)
-        
+
         return transformed_df
+
 
 def transform_dataframe(df):
     """
@@ -420,6 +428,7 @@ def transform_dataframe(df):
     transformed_df.columns = wavelengths
 
     return transformed_df
+
 
 def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     """
@@ -464,7 +473,7 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
 
     # Initialize the storage for cumulant matrices
     cumulant_matrices_storage, num_cumulant_matrices = initialize_cumulant_matrices_storage(num_samples, num_components)
-    
+
     # Compute and store cumulant matrices
     for component_index in range(num_components):
         cumulant_matrix = compute_cumulant_matrix(whitened_data.T, num_samples, component_index, num_cumulant_matrices)
@@ -495,6 +504,7 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     print("Separating matrix after fix matrix signs function {}", separating_matrix)
 
     return separating_matrix.astype(input_data_type)
+
 
 class JADE:
     def __init__(self, num_components=4):
@@ -570,8 +580,9 @@ class JADE:
         self.ica_jade_corr = corrdf
         self.ica_jade_ids = ica_jade_ids
 
+
 def main():
-    file_path = "/home/iho/projects/thesis-chemcam/baseline/data/data/calib/calib_2015/1600mm/pls/cadillac/2013_08_06_200120_ccs.csv"
+    file_path = "./data/data/calib/calib_2015/1600mm/pls/cadillac/2013_08_06_200120_ccs.csv"
 
     debug = True  # Set this to True for debugging with a smaller dataset
 
