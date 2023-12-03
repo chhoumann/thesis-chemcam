@@ -1,4 +1,5 @@
 from sys import stdout
+import os
 import numpy as np
 from numpy import *
 from numpy.linalg import eig, pinv
@@ -9,6 +10,8 @@ import matplotlib.pyplot as plt
 
 
 def check_input(X_input, num_components=None, verbose=True):
+    print("function: check input")
+
     # Check if X is a NumPy ndarray
     assert isinstance(X_input, np.ndarray), \
         "X (input data matrix) is of the wrong type (%s)" % type(X_input)
@@ -60,7 +63,7 @@ def perform_whitening(preprocessed_data, num_samples, verbose=True):
     numpy.matrix: The whitened data matrix.
     numpy.matrix: The whitening matrix.
     """
-
+    print("function: perform whitening")
     if verbose:
         print("jade -> Performing whitening on the data")
 
@@ -115,7 +118,7 @@ def initialize_cumulant_matrices_storage(num_samples, num_components):
     numpy.matrix: Initialized matrix for storing cumulant matrices.
     int: Number of cumulant matrices.
     """
-
+    print("function: initialize cumulant matrices storage")
     # Validate input
     if not isinstance(num_samples, int) or num_samples <= 0:
         raise ValueError("num_samples must be a positive integer.")
@@ -152,7 +155,7 @@ def compute_cumulant_matrix(preprocessed_data, num_samples, component_index, num
     Returns:
     numpy.matrix: The computed cumulant matrix for the given component.
     """
-
+    print("function: compute cumulant matrix")
     # Validate input
     if not isinstance(preprocessed_data, np.matrix) or preprocessed_data.ndim != 2:
         raise TypeError("preprocessed_data must be a 2-dimensional numpy matrix.")
@@ -204,7 +207,7 @@ def initialize_diagonalization(num_components, num_cumulant_matrices):
         - on_diagonal (float): Sum of squared diagonal elements.
         - off_diagonal (float): Sum of squared off-diagonal elements.
     """
-
+    print("function: initialize diagonalization")
     # Validate input
     if not isinstance(num_components, int) or num_components <= 0:
         raise ValueError("num_components must be a positive integer.")
@@ -229,37 +232,38 @@ def initialize_diagonalization(num_components, num_cumulant_matrices):
     return rotation_matrix, on_diagonal, off_diagonal
 
 
-def joint_diagonalization(cumulant_matrices, num_principal_components, total_cumulant_matrices, sample_count):
+def joint_diagonalization(cumulant_matrices, num_independent_components, num_samples):
     """
-    Perform joint diagonalization on the cumulant matrices.
+    Perform joint diagonalization on the cumulant matrices for ICA.
 
     Parameters:
-    cumulant_matrices (numpy.matrix): Storage matrix containing cumulant matrices.
-    num_principal_components (int): Number of principal components.
-    total_cumulant_matrices (int): Total number of cumulant matrices.
-    sample_count (int): Number of samples in each signal.
+    cumulant_matrices (numpy.ndarray): Storage matrix containing cumulant matrices.
+    num_independent_components (int): Number of independent components to extract.
+    num_samples (int): Number of samples in the dataset.
 
     Returns:
-    numpy.matrix: The diagonalized matrix.
+    numpy.ndarray: The rotation matrix for ICA.
     """
+    print("function: joint diagonalization")
 
     # Input validation
-    if not isinstance(cumulant_matrices, np.matrix) or cumulant_matrices.ndim != 2:
-        raise TypeError("cumulant_matrices must be a 2-dimensional numpy matrix.")
+    if not isinstance(cumulant_matrices, np.ndarray) or cumulant_matrices.ndim != 2:
+        raise TypeError("cumulant_matrices must be a 2-dimensional numpy array.")
 
-    if not isinstance(num_principal_components, int) or num_principal_components <= 0:
-        raise ValueError("num_principal_components must be a positive integer.")
+    if cumulant_matrices.shape[0] != num_samples or cumulant_matrices.shape[1] != num_samples * num_independent_components:
+        raise ValueError("cumulant_matrices must have shape (num_samples, num_samples * num_independent_components)")
 
-    if not isinstance(total_cumulant_matrices, int) or total_cumulant_matrices <= 0:
-        raise ValueError("total_cumulant_matrices must be a positive integer.")
+    if not isinstance(num_independent_components, int) or num_independent_components <= 0:
+        raise ValueError("num_independent_components must be a positive integer.")
 
-    if not isinstance(sample_count, int) or sample_count <= 0:
-        raise ValueError("sample_count must be a positive integer.")
+    if not isinstance(num_samples, int) or num_samples <= 0:
+        raise ValueError("num_samples must be a positive integer.")
 
     # Initialize rotation matrix and diagonal/off-diagonal values
-    rotation_matrix, on_diagonal_sum, off_diagonal_sum = initialize_diagonalization(num_principal_components, total_cumulant_matrices)
+    rotation_matrix = np.eye(num_independent_components)
+    on_diagonal_sum = off_diagonal_sum = 0.0
 
-    convergence_threshold = 1.0e-6 / np.sqrt(sample_count)
+    convergence_threshold = 1.0e-6 / np.sqrt(num_samples)
     continue_diagonalization = True
     total_sweeps = 0
     total_updates = 0
@@ -269,15 +273,15 @@ def joint_diagonalization(cumulant_matrices, num_principal_components, total_cum
         total_sweeps += 1
         current_sweep_updates = 0
 
-        for component_p in range(num_principal_components - 1):
-            for component_q in range(component_p + 1, num_principal_components):
+        for component_p in range(num_independent_components - 1):
+            for component_q in range(component_p + 1, num_independent_components):
 
-                index_p = np.arange(component_p, num_principal_components * total_cumulant_matrices, num_principal_components)
-                index_q = np.arange(component_q, num_principal_components * total_cumulant_matrices, num_principal_components)
+                index_p = np.arange(component_p, num_samples * num_independent_components, num_independent_components)
+                index_q = np.arange(component_q, num_samples * num_independent_components, num_independent_components)
 
                 # Compute Givens rotation angles
                 givens_vector = np.concatenate([cumulant_matrices[component_p, index_p] - cumulant_matrices[component_q, index_q],
-                                                cumulant_matrices[component_p, index_q] + cumulant_matrices[component_q, index_p]])
+                                            cumulant_matrices[component_p, index_q] + cumulant_matrices[component_q, index_p]])
                 givens_dot_product = np.dot(givens_vector, givens_vector.T)
                 tonality = givens_dot_product[0, 0] - givens_dot_product[1, 1]
                 off_diagonal_sum_new = givens_dot_product[0, 1] + givens_dot_product[1, 0]
@@ -293,11 +297,12 @@ def joint_diagonalization(cumulant_matrices, num_principal_components, total_cum
                     givens_matrix = np.matrix([[cosine_theta, -sine_theta], [sine_theta, cosine_theta]])
                     component_pair = np.array([component_p, component_q])
 
-                    rotation_matrix[:, component_pair] *= givens_matrix
+                    rotation_matrix[:, component_pair] = np.dot(rotation_matrix[:, component_pair], givens_matrix)
+                    print("rotation matrix", rotation_matrix.shape())
                     cumulant_matrices[component_pair, :] = givens_matrix.T * cumulant_matrices[component_pair, :]
                     cumulant_matrices[:, np.concatenate([index_p, index_q])] = \
                         np.append(cosine_theta * cumulant_matrices[:, index_p] + sine_theta * cumulant_matrices[:, index_q],
-                                  -sine_theta * cumulant_matrices[:, index_p] + cosine_theta * cumulant_matrices[:, index_q], axis=1)
+                              -sine_theta * cumulant_matrices[:, index_p] + cosine_theta * cumulant_matrices[:, index_q], axis=1)
                     on_diagonal_sum += rotation_gain
                     off_diagonal_sum -= rotation_gain
 
@@ -316,7 +321,7 @@ def sort_separating_matrix(separating_matrix):
     Returns:
     numpy.matrix: Sorted separating matrix.
     """
-
+    print("function: sort separating matrix")
     # Validate input
     if not isinstance(separating_matrix, np.matrix) or separating_matrix.ndim != 2:
         raise TypeError("separating_matrix must be a 2-dimensional numpy matrix.")
@@ -355,6 +360,7 @@ def fix_matrix_signs(separating_matrix):
     numpy.matrix: The separating matrix with adjusted signs.
     """
 
+    print("function: fix matrix signs")
     # Validate input
     if not isinstance(separating_matrix, np.matrix) or separating_matrix.ndim != 2:
         raise TypeError("separating_matrix must be a 2-dimensional numpy matrix.")
@@ -368,48 +374,6 @@ def fix_matrix_signs(separating_matrix):
             separating_matrix[i, :] *= -1
 
     return separating_matrix
-
-def get_dataset_frame(dataset_path):
-    with open(dataset_path) as f:
-        # Find index of last line starting with "#" and skip rows until then
-        for i, line in enumerate(f):
-            if not line.startswith("#"):
-                break
-        # Read CSV from that line - columns also start with "#"
-        return pd.read_csv(dataset_path, skiprows=i-1)
-
-def preprocess_LIBS_data(file_path, debug=False):
-    df = get_dataset_frame(file_path)
-
-    # Clean up column names
-    df.columns = df.columns.str.strip()
-    df.columns = df.columns.str.replace("# ", "")
-
-    exclude = ["mean", "median"]
-    first_five_shots = [f"shot{i}" for i in range(1, 6)]
-    df.drop(exclude + first_five_shots, axis=1, inplace=True)
-
-    for mask in masks:
-        df = df.loc[~((df["wave"] >= mask[0]) & (df["wave"] <= mask[1]))]
-    print("Number of wavelengths before threshold:", df.shape[0])
-
-    # Set 'wave' as the index and transpose the DataFrame
-    df = df.set_index('wave').transpose()
-
-    # Recalculate variances and threshold on the transposed DataFrame
-    variances = df.var(axis=0)
-    print("Variances:", variances)
-    threshold = variances.mean()
-    print("Threshold:", threshold)
-
-    selected_wavelengths = variances[variances > threshold].index
-    print("Selected wavelengths", selected_wavelengths)
-
-    df = df[selected_wavelengths]
-    
-    print("Number of wavelengths after threshold:", df.shape[1])
-
-    return df
 
 def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     """
@@ -466,7 +430,7 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
         cumulant_matrices_storage[:, storage_start_index:storage_end_index] = cumulant_matrix
 
 
-    rotation_matrix = joint_diagonalization(cumulant_matrices_storage, num_components, num_cumulant_matrices, num_samples)
+    rotation_matrix = joint_diagonalization(cumulant_matrices_storage, num_components, num_samples)
     print("Rotation matrix {}", rotation_matrix.shape)
 
     separating_matrix = rotation_matrix.T
@@ -485,7 +449,6 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     print("Separating matrix after fix matrix signs function {}", separating_matrix)
 
     return separating_matrix.astype(input_data_type)
-
 
 class JADE:
     def __init__(self, num_components=4):
@@ -518,20 +481,22 @@ class JADE:
         return unmixing_matrix
 
     def transform(self, mixed_signal_matrix):
-        print("Shape of mixed signal matrix in transform ", mixed_signal_matrix.shape)
+        print("shape of mixed signal matrix", mixed_signal_matrix.shape)
 
         if self.unmixing_matrix is None:
             raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
 
-        # Transpose if necessary
-        if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[1]:
+        # Check if transposition is needed
+        if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[0]:
             mixed_signal_matrix = mixed_signal_matrix.T
 
-        # Ensure the matrix is still in the correct shape after transpose
-        if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[1]:
-            raise ValueError("Mismatch in matrix shapes for transformation.")
+        # Recheck the dimensions after transposition
+        #if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[0]:
+            #raise ValueError("Mismatch in matrix shapes for transformation. Expected {}, got {}".format(self.unmixing_matrix.shape[0], mixed_signal_matrix.shape[0]))
 
         return np.dot(self.unmixing_matrix, mixed_signal_matrix).T
+
+
 
     def correlate_loadings(self, df, corrcols, icacols):
         """
@@ -561,33 +526,104 @@ class JADE:
         self.ica_jade_corr = corrdf
         self.ica_jade_ids = ica_jade_ids
 
+def get_dataset_frame(dataset_path):
+    with open(dataset_path) as f:
+        # Find index of last line starting with "#" and skip rows until then
+        for i, line in enumerate(f):
+            if not line.startswith("#"):
+                break
+        # Read CSV from that line - columns also start with "#"
+        return pd.read_csv(dataset_path, skiprows=i-1)
+
+def initial_preprocess(file_path):
+    df = get_dataset_frame(file_path)
+
+    # Clean up column names
+    df.columns = df.columns.str.strip()
+    df.columns = df.columns.str.replace("# ", "")
+
+    # Drop specific columns
+    exclude = ["mean", "median"]
+    first_five_shots = [f"shot{i}" for i in range(1, 6)]
+    df.drop(exclude + first_five_shots, axis=1, inplace=True)
+
+    # Apply any masking required
+    for mask in masks:
+        df = df.loc[~((df["wave"] >= mask[0]) & (df["wave"] <= mask[1]))]
+
+    return df
+
+def variance_based_selection(df):
+    # Calculate variances without transposing
+    variances = df.var(axis=1)
+    threshold = variances.mean()
+
+    # Select wavelengths based on the threshold
+    selected_wavelengths = variances[variances > threshold].index
+    df_selected = df.loc[selected_wavelengths]
+
+    # Transpose the DataFrame for ICA
+    df_transposed = df_selected.transpose()
+
+    return df_transposed
+
+def average_datasets(parent_directory):
+    aggregated_data = []
+
+    for subdirpath, subdirnames, _ in os.walk(parent_directory):
+        for subdirname in subdirnames:
+            dir_path = os.path.join(subdirpath, subdirname)
+            csv_files = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.endswith('.csv')]
+
+            for file_path in csv_files:
+                df = initial_preprocess(file_path)
+                aggregated_data.append(df)
+
+    if aggregated_data:
+        # Concatenate all DataFrames along the rows
+        combined_df = pd.concat(aggregated_data, axis=0)
+
+        # Calculate the mean across rows for each wavelength
+        # This assumes that the index of each DataFrame is the wavelength
+        averaged_df = combined_df.groupby('wave').mean()
+        
+        return averaged_df
+    else:
+        return None
+
 
 def main():
-    file_path = "./data/data/calib/calib_2015/1600mm/pls/cadillac/2013_08_06_200120_ccs.csv"
+    parent_directory = "/home/iho/projects/thesis-chemcam/baseline/data/data/calib/calib_2015/1600mm/pls"
 
-    debug = True  # Set this to True for debugging with a smaller dataset
+    # Averaging datasets
+    combined_data = average_datasets(parent_directory)
 
+    if combined_data is None:
+        print("No data to process.")
+        return
+
+    processed_data = variance_based_selection(combined_data)
+    #processed_data.to_csv("processed_data.csv")
+    print("Processed data shape:", processed_data.shape)
+
+    # Debug mode
+    debug = False
     if debug:
-        # Load and preprocess data
-        debug_data = preprocess_LIBS_data(file_path, debug=True)
-
-        # Select a small subset of the data for debugging
-        # For example, select the first 100 rows and 100 columns
-        subset_data = debug_data.iloc[:4, :50]
+        subset_data = processed_data.iloc[:4, :50]
         print("Subset data shape:", subset_data.shape)
 
-        # Proceed with your JADE model fitting on the subset
         jade_model = JADE(num_components=4)
-        jade_model.fit(subset_data.values.T)
+        jade_model.fit(subset_data.values)
         separated_signals = jade_model.transform(subset_data.values)
         print(separated_signals)
 
     else:
         # Normal processing with the full dataset
-        preprocessed_data = preprocess_LIBS_data(file_path, debug=False)
-        jade_model = JADE(num_components=4)
-        jade_model.fit(preprocessed_data.values)
-        separated_signals = jade_model.transform(preprocessed_data.values)
+        num_features = processed_data.shape[1]
+        jade_model = JADE(num_components=min(8, num_features))
+        jade_model.fit(processed_data.values)
+        separated_signals = jade_model.transform(processed_data.values)
+        print("Separated signals shape:", separated_signals.shape)
 
 if __name__ == "__main__":
     main()
