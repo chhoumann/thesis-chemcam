@@ -50,53 +50,43 @@ def check_input(X_input, num_components=None, verbose=True):
     return X_input, input_data_type, num_components, num_samples
 
 
-def perform_whitening(preprocessed_data, num_samples, verbose=True):
+def perform_whitening(preprocessed_data, num_samples, num_components, verbose=True):
     """
     Perform whitening on the given preprocessed data.
 
     Parameters:
-    preprocessed_data (numpy.matrix): The data matrix after preprocessing.
+    preprocessed_data (numpy.ndarray): The data matrix after preprocessing.
     num_samples (int): The number of samples in each signal.
+    num_components (int): The number of independent components to extract.
     verbose (bool): If True, additional information is printed.
 
     Returns:
-    numpy.matrix: The whitened data matrix.
-    numpy.matrix: The whitening matrix.
+    numpy.ndarray: The whitened data matrix.
+    numpy.ndarray: The whitening matrix.
     """
     print("function: perform whitening")
     if verbose:
         print("jade -> Performing whitening on the data")
 
-    # Validate input data
-    if not isinstance(preprocessed_data, np.matrix):
-        raise TypeError("preprocessed_data must be a numpy matrix.")
-
-    if preprocessed_data.ndim != 2:
-        raise ValueError("preprocessed_data must be a 2-dimensional matrix.")
-
-    if num_samples is None or not isinstance(num_samples, int):
-        raise TypeError("num_samples must be an integer.")
-
-    if num_samples < 1:
-        raise ValueError("num_samples must be a positive integer.")
-
     # Compute the covariance matrix of the data
-    covariance_matrix = (preprocessed_data * preprocessed_data.T) / float(num_samples)
+    covariance_matrix = np.cov(preprocessed_data)
 
     # Perform eigenvalue decomposition on the covariance matrix
-    eigenvalues, eigenvectors = eig(covariance_matrix)
+    eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
 
     # Sort eigenvalues in descending order and get the sorted indices
-    sorted_indices = eigenvalues.argsort()[::-1]
-    sorted_eigenvalues = eigenvalues[sorted_indices]
+    sorted_indices = np.argsort(eigenvalues)[::-1]
+
+    # Select the top 'num_components' eigenvectors
+    eigenvectors = eigenvectors[:, sorted_indices[:num_components]]
+    eigenvalues = eigenvalues[sorted_indices[:num_components]]
 
     # Whitening: Create the whitening matrix
-    # The scaling factor for each eigenvalue is the inverse of the square root
-    scaling_factors = np.sqrt(sorted_eigenvalues)
-    whitening_matrix = eigenvectors[:, sorted_indices] @ np.diag(1. / scaling_factors) @ eigenvectors[:, sorted_indices].T
+    scaling_factors = np.sqrt(eigenvalues)
+    whitening_matrix = np.dot(eigenvectors, np.diag(1. / scaling_factors))
 
     # Apply the whitening matrix to the data
-    whitened_data = whitening_matrix @ preprocessed_data
+    whitened_data = np.dot(whitening_matrix.T, preprocessed_data)
 
     if verbose:
         print("Shape of whitening_matrix:", whitening_matrix.shape)
@@ -105,6 +95,10 @@ def perform_whitening(preprocessed_data, num_samples, verbose=True):
 
     return whitened_data, whitening_matrix
 
+
+    
+
+    return whitened_data, whitening_matrix
 
 def initialize_cumulant_matrices_storage(num_samples, num_components):
     """
@@ -281,7 +275,7 @@ def joint_diagonalization(cumulant_matrices, num_independent_components, num_sam
 
                 # Compute Givens rotation angles
                 givens_vector = np.concatenate([cumulant_matrices[component_p, index_p] - cumulant_matrices[component_q, index_q],
-                                            cumulant_matrices[component_p, index_q] + cumulant_matrices[component_q, index_p]])
+                                                cumulant_matrices[component_p, index_q] + cumulant_matrices[component_q, index_p]])
                 givens_dot_product = np.dot(givens_vector, givens_vector.T)
                 tonality = givens_dot_product[0, 0] - givens_dot_product[1, 1]
                 off_diagonal_sum_new = givens_dot_product[0, 1] + givens_dot_product[1, 0]
@@ -294,15 +288,14 @@ def joint_diagonalization(cumulant_matrices, num_independent_components, num_sam
                     current_sweep_updates += 1
                     cosine_theta = np.cos(rotation_angle)
                     sine_theta = np.sin(rotation_angle)
-                    givens_matrix = np.matrix([[cosine_theta, -sine_theta], [sine_theta, cosine_theta]])
+                    givens_matrix = np.array([[cosine_theta, -sine_theta], [sine_theta, cosine_theta]])
                     component_pair = np.array([component_p, component_q])
 
                     rotation_matrix[:, component_pair] = np.dot(rotation_matrix[:, component_pair], givens_matrix)
-                    print("rotation matrix", rotation_matrix.shape())
-                    cumulant_matrices[component_pair, :] = givens_matrix.T * cumulant_matrices[component_pair, :]
+                    cumulant_matrices[component_pair, :] = np.dot(givens_matrix.T, cumulant_matrices[component_pair, :])
                     cumulant_matrices[:, np.concatenate([index_p, index_q])] = \
                         np.append(cosine_theta * cumulant_matrices[:, index_p] + sine_theta * cumulant_matrices[:, index_q],
-                              -sine_theta * cumulant_matrices[:, index_p] + cosine_theta * cumulant_matrices[:, index_q], axis=1)
+                                  -sine_theta * cumulant_matrices[:, index_p] + cosine_theta * cumulant_matrices[:, index_q], axis=1)
                     on_diagonal_sum += rotation_gain
                     off_diagonal_sum -= rotation_gain
 
@@ -316,15 +309,15 @@ def sort_separating_matrix(separating_matrix):
     Sort the rows of the separating matrix based on the energy of the components.
 
     Parameters:
-    separating_matrix (numpy.matrix): The separating matrix.
+    separating_matrix (numpy.ndarray): The separating matrix.
 
     Returns:
-    numpy.matrix: Sorted separating matrix.
+    numpy.ndarray: Sorted separating matrix.
     """
-    print("function: sort separating matrix")
+    print("function: sort separating matrix", type(separating_matrix))
     # Validate input
-    if not isinstance(separating_matrix, np.matrix) or separating_matrix.ndim != 2:
-        raise TypeError("separating_matrix must be a 2-dimensional numpy matrix.")
+    if not isinstance(separating_matrix, np.ndarray) or separating_matrix.ndim != 2:
+        raise TypeError("separating_matrix must be a 2-dimensional numpy array.")
 
     # Compute the pseudo-inverse (mixing matrix) of the separating matrix
     mixing_matrix = np.linalg.pinv(separating_matrix)
@@ -336,16 +329,10 @@ def sort_separating_matrix(separating_matrix):
     # Determine the order of components based on their energy (descending order)
     energy_order = np.argsort(energy_per_component)[::-1]
 
-    # Convert separating_matrix to a numpy array for proper indexing
-    separating_matrix = np.asarray(separating_matrix)
-
     # Sort the separating matrix rows according to the energy order
     sorted_matrix = separating_matrix[energy_order, :]
 
-    # Convert the sorted array back to a matrix
-    sorted_matrix = np.matrix(sorted_matrix)
-
-    # Return the sorted matrix with the most energetic components first
+    # No need to convert back to matrix
     return sorted_matrix[::-1, :]
 
 
@@ -354,16 +341,16 @@ def fix_matrix_signs(separating_matrix):
     Adjust the signs of the rows of the separating matrix.
 
     Parameters:
-    separating_matrix (numpy.matrix): The separating matrix.
+    separating_matrix (numpy.ndarray): The separating matrix.
 
     Returns:
-    numpy.matrix: The separating matrix with adjusted signs.
+    numpy.ndarray: The separating matrix with adjusted signs.
     """
 
     print("function: fix matrix signs")
     # Validate input
-    if not isinstance(separating_matrix, np.matrix) or separating_matrix.ndim != 2:
-        raise TypeError("separating_matrix must be a 2-dimensional numpy matrix.")
+    if not isinstance(separating_matrix, np.ndarray) or separating_matrix.ndim != 2:
+        raise TypeError("separating_matrix must be a 2-dimensional numpy array.")
 
     # Iterate over each row of the separating matrix
     for i in range(separating_matrix.shape[0]):
@@ -374,6 +361,7 @@ def fix_matrix_signs(separating_matrix):
             separating_matrix[i, :] *= -1
 
     return separating_matrix
+
 
 def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     """
@@ -408,10 +396,7 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     preprocessed_data, input_data_type, num_components, num_samples = check_input(mixed_signal_matrix, num_components, verbose)
 
     # whitening & PCA
-    whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_samples, verbose)
-
-    # Clean up by deleting variables that are no longer needed to free up memory
-    del whitened_matrix
+    whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_samples, num_components, verbose)
 
     if verbose:
         print("jade -> Estimating cumulant matrices")
@@ -448,12 +433,13 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     separating_matrix = fix_matrix_signs(separating_matrix)
     print("Separating matrix after fix matrix signs function {}", separating_matrix)
 
-    return separating_matrix.astype(input_data_type)
+    return separating_matrix.astype(input_data_type), whitened_matrix
 
 class JADE:
     def __init__(self, num_components=4):
         self.num_components = num_components
         self.unmixing_matrix = None
+        self.whitening_matrix = None
         self.ica_jade_loadings = None
         self.ica_jade_corr = None
         self.ica_jade_ids = None
@@ -469,7 +455,7 @@ class JADE:
         numpy.ndarray: The unmixing matrix after applying JADE.
         """
         mixed_signal_matrix = np.array(mixed_signal_matrix)
-        unmixing_matrix = jadeR(mixed_signal_matrix, num_components=self.num_components)
+        unmixing_matrix, self.whitening_matrix = jadeR(mixed_signal_matrix, num_components=self.num_components)
         print("shape of unmixing matrix ", unmixing_matrix.shape)
 
         # Adjust the sign of each row for better interpretability
@@ -483,20 +469,19 @@ class JADE:
     def transform(self, mixed_signal_matrix):
         print("shape of mixed signal matrix", mixed_signal_matrix.shape)
 
-        if self.unmixing_matrix is None:
+        if self.unmixing_matrix is None or self.whitening_matrix is None:
             raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
 
+        # First, apply the whitening matrix to the input data
+        whitened_data = np.dot(self.whitening_matrix.T, mixed_signal_matrix)
+
         # Check if transposition is needed
-        if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[0]:
-            mixed_signal_matrix = mixed_signal_matrix.T
+        if whitened_data.shape[0] != self.unmixing_matrix.shape[0]:
+            whitened_data = whitened_data.T
 
-        # Recheck the dimensions after transposition
-        #if mixed_signal_matrix.shape[0] != self.unmixing_matrix.shape[0]:
-            #raise ValueError("Mismatch in matrix shapes for transformation. Expected {}, got {}".format(self.unmixing_matrix.shape[0], mixed_signal_matrix.shape[0]))
-
-        return np.dot(self.unmixing_matrix, mixed_signal_matrix).T
-
-
+        # Apply the unmixing matrix to the whitened data
+        separated_signals = np.dot(self.unmixing_matrix, whitened_data).T
+        return separated_signals
 
     def correlate_loadings(self, df, corrcols, icacols):
         """
@@ -621,9 +606,12 @@ def main():
         # Normal processing with the full dataset
         num_features = processed_data.shape[1]
         jade_model = JADE(num_components=min(8, num_features))
+        print("processed data:", processed_data.values)
+        #return
         jade_model.fit(processed_data.values)
         separated_signals = jade_model.transform(processed_data.values)
         print("Separated signals shape:", separated_signals.shape)
+        print("Separated signals:", separated_signals)
 
 if __name__ == "__main__":
     main()
