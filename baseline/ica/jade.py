@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple, Optional
 import numpy as np
 import pandas as pd
 
@@ -30,6 +30,7 @@ class JADE:
                 unmixing_matrix[i, :] *= -1
 
         self.unmixing_matrix = unmixing_matrix
+
         return unmixing_matrix
 
     def transform(self, mixed_signal_matrix: np.ndarray) -> np.ndarray:
@@ -393,8 +394,6 @@ def fix_matrix_signs(separating_matrix):
     Returns:
     numpy.ndarray: The separating matrix with adjusted signs.
     """
-
-    print("function: fix matrix signs")
     # Validate input
     if not isinstance(separating_matrix, np.ndarray) or separating_matrix.ndim != 2:
         raise TypeError("separating_matrix must be a 2-dimensional numpy array.")
@@ -410,7 +409,7 @@ def fix_matrix_signs(separating_matrix):
     return separating_matrix
 
 
-def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
+def jadeR(mixed_signal_matrix: np.ndarray, num_components: Optional[int] = None, verbose: bool = True) -> Tuple[np.ndarray, np.ndarray]:
     """
     Parameters:
 
@@ -440,9 +439,8 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
 
     # Original code had: X, origtype, m, n, T
 
+    # Validating input and performing whitening & PCA
     preprocessed_data, input_data_type, num_components, num_samples = validate_input(mixed_signal_matrix, num_components, verbose)
-
-    # whitening & PCA
     whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_components, verbose)
 
     if verbose:
@@ -454,29 +452,28 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     # Compute and store cumulant matrices
     for component_index in range(num_components):
         cumulant_matrix = compute_cumulant_matrix(whitened_data.T, num_components, component_index, num_cumulant_matrices)
-        print("Shape of cumulant matrix {}", cumulant_matrix.shape)
 
-        # Store the computed cumulant matrix in the appropriate location
+        # Store the computed cumulant matrix
         storage_start_index = component_index * num_components
         storage_end_index = storage_start_index + num_components
         cumulant_matrices_storage[:, storage_start_index:storage_end_index] = cumulant_matrix
 
+    # Perform joint diagonalization
     rotation_matrix = joint_diagonalization(cumulant_matrices_storage, num_components)
-    print("Rotation matrix {}", rotation_matrix.shape)
 
+    # Extract separating matrix
     separating_matrix = rotation_matrix.T
-    print("Separating matrix {}", separating_matrix.shape)
 
-    # Apply the sorting and sign fixing
+    # Sorting the components
     if verbose:
         print("jade -> Sorting the components")
-    separating_matrix = sort_separating_matrix(separating_matrix)
-    print("Separating matrix after sort separating matrix function {}", separating_matrix.shape)
-    print("Separating matrix type after sort separating matrix function {}", type(separating_matrix))
 
+    separating_matrix = sort_separating_matrix(separating_matrix)
+
+    # Fix the signs of the separating matrix
     if verbose:
         print("jade -> Fixing the signs")
+
     separating_matrix = fix_matrix_signs(separating_matrix)
-    print("Separating matrix after fix matrix signs function {}", separating_matrix)
 
     return separating_matrix.astype(input_data_type), whitened_matrix
