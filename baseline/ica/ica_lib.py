@@ -1,11 +1,7 @@
-from sys import stdout
-import os
 import numpy as np
 from numpy import *
 from numpy.linalg import eig, pinv
-from pathlib import Path
-import pandas as pd
-from reproduction import masks
+from ica.preprocess import preprocess_data
 import matplotlib.pyplot as plt
 
 
@@ -494,83 +490,8 @@ class JADE:
         self.ica_jade_ids = ica_jade_ids
 
 
-def get_dataset_frame(dataset_path):
-    with open(dataset_path) as f:
-        # Find index of last line starting with "#" and skip rows until then
-        for i, line in enumerate(f):
-            if not line.startswith("#"):
-                break
-        # Read CSV from that line - columns also start with "#"
-        return pd.read_csv(dataset_path, skiprows=i-1)
-
-def initial_preprocess(file_path):
-    df = get_dataset_frame(file_path)
-
-    # Clean up column names
-    df.columns = df.columns.str.strip()
-    df.columns = df.columns.str.replace("# ", "")
-
-    # Drop specific columns
-    exclude = ["mean", "median"]
-    first_five_shots = [f"shot{i}" for i in range(1, 6)]
-    df.drop(exclude + first_five_shots, axis=1, inplace=True)
-
-    # Apply any masking required
-    for mask in masks:
-        df = df.loc[~((df["wave"] >= mask[0]) & (df["wave"] <= mask[1]))]
-
-    return df
-
-def variance_based_selection(df):
-    # Calculate variances without transposing
-    variances = df.var(axis=1)
-    threshold = variances.mean()
-
-    # Select wavelengths based on the threshold
-    selected_wavelengths = variances[variances > threshold].index
-    df_selected = df.loc[selected_wavelengths]
-
-    # Transpose the DataFrame for ICA
-    df_transposed = df_selected.transpose()
-
-    return df_transposed
-
-def average_datasets(parent_directory):
-    aggregated_data = []
-
-    for subdirpath, subdirnames, _ in os.walk(parent_directory):
-        for subdirname in subdirnames:
-            dir_path = os.path.join(subdirpath, subdirname)
-            csv_files = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.endswith('.csv')]
-
-            for file_path in csv_files:
-                df = initial_preprocess(file_path)
-                aggregated_data.append(df)
-
-    if aggregated_data:
-        # Concatenate all DataFrames along the rows
-        combined_df = pd.concat(aggregated_data, axis=0)
-
-        # Calculate the mean across rows for each wavelength
-        # This assumes that the index of each DataFrame is the wavelength
-        averaged_df = combined_df.groupby('wave').mean()
-
-        return averaged_df
-    else:
-        return None
-
-
 def main():
-    parent_directory = "./data/data/calib/calib_2015/1600mm/pls"
-
-    # Averaging datasets
-    combined_data = average_datasets(parent_directory)
-
-    if combined_data is None:
-        print("No data to process.")
-        return
-
-    processed_data = variance_based_selection(combined_data)
+    processed_data = preprocess_data("./data/data/calib/calib_2015/1600mm/pls")
     print("Processed data shape:", processed_data.shape)
 
     num_features = processed_data.shape[1]
