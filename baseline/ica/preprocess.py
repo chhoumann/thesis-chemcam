@@ -75,12 +75,12 @@ def variance_based_selection(df):
 
 
 def preprocess_data(parent_directory):
-    combined_data = average_datasets(parent_directory)
+    data = average_datasets(parent_directory)
 
-    if combined_data is None:
+    if data is None:
         print("No data to process.")
         return
 
-    processed_data = variance_based_selection(combined_data)
+    data = variance_based_selection(data)
 
-    return processed_data
+    return data

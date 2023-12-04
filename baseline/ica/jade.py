@@ -1,11 +1,89 @@
 import numpy as np
 from numpy import *
-from numpy.linalg import eig, pinv
-from ica.preprocess import preprocess_data
-import matplotlib.pyplot as plt
 
 
-def check_input(X_input, num_components=None, verbose=True):
+class JADE:
+    def __init__(self, num_components=4):
+        self.num_components = num_components
+        self.unmixing_matrix = None
+        self.whitening_matrix = None
+        self.ica_jade_loadings = None
+        self.ica_jade_corr = None
+        self.ica_jade_ids = None
+
+    def fit(self, mixed_signal_matrix):
+        """
+        Fit the JADE model to the data.
+
+        Parameters:
+        mixed_signal_matrix (numpy.ndarray): The mixed signal data matrix.
+
+        Returns:
+        numpy.ndarray: The unmixing matrix after applying JADE.
+        """
+        mixed_signal_matrix = np.array(mixed_signal_matrix)
+        unmixing_matrix, self.whitening_matrix = jadeR(mixed_signal_matrix, num_components=self.num_components)
+        print("shape of unmixing matrix ", unmixing_matrix.shape)
+
+        # Adjust the sign of each row for better interpretability
+        for i in range(unmixing_matrix.shape[0]):
+            if np.abs(np.max(unmixing_matrix[i, :])) < np.abs(np.min(unmixing_matrix[i, :])):
+                unmixing_matrix[i, :] *= -1
+
+        self.unmixing_matrix = unmixing_matrix
+        return unmixing_matrix
+
+    def transform(self, mixed_signal_matrix):
+        print("shape of mixed signal matrix", mixed_signal_matrix.shape)
+
+        if self.unmixing_matrix is None or self.whitening_matrix is None:
+            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
+
+        # Transpose the mixed_signal_matrix to align it for matrix multiplication
+        mixed_signal_matrix = mixed_signal_matrix.T
+
+        # First, apply the whitening matrix to the transposed input data
+        whitened_data = np.dot(self.whitening_matrix, mixed_signal_matrix)
+
+        # Apply the unmixing matrix to the whitened data
+        separated_signals = np.dot(self.unmixing_matrix, whitened_data).T
+        return separated_signals
+
+
+    def correlate_loadings(self, df, corrcols, ic_labels):
+        """
+        Find the correlation between loadings and a set of columns.
+
+        Parameters:
+        df (pandas.DataFrame): The DataFrame containing data.
+        corrcols (list): List of columns to correlate.
+        ic_labels (list): List of ICA column labels.
+
+        Updates:
+        self.ica_jade_corr: DataFrame of correlations.
+        self.ica_jade_ids: Identifiers for the correlated loadings.
+        """
+        if self.unmixing_matrix is None:
+            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
+
+        # Compute the correlation matrix and filter it for relevant columns and rows
+        corrdf = df.corr().drop(ic_labels, axis=1).drop(corrcols, axis=0)
+        ica_jade_ids = []
+
+        # Iterate over each independent component label
+        for ic_label in ic_labels:
+            tmp = corrdf.loc[ic_label]
+            print(tmp)
+            max_corr = np.max(tmp)
+            match = tmp.values == max_corr
+            matched_col = corrcols[np.where(match)[0][0]]
+            ica_jade_ids.append(f"{matched_col} (r={np.round(max_corr, 1)})")
+
+        self.ica_jade_corr = corrdf
+        self.ica_jade_ids = ica_jade_ids
+
+
+def validate_input(X_input, num_components=None, verbose=True):
     print("function: check input")
 
     # Check if X is a NumPy ndarray
@@ -90,6 +168,7 @@ def perform_whitening(preprocessed_data, num_components, verbose=True):
         print("jade -> Whitening completed")
 
     return whitened_data.T, whitening_matrix
+
 
 def initialize_cumulant_matrices_storage(num_samples, num_components):
     """
@@ -176,7 +255,6 @@ def compute_cumulant_matrix(preprocessed_data, num_components, component_index, 
                 cumulant_matrix[j, i] = cumulant
 
     return cumulant_matrix
-
 
 
 def initialize_diagonalization(num_components, num_cumulant_matrices):
@@ -277,8 +355,6 @@ def joint_diagonalization(cumulant_matrices, num_components):
     return rotation_matrix
 
 
-
-
 def sort_separating_matrix(separating_matrix):
     """
     Sort the rows of the separating matrix based on the energy of the components.
@@ -368,7 +444,7 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
 
     # Original code had: X, origtype, m, n, T
 
-    preprocessed_data, input_data_type, num_components, num_samples = check_input(mixed_signal_matrix, num_components, verbose)
+    preprocessed_data, input_data_type, num_components, num_samples = validate_input(mixed_signal_matrix, num_components, verbose)
 
     # whitening & PCA
     whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_components, verbose)
@@ -408,115 +484,3 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     print("Separating matrix after fix matrix signs function {}", separating_matrix)
 
     return separating_matrix.astype(input_data_type), whitened_matrix
-
-class JADE:
-    def __init__(self, num_components=4):
-        self.num_components = num_components
-        self.unmixing_matrix = None
-        self.whitening_matrix = None
-        self.ica_jade_loadings = None
-        self.ica_jade_corr = None
-        self.ica_jade_ids = None
-
-    def fit(self, mixed_signal_matrix):
-        """
-        Fit the JADE model to the data.
-
-        Parameters:
-        mixed_signal_matrix (numpy.ndarray): The mixed signal data matrix.
-
-        Returns:
-        numpy.ndarray: The unmixing matrix after applying JADE.
-        """
-        mixed_signal_matrix = np.array(mixed_signal_matrix)
-        unmixing_matrix, self.whitening_matrix = jadeR(mixed_signal_matrix, num_components=self.num_components)
-        print("shape of unmixing matrix ", unmixing_matrix.shape)
-
-        # Adjust the sign of each row for better interpretability
-        for i in range(unmixing_matrix.shape[0]):
-            if np.abs(np.max(unmixing_matrix[i, :])) < np.abs(np.min(unmixing_matrix[i, :])):
-                unmixing_matrix[i, :] *= -1
-
-        self.unmixing_matrix = unmixing_matrix
-        return unmixing_matrix
-
-    def transform(self, mixed_signal_matrix):
-        print("shape of mixed signal matrix", mixed_signal_matrix.shape)
-
-        if self.unmixing_matrix is None or self.whitening_matrix is None:
-            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
-
-        # Transpose the mixed_signal_matrix to align it for matrix multiplication
-        mixed_signal_matrix = mixed_signal_matrix.T
-
-        # First, apply the whitening matrix to the transposed input data
-        whitened_data = np.dot(self.whitening_matrix, mixed_signal_matrix)
-
-        # Apply the unmixing matrix to the whitened data
-        separated_signals = np.dot(self.unmixing_matrix, whitened_data).T
-        return separated_signals
-
-
-    def correlate_loadings(self, df, corrcols, ic_labels):
-        """
-        Find the correlation between loadings and a set of columns.
-
-        Parameters:
-        df (pandas.DataFrame): The DataFrame containing data.
-        corrcols (list): List of columns to correlate.
-        ic_labels (list): List of ICA column labels.
-
-        Updates:
-        self.ica_jade_corr: DataFrame of correlations.
-        self.ica_jade_ids: Identifiers for the correlated loadings.
-        """
-        if self.unmixing_matrix is None:
-            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
-
-        # Compute the correlation matrix and filter it for relevant columns and rows
-        corrdf = df.corr().drop(ic_labels, axis=1).drop(corrcols, axis=0)
-        ica_jade_ids = []
-
-        # Iterate over each independent component label
-        for ic_label in ic_labels:
-            tmp = corrdf.loc[ic_label]
-            print(tmp)
-            max_corr = np.max(tmp)
-            match = tmp.values == max_corr
-            matched_col = corrcols[np.where(match)[0][0]]
-            ica_jade_ids.append(f"{matched_col} (r={np.round(max_corr, 1)})")
-
-        self.ica_jade_corr = corrdf
-        self.ica_jade_ids = ica_jade_ids
-
-
-def main():
-    processed_data = preprocess_data("./data/data/calib/calib_2015/1600mm/pls")
-    print("Processed data shape:", processed_data.shape)
-
-    num_features = processed_data.shape[1]
-    jade_model = JADE(num_components=min(8, num_features))
-    print("processed data:", processed_data.values)
-    jade_model.fit(processed_data.values)
-    separated_signals = jade_model.transform(processed_data.values)
-    print("Separated signals shape:", separated_signals.shape)
-    print("Separated signals:", separated_signals)
-
-    # Assuming you want to correlate all original features with the independent components
-    corrcols = processed_data.columns.tolist()  # All columns in processed_data
-    icacols = ['IC' + str(i) for i in range(1, jade_model.num_components + 1)]  # List of independent components
-
-    # Add the separated signals to the processed data for correlation
-    for i, col in enumerate(icacols):
-        processed_data[col] = separated_signals[:, i]
-
-    # Perform correlation
-    jade_model.correlate_loadings(processed_data, corrcols, icacols)
-
-    # Print or inspect the correlation results
-    print("ICA-JADE Correlations:", jade_model.ica_jade_corr)
-    print("ICA-JADE IDs:", jade_model.ica_jade_ids)
-
-
-if __name__ == "__main__":
-    main()
