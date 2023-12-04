@@ -81,8 +81,6 @@ class JADE:
 
 
 def validate_input(X_input, num_components=None, verbose=True):
-    print("function: check input")
-
     # Check if X is a NumPy ndarray
     assert isinstance(X_input, np.ndarray), \
         "X (input data matrix) is of the wrong type (%s)" % type(X_input)
@@ -202,6 +200,7 @@ def initialize_cumulant_matrices_storage(num_samples, num_components):
         f"Cumulant matrices storage has incorrect dimensions. Expected: {expected_shape}, Got: {cumulant_matrices_storage.shape}"
 
     return cumulant_matrices_storage, num_cumulant_matrices
+
 
 def compute_cumulant_matrix(preprocessed_data, num_components, component_index, num_cumulant_matrices):
     """
@@ -384,7 +383,7 @@ def sort_separating_matrix(separating_matrix):
     return sorted_matrix[::-1, :]
 
 
-def fix_matrix_signs(separating_matrix):
+def fix_matrix_signs(separating_matrix: np.ndarray) -> np.ndarray:
     """
     Adjust the signs of the rows of the separating matrix.
 
