@@ -1,31 +1,12 @@
 version: "3.8"
-
 services:
-    postgres:
-        image: postgres:latest
-        environment:
-            POSTGRES_USER: mlflow
-            POSTGRES_PASSWORD: mlflow
-            POSTGRES_DB: mlflow
-        ports:
-            - "5432:5432"
-        volumes:
-            - postgres_data:/var/lib/postgresql/data
-
-    mlflow:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        environment:
-            MLFLOW_BACKEND_STORE_URI: postgresql://mlflow:mlflow@postgres:5432/mlflow
-            MLFLOW_DEFAULT_ARTIFACT_ROOT: /mlflow/artifacts
+    mlflow-server:
+        image: ghcr.io/mlflow/mlflow:latest
         ports:
             - "5000:5000"
+        command: mlflow server -h 0.0.0.0 -p 5000
         volumes:
-            - mlflow_artifacts:/mlflow/artifacts
-        depends_on:
-            - postgres
+            - mlflow-data:/mlflow
 
 volumes:
-    postgres_data:
-    mlflow_artifacts:
+    mlflow-data:
