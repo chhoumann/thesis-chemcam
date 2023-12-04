@@ -50,13 +50,44 @@ major_oxides = [
 ]
 
 
-paper_rmses_full_model = {
-    "SiO2": 5.66,
-    "TiO2": 0.51,
-    "Al2O3": 2.79,
-    "FeOT": 3.34,
-    "MgO": 1.43,
-    "CaO": 1.8,
-    "Na2O": 0.6,
-    "K2O": 0.78,
+paper_individual_sm_rmses = {
+    "Full": {
+        "SiO2": 5.66,
+        "TiO2": 0.51,
+        "Al2O3": 2.79,
+        "FeOT": 3.34,
+        "MgO": 1.43,
+        "CaO": 1.8,
+        "Na2O": 0.6,
+        "K2O": 0.78,
+    },
+    "Low": {
+        "SiO2": 4.24,
+        "TiO2": 0.26,
+        "Al2O3": 1.58,
+        "FeOT": 2.08,
+        "MgO": 0.47,
+        "CaO": 1.17,
+        "Na2O": 0.51,
+        "K2O": 0.32,
+    },
+    "Mid": {
+        "SiO2": 3.46,
+        "TiO2": 0.61,
+        "Al2O3": 1.89,
+        "FeOT": 1.97,
+        "MgO": 1.33,
+        "CaO": 1.49,
+        # Na2O and K2O are not included in the mid range
+    },
+    "High": {
+        "SiO2": 4.07,
+        "TiO2": 6.09,
+        "Al2O3": 2.03,
+        "FeOT": 3.68,
+        "MgO": 2.43,
+        "CaO": 2.38,
+        "Na2O": 0.54,
+        "K2O": 0.74,
+    },
 }
