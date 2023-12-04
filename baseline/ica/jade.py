@@ -1,4 +1,5 @@
 from typing import List, Tuple, Optional
+from numpy import matrix
 import numpy as np
 import pandas as pd
 
@@ -80,7 +81,7 @@ class JADE:
 
 
 
-def validate_input(X_input, num_components=None, verbose=True):
+def validate_input(X_input: np.ndarray, num_components: Optional[int] = None, verbose: bool = True) -> Tuple[np.matrix, np.dtype, int, int]:
     # Check if X is a NumPy ndarray
     assert isinstance(X_input, np.ndarray), \
         "X (input data matrix) is of the wrong type (%s)" % type(X_input)
@@ -104,6 +105,7 @@ def validate_input(X_input, num_components=None, verbose=True):
     # Set the number of sources to the number of sensors if not specified
     if num_components is None:
         num_components = num_signals
+
     # Check if the number of sources does not exceed the number of sensors
     assert num_components <= num_signals, \
         "jade -> Do not ask more sources (%d) than sensors (%d) here!!!" % (num_components, num_signals)
@@ -119,7 +121,7 @@ def validate_input(X_input, num_components=None, verbose=True):
     return X_input, input_data_type, num_components, num_samples
 
 
-def perform_whitening(preprocessed_data, num_components, verbose=True):
+def perform_whitening(preprocessed_data: np.ndarray, num_components: int, verbose: bool = True) -> Tuple[np.ndarray, np.ndarray]:
     """
     Perform whitening on the given preprocessed data.
 
@@ -133,7 +135,6 @@ def perform_whitening(preprocessed_data, num_components, verbose=True):
     numpy.ndarray: The whitened data matrix.
     numpy.ndarray: The whitening matrix.
     """
-    print("function: perform whitening")
     if verbose:
         print("jade -> Performing whitening on the data")
 
@@ -165,7 +166,7 @@ def perform_whitening(preprocessed_data, num_components, verbose=True):
     return whitened_data.T, whitening_matrix
 
 
-def initialize_cumulant_matrices_storage(num_samples, num_components):
+def initialize_cumulant_matrices_storage(num_samples: int, num_components: int) -> Tuple[np.ndarray, int]:
     """
     Initialize the storage for cumulant matrices.
 
@@ -177,7 +178,6 @@ def initialize_cumulant_matrices_storage(num_samples, num_components):
     numpy.matrix: Initialized matrix for storing cumulant matrices.
     int: Number of cumulant matrices.
     """
-    print("function: initialize cumulant matrices storage")
     # Validate input
     if not isinstance(num_samples, int) or num_samples <= 0:
         raise ValueError("num_samples must be a positive integer.")
@@ -202,7 +202,7 @@ def initialize_cumulant_matrices_storage(num_samples, num_components):
     return cumulant_matrices_storage, num_cumulant_matrices
 
 
-def compute_cumulant_matrix(preprocessed_data, num_components, component_index, num_cumulant_matrices):
+def compute_cumulant_matrix(preprocessed_data: np.matrix, num_components: int, component_index: int, num_cumulant_matrices: int) -> np.matrix:
     """
     Compute an individual cumulant matrix for a given component.
 
@@ -215,7 +215,6 @@ def compute_cumulant_matrix(preprocessed_data, num_components, component_index, 
     Returns:
     numpy.matrix: The computed cumulant matrix for the given component.
     """
-    print("function: compute cumulant matrix")
     # Validate input
     if not isinstance(preprocessed_data, np.matrix) or preprocessed_data.ndim != 2:
         raise TypeError("preprocessed_data must be a 2-dimensional numpy matrix.")
@@ -253,7 +252,7 @@ def compute_cumulant_matrix(preprocessed_data, num_components, component_index, 
     return cumulant_matrix
 
 
-def initialize_diagonalization(num_components, num_cumulant_matrices):
+def initialize_diagonalization(num_components: int, num_cumulant_matrices: int) -> Tuple[matrix, float, float]:
     """
     Initialize matrices and variables for the diagonalization process.
 
@@ -267,7 +266,6 @@ def initialize_diagonalization(num_components, num_cumulant_matrices):
         - on_diagonal (float): Sum of squared diagonal elements.
         - off_diagonal (float): Sum of squared off-diagonal elements.
     """
-    print("function: initialize diagonalization")
     # Validate input
     if not isinstance(num_components, int) or num_components <= 0:
         raise ValueError("num_components must be a positive integer.")
