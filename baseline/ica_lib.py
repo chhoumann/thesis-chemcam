@@ -50,7 +50,7 @@ def check_input(X_input, num_components=None, verbose=True):
     return X_input, input_data_type, num_components, num_samples
 
 
-def perform_whitening(preprocessed_data, num_samples, num_components, verbose=True):
+def perform_whitening(preprocessed_data, num_components, verbose=True):
     """
     Perform whitening on the given preprocessed data.
 
@@ -375,7 +375,7 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
     preprocessed_data, input_data_type, num_components, num_samples = check_input(mixed_signal_matrix, num_components, verbose)
 
     # whitening & PCA
-    whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_samples, num_components, verbose)
+    whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_components, verbose)
 
     if verbose:
         print("jade -> Estimating cumulant matrices")
@@ -461,14 +461,14 @@ class JADE:
         return separated_signals
 
 
-    def correlate_loadings(self, df, corrcols, icacols):
+    def correlate_loadings(self, df, corrcols, ic_labels):
         """
         Find the correlation between loadings and a set of columns.
 
         Parameters:
         df (pandas.DataFrame): The DataFrame containing data.
         corrcols (list): List of columns to correlate.
-        icacols (list): List of ICA columns.
+        ic_labels (list): List of ICA column labels.
 
         Updates:
         self.ica_jade_corr: DataFrame of correlations.
@@ -477,10 +477,14 @@ class JADE:
         if self.unmixing_matrix is None:
             raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
 
-        corrdf = df.corr().drop(icacols, axis=1).drop(corrcols, axis=0)
+        # Compute the correlation matrix and filter it for relevant columns and rows
+        corrdf = df.corr().drop(ic_labels, axis=1).drop(corrcols, axis=0)
         ica_jade_ids = []
-        for i in corrdf.loc['ICA-JADE'].index:
-            tmp = corrdf.loc[('ICA-JADE', i)]
+
+        # Iterate over each independent component label
+        for ic_label in ic_labels:
+            tmp = corrdf.loc[ic_label]
+            print(tmp)
             max_corr = np.max(tmp)
             match = tmp.values == max_corr
             matched_col = corrcols[np.where(match)[0][0]]
@@ -488,6 +492,7 @@ class JADE:
 
         self.ica_jade_corr = corrdf
         self.ica_jade_ids = ica_jade_ids
+
 
 def get_dataset_frame(dataset_path):
     with open(dataset_path) as f:
@@ -566,30 +571,31 @@ def main():
         return
 
     processed_data = variance_based_selection(combined_data)
-    #processed_data.to_csv("processed_data.csv")
     print("Processed data shape:", processed_data.shape)
 
-    # Debug mode
-    debug = False
-    if debug:
-        subset_data = processed_data.iloc[:4, :50]
-        print("Subset data shape:", subset_data.shape)
+    num_features = processed_data.shape[1]
+    jade_model = JADE(num_components=min(7, num_features))
+    print("processed data:", processed_data.values)
+    jade_model.fit(processed_data.values)
+    separated_signals = jade_model.transform(processed_data.values)
+    print("Separated signals shape:", separated_signals.shape)
+    print("Separated signals:", separated_signals)
 
-        jade_model = JADE(num_components=4)
-        jade_model.fit(subset_data.values)
-        separated_signals = jade_model.transform(subset_data.values)
-        print(separated_signals)
+    # Assuming you want to correlate all original features with the independent components
+    corrcols = processed_data.columns.tolist()  # All columns in processed_data
+    icacols = ['IC' + str(i) for i in range(1, jade_model.num_components + 1)]  # List of independent components
 
-    else:
-        # Normal processing with the full dataset
-        num_features = processed_data.shape[1]
-        jade_model = JADE(num_components=min(8, num_features))
-        print("processed data:", processed_data.values)
-        #return
-        jade_model.fit(processed_data.values)
-        separated_signals = jade_model.transform(processed_data.values)
-        print("Separated signals shape:", separated_signals.shape)
-        print("Separated signals:", separated_signals)
+    # Add the separated signals to the processed data for correlation
+    for i, col in enumerate(icacols):
+        processed_data[col] = separated_signals[:, i]
+
+    # Perform correlation
+    jade_model.correlate_loadings(processed_data, corrcols, icacols)
+
+    # Print or inspect the correlation results
+    print("ICA-JADE Correlations:", jade_model.ica_jade_corr)
+    print("ICA-JADE IDs:", jade_model.ica_jade_ids)
+
 
 if __name__ == "__main__":
     main()
