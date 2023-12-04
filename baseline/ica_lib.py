@@ -69,7 +69,7 @@ def perform_whitening(preprocessed_data, num_samples, num_components, verbose=Tr
         print("jade -> Performing whitening on the data")
 
     # Compute the covariance matrix of the data
-    covariance_matrix = np.cov(preprocessed_data)
+    covariance_matrix = np.cov(preprocessed_data.T)
 
     # Perform eigenvalue decomposition on the covariance matrix
     eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
@@ -83,22 +83,17 @@ def perform_whitening(preprocessed_data, num_samples, num_components, verbose=Tr
 
     # Whitening: Create the whitening matrix
     scaling_factors = np.sqrt(eigenvalues)
-    whitening_matrix = np.dot(eigenvectors, np.diag(1. / scaling_factors))
+    whitening_matrix = (eigenvectors / scaling_factors).T
 
     # Apply the whitening matrix to the data
-    whitened_data = np.dot(whitening_matrix.T, preprocessed_data)
+    whitened_data = np.dot(whitening_matrix, preprocessed_data.T)
 
     if verbose:
         print("Shape of whitening_matrix:", whitening_matrix.shape)
         print("Shape of whitened_data:", whitened_data.shape)
         print("jade -> Whitening completed")
 
-    return whitened_data, whitening_matrix
-
-
-    
-
-    return whitened_data, whitening_matrix
+    return whitened_data.T, whitening_matrix
 
 def initialize_cumulant_matrices_storage(num_samples, num_components):
     """
@@ -125,24 +120,24 @@ def initialize_cumulant_matrices_storage(num_samples, num_components):
     # Initialize a zero matrix for storing cumulant matrices.
     # The size is num_samples x (num_samples * num_cumulant_matrices)
     # This structure allows storing each cumulant matrix as a column block.
-    cumulant_matrices_storage = np.matrix(np.zeros([num_samples, num_samples * num_cumulant_matrices], dtype=np.float64))
+    cumulant_matrices_storage = np.zeros([num_components, num_components * num_components], dtype=np.float64)
     print("Shape of cumulant matrices storage {}", cumulant_matrices_storage.shape)
 
     # Ensure that the matrix has the correct dimensions
-    expected_shape = (num_samples, num_samples * num_cumulant_matrices)
+    expected_shape = (num_components, num_components * num_cumulant_matrices)
     print("Expected shape of cumulant matrices storage {}", expected_shape)
     assert cumulant_matrices_storage.shape == expected_shape, \
         f"Cumulant matrices storage has incorrect dimensions. Expected: {expected_shape}, Got: {cumulant_matrices_storage.shape}"
 
     return cumulant_matrices_storage, num_cumulant_matrices
 
-def compute_cumulant_matrix(preprocessed_data, num_samples, component_index, num_cumulant_matrices):
+def compute_cumulant_matrix(preprocessed_data, num_components, component_index, num_cumulant_matrices):
     """
     Compute an individual cumulant matrix for a given component.
 
     Parameters:
     preprocessed_data (numpy.matrix): Transposed preprocessed data matrix.
-    num_samples (int): Number of samples in each signal.
+    num_components (int): Number of components.
     component_index (int): Index of the current component.
     num_cumulant_matrices (int): Total number of cumulant matrices.
 
@@ -154,8 +149,8 @@ def compute_cumulant_matrix(preprocessed_data, num_samples, component_index, num
     if not isinstance(preprocessed_data, np.matrix) or preprocessed_data.ndim != 2:
         raise TypeError("preprocessed_data must be a 2-dimensional numpy matrix.")
 
-    if not isinstance(num_samples, int) or num_samples <= 0:
-        raise ValueError("num_samples must be a positive integer.")
+    if not isinstance(num_components, int) or num_components <= 0:
+        raise ValueError("num_components must be a positive integer.")
 
     if not isinstance(component_index, int) or component_index < 0 or component_index >= preprocessed_data.shape[1]:
         raise ValueError("component_index must be a non-negative integer less than the number of columns in preprocessed_data.")
@@ -167,12 +162,12 @@ def compute_cumulant_matrix(preprocessed_data, num_samples, component_index, num
     component_signal = preprocessed_data[:, component_index]
 
     # Initialize the cumulant matrix
-    cumulant_matrix = np.zeros((preprocessed_data.shape[0], preprocessed_data.shape[0]))
+    cumulant_matrix = np.zeros((num_components, num_components))
 
     # Vectorize computation for the cumulant matrix
-    for i in range(preprocessed_data.shape[0]):
+    for i in range(num_components):
         Xii = component_signal[i] * component_signal[i]  # Square of the ith component
-        for j in range(i, preprocessed_data.shape[0]):
+        for j in range(i, num_components):
             Xjj = component_signal[j] * component_signal[j]  # Square of the jth component
             Xij = component_signal[i] * component_signal[j]  # Product of ith and jth components
 
@@ -185,6 +180,7 @@ def compute_cumulant_matrix(preprocessed_data, num_samples, component_index, num
                 cumulant_matrix[j, i] = cumulant
 
     return cumulant_matrix
+
 
 
 def initialize_diagonalization(num_components, num_cumulant_matrices):
@@ -226,66 +222,48 @@ def initialize_diagonalization(num_components, num_cumulant_matrices):
     return rotation_matrix, on_diagonal, off_diagonal
 
 
-def joint_diagonalization(cumulant_matrices, num_independent_components, num_samples):
-    """
-    Perform joint diagonalization on the cumulant matrices for ICA.
-
-    Parameters:
-    cumulant_matrices (numpy.ndarray): Storage matrix containing cumulant matrices.
-    num_independent_components (int): Number of independent components to extract.
-    num_samples (int): Number of samples in the dataset.
-
-    Returns:
-    numpy.ndarray: The rotation matrix for ICA.
-    """
+def joint_diagonalization(cumulant_matrices, num_components):
     print("function: joint diagonalization")
 
     # Input validation
     if not isinstance(cumulant_matrices, np.ndarray) or cumulant_matrices.ndim != 2:
         raise TypeError("cumulant_matrices must be a 2-dimensional numpy array.")
 
-    if cumulant_matrices.shape[0] != num_samples or cumulant_matrices.shape[1] != num_samples * num_independent_components:
-        raise ValueError("cumulant_matrices must have shape (num_samples, num_samples * num_independent_components)")
+    if cumulant_matrices.shape[0] != num_components or cumulant_matrices.shape[1] != num_components * num_components:
+        raise ValueError("cumulant_matrices must have shape (num_components, num_components * num_components)")
 
-    if not isinstance(num_independent_components, int) or num_independent_components <= 0:
-        raise ValueError("num_independent_components must be a positive integer.")
+    if not isinstance(num_components, int) or num_components <= 0:
+        raise ValueError("num_components must be a positive integer.")
 
-    if not isinstance(num_samples, int) or num_samples <= 0:
-        raise ValueError("num_samples must be a positive integer.")
+    # Initialize rotation matrix
+    rotation_matrix = np.eye(num_components)
 
-    # Initialize rotation matrix and diagonal/off-diagonal values
-    rotation_matrix = np.eye(num_independent_components)
-    on_diagonal_sum = off_diagonal_sum = 0.0
-
-    convergence_threshold = 1.0e-6 / np.sqrt(num_samples)
+    # Convergence threshold and initialization
+    convergence_threshold = 1.0e-6 / np.sqrt(num_components)
     continue_diagonalization = True
-    total_sweeps = 0
-    total_updates = 0
+    max_iterations = 1000  # Set a maximum number of iterations to prevent potential infinite loop
+    iteration_count = 0
 
-    while continue_diagonalization:
+    while continue_diagonalization and iteration_count < max_iterations:
         continue_diagonalization = False
-        total_sweeps += 1
-        current_sweep_updates = 0
+        iteration_count += 1
 
-        for component_p in range(num_independent_components - 1):
-            for component_q in range(component_p + 1, num_independent_components):
+        for component_p in range(num_components - 1):
+            index_p = np.arange(component_p, num_components * num_components, num_components)
+            Cpp = np.sum(cumulant_matrices[component_p, index_p] ** 2)
 
-                index_p = np.arange(component_p, num_samples * num_independent_components, num_independent_components)
-                index_q = np.arange(component_q, num_samples * num_independent_components, num_independent_components)
+            for component_q in range(component_p + 1, num_components):
+                index_q = np.arange(component_q, num_components * num_components, num_components)
+                Cqq = np.sum(cumulant_matrices[component_q, index_q] ** 2)
+                Cpq = np.sum(cumulant_matrices[component_p, index_p] * cumulant_matrices[component_q, index_q])
 
-                # Compute Givens rotation angles
-                givens_vector = np.concatenate([cumulant_matrices[component_p, index_p] - cumulant_matrices[component_q, index_q],
-                                                cumulant_matrices[component_p, index_q] + cumulant_matrices[component_q, index_p]])
-                givens_dot_product = np.dot(givens_vector, givens_vector.T)
-                tonality = givens_dot_product[0, 0] - givens_dot_product[1, 1]
-                off_diagonal_sum_new = givens_dot_product[0, 1] + givens_dot_product[1, 0]
+                tonality = Cpp - Cqq
+                off_diagonal_sum_new = 2 * Cpq
                 rotation_angle = 0.5 * np.arctan2(off_diagonal_sum_new, tonality + np.sqrt(tonality * tonality + off_diagonal_sum_new * off_diagonal_sum_new))
-                rotation_gain = (np.sqrt(tonality * tonality + off_diagonal_sum_new * off_diagonal_sum_new) - tonality) / 4.0
 
                 # Update based on Givens rotation
                 if abs(rotation_angle) > convergence_threshold:
                     continue_diagonalization = True
-                    current_sweep_updates += 1
                     cosine_theta = np.cos(rotation_angle)
                     sine_theta = np.sin(rotation_angle)
                     givens_matrix = np.array([[cosine_theta, -sine_theta], [sine_theta, cosine_theta]])
@@ -296,12 +274,13 @@ def joint_diagonalization(cumulant_matrices, num_independent_components, num_sam
                     cumulant_matrices[:, np.concatenate([index_p, index_q])] = \
                         np.append(cosine_theta * cumulant_matrices[:, index_p] + sine_theta * cumulant_matrices[:, index_q],
                                   -sine_theta * cumulant_matrices[:, index_p] + cosine_theta * cumulant_matrices[:, index_q], axis=1)
-                    on_diagonal_sum += rotation_gain
-                    off_diagonal_sum -= rotation_gain
 
-        total_updates += current_sweep_updates
+    if iteration_count >= max_iterations:
+        print("Warning: Maximum iterations reached in joint diagonalization")
 
     return rotation_matrix
+
+
 
 
 def sort_separating_matrix(separating_matrix):
@@ -406,16 +385,15 @@ def jadeR(mixed_signal_matrix, num_components=None, verbose=True):
 
     # Compute and store cumulant matrices
     for component_index in range(num_components):
-        cumulant_matrix = compute_cumulant_matrix(whitened_data.T, num_samples, component_index, num_cumulant_matrices)
+        cumulant_matrix = compute_cumulant_matrix(whitened_data.T, num_components, component_index, num_cumulant_matrices)
         print("Shape of cumulant matrix {}", cumulant_matrix.shape)
 
         # Store the computed cumulant matrix in the appropriate location
-        storage_start_index = component_index * num_samples
-        storage_end_index = storage_start_index + num_samples
+        storage_start_index = component_index * num_components
+        storage_end_index = storage_start_index + num_components
         cumulant_matrices_storage[:, storage_start_index:storage_end_index] = cumulant_matrix
 
-
-    rotation_matrix = joint_diagonalization(cumulant_matrices_storage, num_components, num_samples)
+    rotation_matrix = joint_diagonalization(cumulant_matrices_storage, num_components)
     print("Rotation matrix {}", rotation_matrix.shape)
 
     separating_matrix = rotation_matrix.T
@@ -465,23 +443,23 @@ class JADE:
 
         self.unmixing_matrix = unmixing_matrix
         return unmixing_matrix
-
+    
     def transform(self, mixed_signal_matrix):
         print("shape of mixed signal matrix", mixed_signal_matrix.shape)
 
         if self.unmixing_matrix is None or self.whitening_matrix is None:
             raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
 
-        # First, apply the whitening matrix to the input data
-        whitened_data = np.dot(self.whitening_matrix.T, mixed_signal_matrix)
+        # Transpose the mixed_signal_matrix to align it for matrix multiplication
+        mixed_signal_matrix = mixed_signal_matrix.T
 
-        # Check if transposition is needed
-        if whitened_data.shape[0] != self.unmixing_matrix.shape[0]:
-            whitened_data = whitened_data.T
+        # First, apply the whitening matrix to the transposed input data
+        whitened_data = np.dot(self.whitening_matrix, mixed_signal_matrix)
 
         # Apply the unmixing matrix to the whitened data
         separated_signals = np.dot(self.unmixing_matrix, whitened_data).T
         return separated_signals
+
 
     def correlate_loadings(self, df, corrcols, icacols):
         """
