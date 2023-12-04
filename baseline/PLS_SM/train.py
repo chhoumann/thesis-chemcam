@@ -7,7 +7,12 @@ from tqdm import tqdm
 
 from .config import logger
 from .data import CustomSpectralPipeline, load_data
-from .reproduction import major_oxides, masks, oxide_ranges, paper_rmses_full_model
+from .reproduction import (
+    major_oxides,
+    masks,
+    oxide_ranges,
+    paper_rmses_full_model,
+)
 from .utils import custom_kfold_cross_validation
 
 # Initialize MLflow
@@ -37,7 +42,9 @@ def filter_data_by_compositional_range(data, compositional_range, oxide):
     data = data.dropna(subset=[oxide])
 
     # Filter the dataset based on the oxide concentration within the specified range
-    filtered_data = data[(data[oxide] >= lower_bound) & (data[oxide] <= upper_bound)]
+    filtered_data = data[
+        (data[oxide] >= lower_bound) & (data[oxide] <= upper_bound)
+    ]
 
     return filtered_data
 
@@ -109,7 +116,9 @@ def train_model(
                 )  # Adjust n_components as needed
 
                 logger.info("Extracting features and target for training.")
-                X_train = train_data.drop(columns=major_oxides + ["Sample Name"])
+                X_train = train_data.drop(
+                    columns=major_oxides + ["Sample Name"]
+                )
                 y_train = train_data[oxide]
                 logger.info("Extracting features and target for testing.")
                 X_test = test_data.drop(columns=major_oxides + ["Sample Name"])
@@ -137,7 +146,9 @@ def train_model(
             mlflow.log_metric("avg_rmse", float(avg_rmse))
             mlflow.log_metric("paper_rmse", paper_rmses_full_model[oxide])
             mlflow.sklearn.log_model(
-                best_model, "model", registered_model_name=f"Best_{oxide}_full_model"
+                best_model,
+                "model",
+                registered_model_name=f"Best_{oxide}_full_model",
             )
 
             logger.info(
