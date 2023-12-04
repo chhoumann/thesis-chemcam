@@ -351,7 +351,7 @@ def joint_diagonalization(cumulant_matrices, num_components):
     return rotation_matrix
 
 
-def sort_separating_matrix(separating_matrix):
+def sort_separating_matrix(separating_matrix: np.ndarray) -> np.ndarray:
     """
     Sort the rows of the separating matrix based on the energy of the components.
 
@@ -361,7 +361,6 @@ def sort_separating_matrix(separating_matrix):
     Returns:
     numpy.ndarray: Sorted separating matrix.
     """
-    print("function: sort separating matrix", type(separating_matrix))
     # Validate input
     if not isinstance(separating_matrix, np.ndarray) or separating_matrix.ndim != 2:
         raise TypeError("separating_matrix must be a 2-dimensional numpy array.")
