@@ -443,7 +443,7 @@ class JADE:
 
         self.unmixing_matrix = unmixing_matrix
         return unmixing_matrix
-    
+
     def transform(self, mixed_signal_matrix):
         print("shape of mixed signal matrix", mixed_signal_matrix.shape)
 
@@ -554,14 +554,14 @@ def average_datasets(parent_directory):
         # Calculate the mean across rows for each wavelength
         # This assumes that the index of each DataFrame is the wavelength
         averaged_df = combined_df.groupby('wave').mean()
-        
+
         return averaged_df
     else:
         return None
 
 
 def main():
-    parent_directory = "/home/iho/projects/thesis-chemcam/baseline/data/data/calib/calib_2015/1600mm/pls"
+    parent_directory = "./data/data/calib/calib_2015/1600mm/pls"
 
     # Averaging datasets
     combined_data = average_datasets(parent_directory)
