@@ -292,9 +292,17 @@ def initialize_diagonalization(num_components, num_cumulant_matrices):
     return rotation_matrix, on_diagonal, off_diagonal
 
 
-def joint_diagonalization(cumulant_matrices, num_components):
-    print("function: joint diagonalization")
+def joint_diagonalization(cumulant_matrices: np.ndarray, num_components: int) -> np.ndarray:
+    """
+    Perform joint diagonalization on a set of cumulant matrices.
 
+    Parameters:
+    cumulant_matrices (numpy.ndarray): A 2-dimensional array containing cumulant matrices.
+    num_components (int): The number of components for diagonalization.
+
+    Returns:
+    numpy.ndarray: The rotation matrix resulting from the joint diagonalization.
+    """
     # Input validation
     if not isinstance(cumulant_matrices, np.ndarray) or cumulant_matrices.ndim != 2:
         raise TypeError("cumulant_matrices must be a 2-dimensional numpy array.")
