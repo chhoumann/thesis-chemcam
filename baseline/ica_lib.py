@@ -574,7 +574,7 @@ def main():
     print("Processed data shape:", processed_data.shape)
 
     num_features = processed_data.shape[1]
-    jade_model = JADE(num_components=min(7, num_features))
+    jade_model = JADE(num_components=min(8, num_features))
     print("processed data:", processed_data.values)
     jade_model.fit(processed_data.values)
     separated_signals = jade_model.transform(processed_data.values)
