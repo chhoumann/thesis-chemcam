@@ -3,6 +3,7 @@ from numpy import matrix
 import numpy as np
 import pandas as pd
 
+
 class JADE:
     def __init__(self, num_components: int = 4) -> None:
         self.num_components: int = num_components
@@ -78,7 +79,6 @@ class JADE:
 
         self.ica_jade_corr = corrdf
         self.ica_jade_ids = ica_jade_ids
-
 
 
 def validate_input(X_input: np.ndarray, num_components: Optional[int] = None, verbose: bool = True) -> Tuple[np.matrix, np.dtype, int, int]:
