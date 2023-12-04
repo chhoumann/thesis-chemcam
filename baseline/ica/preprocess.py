@@ -1,9 +1,10 @@
 import pandas as pd
 import os
 from reproduction import masks
+from typing import Optional
 
 
-def average_datasets(parent_directory):
+def average_datasets(parent_directory: str) -> pd.DataFrame:
     aggregated_data = []
 
     for subdirpath, subdirnames, _ in os.walk(parent_directory):
@@ -15,20 +16,20 @@ def average_datasets(parent_directory):
                 df = initial_preprocess(file_path)
                 aggregated_data.append(df)
 
-    if aggregated_data:
-        # Concatenate all DataFrames along the rows
-        combined_df = pd.concat(aggregated_data, axis=0)
+    if not aggregated_data:
+        raise ValueError("No data to process.")
 
-        # Calculate the mean across rows for each wavelength
-        # This assumes that the index of each DataFrame is the wavelength
-        averaged_df = combined_df.groupby('wave').mean()
+    # Concatenate all DataFrames along the rows
+    combined_df = pd.concat(aggregated_data, axis=0)
 
-        return averaged_df
-    else:
-        return None
+    # Calculate the mean across rows for each wavelength
+    # This assumes that the index of each DataFrame is the wavelength
+    averaged_df = combined_df.groupby('wave').mean()
+
+    return averaged_df
 
 
-def initial_preprocess(file_path):
+def initial_preprocess(file_path: str) -> pd.DataFrame:
     df = get_dataset_frame(file_path)
 
     # Clean up column names
@@ -47,7 +48,7 @@ def initial_preprocess(file_path):
     return df
 
 
-def get_dataset_frame(dataset_path):
+def get_dataset_frame(dataset_path: str) -> pd.DataFrame:
     with open(dataset_path) as f:
         # Find index of last line starting with "#" and skip rows until then
         for i, line in enumerate(f):
@@ -58,7 +59,7 @@ def get_dataset_frame(dataset_path):
         return pd.read_csv(dataset_path, skiprows=i-1)
 
 
-def variance_based_selection(df):
+def variance_based_selection(df: pd.DataFrame) -> pd.DataFrame:
     # Calculate variances without transposing
     variances = df.var(axis=1)
     threshold = variances.mean()
@@ -73,13 +74,8 @@ def variance_based_selection(df):
     return df_transposed
 
 
-def preprocess_data(parent_directory):
+def preprocess_data(parent_directory: str) -> pd.DataFrame:
     data = average_datasets(parent_directory)
-
-    if data is None:
-        print("No data to process.")
-        return
-
     data = variance_based_selection(data)
 
     return data
