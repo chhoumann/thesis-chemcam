@@ -1,17 +1,17 @@
+from typing import List
 import numpy as np
-from numpy import *
-
+import pandas as pd
 
 class JADE:
-    def __init__(self, num_components=4):
-        self.num_components = num_components
-        self.unmixing_matrix = None
-        self.whitening_matrix = None
-        self.ica_jade_loadings = None
-        self.ica_jade_corr = None
-        self.ica_jade_ids = None
+    def __init__(self, num_components: int = 4) -> None:
+        self.num_components: int = num_components
+        self.unmixing_matrix: np.ndarray = None
+        self.whitening_matrix: np.ndarray = None
+        self.ica_jade_loadings: np.ndarray = None
+        self.ica_jade_corr: pd.DataFrame = None
+        self.ica_jade_ids: List[str] = None
 
-    def fit(self, mixed_signal_matrix):
+    def fit(self, mixed_signal_matrix: np.ndarray) -> np.ndarray:
         """
         Fit the JADE model to the data.
 
@@ -23,7 +23,6 @@ class JADE:
         """
         mixed_signal_matrix = np.array(mixed_signal_matrix)
         unmixing_matrix, self.whitening_matrix = jadeR(mixed_signal_matrix, num_components=self.num_components)
-        print("shape of unmixing matrix ", unmixing_matrix.shape)
 
         # Adjust the sign of each row for better interpretability
         for i in range(unmixing_matrix.shape[0]):
@@ -33,9 +32,7 @@ class JADE:
         self.unmixing_matrix = unmixing_matrix
         return unmixing_matrix
 
-    def transform(self, mixed_signal_matrix):
-        print("shape of mixed signal matrix", mixed_signal_matrix.shape)
-
+    def transform(self, mixed_signal_matrix: np.ndarray) -> np.ndarray:
         if self.unmixing_matrix is None or self.whitening_matrix is None:
             raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
 
@@ -49,8 +46,7 @@ class JADE:
         separated_signals = np.dot(self.unmixing_matrix, whitened_data).T
         return separated_signals
 
-
-    def correlate_loadings(self, df, corrcols, ic_labels):
+    def correlate_loadings(self, df: pd.DataFrame, corrcols: List[str], ic_labels: List[str]) -> None:
         """
         Find the correlation between loadings and a set of columns.
 
@@ -73,7 +69,6 @@ class JADE:
         # Iterate over each independent component label
         for ic_label in ic_labels:
             tmp = corrdf.loc[ic_label]
-            print(tmp)
             max_corr = np.max(tmp)
             match = tmp.values == max_corr
             matched_col = corrcols[np.where(match)[0][0]]
@@ -81,6 +76,7 @@ class JADE:
 
         self.ica_jade_corr = corrdf
         self.ica_jade_ids = ica_jade_ids
+
 
 
 def validate_input(X_input, num_components=None, verbose=True):

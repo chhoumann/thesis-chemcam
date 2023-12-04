@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 from reproduction import masks
-from pathlib import Path
 
 
 def average_datasets(parent_directory):
