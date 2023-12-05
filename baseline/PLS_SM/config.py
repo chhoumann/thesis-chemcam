@@ -31,7 +31,7 @@ logging_config = {
             "class": "logging.StreamHandler",
             "stream": sys.stdout,
             "formatter": "minimal",
-            "level": logging.DEBUG,
+            "level": logging.info,
         },
         "info": {
             "class": "logging.handlers.RotatingFileHandler",
