@@ -1,19 +1,18 @@
 import pandas as pd
+import glob
 import os
 from reproduction import masks
 
 
-def average_datasets(parent_directory: str) -> pd.DataFrame:
+def average_datasets(target_dir: str) -> pd.DataFrame:
     aggregated_data = []
 
-    for subdirpath, subdirnames, _ in os.walk(parent_directory):
-        for subdirname in subdirnames:
-            dir_path = os.path.join(subdirpath, subdirname)
-            csv_files = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.endswith('.csv')]
+    path_pattern = os.path.join(target_dir, "*.csv")
+    csv_files = glob.glob(path_pattern)
 
-            for file_path in csv_files:
-                df = initial_preprocess(file_path)
-                aggregated_data.append(df)
+    for file_path in csv_files:
+        df = initial_preprocess(file_path)
+        aggregated_data.append(df)
 
     if not aggregated_data:
         raise ValueError("No data to process.")
@@ -73,8 +72,8 @@ def variance_based_selection(df: pd.DataFrame) -> pd.DataFrame:
     return df_transposed
 
 
-def preprocess_data(parent_directory: str) -> pd.DataFrame:
-    data = average_datasets(parent_directory)
+def preprocess_data(target_dir: str) -> pd.DataFrame:
+    data = average_datasets(target_dir)
     data = variance_based_selection(data)
 
     return data
