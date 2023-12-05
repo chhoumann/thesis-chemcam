@@ -75,36 +75,3 @@ def plot_leverage_residuals(leverage, Q, outliers, plot_file_path=None) -> None:
 
     if plot_file_path:
         fig.savefig(plot_file_path)
-
-
-# def iteratively_remove_outliers(
-#     X: pd.DataFrame, y: pd.DataFrame, n_components: int = 2
-# ):
-#     model = train_model(X, y, n_components)
-#     leverage, Q = calculate_leverage_residuals(model, X)
-
-#     outliers = identify_outliers(leverage, Q)
-    # Initial training
-    # model = train_model(X_train, Y_train, optimal_num_components)
-    # initial_performance = evaluate_model(model, X_val, Y_val)
-
-    # while True:
-    #     leverage, Q = calculate_leverage_residuals(model, X_train)
-    #     outliers = identify_outliers(leverage, Q, leverage_threshold, Q_threshold)
-
-    #     if not np.any(outliers):
-    #         break
-
-    #     # Remove outliers
-    #     X_train = X_train[~outliers]
-    #     Y_train = Y_train[~outliers]
-
-    #     # Retrain model
-    #     model = train_model(X_train, Y_train, optimal_num_components)
-    #     new_performance = evaluate_model(model, X_val, Y_val)
-
-    #     if new_performance <= initial_performance:
-    #         # Stop if performance does not improve or degrades
-    #         break
-
-    #     initial_performance = new_performance
