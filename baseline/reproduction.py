@@ -6,6 +6,12 @@ masks = [
     (849, 905.574),
 ]
 
+spectrometer_wavelength_ranges = {
+    "UV": (223.4, 325.97),
+    "VIS": (381.86, 471.03),
+    "VNIR": (494.93, 927.06),
+}
+
 oxide_ranges = {
     "SiO2": {
         "Full": (0, 100),
@@ -36,6 +42,56 @@ oxide_ranges = {
     "Na2O": {"Full": (0, 100), "Low": (0, 4), "High": (3.5, 100)},
     "K2O": {"Full": (0, 100), "Low": (0, 2), "High": (1.5, 100)},
 }
+
+training_info = {
+    "SiO2": {
+        "Full": {"range": (0, 100), "n_components": 6, "normalization": 1},
+        "Low": {"range": (0, 50), "n_components": 9, "normalization": 3},
+        "Mid": {"range": (30, 70), "n_components": 6, "normalization": 3},
+        "High": {"range": (60, 100), "n_components": 5, "normalization": 1},
+    },
+    "TiO2": {
+        "Full": {"range": (0, 100), "n_components": 5, "normalization": 3},
+        "Low": {"range": (0, 2), "n_components": 7, "normalization": 3},
+        "Mid": {"range": (1, 5), "n_components": 5, "normalization": 1},
+        "High": {"range": (3, 100), "n_components": 3, "normalization": 3},
+    },
+    "Al2O3": {
+        "Full": {"range": (0, 100), "n_components": 6, "normalization": 3},
+        "Low": {"range": (0, 12), "n_components": 6, "normalization": 1},
+        "Mid": {"range": (10, 25), "n_components": 8, "normalization": 1},
+        "High": {"range": (20, 100), "n_components": 6, "normalization": 1},
+    },
+    "FeOT": {
+        "Full": {"range": (0, 100), "n_components": 8, "normalization": 3},
+        "Low": {"range": (0, 15), "n_components": 3, "normalization": 3},
+        "Mid": {"range": (5, 25), "n_components": 8, "normalization": 1},
+        "High": {"range": (15, 100), "n_components": 3, "normalization": 3},
+    },
+    "MgO": {
+        "Full": {"range": (0, 100), "n_components": 7, "normalization": 3},
+        "Low": {"range": (0, 3.5), "n_components": 6, "normalization": 1},
+        "Mid": {"range": (0, 20), "n_components": 9, "normalization": 1},
+        "High": {"range": (8, 100), "n_components": 8, "normalization": 1},
+    },
+    "CaO": {
+        "Full": {"range": (0, 42), "n_components": 8, "normalization": 3},
+        "Low": {"range": (0, 7), "n_components": 9, "normalization": 1},
+        "Mid": {"range": (0, 15), "n_components": 9, "normalization": 3},
+        "High": {"range": (30, 100), "n_components": 6, "normalization": 3},
+    },
+    "Na2O": {
+        "Full": {"range": (0, 100), "n_components": 8, "normalization": 1},
+        "Low": {"range": (0, 4), "n_components": 7, "normalization": 1},
+        "High": {"range": (3.5, 100), "n_components": 7, "normalization": 1},
+    },
+    "K2O": {
+        "Full": {"range": (0, 100), "n_components": 4, "normalization": 3},
+        "Low": {"range": (0, 2), "n_components": 6, "normalization": 3},
+        "High": {"range": (1.5, 100), "n_components": 9, "normalization": 1},
+    },
+}
+
 
 optimized_blending_ranges = {
     "SiO2": {
