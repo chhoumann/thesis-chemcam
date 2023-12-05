@@ -8,7 +8,7 @@ from sklearn.decomposition import FastICA
 
 
 def main():
-    root_dir = "./data/calib_2015/1600mm/ica"
+    root_dir = "./data/calib_2015/1600mm/pls"
     max_runs = 5
     runs = 0
 
@@ -19,7 +19,8 @@ def main():
 
         data = preprocess_data(target_dir_path)
         # separated_signals = run_jade(data)
-        separated_signals = run_fastica(data)
+        separated_signals = run_ica(data)
+        return
         data = postprocess_data(target_dir_name, separated_signals)
 
         #df = df.append(data)
@@ -33,16 +34,20 @@ def main():
     df.to_csv("./ica_results.csv")
 
 
-def run_fastica(processed_data):
+def run_ica(processed_data, model=""):
     num_components = 8
-    fastica_model = FastICA(n_components=num_components, random_state=0, max_iter=5000)
+    separated_signals = None
 
-    # Fit the model and transform the data
-    separated_signals = fastica_model.fit_transform(processed_data)
+    if model == "jade":
+        jade_model = JADE(num_components=num_components)
+        scores = jade_model.fit(processed_data)
+        separated_signals = jade_model.transform(processed_data)
+    else:
+        fastica_model = FastICA(n_components=num_components, random_state=0, max_iter=5000)
+        separated_signals = fastica_model.fit_transform(processed_data)
 
     # Convert separated signals to NumPy array if it's not already
     correlation_matrix = np.corrcoef(separated_signals, rowvar=False)
-    print("Correlation matrix:\n", correlation_matrix)
 
     # Independence check
     independence = np.allclose(correlation_matrix, np.eye(correlation_matrix.shape[0]), atol=0.1)
@@ -82,7 +87,6 @@ def run_jade(processed_data):
         for j in range(num_signals):
             corr = np.corrcoef(separated_signals_array[:, i], processed_data_array[:, j])[0, 1]
             correlation_matrix[i, j] = corr
-
 
 
     squared_correlations = correlation_matrix ** 2
