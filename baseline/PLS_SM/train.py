@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 
 from .config import logger
-from .data import CustomSpectralPipeline, load_data
+from .data_handling import CustomSpectralPipeline, load_data
 from ..reproduction import major_oxides, masks, oxide_ranges, paper_individual_sm_rmses
 from .utils import (
     custom_kfold_cross_validation,
