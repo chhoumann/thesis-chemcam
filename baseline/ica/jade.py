@@ -1,426 +1,85 @@
-from typing import List, Tuple, Optional
-from numpy import matrix
+#######################################################################
+# jade.py -- Blind source separation of real signals
+#
+# Version 1.8
+#
+# Copyright 2005, Jean-Francois Cardoso (Original MATLAB code)
+# Copyright 2007, Gabriel J.L. Beckers (NumPy translation)
+# http://gbeckers.nl/pages/numpy_scripts/jadeR.py
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
+
 import numpy as np
-import pandas as pd
+from numpy import *
+from numpy.linalg import eig, pinv
 
+#JADE class created for compatibility with PyHAT
+class JADE():
+    def __init__(self,num_components=4):
+        self.num_components = num_components
 
-class JADE:
-    def __init__(self, num_components: int = 4) -> None:
-        self.num_components: int = num_components
-        self.unmixing_matrix: np.ndarray = None
-        self.whitening_matrix: np.ndarray = None
-        self.ica_jade_loadings: np.ndarray = None
-        self.ica_jade_corr: pd.DataFrame = None
-        self.ica_jade_ids: List[str] = None
+    def fit(self,X, corrdata = None):
+        X = np.array(X)
+        scores = jadeR(X,m = self.num_components)
+        loadings = np.dot(scores, X)
 
-    def fit(self, mixed_signal_matrix: np.ndarray) -> np.ndarray:
-        """
-        Fit the JADE model to the data.
+        for i in list(range(1, len(scores[:, 0]) + 1)):
+            if np.abs(np.max(loadings[i - 1, :])) < np.abs(
+                    np.min(loadings[i - 1, :])):  # flip the sign if necessary to look nicer
+                loadings[i - 1, :] = loadings[i - 1, :] * -1
+                scores[i - 1, :] = scores[i - 1, :] * -1
 
-        Parameters:
-        mixed_signal_matrix (numpy.ndarray): The mixed signal data matrix.
+        self.ica_jade_loadings = loadings
+        return scores.T
 
-        Returns:
-        numpy.ndarray: The unmixing matrix after applying JADE.
-        """
-        mixed_signal_matrix = np.array(mixed_signal_matrix)
-        unmixing_matrix, self.whitening_matrix = jadeR(mixed_signal_matrix, num_components=self.num_components)
+    def transform(self, X):
+        return np.dot(self.ica_jade_loadings, X.T).T
 
-        # Adjust the sign of each row for better interpretability
-        for i in range(unmixing_matrix.shape[0]):
-            if np.abs(np.max(unmixing_matrix[i, :])) < np.abs(np.min(unmixing_matrix[i, :])):
-                unmixing_matrix[i, :] *= -1
+    #this is a function that finds the correlation between loadings and a set of columns
+    #The idea is to somewhat automate identifying which element the loading corresponds to.
+    def correlate_loadings(self, df, corrcols, icacols):
+        corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
 
-        self.unmixing_matrix = unmixing_matrix
-
-        return unmixing_matrix
-
-    def transform(self, mixed_signal_matrix: np.ndarray) -> np.ndarray:
-        if self.unmixing_matrix is None or self.whitening_matrix is None:
-            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
-
-        # Transpose the mixed_signal_matrix to align it for matrix multiplication
-        mixed_signal_matrix = mixed_signal_matrix.T
-
-        # First, apply the whitening matrix to the transposed input data
-        whitened_data = np.dot(self.whitening_matrix, mixed_signal_matrix)
-
-        # Apply the unmixing matrix to the whitened data
-        separated_signals = np.dot(self.unmixing_matrix, whitened_data).T
-        return separated_signals
-
-    def correlate_loadings(self, df: pd.DataFrame, corrcols: List[str], ic_labels: List[str]) -> None:
-        """
-        Find the correlation between loadings and a set of columns.
-
-        Parameters:
-        df (pandas.DataFrame): The DataFrame containing data.
-        corrcols (list): List of columns to correlate.
-        ic_labels (list): List of ICA column labels.
-
-        Updates:
-        self.ica_jade_corr: DataFrame of correlations.
-        self.ica_jade_ids: Identifiers for the correlated loadings.
-        """
-        if self.unmixing_matrix is None:
-            raise ValueError("Model has not been fit yet. Call 'fit' with training data.")
-
-        # Compute the correlation matrix and filter it for relevant columns and rows
-        corrdf = df.corr().drop(ic_labels, axis=1).drop(corrcols, axis=0)
         ica_jade_ids = []
 
-        # Iterate over each independent component label
-        for ic_label in ic_labels:
+        for ic_label in icacols:
             tmp = corrdf.loc[ic_label]
-            max_corr = np.max(tmp)
-            match = tmp.values == max_corr
-            matched_col = corrcols[np.where(match)[0][0]]
-            ica_jade_ids.append(f"{matched_col} (r={np.round(max_corr, 1)})")
+            match = tmp.values == np.max(tmp)
+            ica_jade_ids.append(str(corrcols[np.where(match)[0][0]]) + ' (r=' + str((np.max(tmp), 1)) + ')')
 
         self.ica_jade_corr = corrdf
         self.ica_jade_ids = ica_jade_ids
 
-
-def validate_input(X_input: np.ndarray, num_components: Optional[int] = None, verbose: bool = True) -> Tuple[np.matrix, np.dtype, int, int]:
-    # Check if X is a NumPy ndarray
-    assert isinstance(X_input, np.ndarray), \
-        "X (input data matrix) is of the wrong type (%s)" % type(X_input)
-
-    # Remember the original data type of X
-    input_data_type = X_input.dtype
-
-    # Convert X to a NumPy matrix of type float64
-    X_input = np.matrix(X_input.astype(np.float64))
-
-    # Check if X is a 2-dimensional matrix
-    assert X_input.ndim == 2, "X_input has %d dimensions, should be 2" % X_input.ndim
-
-    # Check if the verbose parameter is either True or False
-    assert isinstance(verbose, bool), \
-        "verbose parameter should be either True or False"
-
-    # Get the number of input signals (num_signals (n)) and number of samples (num_samples (T))
-    num_signals, num_samples = X_input.shape
-
-    # Set the number of sources to the number of sensors if not specified
-    if num_components is None:
-        num_components = num_signals
-
-    # Check if the number of sources does not exceed the number of sensors
-    assert num_components <= num_signals, \
-        "jade -> Do not ask more sources (%d) than sensors (%d) here!!!" % (num_components, num_signals)
-
-    # Verbose output
-    if verbose:
-        print("jade -> Looking for " + str(num_components) + " sources")
-        print("jade -> Removing the mean value")
-
-    # Remove the mean value from X
-    X_input -= X_input.mean(1)
-
-    return X_input, input_data_type, num_components, num_samples
-
-
-def perform_whitening(preprocessed_data: np.ndarray, num_components: int, verbose: bool = True) -> Tuple[np.ndarray, np.ndarray]:
+def jadeR(X, m=None, verbose=True):
     """
-    Perform whitening on the given preprocessed data.
+    Blind separation of real signals with JADE.
+
+    jadeR implements JADE, an Independent Component Analysis (ICA) algorithm
+    developed by Jean-Francois Cardoso. See
+    http://www.tsi.enst.fr/~cardoso/guidesepsou.html , and papers cited
+    at the end of the source file.
+
+    Translated into NumPy from the original Matlab Version 1.8 (May 2005) by
+    Gabriel Beckers, http://gbeckers.nl/pages/numpy_scripts/jadeR.py
 
     Parameters:
-    preprocessed_data (numpy.ndarray): The data matrix after preprocessing.
-    num_samples (int): The number of samples in each signal.
-    num_components (int): The number of independent components to extract.
-    verbose (bool): If True, additional information is printed.
 
-    Returns:
-    numpy.ndarray: The whitened data matrix.
-    numpy.ndarray: The whitening matrix.
-    """
-    if verbose:
-        print("jade -> Performing whitening on the data")
-
-    # Compute the covariance matrix of the data
-    covariance_matrix = np.cov(preprocessed_data.T)
-
-    # Perform eigenvalue decomposition on the covariance matrix
-    eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
-
-    # Sort eigenvalues in descending order and get the sorted indices
-    sorted_indices = np.argsort(eigenvalues)[::-1]
-
-    # Select the top 'num_components' eigenvectors
-    eigenvectors = eigenvectors[:, sorted_indices[:num_components]]
-    eigenvalues = eigenvalues[sorted_indices[:num_components]]
-
-    # Whitening: Create the whitening matrix
-    scaling_factors = np.sqrt(eigenvalues)
-    whitening_matrix = (eigenvectors / scaling_factors).T
-
-    # Apply the whitening matrix to the data
-    whitened_data = np.dot(whitening_matrix, preprocessed_data.T)
-
-    if verbose:
-        print("Shape of whitening_matrix:", whitening_matrix.shape)
-        print("Shape of whitened_data:", whitened_data.shape)
-        print("jade -> Whitening completed")
-
-    return whitened_data.T, whitening_matrix
-
-
-def initialize_cumulant_matrices_storage(num_samples: int, num_components: int) -> Tuple[np.ndarray, int]:
-    """
-    Initialize the storage for cumulant matrices.
-
-    Parameters:
-    num_samples (int): Number of samples in the dataset.
-    num_components (int): Number of principal components.
-
-    Returns:
-    numpy.matrix: Initialized matrix for storing cumulant matrices.
-    int: Number of cumulant matrices.
-    """
-    # Validate input
-    if not isinstance(num_samples, int) or num_samples <= 0:
-        raise ValueError("num_samples must be a positive integer.")
-    if not isinstance(num_components, int) or num_components <= 0:
-        raise ValueError("num_components must be a positive integer.")
-
-    # The number of cumulant matrices is equal to the number of components.
-    num_cumulant_matrices = num_components
-
-    # Initialize a zero matrix for storing cumulant matrices.
-    # The size is num_samples x (num_samples * num_cumulant_matrices)
-    # This structure allows storing each cumulant matrix as a column block.
-    cumulant_matrices_storage = np.zeros([num_components, num_components * num_components], dtype=np.float64)
-    print("Shape of cumulant matrices storage {}", cumulant_matrices_storage.shape)
-
-    # Ensure that the matrix has the correct dimensions
-    expected_shape = (num_components, num_components * num_cumulant_matrices)
-    print("Expected shape of cumulant matrices storage {}", expected_shape)
-    assert cumulant_matrices_storage.shape == expected_shape, \
-        f"Cumulant matrices storage has incorrect dimensions. Expected: {expected_shape}, Got: {cumulant_matrices_storage.shape}"
-
-    return cumulant_matrices_storage, num_cumulant_matrices
-
-
-def compute_cumulant_matrix(preprocessed_data: np.matrix, num_components: int, component_index: int, num_cumulant_matrices: int) -> np.matrix:
-    """
-    Compute an individual cumulant matrix for a given component.
-
-    Parameters:
-    preprocessed_data (numpy.matrix): Transposed preprocessed data matrix.
-    num_components (int): Number of components.
-    component_index (int): Index of the current component.
-    num_cumulant_matrices (int): Total number of cumulant matrices.
-
-    Returns:
-    numpy.matrix: The computed cumulant matrix for the given component.
-    """
-    # Validate input
-    if not isinstance(preprocessed_data, np.matrix) or preprocessed_data.ndim != 2:
-        raise TypeError("preprocessed_data must be a 2-dimensional numpy matrix.")
-
-    if not isinstance(num_components, int) or num_components <= 0:
-        raise ValueError("num_components must be a positive integer.")
-
-    if not isinstance(component_index, int) or component_index < 0 or component_index >= preprocessed_data.shape[1]:
-        raise ValueError("component_index must be a non-negative integer less than the number of columns in preprocessed_data.")
-
-    if not isinstance(num_cumulant_matrices, int) or num_cumulant_matrices <= 0:
-        raise ValueError("num_cumulant_matrices must be a positive integer.")
-
-    # Extract the signal corresponding to the specified component index
-    component_signal = preprocessed_data[:, component_index]
-
-    # Initialize the cumulant matrix
-    cumulant_matrix = np.zeros((num_components, num_components))
-
-    # Vectorize computation for the cumulant matrix
-    for i in range(num_components):
-        Xii = component_signal[i] * component_signal[i]  # Square of the ith component
-        for j in range(i, num_components):
-            Xjj = component_signal[j] * component_signal[j]  # Square of the jth component
-            Xij = component_signal[i] * component_signal[j]  # Product of ith and jth components
-
-            # Compute the cumulant
-            cumulant = np.mean(Xii * Xjj) - 3 * np.mean(Xij) ** 2
-
-            # Assign cumulant value (exploiting symmetry)
-            cumulant_matrix[i, j] = cumulant
-            if i != j:
-                cumulant_matrix[j, i] = cumulant
-
-    return cumulant_matrix
-
-
-def initialize_diagonalization(num_components: int, num_cumulant_matrices: int) -> Tuple[matrix, float, float]:
-    """
-    Initialize matrices and variables for the diagonalization process.
-
-    Parameters:
-    num_components (int): Number of principal components.
-    num_cumulant_matrices (int): Total number of cumulant matrices.
-
-    Returns:
-    Tuple containing:
-        - rotation_matrix (numpy.matrix): Matrix for joint diagonalization.
-        - on_diagonal (float): Sum of squared diagonal elements.
-        - off_diagonal (float): Sum of squared off-diagonal elements.
-    """
-    # Validate input
-    if not isinstance(num_components, int) or num_components <= 0:
-        raise ValueError("num_components must be a positive integer.")
-
-    if not isinstance(num_cumulant_matrices, int) or num_cumulant_matrices <= 0:
-        raise ValueError("num_cumulant_matrices must be a positive integer.")
-
-    # Initialize the rotation matrix as an identity matrix of size num_components
-    # This matrix will be updated during the joint diagonalization process.
-    rotation_matrix = np.matrix(np.eye(num_components, dtype=np.float64))
-
-    # Initialize on_diagonal and off_diagonal values
-    # These values will be used to track the progress of the diagonalization process
-    # and assess its convergence.
-    on_diagonal = 0.0
-    off_diagonal = 0.0
-
-    # The initial values of on_diagonal and off_diagonal are set to zero since the
-    # rotation_matrix is initialized as an identity matrix, and thus, all off-diagonal
-    # elements are initially zero.
-
-    return rotation_matrix, on_diagonal, off_diagonal
-
-
-def joint_diagonalization(cumulant_matrices: np.ndarray, num_components: int) -> np.ndarray:
-    """
-    Perform joint diagonalization on a set of cumulant matrices.
-
-    Parameters:
-    cumulant_matrices (numpy.ndarray): A 2-dimensional array containing cumulant matrices.
-    num_components (int): The number of components for diagonalization.
-
-    Returns:
-    numpy.ndarray: The rotation matrix resulting from the joint diagonalization.
-    """
-    # Input validation
-    if not isinstance(cumulant_matrices, np.ndarray) or cumulant_matrices.ndim != 2:
-        raise TypeError("cumulant_matrices must be a 2-dimensional numpy array.")
-
-    if cumulant_matrices.shape[0] != num_components or cumulant_matrices.shape[1] != num_components * num_components:
-        raise ValueError("cumulant_matrices must have shape (num_components, num_components * num_components)")
-
-    if not isinstance(num_components, int) or num_components <= 0:
-        raise ValueError("num_components must be a positive integer.")
-
-    # Initialize rotation matrix
-    rotation_matrix = np.eye(num_components)
-
-    # Convergence threshold and initialization
-    convergence_threshold = 1.0e-6 / np.sqrt(num_components)
-    continue_diagonalization = True
-    max_iterations = 1000  # Set a maximum number of iterations to prevent potential infinite loop
-    iteration_count = 0
-
-    while continue_diagonalization and iteration_count < max_iterations:
-        continue_diagonalization = False
-        iteration_count += 1
-
-        for component_p in range(num_components - 1):
-            index_p = np.arange(component_p, num_components * num_components, num_components)
-            Cpp = np.sum(cumulant_matrices[component_p, index_p] ** 2)
-
-            for component_q in range(component_p + 1, num_components):
-                index_q = np.arange(component_q, num_components * num_components, num_components)
-                Cqq = np.sum(cumulant_matrices[component_q, index_q] ** 2)
-                Cpq = np.sum(cumulant_matrices[component_p, index_p] * cumulant_matrices[component_q, index_q])
-
-                tonality = Cpp - Cqq
-                off_diagonal_sum_new = 2 * Cpq
-                rotation_angle = 0.5 * np.arctan2(off_diagonal_sum_new, tonality + np.sqrt(tonality * tonality + off_diagonal_sum_new * off_diagonal_sum_new))
-
-                # Update based on Givens rotation
-                if abs(rotation_angle) > convergence_threshold:
-                    continue_diagonalization = True
-                    cosine_theta = np.cos(rotation_angle)
-                    sine_theta = np.sin(rotation_angle)
-                    givens_matrix = np.array([[cosine_theta, -sine_theta], [sine_theta, cosine_theta]])
-                    component_pair = np.array([component_p, component_q])
-
-                    rotation_matrix[:, component_pair] = np.dot(rotation_matrix[:, component_pair], givens_matrix)
-                    cumulant_matrices[component_pair, :] = np.dot(givens_matrix.T, cumulant_matrices[component_pair, :])
-                    cumulant_matrices[:, np.concatenate([index_p, index_q])] = \
-                        np.append(cosine_theta * cumulant_matrices[:, index_p] + sine_theta * cumulant_matrices[:, index_q],
-                                  -sine_theta * cumulant_matrices[:, index_p] + cosine_theta * cumulant_matrices[:, index_q], axis=1)
-
-    if iteration_count >= max_iterations:
-        print("Warning: Maximum iterations reached in joint diagonalization")
-
-    return rotation_matrix
-
-
-def sort_separating_matrix(separating_matrix: np.ndarray) -> np.ndarray:
-    """
-    Sort the rows of the separating matrix based on the energy of the components.
-
-    Parameters:
-    separating_matrix (numpy.ndarray): The separating matrix.
-
-    Returns:
-    numpy.ndarray: Sorted separating matrix.
-    """
-    # Validate input
-    if not isinstance(separating_matrix, np.ndarray) or separating_matrix.ndim != 2:
-        raise TypeError("separating_matrix must be a 2-dimensional numpy array.")
-
-    # Compute the pseudo-inverse (mixing matrix) of the separating matrix
-    mixing_matrix = np.linalg.pinv(separating_matrix)
-
-    # Calculate the energy of each component in the mixing matrix
-    energy_per_component = np.sum(np.square(mixing_matrix), axis=0)
-    energy_per_component = np.asarray(energy_per_component).ravel()  # Convert to 1D array
-
-    # Determine the order of components based on their energy (descending order)
-    energy_order = np.argsort(energy_per_component)[::-1]
-
-    # Sort the separating matrix rows according to the energy order
-    sorted_matrix = separating_matrix[energy_order, :]
-
-    # No need to convert back to matrix
-    return sorted_matrix[::-1, :]
-
-
-def fix_matrix_signs(separating_matrix: np.ndarray) -> np.ndarray:
-    """
-    Adjust the signs of the rows of the separating matrix.
-
-    Parameters:
-    separating_matrix (numpy.ndarray): The separating matrix.
-
-    Returns:
-    numpy.ndarray: The separating matrix with adjusted signs.
-    """
-    # Validate input
-    if not isinstance(separating_matrix, np.ndarray) or separating_matrix.ndim != 2:
-        raise TypeError("separating_matrix must be a 2-dimensional numpy array.")
-
-    # Iterate over each row of the separating matrix
-    for i in range(separating_matrix.shape[0]):
-        # Check the sign of the first element in each row
-        # If the sign is negative or zero, multiply the entire row by -1
-        # This standardizes the sign of the components for consistency
-        if np.sign(separating_matrix[i, 0]) <= 0:
-            separating_matrix[i, :] *= -1
-
-    return separating_matrix
-
-
-def jadeR(mixed_signal_matrix: np.ndarray, num_components: Optional[int] = None, verbose: bool = True) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Parameters:
-
-        mixed_signal_matrix -- an nxT data matrix (n sensors, T samples). May be a numpy array or
+        X -- an nxT data matrix (n sensors, T samples). May be a numpy array or
              matrix.
 
-        num_components -- output matrix B has size mxn so that only m sources are
+        m -- output matrix B has size mxn so that only m sources are
              extracted.  This is done by restricting the operation of jadeR
              to the m first principal components. Defaults to None, in which
              case m=n.
@@ -435,49 +94,232 @@ def jadeR(mixed_signal_matrix: np.ndarray, num_components: Optional[int] = None,
         ordered such that the columns of pinv(B) are in order of decreasing
         norm; this has the effect that the `most energetically significant`
         components appear first in the rows of Y=B*X.
+
+    Quick notes (more at the end of this file):
+
+    o This code is for REAL-valued signals.  A MATLAB implementation of JADE
+        for both real and complex signals is also available from
+        http://sig.enst.fr/~cardoso/stuff.html
+
+    o This algorithm differs from the first released implementations of
+        JADE in that it has been optimized to deal more efficiently
+        1) with real signals (as opposed to complex)
+        2) with the case when the ICA model does not necessarily hold.
+
+    o There is a practical limit to the number of independent
+        components that can be extracted with this implementation.  Note
+        that the first step of JADE amounts to a PCA with dimensionality
+        reduction from n to m (which defaults to n).  In practice m
+        cannot be `very large` (more than 40, 50, 60... depending on
+        available memory)
+
+    o See more notes, references and revision history at the end of
+        this file and more stuff on the WEB
+        http://sig.enst.fr/~cardoso/stuff.html
+
+    o For more info on NumPy translation, see the end of this file.
+
+    o This code is supposed to do a good job!  Please report any
+        problem relating to the NumPY code gabriel@gbeckers.nl
+
+    Copyright original Matlab code : Jean-Francois Cardoso <cardoso@sig.enst.fr>
+    Copyright Numpy translation : Gabriel Beckers <gabriel@gbeckers.nl>
     """
 
     # GB: we do some checking of the input arguments and copy data to new
     # variables to avoid messing with the original input. We also require double
-    # precision (float64) and a numpy matrix type for preprocessed_data.
+    # precision (float64) and a numpy matrix type for X.
 
-    # Original code had: X, origtype, m, n, T
+    assert isinstance(X, ndarray), \
+        "X (input data matrix) is of the wrong type (%s)" % type(X)
+    origtype = X.dtype  # remember to return matrix B of the same type
+    X = matrix(X.astype(float64))
+    assert X.ndim == 2, "X has %d dimensions, should be 2" % X.ndim
+    assert (verbose == True) or (verbose == False), \
+        "verbose parameter should be either True or False"
 
-    # Validating input and performing whitening & PCA
-    preprocessed_data, input_data_type, num_components, num_samples = validate_input(mixed_signal_matrix, num_components, verbose)
-    whitened_data, whitened_matrix = perform_whitening(preprocessed_data, num_components, verbose)
+    [n, T] = X.shape  # GB: n is number of input signals, T is number of samples
 
+    if m == None:
+        m = n  # Number of sources defaults to # of sensors
+    assert m <= n, \
+        "jade -> Do not ask more sources (%d) than sensors (%d )here!!!" % (m, n)
+
+    if verbose:
+        print("jade -> Looking for " + str(m) + " sources")
+        print("jade -> Removing the mean value")
+    X -= X.mean(1)
+
+    # whitening & projection onto signal subspace
+    # ===========================================
+    if verbose:
+        print("jade -> Whitening the data")
+    [D, U] = eig((X * X.T) / float(T))  # An eigen basis for the sample covariance matrix
+    k = D.argsort()
+    Ds = D[k]  # Sort by increasing variances
+    PCs = arange(n - 1, n - m - 1, -1)  # The m most significant princip. comp. by decreasing variance
+
+    # --- PCA  ----------------------------------------------------------
+    B = U[:, k[PCs]].T  # % At this stage, B does the PCA on m components
+
+    # --- Scaling  ------------------------------------------------------
+    scales = sqrt(Ds[PCs])  # The scales of the principal components .
+    B = diag(1. / scales) * B  # Now, B does PCA followed by a rescaling = sphering
+    # B[-1,:] = -B[-1,:] # GB: to make it compatible with octave
+    # --- Sphering ------------------------------------------------------
+    X = B * X  # %% We have done the easy part: B is a whitening matrix and X is white.
+
+    del U, D, Ds, k, PCs, scales
+
+    # NOTE: At this stage, X is a PCA analysis in m components of the real data, except that
+    # all its entries now have unit variance.  Any further rotation of X will preserve the
+    # property that X is a vector of uncorrelated components.  It remains to find the
+    # rotation matrix such that the entries of X are not only uncorrelated but also `as
+    # independent as possible".  This independence is measured by correlations of order
+    # higher than 2.  We have defined such a measure of independence which
+    #   1) is a reasonable approximation of the mutual information
+    #   2) can be optimized by a `fast algorithm"
+    # This measure of independence also corresponds to the `diagonality" of a set of
+    # cumulant matrices.  The code below finds the `missing rotation " as the matrix which
+    # best diagonalizes a particular set of cumulant matrices.
+
+
+    # Estimation of the cumulant matrices.
+    # ====================================
     if verbose:
         print("jade -> Estimating cumulant matrices")
 
-    # Initialize the storage for cumulant matrices
-    cumulant_matrices_storage, num_cumulant_matrices = initialize_cumulant_matrices_storage(num_samples, num_components)
+    # Reshaping of the data, hoping to speed up things a little bit...
+    X = X.T
+    dimsymm = (m * (m + 1)) / 2  # Dim. of the space of real symm matrices
+    nbcm = dimsymm  # number of cumulant matrices
+    CM = matrix(zeros([m, int(m * nbcm)], dtype=float64))  # Storage for cumulant matrices
+    R = matrix(eye(m, dtype=float64))
+    Qij = matrix(zeros([m, m], dtype=float64))  # Temp for a cum. matrix
+    Xim = zeros(m, dtype=float64)  # Temp
+    Xijm = zeros(m, dtype=float64)  # Temp
+    # Uns = numpy.ones([1,m], dtype=numpy.uint32)    # for convenience
+    # GB: we don't translate that one because NumPy doesn't need Tony's rule
 
-    # Compute and store cumulant matrices
-    for component_index in range(num_components):
-        cumulant_matrix = compute_cumulant_matrix(whitened_data.T, num_components, component_index, num_cumulant_matrices)
+    # I am using a symmetry trick to save storage.  I should write a short note one of these
+    # days explaining what is going on here.
+    Range = arange(m)  # will index the columns of CM where to store the cum. mats.
 
-        # Store the computed cumulant matrix
-        storage_start_index = component_index * num_components
-        storage_end_index = storage_start_index + num_components
-        cumulant_matrices_storage[:, storage_start_index:storage_end_index] = cumulant_matrix
+    for im in range(m):
+        Xim = X[:, im]
+        Xijm = multiply(Xim, Xim)
+        # Note to myself: the -R on next line can be removed: it does not affect
+        # the joint diagonalization criterion
+        Qij = multiply(Xijm, X).T * X / float(T) \
+              - R - 2 * dot(R[:, im], R[:, im].T)
+        CM[:, Range] = Qij
+        Range = Range + m
+        for jm in range(im):
+            Xijm = multiply(Xim, X[:, jm])
+            Qij = sqrt(2) * multiply(Xijm, X).T * X / float(T) \
+                  - R[:, im] * R[:, jm].T - R[:, jm] * R[:, im].T
+            CM[:, Range] = Qij
+            Range = Range + m
 
-    # Perform joint diagonalization
-    rotation_matrix = joint_diagonalization(cumulant_matrices_storage, num_components)
+    # Now we have nbcm = m(m+1)/2 cumulants matrices stored in a big m x m*nbcm array.
 
-    # Extract separating matrix
-    separating_matrix = rotation_matrix.T
+    V = matrix(eye(m, dtype=float64))
 
-    # Sorting the components
+    Diag = zeros(m, dtype=float64)
+    On = 0.0
+    Range = arange(m)
+    for im in list(range(int(nbcm))):
+        Diag = diag(CM[:, Range])
+        On = On + (Diag * Diag).sum(axis=0)
+        Range = Range + m
+    Off = (multiply(CM, CM).sum(axis=0)).sum(axis=0) - On
+
+    seuil = 1.0e-6 / sqrt(T)  # % A statistically scaled threshold on `small" angles
+    encore = True
+    sweep = 0  # % sweep number
+    updates = 0  # % Total number of rotations
+    upds = 0  # % Number of rotations in a given seep
+    g = zeros([2, int(nbcm)], dtype=float64)
+    gg = zeros([2, 2], dtype=float64)
+    G = zeros([2, 2], dtype=float64)
+    c = 0
+    s = 0
+    ton = 0
+    toff = 0
+    theta = 0
+    Gain = 0
+
+    # Joint diagonalization proper
+
+    if verbose:
+        print("jade -> Contrast optimization by joint diagonalization")
+
+    while encore:
+        encore = False
+        if verbose:
+            pass
+        sweep = sweep + 1
+        upds = 0
+        Vkeep = V
+
+        for p in range(m - 1):
+            for q in range(p + 1, m):
+
+                Ip = np.array(arange(p, m * nbcm, m), dtype='int')
+                Iq = np.array(arange(q, m * nbcm, m), dtype='int')
+
+                # computation of Givens angle
+                g = concatenate([CM[p, Ip] - CM[q, Iq], CM[p, Iq] + CM[q, Ip]])
+                gg = dot(g, g.T)
+                ton = gg[0, 0] - gg[1, 1]
+                toff = gg[0, 1] + gg[1, 0]
+                theta = 0.5 * arctan2(toff, ton + sqrt(ton * ton + toff * toff))
+                Gain = (sqrt(ton * ton + toff * toff) - ton) / 4.0
+
+                # Givens update
+                if abs(theta) > seuil:
+                    encore = True
+                    upds = upds + 1
+                    c = cos(theta)
+                    s = sin(theta)
+                    G = matrix([[c, -s], [s, c]])
+                    pair = array([p, q])
+                    V[:, pair] = V[:, pair] * G
+                    CM[pair, :] = G.T * CM[pair, :]
+                    CM[:, concatenate([Ip, Iq])] = \
+                        append(c * CM[:, Ip] + s * CM[:, Iq], -s * CM[:, Ip] + c * CM[:, Iq], \
+                               axis=1)
+                    On = On + Gain
+                    Off = Off - Gain
+
+        if verbose:
+            pass
+            print("completed in %d rotations" % upds)
+        updates = updates + upds
+    if verbose:
+        print("jade -> Total of %d Givens rotations" % updates)
+
+    # A separating matrix
+    # ===================
+
+    B = V.T * B
+
+    # Permute the rows of the separating matrix B to get the most energetic components first.
+    # Here the **signals** are normalized to unit variance.  Therefore, the sort is
+    # according to the norm of the columns of A = pinv(B)
+
     if verbose:
         print("jade -> Sorting the components")
 
-    separating_matrix = sort_separating_matrix(separating_matrix)
+    A = pinv(B)
+    keys = array(argsort(multiply(A, A).sum(axis=0)[0]))[0]
+    B = B[keys, :]
+    B = B[::-1, :]  # % Is this smart ?
 
-    # Fix the signs of the separating matrix
     if verbose:
         print("jade -> Fixing the signs")
+    b = B[:, 0]
+    signs = array(sign(sign(b) + 0.1).T)[0]  # just a trick to deal with sign=0
+    B = diag(signs) * B
 
-    separating_matrix = fix_matrix_signs(separating_matrix)
-
-    return separating_matrix.astype(input_data_type), whitened_matrix
+    return B.astype(origtype)
