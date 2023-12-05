@@ -2,3 +2,6 @@ env/
 data/
 __pycache__/
 mlruns/
+plots/
+mlartifacts/
+logs/
