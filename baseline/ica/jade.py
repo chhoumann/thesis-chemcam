@@ -27,12 +27,13 @@ from numpy.linalg import eig, pinv
 
 #JADE class created for compatibility with PyHAT
 class JADE():
-    def __init__(self,num_components=4):
+    def __init__(self, num_components=4, verbose=False):
         self.num_components = num_components
+        self.verbose = verbose
 
     def fit(self,X, corrdata = None):
         X = np.array(X)
-        scores = jadeR(X,m = self.num_components)
+        scores = jadeR(X, m = self.num_components, verbose = self.verbose)
         loadings = np.dot(scores, X)
 
         for i in list(range(1, len(scores[:, 0]) + 1)):
