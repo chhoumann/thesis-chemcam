@@ -1,7 +1,9 @@
 import logging
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import mlflow
-import pandas as pd
+import numpy as np
 import typer
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error
@@ -9,52 +11,18 @@ from tqdm import tqdm
 
 from .config import logger
 from .data import CustomSpectralPipeline, load_data
-from .reproduction import major_oxides, masks, oxide_ranges, paper_individual_sm_rmses
-from .utils import custom_kfold_cross_validation
+from ..reproduction import major_oxides, masks, oxide_ranges, paper_individual_sm_rmses
+from .utils import (
+    custom_kfold_cross_validation,
+    custom_train_test_split,
+    filter_data_by_compositional_range,
+)
 
 # Initialize MLflow
 # mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 mlflow.set_experiment("PLS_Models")
 
 app = typer.Typer()
-
-
-def filter_data_by_compositional_range(data, compositional_range, oxide):
-    """
-    Filter the dataset for a given compositional range and oxide.
-
-    Parameters:
-    - data (pd.DataFrame): The dataset to filter.
-    - compositional_range (str): The compositional range ('Full', 'Low', 'Mid', 'High').
-    - oxide (str): The oxide to filter by.
-
-    Returns:
-    - pd.DataFrame: The filtered dataset.
-    """
-    # Access the global oxide_ranges dictionary
-    # Get the lower and upper bounds for the specified compositional range and oxide
-    lower_bound, upper_bound = oxide_ranges[oxide][compositional_range]
-
-    data[oxide] = pd.to_numeric(data[oxide], errors="coerce")
-    data = data.dropna(subset=[oxide])
-
-    # Filter the dataset based on the oxide concentration within the specified range
-    filtered_data = data[(data[oxide] >= lower_bound) & (data[oxide] <= upper_bound)]
-
-    return filtered_data
-
-
-def train_step():
-    pass
-
-
-def val_step():
-    pass
-
-
-def train_loop_per_worker():
-    pass
-
 
 logger.setLevel(logging.WARNING)
 
@@ -102,12 +70,19 @@ def train_model(
                 mlflow.log_param("random_state", random_state)
                 logger.info("Filtering data by compositional range.")
                 data_filtered = filter_data_by_compositional_range(
-                    processed_data, compositional_range, oxide
+                    processed_data, compositional_range, oxide, oxide_ranges
+                )
+
+                train, test = custom_train_test_split(
+                    data_filtered,
+                    group_by="Sample Name",
+                    test_size=0.2,
+                    random_state=random_state,
                 )
 
                 logger.info("Performing custom k-fold cross-validation.")
                 kf = custom_kfold_cross_validation(
-                    data_filtered,
+                    train,
                     k=k_folds,
                     group_by="Sample Name",
                     random_state=random_state,
@@ -157,6 +132,49 @@ def train_model(
                     registered_model_name=f"{oxide}_{compositional_range}",
                 )
 
+                # ----- Influence Plots for Outlier Removal ----- #
+
+                pls = PLSRegression(n_components=n_components)
+                train_data = train.drop(columns=major_oxides + ["Sample Name"])
+                X_train = train_data.to_numpy()
+                Y_train = train[oxide].to_numpy()
+                pls.fit(X_train, Y_train)
+
+                # Calculate leverage
+                t = pls.x_scores_
+                leverage = np.diag(
+                    np.dot(t, np.dot(np.linalg.inv(np.dot(t.T, t)), t.T))
+                )
+
+                # Calculate residuals
+                X_reconstructed = np.dot(t, pls.x_loadings_.T)
+                residuals = X_train - X_reconstructed
+                Q = np.sum(residuals**2, axis=1)
+
+                # Plotting the influence plot
+                plt.scatter(leverage, Q)
+                plt.xlabel("Leverage")
+                plt.ylabel("Residuals")
+                plt.title("Influence Plot")
+                plot_path = Path(
+                    f"plots/{experiment_name}/{oxide}_{compositional_range}_ip.png"
+                )
+                if not plot_path.parent.exists():
+                    plot_path.parent.mkdir(parents=True, exist_ok=True)
+                plt.savefig(plot_path)
+                plt.close()
+
+                mlflow.log_artifact(str(plot_path))
+
+                # # Identify outliers (this step is more qualitative and depends on your specific dataset)
+                # outliers = identify_outliers(
+                #     leverage, Q
+                # )  # Implement this function based on your criteria
+
+                # # Remove outliers and repeat the process
+                # X_train = np.delete(X_train, outliers, axis=0)
+                # Y_train = np.delete(Y_train, outliers, axis=0)
+
                 logger.info(
                     "Compositional Range: %s, Oxide: %s, Average RMSE: %f",
                     compositional_range,
@@ -171,7 +189,7 @@ if __name__ == "__main__":
     # ray.init()
     # app()  # initialize Typer app
     train_model(
-        "full_pls_sm",
+        "full_pls_sm_2",
         "data/data/calib/calib_2015/1600mm/pls",
         "data/data/calib/ccam_calibration_compositions.csv",
         # 100,

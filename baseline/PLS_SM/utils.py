@@ -73,3 +73,28 @@ def custom_train_test_split(data, group_by: str, test_size=0.2, random_state=Non
     test_data = pd.concat([grouped.get_group(key) for key in test_keys])
 
     return train_data, test_data
+
+
+def filter_data_by_compositional_range(data, compositional_range, oxide, oxide_ranges):
+    """
+    Filter the dataset for a given compositional range and oxide.
+
+    Parameters:
+    - data (pd.DataFrame): The dataset to filter.
+    - compositional_range (str): The compositional range ('Full', 'Low', 'Mid', 'High').
+    - oxide (str): The oxide to filter by.
+
+    Returns:
+    - pd.DataFrame: The filtered dataset.
+    """
+    # Access the global oxide_ranges dictionary
+    # Get the lower and upper bounds for the specified compositional range and oxide
+    lower_bound, upper_bound = oxide_ranges[oxide][compositional_range]
+
+    data[oxide] = pd.to_numeric(data[oxide], errors="coerce")
+    data = data.dropna(subset=[oxide])
+
+    # Filter the dataset based on the oxide concentration within the specified range
+    filtered_data = data[(data[oxide] >= lower_bound) & (data[oxide] <= upper_bound)]
+
+    return filtered_data
