@@ -75,3 +75,7 @@ def plot_leverage_residuals(leverage, Q, outliers, plot_file_path=None) -> None:
 
     if plot_file_path:
         fig.savefig(plot_file_path)
+
+
+def test():
+    print(123)

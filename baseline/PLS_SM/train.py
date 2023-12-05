@@ -9,7 +9,7 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 
-from ..reproduction import (
+from ..lib.reproduction import (
     major_oxides,
     masks,
     oxide_ranges,
