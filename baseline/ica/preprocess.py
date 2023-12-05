@@ -2,7 +2,8 @@ import pandas as pd
 import glob
 import os
 from reproduction import masks
-
+from norms import Norm1Scaler
+from sklearn.preprocessing import StandardScaler
 
 def average_datasets(target_dir: str) -> pd.DataFrame:
     aggregated_data = []
@@ -66,14 +67,18 @@ def variance_based_selection(df: pd.DataFrame) -> pd.DataFrame:
     selected_wavelengths = variances[variances > threshold].index
     df_selected = df.loc[selected_wavelengths]
 
-    # Transpose the DataFrame for ICA
-    df_transposed = df_selected.transpose()
-
-    return df_transposed
+    return df_selected
 
 
 def preprocess_data(target_dir: str) -> pd.DataFrame:
     data = average_datasets(target_dir)
     data = variance_based_selection(data)
+
+    # scaler = StandardScaler()
+    # data = scaler.fit_transform(data)
+    norm1_scaler = Norm1Scaler()
+    data = norm1_scaler.fit_transform(data)
+
+    data = data.transpose()
 
     return data
