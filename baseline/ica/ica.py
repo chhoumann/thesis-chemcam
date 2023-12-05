@@ -18,9 +18,7 @@ def main():
         target_dir_path = os.path.join(root_dir, target_dir_name)
 
         data = preprocess_data(target_dir_path)
-        # separated_signals = run_jade(data)
-        separated_signals = run_ica(data)
-        return
+        separated_signals = run_ica(data, model="fastica")
         data = postprocess_data(target_dir_name, separated_signals)
 
         #df = df.append(data)
@@ -42,9 +40,11 @@ def run_ica(processed_data, model=""):
         jade_model = JADE(num_components=num_components)
         scores = jade_model.fit(processed_data)
         separated_signals = jade_model.transform(processed_data)
-    else:
+    elif model == "fastica":
         fastica_model = FastICA(n_components=num_components, random_state=0, max_iter=5000)
         separated_signals = fastica_model.fit_transform(processed_data)
+    else:
+        raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
 
     # Convert separated signals to NumPy array if it's not already
     correlation_matrix = np.corrcoef(separated_signals, rowvar=False)
