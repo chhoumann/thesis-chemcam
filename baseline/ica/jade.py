@@ -57,7 +57,7 @@ class JADE():
         for ic_label in icacols:
             tmp = corrdf.loc[ic_label]
             match = tmp.values == np.max(tmp)
-            ica_jade_ids.append(str(corrcols[np.where(match)[0][0]]) + ' (r=' + str(np.max(tmp)) + ')')
+            ica_jade_ids.append(str(corrcols[np.where(match)[0][-1]]) + ' (r=' + str(np.max(tmp)) + ')')
 
         self.ica_jade_corr = corrdf
         self.ica_jade_ids = ica_jade_ids
