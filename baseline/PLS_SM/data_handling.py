@@ -28,7 +28,7 @@ def get_dataset_frame(dataset_path):
 
 
 def get_preprocessed_sample_data(
-    sample_name: str, data_path: Path
+    sample_name: str, data_path: Path, average_shots=True
 ) -> list[pd.DataFrame]:
     exclude_from_avg = ["wave", "mean", "median"]
     first_five_shots = [f"shot{i}" for i in range(1, 6)]
@@ -60,10 +60,11 @@ def get_preprocessed_sample_data(
         df.insert(0, "wave", wavelengths)
 
         # add average of all shots and remove individual shots
-        shot_cols = [col for col in df.columns if "shot" in col]
-        shot_avg = df[shot_cols].mean(axis=1)
-        df.drop(shot_cols, axis=1, inplace=True)
-        df.insert(1, "shot_avg", shot_avg)
+        if average_shots:
+            shot_cols = [col for col in df.columns if "shot" in col]
+            shot_avg = df[shot_cols].mean(axis=1)
+            df.drop(shot_cols, axis=1, inplace=True)
+            df.insert(1, "shot_avg", shot_avg)
 
         sample_spectra.append(df)
 
@@ -71,7 +72,7 @@ def get_preprocessed_sample_data(
 
 
 def load_data(
-    dataset_loc: str, num_samples: Optional[int] = None
+    dataset_loc: str, num_samples: Optional[int] = None, average_shots=True
 ) -> dict[str, list[pd.DataFrame]]:
     """
     Load data from the specified dataset location.
@@ -93,7 +94,7 @@ def load_data(
 
     for _sample_name in tqdm(sample_names[:take_amount], desc="Loading data"):
         sample_data[_sample_name] = get_preprocessed_sample_data(
-            _sample_name, data_path
+            _sample_name, data_path, average_shots
         )
 
     return sample_data
