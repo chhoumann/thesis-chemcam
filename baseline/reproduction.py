@@ -6,7 +6,7 @@ masks = [
     (849, 905.574),
 ]
 
-training_oxide_ranges = {
+oxide_ranges = {
     "SiO2": {
         "Full": (0, 100),
         "Low": (0, 50),
