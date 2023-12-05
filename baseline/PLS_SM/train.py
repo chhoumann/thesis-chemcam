@@ -16,8 +16,8 @@ from ..reproduction import (
     paper_individual_sm_rmses,
 )
 from .config import logger
-from .data_handling import CustomSpectralPipeline, load_data
-from .utils import (
+from ..lib.data_handling import CustomSpectralPipeline, load_data
+from ..lib.utils import (
     custom_kfold_cross_validation,
     custom_train_test_split,
     filter_data_by_compositional_range,
