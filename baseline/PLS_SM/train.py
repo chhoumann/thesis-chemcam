@@ -9,9 +9,14 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 
+from ..reproduction import (
+    major_oxides,
+    masks,
+    oxide_ranges,
+    paper_individual_sm_rmses,
+)
 from .config import logger
 from .data_handling import CustomSpectralPipeline, load_data
-from ..reproduction import major_oxides, masks, oxide_ranges, paper_individual_sm_rmses
 from .utils import (
     custom_kfold_cross_validation,
     custom_train_test_split,
