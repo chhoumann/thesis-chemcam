@@ -18,7 +18,7 @@ def main():
         target_dir_path = os.path.join(root_dir, target_dir_name)
 
         data = preprocess_data(target_dir_path)
-        separated_signals = run_ica(data, model="fastica")
+        separated_signals = run_ica(data, model="jade")
         data = postprocess_data(target_dir_name, separated_signals)
 
         #df = df.append(data)
@@ -37,7 +37,7 @@ def run_ica(processed_data, model=""):
     separated_signals = None
 
     if model == "jade":
-        jade_model = JADE(num_components=num_components)
+        jade_model = JADE(num_components)
         scores = jade_model.fit(processed_data)
         separated_signals = jade_model.transform(processed_data)
     elif model == "fastica":
@@ -59,77 +59,6 @@ def run_ica(processed_data, model=""):
     print("Independence:", independence)
     print("Sum of squares:\n", sum_of_squares)
     print("Sum of squares close to one:", sum_of_squares_close_to_one)
-
-    return separated_signals
-
-
-def run_jade(processed_data):
-    num_components = 8
-    num_signals = processed_data.shape[1]
-    jade_model = JADE(num_components=num_components)
-
-    jade_model.fit(processed_data)
-    separated_signals = jade_model.transform(processed_data) # Note: separated signals are "scores", oftenf denoted S
-    # separated_signals = (separated_signals - np.mean(separated_signals, axis=0)) / np.std(separated_signals, axis=0)
-
-    separated_signals_array = np.array(separated_signals)
-    print("separated signals:\n", separated_signals_array)
-    processed_data_array = np.array(processed_data)
-
-    num_components = separated_signals_array.shape[1]  # Number of components in S (8)
-    num_signals = processed_data_array.shape[1]  # Number of signals in X (462)
-
-    # Initialize an empty matrix to store correlations
-    correlation_matrix = np.zeros((num_components, num_signals))
-
-    # Compute pairwise correlations
-    for i in range(num_components):
-        for j in range(num_signals):
-            corr = np.corrcoef(separated_signals_array[:, i], processed_data_array[:, j])[0, 1]
-            correlation_matrix[i, j] = corr
-
-
-    squared_correlations = correlation_matrix ** 2
-    sum_of_squares = np.sum(squared_correlations, axis=1)
-    print("sum of squares:\n", sum_of_squares)
-
-
-    # Assuming you want to correlate all original features with the independent components
-    # corrcols = processed_data.columns.tolist()  # All columns in processed_data
-    # icacols = ['IC' + str(i) for i in range(1, jade_model.num_components + 1)]  # List of independent components
-
-
-    # Add the separated signals to the processed data for correlation
-    # for i, col in enumerate(icacols):
-        # processed_data[col] = separated_signals[:, i]
-
-    # Perform correlation
-    # jade_model.correlate_loadings(processed_data, corrcols, icacols)
-    # corr = jade_model.ica_jade_corr
-    # print("ICA-JADE Correlations:\n", corr)
-
-    # sums = []
-    # means = corr.mean()
-
-    # for i, col in enumerate(corr.columns):
-    #     sum = 0
-
-    #     for row in corr[col]:
-    #         sum += (row - means[i]) ** 2
-
-    #     sums.append(sum)
-
-    # sum_of_squares = 0
-
-    # for sum in sums:
-    #     sum_of_squares += sum
-
-    # # sum_of_squares = (df**2).sum(axis=1)(corr**2).sum().sum()
-    # print("the final sum:", sum_of_squares)
-
-    # Print or inspect the correlation results
-    # print("ICA-JADE Correlations:", jade_model.ica_jade_corr)
-    # print("ICA-JADE IDs:", jade_model.ica_jade_ids)
 
     return separated_signals
 
