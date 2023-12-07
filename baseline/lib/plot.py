@@ -84,7 +84,7 @@ def plot_spectra(
     plt.ylabel("Intensity")
 
     plt.legend(title="Spectral Ranges")
-    plt.show()
+    # plt.show()
 
     if fig_name != "":
         plt.savefig(fig_name, bbox_inches="tight")
@@ -132,7 +132,7 @@ def plot_outliers_for_run(mlflow_run_id: str, figure_name=""):
         save_file_path = local_dir / figure_name
         plt.savefig(save_file_path, bbox_inches="tight")
 
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
