@@ -37,33 +37,32 @@ def main():
 
 def custom_ica(df: pd.DataFrame, num_components: int = 8):
     # Whitening
-    data = df.to_numpy()
-    whitened_data, whitening_matrix = prewhiten(data)
+    data = df.to_numpy().T
+    X_whitened, whitening_matrix = prewhiten(data, num_components=num_components)
 
     # Optimization
-    rotation_matrix = optimize_contrast_function(whitened_data)
+    rotation_matrix = optimize_contrast_function(X_whitened)
 
     # Separation
-    separated_signals = rotation_matrix @ whitened_data
+    separated_signals = rotation_matrix @ X_whitened
 
     # Ensure separated_signals has the same number of columns as the original data
-    # Note: This step assumes that separated_signals has the correct shape after the ICA transformation
-    # If not, you'll need to verify the shapes and make sure they match
     if separated_signals.shape[1] != data.shape[1]:
         raise ValueError(
             "Separated signals and original data must have the same number of columns"
         )
 
-    # Now calculate the correlation matrix with the separated signals and the original data
-    correlation_matrix_with_preprocessed_data = np.corrcoef(
-        separated_signals, data, rowvar=False
-    )
+    # Concatenate separated_signals and data for correlation computation
+    concatenated_signals = np.vstack((separated_signals, data))
+
+    # Now calculate the correlation matrix with the concatenated array
+    correlation_matrix = np.corrcoef(concatenated_signals, rowvar=False)
 
     # Extract the relevant part of the correlation matrix
-    # Assuming rowvar=False, the correlation matrix will be (n_components + n_features) x (n_components + n_features)
+    # The correlation matrix will be (num_components + num_features) x (num_components + num_features)
     m = separated_signals.shape[0]
     n = data.shape[0]
-    correlation_Z_preprocessed_data = correlation_matrix_with_preprocessed_data[m:, :n]
+    correlation_Z_preprocessed_data = correlation_matrix[:m, m:]
 
     print(correlation_Z_preprocessed_data)
     print(separated_signals.shape)

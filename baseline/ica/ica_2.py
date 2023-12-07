@@ -2,10 +2,9 @@ import numpy as np
 import scipy.linalg as la
 
 
-def prewhiten(X):
+def prewhiten(X, num_components=None):
     """
-    Prewhiten the data matrix X so that its rows have a sample mean of zero
-    and a sample covariance matrix that is the identity matrix.
+    Prewhiten the data matrix X and reduce dimensionality to num_components if specified.
     """
     # Subtract the mean of each row
     X_mean = X.mean(axis=1, keepdims=True)
@@ -14,8 +13,21 @@ def prewhiten(X):
     # Compute the covariance matrix
     cov_matrix = np.cov(X_centered)
 
-    # Compute the whitening matrix using the Cholesky decomposition of the inverse covariance matrix
-    whitening_matrix = la.inv(la.cholesky(cov_matrix)).T
+    # Perform eigenvalue decomposition of the covariance matrix
+    eigenvalues, eigenvectors = la.eigh(cov_matrix)
+
+    # Sort eigenvalues and eigenvectors in descending order
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+
+    # Select a subset of the eigenvectors if num_components is specified
+    if num_components is not None and num_components < eigenvectors.shape[1]:
+        eigenvectors = eigenvectors[:, :num_components]
+        eigenvalues = eigenvalues[:num_components]
+
+    # Compute the whitening matrix using the inverse square root of the eigenvalues
+    whitening_matrix = (eigenvectors / np.sqrt(eigenvalues)).T
 
     # Apply the whitening matrix to X_centered
     X_whitened = whitening_matrix @ X_centered
