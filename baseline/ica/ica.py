@@ -36,8 +36,9 @@ def main():
 
 
 def custom_ica(df: pd.DataFrame, num_components: int = 8):
-    # Whitening
+    # Transpose data so that wavelengths are rows and intensity values are columns
     data = df.to_numpy().T
+    # Whitening
     X_whitened, whitening_matrix = prewhiten(data, num_components=num_components)
 
     # Optimization
@@ -55,6 +56,8 @@ def custom_ica(df: pd.DataFrame, num_components: int = 8):
     # Concatenate separated_signals and data for correlation computation
     concatenated_signals = np.vstack((separated_signals, data))
 
+    print(separated_signals)
+
     # Now calculate the correlation matrix with the concatenated array
     correlation_matrix = np.corrcoef(concatenated_signals, rowvar=False)
 
@@ -62,9 +65,15 @@ def custom_ica(df: pd.DataFrame, num_components: int = 8):
     # The correlation matrix will be (num_components + num_features) x (num_components + num_features)
     m = separated_signals.shape[0]
     n = data.shape[0]
+    print("mn", m, n)
     correlation_Z_preprocessed_data = correlation_matrix[:m, m:]
 
+    print("///////////////////")
+    print(data.shape)
+    print("///////////////////")
     print(correlation_Z_preprocessed_data)
+    pd.DataFrame(correlation_Z_preprocessed_data).to_csv("./correlation.csv")
+    print("///////////////////")
     print(separated_signals.shape)
     return separated_signals
     # # Whitening
@@ -108,17 +117,17 @@ def run_ica(processed_data, model=""):
         )
         separated_signals = fastica_model.fit_transform(processed_data)
     elif model == "custom_jade":
-        return custom_ica(processed_data, num_components=num_components)
+        separated_signals = custom_ica(processed_data, num_components=num_components)
     else:
         raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
 
     # Convert separated signals to NumPy array if it's not already
     # correlation_matrix = np.corrcoef(separated_signals, rowvar=False)
 
-    # Independence check
+    # # Independence check
     # independence = np.allclose(correlation_matrix, np.eye(correlation_matrix.shape[0]), atol=0.1)
 
-    # Sum of squares check
+    # # Sum of squares check
     # sum_of_squares = np.sum(correlation_matrix**2, axis=1)
     # sum_of_squares_close_to_one = np.allclose(sum_of_squares, np.ones(sum_of_squares.shape[0]))
 
