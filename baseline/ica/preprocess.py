@@ -4,6 +4,7 @@ import os
 from lib.reproduction import masks
 from norms import Norm1Scaler
 from sklearn.preprocessing import StandardScaler
+from lib.data_handling import WavelengthMaskTransformer
 
 def average_datasets(target_dir: str) -> pd.DataFrame:
     aggregated_data = []
@@ -11,6 +12,7 @@ def average_datasets(target_dir: str) -> pd.DataFrame:
     path_pattern = os.path.join(target_dir, "*.csv")
     csv_files = glob.glob(path_pattern)
 
+    return initial_preprocess(csv_files[0])
     for file_path in csv_files:
         df = initial_preprocess(file_path)
         aggregated_data.append(df)
@@ -24,6 +26,14 @@ def average_datasets(target_dir: str) -> pd.DataFrame:
     # Calculate the mean across rows for each wavelength
     # This assumes that the index of each DataFrame is the wavelength
     averaged_df = combined_df.groupby('wave').mean()
+
+    # unset index
+    # averaged_df.reset_index(inplace=True)
+
+    # wmt = WavelengthMaskTransformer(masks)
+    # transformed = wmt.fit_transform(averaged_df)
+    # back to df
+    # averaged_df = pd.DataFrame(transformed, columns=averaged_df.columns)
 
     return averaged_df
 
@@ -40,9 +50,13 @@ def initial_preprocess(file_path: str) -> pd.DataFrame:
     first_five_shots = [f"shot{i}" for i in range(1, 6)]
     df.drop(exclude + first_five_shots, axis=1, inplace=True)
 
+
     # Apply any masking required
     for mask in masks:
         df = df.loc[~((df["wave"] >= mask[0]) & (df["wave"] <= mask[1]))]
+
+    # set wave as index
+    df.set_index("wave", inplace=True)
 
     return df
 
@@ -72,12 +86,18 @@ def variance_based_selection(df: pd.DataFrame) -> pd.DataFrame:
 
 def preprocess_data(target_dir: str) -> pd.DataFrame:
     data = average_datasets(target_dir)
-    data = variance_based_selection(data)
+    # data = variance_based_selection(data)
 
-    # scaler = StandardScaler()
-    # data = scaler.fit_transform(data)
-    norm1_scaler = Norm1Scaler()
-    data = norm1_scaler.fit_transform(data)
+    scaler = StandardScaler()
+    # print(data)
+    # print(data.transpose())
+    data = scaler.fit_transform(data.transpose())
+    print("mean=", round(data[1].mean(), 2))
+    print("stdev=", data[1].std(ddof=1))
+    data_standardized_manual = (data - data.mean()) / data.std(ddof=0)
+    print(data_standardized_manual)
+    # norm1_scaler = Norm1Scaler()
+    # data = norm1_scaler.fit_transform(data)
 
     data = data.transpose()
 

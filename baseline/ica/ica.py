@@ -11,7 +11,7 @@ from ica.preprocess import preprocess_data
 
 
 def main():
-    root_dir = "./data/data/calib/calib_2015/1600mm/pls"
+    root_dir = "./data/data/calib/calib_2015/1600mm/ica"
     max_runs = 1
     runs = 0
 
@@ -35,9 +35,37 @@ def main():
     df.to_csv("./ica_results.csv")
 
 
+def compute_correlations(df, separated_signals):
+    # Convert separated signals to DataFrame for easier processing
+    separated_df = pd.DataFrame(separated_signals.T)
+
+    # Initialize a DataFrame to store correlation coefficients
+    correlations = pd.DataFrame(
+        index=df.columns,
+        columns=[f"Component_{i}" for i in range(separated_signals.shape[0])],
+    )
+
+    # Calculate correlation for each component with each feature in the original dataset
+    for i in range(separated_signals.shape[0]):
+        for col in df.columns:
+            correlation = np.corrcoef(df[col], separated_df[i])[0, 1]
+            correlations.at[col, f"Component_{i}"] = correlation
+
+    return correlations
+
+
 def custom_ica(df: pd.DataFrame, num_components: int = 8):
+    # print(df.transpose())
+    # transformed = wmt.fit_transform(df.transpose())
     # Transpose data so that wavelengths are rows and intensity values are columns
     data = df.to_numpy().T
+
+    # calculate mean and stdev for each feature
+    # for i in range(data.shape[0]):
+    #     mean = np.mean(data[i])
+    #     stdev = np.std(data[i])
+    #     print(f"mean: {mean:.2f}, stdev: {stdev:.2f}")
+
     # Whitening
     X_whitened, whitening_matrix = prewhiten(data, num_components=num_components)
 
@@ -53,54 +81,9 @@ def custom_ica(df: pd.DataFrame, num_components: int = 8):
             "Separated signals and original data must have the same number of columns"
         )
 
-    # Concatenate separated_signals and data for correlation computation
-    concatenated_signals = np.vstack((separated_signals, data))
-
-    print(separated_signals)
-
-    # Now calculate the correlation matrix with the concatenated array
-    correlation_matrix = np.corrcoef(concatenated_signals, rowvar=False)
-
-    # Extract the relevant part of the correlation matrix
-    # The correlation matrix will be (num_components + num_features) x (num_components + num_features)
-    m = separated_signals.shape[0]
-    n = data.shape[0]
-    print("mn", m, n)
-    correlation_Z_preprocessed_data = correlation_matrix[:m, m:]
-
-    print("///////////////////")
-    print(data.shape)
-    print("///////////////////")
-    print(correlation_Z_preprocessed_data)
-    pd.DataFrame(correlation_Z_preprocessed_data).to_csv("./correlation.csv")
-    print("///////////////////")
-    print(separated_signals.shape)
+    correlations = compute_correlations(df, separated_signals)
+    
     return separated_signals
-    # # Whitening
-    # data = df.to_numpy()
-    # whitened_data, whitening_matrix = prewhiten(data)
-
-    # # Optimization
-    # rotation_matrix = optimize_contrast_function(whitened_data)
-
-    # # Separation
-    # separated_signals = rotation_matrix @ whitened_data
-    # print(separated_signals.shape)
-
-    # # Compute the correlation matrix between separated signals and original data
-    # # Ensure that the separated signals are correctly shaped to match the data
-    # separated_signals_reshaped = separated_signals[:num_components, :]
-
-    # # Compute correlation only if the number of components is less than or equal to the number of features in data
-    # if separated_signals_reshaped.shape[0] <= data.shape[0]:
-    #     correlation_matrix_with_preprocessed_data = np.corrcoef(
-    #         separated_signals_reshaped, data, rowvar=False
-    #     )
-    #     m = 45
-    #     correlation_Z_preprocessed_data = correlation_matrix_with_preprocessed_data[
-    #         :m, m:
-    #     ]
-    #     print(correlation_Z_preprocessed_data)
 
 
 def run_ica(processed_data, model=""):
@@ -123,13 +106,16 @@ def run_ica(processed_data, model=""):
 
     # Convert separated signals to NumPy array if it's not already
     # correlation_matrix = np.corrcoef(separated_signals, rowvar=False)
+    # correlation_matrix = np.corrcoef(separated_signals, processed_data.to_numpy().T, rowvar=False)
 
     # # Independence check
-    # independence = np.allclose(correlation_matrix, np.eye(correlation_matrix.shape[0]), atol=0.1)
+    # independence = np.allclose(corr, np.eye(corr.shape[0]), atol=0.1)
 
-    # # Sum of squares check
-    # sum_of_squares = np.sum(correlation_matrix**2, axis=1)
-    # sum_of_squares_close_to_one = np.allclose(sum_of_squares, np.ones(sum_of_squares.shape[0]))
+    # # # Sum of squares check
+    # sum_of_squares = np.sum(corr**2, axis=1)
+    # sum_of_squares_close_to_one = np.allclose(
+    #     sum_of_squares, np.ones(sum_of_squares.shape[0])
+    # )
 
     # print("Independence:", independence)
     # print("Sum of squares:\n", sum_of_squares)
