@@ -344,7 +344,7 @@ class CustomSpectralPipeline:
         Process a single sample.
 
         Args:
-            sample_df (pd.DataFrame): DataFrame containing the spectral data for the 
+            sample_df (pd.DataFrame): DataFrame containing the spectral data for the
                 sample.
             sample_name (str): Name of the sample.
 
