@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
+
+from pathlib import Path
 from ica.preprocess import preprocess_data
 from ica.postprocess import postprocess_data
 from ica.jade import JADE
@@ -8,21 +10,17 @@ from sklearn.decomposition import FastICA
 
 
 def main():
-    root_dir = "./data/calib_2015/1600mm/pls"
+    data_path = Path("./data/calib_2015/1600mm/pls")
     max_runs = 5
     runs = 0
+    num_components = 8
 
     df = pd.DataFrame()
 
-    for target_dir_name in os.listdir(root_dir):
-        target_dir_path = os.path.join(root_dir, target_dir_name)
-
-        data = preprocess_data(target_dir_path)
-        separated_signals = run_ica(data, model="jade")
-        data = postprocess_data(target_dir_name, separated_signals)
-
-        #df = df.append(data)
-        df = pd.concat([df, data])
+    for sample_name in os.listdir(data_path):
+        X = preprocess_data(sample_name, data_path)
+        estimated_sources = run_ica(X, model="fastica", num_components=num_components)
+        df = pd.concat([df, postprocess_data(sample_name, estimated_sources)])
 
         runs += 1
 
@@ -32,22 +30,48 @@ def main():
     df.to_csv("./ica_results.csv")
 
 
-def run_ica(processed_data, model=""):
-    num_components = 8
-    separated_signals = None
+def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -> np.ndarray:
+    """
+    Performs Independent Component Analysis (ICA) on a given dataset using JADE or FastICA algorithms.
+
+    Parameters:
+    ----------
+    df : pd.DataFrame
+        The input dataset for ICA. The DataFrame should have rows as samples and columns as features.
+
+    model : str, optional
+        The ICA model to be used. Must be either 'jade' or 'fastica'. Defaults to 'fastica'.
+
+    num_components : int, optional
+        The number of independent components to be extracted. Defaults to 8.
+
+    Returns:
+    -------
+    np.ndarray
+        An array of the estimated independent components extracted from the input data.
+
+    Raises:
+    ------
+    ValueError
+        If an invalid model name is specified.
+
+    AssertionError
+        If the extracted signals are not independent, indicated by the correlation matrix not being
+        close to the identity matrix or the sum of squares of correlations not being close to one.
+    """
+    estimated_sources = None
 
     if model == "jade":
         jade_model = JADE(num_components)
-        scores = jade_model.fit(processed_data)
-        separated_signals = jade_model.transform(processed_data)
+        scores = jade_model.fit(df)
+        estimated_sources = jade_model.transform(df)
     elif model == "fastica":
-        fastica_model = FastICA(n_components=num_components, random_state=0, max_iter=5000)
-        separated_signals = fastica_model.fit_transform(processed_data)
+        fastica_model = FastICA(n_components=num_components, whiten="unit_variance", max_iter=5000)
+        estimated_sources = fastica_model.fit_transform(df)
     else:
         raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
 
-    # Convert separated signals to NumPy array if it's not already
-    correlation_matrix = np.corrcoef(separated_signals, rowvar=False)
+    correlation_matrix = np.corrcoef(estimated_sources.T)
 
     # Independence check
     independence = np.allclose(correlation_matrix, np.eye(correlation_matrix.shape[0]), atol=0.1)
@@ -56,11 +80,9 @@ def run_ica(processed_data, model=""):
     sum_of_squares = np.sum(correlation_matrix**2, axis=1)
     sum_of_squares_close_to_one = np.allclose(sum_of_squares, np.ones(sum_of_squares.shape[0]))
 
-    print("Independence:", independence)
-    print("Sum of squares:\n", sum_of_squares)
-    print("Sum of squares close to one:", sum_of_squares_close_to_one)
+    assert independence and sum_of_squares_close_to_one, "ICA failed. Extracted signals are not independent because the correlation matrix is not close to the identity matrix."
 
-    return separated_signals
+    return estimated_sources
 
 
 if __name__ == "__main__":
