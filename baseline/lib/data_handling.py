@@ -51,7 +51,7 @@ def get_preprocessed_sample_data(
     exclude_from_avg = ["wave", "mean", "median"]
     first_five_shots = [f"shot{i}" for i in range(1, 6)]
 
-    wavelengths = pd.Series()
+    wavelengths = pd.Series(dtype="float64")
 
     sample_dataset_paths = get_location_dataset_paths_for_sample(sample_name, data_path)
     sample_spectra = []
