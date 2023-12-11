@@ -4,26 +4,81 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class Norm1Scaler(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        self.total = None
+    def __init__(self, reshaped=False):
+        if reshaped:
+            self.scaler = Norm1ScalerReshapedData()
+        else:
+            self.scaler = Norm1ScalerOriginalData()
+
+    def fit(self, df):
+        return self.scaler.fit(df)
+
+    def transform(self, df):
+        return self.scaler.transform(df)
+
+
+class Norm1ScalerOriginalData(BaseEstimator, TransformerMixin):
+    def __init__(self) -> None:
+        self.total_ = None
+        self.shot_columns_ = None
 
     def fit(self, df):
         """
         Compute the total intensity across all shots to be used for normalization.
         """
-        shot_columns = df.columns[df.columns.str.startswith("shot")]
-        self.total = df[shot_columns].sum().sum()
+        self.shot_columns_ = df.columns[df.columns.str.startswith("shot")]
+        self.total_ = df[self.shot_columns_].sum().sum()
+        assert self.total_ > 0, "Total intensity must be greater than zero."
         return self
 
     def transform(self, df):
         """
         Apply norm1 normalization to the DataFrame.
         """
-        if self.total is None:
+        if self.total_ is None:
             raise ValueError("The fit method must be called before transform.")
 
-        shot_columns = df.columns[df.columns.str.startswith("shot")]
-        df[shot_columns] = df[shot_columns].div(self.total, axis=1)
+        df[self.shot_columns_] = df[self.shot_columns_].div(self.total_, axis=1)
+        return df
+
+
+class Norm1ScalerReshapedData(BaseEstimator, TransformerMixin):
+    """
+    This class is used to normalize the data in the same way as the
+    Norm1Scaler class, but it is used for the reshaped data. This is
+    necessary because the reshaped data has a different format than
+    the original data.
+
+    The reshaped data has the following format:
+    - Each row represents a single shot
+    - Each column represents a single wavelength
+    - The column names are the wavelengths
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def fit(self, df):
+        return self
+
+    def transform(self, df):
+        """
+        Apply norm1 normalization to the DataFrame.
+        """
+        wavelength_columns = []
+        for col in df.columns:
+            try:
+                float(col)
+                wavelength_columns.append(col)
+            except ValueError:
+                # Ignore columns that cannot be converted to float
+                continue
+
+        df_float = df[wavelength_columns]
+        row_sums = df_float.sum(axis=1)
+        normalized_df = df_float.div(row_sums, axis=0)
+        df.update(normalized_df)
+
         return df
 
 
@@ -34,7 +89,7 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         if reshaped:
             self.scaler = Norm3ScalerReshapedData(wavelength_ranges)
         else:
-            self.scaler = Norm3Scaler(wavelength_ranges)
+            self.scaler = Norm3ScalerOriginalData(wavelength_ranges)
 
     def fit(self, df):
         return self.scaler.fit(df)
