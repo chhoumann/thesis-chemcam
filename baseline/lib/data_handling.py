@@ -305,6 +305,26 @@ class CompositionData:
         return sample_compositions
 
 
+class NonNegativeTransformer(BaseEstimator, TransformerMixin):
+    """
+    A custom transformer that sets all negative values in a DataFrame to zero.
+    """
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        if not isinstance(X, pd.DataFrame):
+            raise TypeError("Input must be a pandas DataFrame")
+
+        # Create a copy of the DataFrame to avoid modifying the original data
+        X_transformed = X.copy()
+
+        X_transformed[X_transformed < 0] = 0
+
+        return X_transformed
+
+
 class CustomSpectralPipeline:
     """
     A custom spectral pipeline for processing spectral data.
@@ -329,6 +349,9 @@ class CustomSpectralPipeline:
         wavelength_feature_name="wave",
     ):
         self.mask_transformer = WavelengthMaskTransformer(masks)
+        # Negative intensities come from the preprocessing step (continuum removal?).
+        # We should not remove them, but set them to 0. (src: Oct. 30, 2023)
+        self.non_negative_transformer = NonNegativeTransformer()
         self.data_reshaper = SpectralDataReshaper(
             intensity_feature_name, wavelength_feature_name
         )
@@ -352,7 +375,8 @@ class CustomSpectralPipeline:
             pd.DataFrame: Processed DataFrame for the sample.
         """
         masked_df = self.mask_transformer.transform(sample_df)
-        reshaped_df = self.data_reshaper.fit_transform(masked_df)
+        non_negative_df = self.non_negative_transformer.transform(masked_df)
+        reshaped_df = self.data_reshaper.fit_transform(non_negative_df)
 
         sample_composition = self.composition_data.get_composition_for_sample(
             sample_name

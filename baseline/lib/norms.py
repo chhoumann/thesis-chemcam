@@ -28,6 +28,22 @@ class Norm1Scaler(BaseEstimator, TransformerMixin):
 
 
 class Norm3Scaler(BaseEstimator, TransformerMixin):
+    def __init__(
+        self, wavelength_ranges: Dict[str, Tuple[float, float]], reshaped=False
+    ):
+        if reshaped:
+            self.scaler = Norm3ScalerReshapedData(wavelength_ranges)
+        else:
+            self.scaler = Norm3Scaler(wavelength_ranges)
+
+    def fit(self, df):
+        return self.scaler.fit(df)
+
+    def transform(self, df):
+        return self.scaler.transform(df)
+
+
+class Norm3ScalerOriginalData(BaseEstimator, TransformerMixin):
     def __init__(self, wavelength_ranges: Dict[str, Tuple[float, float]]):
         self.wavelength_ranges = wavelength_ranges
         self.totals = None
@@ -56,4 +72,64 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
             df.loc[mask, shot_columns] = df.loc[mask, shot_columns].div(
                 self.totals[key], axis=1
             )
+        return df
+
+
+class Norm3ScalerReshapedData(BaseEstimator, TransformerMixin):
+    """
+    This class is used to normalize the data in the same way as the
+    Norm3Scaler class, but it is used for the reshaped data. This is
+    necessary because the reshaped data has a different format than
+    the original data.
+
+    The reshaped data has the following format:
+    - Each row represents a single shot
+    - Each column represents a single wavelength
+    - The column names are the wavelengths
+    """
+
+    def __init__(self, wavelength_ranges: Dict[str, Tuple[float, float]]):
+        self.wavelength_ranges = wavelength_ranges
+        self.totals = None
+
+    def fit(self, df):
+        """
+        Compute the total intensity for each spectrometer range.
+        """
+        self.totals = {}
+        for key, (start, end) in self.wavelength_ranges.items():
+            # Select columns in the specified range and ignore non-float columns
+            selected_columns = []
+            for col in df.columns:
+                try:
+                    if start <= float(col) <= end:
+                        selected_columns.append(col)
+                except ValueError:
+                    # Ignore columns that cannot be converted to float
+                    continue
+
+            # Compute the sum of intensities in these columns
+            self.totals[key] = df[selected_columns].sum().sum()
+        return self
+
+    def transform(self, df):
+        """
+        Apply norm3 normalization to the DataFrame.
+        """
+        if self.totals is None:
+            raise ValueError("The fit method must be called before transform.")
+
+        for key, (start, end) in self.wavelength_ranges.items():
+            # Select columns in the specified range and ignore non-float columns
+            selected_columns = []
+            for col in df.columns:
+                try:
+                    if start <= float(col) <= end:
+                        selected_columns.append(col)
+                except ValueError:
+                    # Ignore columns that cannot be converted to float
+                    continue
+
+            # Normalize intensities in these columns
+            df[selected_columns] = df[selected_columns].div(self.totals[key], axis=0)
         return df
