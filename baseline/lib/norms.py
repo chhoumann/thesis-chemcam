@@ -5,10 +5,9 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 class Norm1Scaler(BaseEstimator, TransformerMixin):
     def __init__(self, reshaped=False):
-        if reshaped:
-            self.scaler = Norm1ScalerReshapedData()
-        else:
-            self.scaler = Norm1ScalerOriginalData()
+        self.scaler = (
+            Norm1ScalerReshapedData() if reshaped else Norm1ScalerOriginalData()
+        )
 
     def fit(self, df):
         return self.scaler.fit(df)
@@ -86,10 +85,11 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
     def __init__(
         self, wavelength_ranges: Dict[str, Tuple[float, float]], reshaped=False
     ):
-        if reshaped:
-            self.scaler = Norm3ScalerReshapedData(wavelength_ranges)
-        else:
-            self.scaler = Norm3ScalerOriginalData(wavelength_ranges)
+        self.scaler = (
+            Norm3ScalerReshapedData(wavelength_ranges)
+            if reshaped
+            else Norm3ScalerOriginalData(wavelength_ranges)
+        )
 
     def fit(self, df):
         return self.scaler.fit(df)
