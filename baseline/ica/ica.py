@@ -10,32 +10,30 @@ from sklearn.decomposition import FastICA
 from scipy.optimize import curve_fit
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
+from collections import Counter
 
 
 def main():
-    data_path = Path("./data/calib/calib_2015/1600mm/pls/")
-    max_runs = 4
+    data_path = Path("./data/calib_2015/1600mm/pls")
+    max_runs = 1
     runs = 0
-    num_components = 15
-    all_estimated_sources = []
+    num_components = 8
 
     df = pd.DataFrame()
 
     for sample_name in os.listdir(data_path):
+        if(sample_name != "agv2"):
+            continue
+        print(f"Processing {sample_name}...")
         X = preprocess_data(sample_name, data_path)
         estimated_sources = run_ica(X, model="jade", num_components=num_components)
         df = pd.concat([df, postprocess_data(sample_name, estimated_sources)])
-
-        estimated_sources_df = pd.DataFrame(estimated_sources)
-        all_estimated_sources.append(estimated_sources_df)
 
         runs += 1
 
         if runs >= max_runs:
             break
 
-    combined_sources = pd.concat(all_estimated_sources, ignore_index=True)
-    
     df.to_csv("./ica_results.csv")
 
 
@@ -69,17 +67,40 @@ def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -
         close to the identity matrix or the sum of squares of correlations not being close to one.
     """
     estimated_sources = None
+    df = df.transpose()
 
     if model == "jade":
+        cols = df.columns
         jade_model = JADE(num_components)
-        df = df.transpose()
         mixing_matrix = jade_model.fit(df)
         estimated_sources = jade_model.transform(df)
-    
+
+        corrcols = [f'IC{i+1}' for i in range(num_components)]
+
+        df_ica = pd.DataFrame(estimated_sources, index=[f'shot{i+6}' for i in range(45)], columns=corrcols)
+        df = pd.concat([df, df_ica], axis=1)
+
+        # print("Duplicates:\n", df[df.duplicated()])
+
+        # append estimated sources to df
+
+        jade_model.correlate_loadings(df, corrcols, cols)
+        # print("Correlation matrix:\n", jade_model.ica_jade_corr)
+        # print("IDs:\n", jade_model.ica_jade_ids)
+        ids = jade_model.ica_jade_ids
+
+        ic_counts = Counter(entry.split(' ')[0] for entry in ids)
+
+        # Calculating the total number of entries
+        total_entries = sum(ic_counts.values())
+
+        # Calculating the percentage for each IC
+        ic_percentages = {ic: (count / total_entries) * 100 for ic, count in ic_counts.items()}
+
+        print(ic_percentages)
 
     elif model == "fastica":
         fastica_model = FastICA(n_components=num_components, max_iter=5000)
-        df = df.transpose()
         estimated_sources = fastica_model.fit_transform(df)
     else:
         raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
