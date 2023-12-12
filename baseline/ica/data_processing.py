@@ -5,6 +5,7 @@ from lib.data_handling import get_preprocessed_sample_data, WavelengthMaskTransf
 from lib.reproduction import masks
 from lib.norms import Norm1Scaler
 
+
 class ICASampleProcessor:
     def __init__(self, sample_name: str, num_components: int):
         self.sample_name = sample_name
@@ -64,7 +65,7 @@ class ICASampleProcessor:
         self.df = pd.concat([self.df, df_ics], axis=1)
 
         # Correlate the loadings
-        corrdf, ids = self.correlate_loadings(corrcols, columns)
+        corrdf, ids = self.__correlate_loadings__(corrcols, columns)
 
         # Create the wavelengths matrix for each component
         self.ic_wavelengths = pd.DataFrame(index=[self.sample_name], columns=columns)
@@ -84,7 +85,7 @@ class ICASampleProcessor:
 
     # This is a function that finds the correlation between loadings and a set of columns
     # The idea is to somewhat automate identifying which element the loading corresponds to.
-    def correlate_loadings(self, corrcols: list, icacols: list) -> (pd.DataFrame, list):
+    def __correlate_loadings__(self, corrcols: list, icacols: list) -> (pd.DataFrame, list):
         corrdf = self.df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
         ids = []
 

@@ -59,8 +59,6 @@ def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_compon
     ica_df = pd.DataFrame()
     compositions_df = pd.DataFrame()
 
-    runs = 0
-
     for sample_name in os.listdir(calib_data_path):
         processor = ICASampleProcessor(sample_name, num_components)
 
@@ -80,11 +78,6 @@ def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_compon
         # Aggregate the ICA results and composition data to their respective DataFrames
         compositions_df = pd.concat([compositions_df, processor.composition_df])
         ica_df = pd.concat([ica_df, processor.ic_wavelengths])
-
-        runs += 1
-
-        if runs == 10:
-            break
 
     return ica_df, compositions_df
 
