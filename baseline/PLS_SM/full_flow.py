@@ -20,6 +20,7 @@ from lib.reproduction import (
     major_oxides,
     masks,
     oxide_ranges,
+    paper_individual_sm_rmses,
     spectrometer_wavelength_ranges,
     training_info,
 )
@@ -33,24 +34,31 @@ logger = logging.getLogger("train")
 
 mlflow.set_tracking_uri("http://localhost:5000")
 
-dataset_loc = Path("../data/data/calib/calib_2015/1600mm/pls/")
-calib_loc = Path("../data/data/calib/ccam_calibration_compositions.csv")
-take_samples = None
+preformatted_data_path = Path("./data/data/calib/calib_2015/1600mm/pls/all_processed.csv")
 
-logger.info("Loading data from location: %s", dataset_loc)
-data = load_data(str(dataset_loc))
-logger.info("Data loaded successfully.")
+if not preformatted_data_path.exists():
+    dataset_loc = Path("./data/data/calib/calib_2015/1600mm/pls/")
+    calib_loc = Path("./data/data/calib/ccam_calibration_compositions.csv")
+    take_samples = None
 
+    logger.info("Loading data from location: %s", dataset_loc)
+    data = load_data(str(dataset_loc))
+    logger.info("Data loaded successfully.")
 
-logger.info("Initializing CustomSpectralPipeline.")
-pipeline = CustomSpectralPipeline(
-    masks=masks,
-    composition_data_loc=calib_loc,
-    major_oxides=major_oxides,
-)
-logger.info("Pipeline initialized. Fitting and transforming data.")
-processed_data = pipeline.fit_transform(data)
-logger.info("Data processing complete.")
+    logger.info("Initializing CustomSpectralPipeline.")
+    pipeline = CustomSpectralPipeline(
+        masks=masks,
+        composition_data_loc=calib_loc,
+        major_oxides=major_oxides,
+    )
+    logger.info("Pipeline initialized. Fitting and transforming data.")
+    processed_data = pipeline.fit_transform(data)
+    logger.info("Data processing complete.")
+
+    processed_data.to_csv(preformatted_data_path, index=False)
+else :
+    logger.info("Loading preformatted data from location: %s", preformatted_data_path)
+    processed_data = pd.read_csv(preformatted_data_path)
 
 k_folds = 4
 random_state = 42
@@ -71,10 +79,6 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
             "Starting MLflow run for compositional range: %s, oxide: %s",
             compositional_range,
             oxide,
-        )
-
-        mlflow.log_metric(
-            "paper_rmse", training_info[oxide][compositional_range]["rmse"]
         )
 
         logger.info("Filtering data by compositional range.")
@@ -113,6 +117,10 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
         test = pd.DataFrame(test, columns=test_cols)
 
         with mlflow.start_run(run_name=f"{oxide}_{compositional_range}"):
+            mlflow.log_metric(
+                "paper_rmse", paper_individual_sm_rmses[compositional_range][oxide]
+            )
+
             # region OUTLIER REMOVAL
             mlflow.log_params(
                 {
@@ -200,7 +208,7 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
 
             # use data from outlier removal
             train_no_outliers = pd.DataFrame(
-                X_train_OR, columns=train_cols.drop(drop_cols)
+                X_train_OR, columns=train_cols
             )
             train_no_outliers[oxide] = y_train_OR
 
@@ -250,7 +258,6 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
             y_pred = pls_all.predict(X_test)
             test_rmse = mean_squared_error(y_test, y_pred, squared=False)
             mlflow.log_metric("RMSEP", float(test_rmse))
-            mlflow.sklearn.log_model(
-                pls_all, f"PLS_ALL_{oxide}_{compositional_range}"
-            )
+            mlflow.sklearn.log_model(pls_all, f"PLS_ALL_{oxide}_{compositional_range}")
             # endregion
+        mlflow.end_run()
