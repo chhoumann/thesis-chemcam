@@ -58,21 +58,21 @@ def get_train_data():
     return ica_df, compositions_df
 
 
-def create_train_data(calib_data_path: Path, num_components: int = 8):
+def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_components: int = 8) -> (pd.DataFrame, pd.DataFrame):
     composition_data = CompositionData("./data/data/ccam_calibration_compositions.csv")
     ica_df = pd.DataFrame()
     compositions_df = pd.DataFrame()
 
     for sample_name in os.listdir(calib_data_path):
         # Check if we have composition data for this sample
-        composition_data_for_sample = composition_data.get_composition_for_sample(sample_name)
+        composition_df = composition_data.get_composition_for_sample(sample_name)
 
-        if composition_data_for_sample.empty:
+        if composition_df.empty:
             print(f"No composition data found for {sample_name}. Skipping...")
             continue
 
         # Check if the composition data contains NaN values
-        if composition_data_for_sample.isnull().values.any():
+        if composition_df.isnull().values.any():
             print(f"NaN values found in composition data for {sample_name}. Skipping...")
             continue
 
@@ -80,36 +80,17 @@ def create_train_data(calib_data_path: Path, num_components: int = 8):
 
         # Preprocess the data
         df = preprocess_data(sample_name, calib_data_path)
-        columns = df.columns
 
         # Run ICA and get the estimated sources
-        estimated_sources = run_ica(df, model="jade", num_components=num_components)
+        estimated_sources = run_ica(df, model=ica_model, num_components=num_components)
 
-        #  Add the estimated sources to the DataFrame for postprocessing
-        corrcols = [f'IC{i+1}' for i in range(num_components)]
-        df_ics = pd.DataFrame(estimated_sources, index=[f'shot{i+6}' for i in range(45)], columns=corrcols)
-        df = pd.concat([df, df_ics], axis=1)
+        # Postprocess the data
+        ic_wavelengths, composition_df = postprocess_data(df, composition_df, sample_name, estimated_sources, num_components)
 
-        # Correlate the loadings
-        corrdf, ids = correlate_loadings(df, corrcols, columns)
-
-        # Create the wavelengths matrix for each component
-        ic_wavelengths = pd.DataFrame(index=[sample_name], columns=columns)
-
-        for i in range(len(ids)):
-            ic = ids[i].split(' ')[0]
-            component_idx = int(ic[2]) - 1
-            wavelength = corrdf.index[i]
-            corr = corrdf.iloc[i][component_idx]
-
-            ic_wavelengths.loc[sample_name, wavelength] = corr
-
-        # Aggregate the composition data and the ICA results to their respective DataFrames
-        composition_data_for_sample = composition_data_for_sample.iloc[:, 3:12]
-        composition_data_for_sample.index = [sample_name]
-
-        compositions_df = pd.concat([compositions_df, composition_data_for_sample])
+        # Aggregate the ICA results and composition data to their respective DataFrames
+        compositions_df = pd.concat([compositions_df, composition_df])
         ica_df = pd.concat([ica_df, ic_wavelengths])
+        break
 
     return ica_df, compositions_df
 
@@ -157,22 +138,6 @@ def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -
         raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
 
     return estimated_sources
-
-
-# This is a function that finds the correlation between loadings and a set of columns
-# The idea is to somewhat automate identifying which element the loading corresponds to.
-def correlate_loadings(df, corrcols, icacols):
-    corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
-    ids = []
-
-    for ic_label in icacols:
-        tmp = corrdf.loc[ic_label]
-        match = tmp.values == np.max(tmp)
-        col = corrcols[np.where(match)[0][-1]]
-
-        ids.append(col + ' (r=' + str(np.max(tmp)) + ')')
-
-    return corrdf, ids
 
 
 if __name__ == "__main__":

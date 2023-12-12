@@ -1,24 +1,45 @@
 import pandas as pd
+import numpy as np
 
 
-def postprocess_data(sample_name, ica_scores):
-    num_ic = ica_scores.shape[1]
+def postprocess_data(df: pd.DataFrame, composition_df: pd.DataFrame, sample_name: str, estimated_sources: np.ndarray, num_components: int):
+    columns = df.columns
+    corrcols = [f'IC{i+1}' for i in range(num_components)]
+    df_ics = pd.DataFrame(estimated_sources, index=[f'shot{i+6}' for i in range(45)], columns=corrcols)
+    df = pd.concat([df, df_ics], axis=1)
 
-    # Generate column names for ICs
-    ic_columns = [f'IC{i+1}' for i in range(num_ic)]
+    # Correlate the loadings
+    corrdf, ids = correlate_loadings(df, corrcols, columns)
 
-    # Create the DataFrame directly from ica_scores
-    df = pd.DataFrame(ica_scores, columns=ic_columns)
+    # Create the wavelengths matrix for each component
+    ic_wavelengths = pd.DataFrame(index=[sample_name], columns=columns)
 
-    # Add 'Shot Number' column
-    df['Shot Number'] = range(1, len(df) + 1)
+    for i in range(len(ids)):
+        ic = ids[i].split(' ')[0]
+        component_idx = int(ic[2]) - 1
+        wavelength = corrdf.index[i]
+        corr = corrdf.iloc[i][component_idx]
 
-    # Reorder the columns
-    columns = ['Shot Number'] + ic_columns
-    df = df[columns]
+        ic_wavelengths.loc[sample_name, wavelength] = corr
 
-    # Set 'Target ID' as the index
-    df.index = [sample_name] * len(df)
-    df.index.name = 'Target ID'
+    # Filter the composition data to only include the oxides and their compositions
+    composition_df = composition_df.iloc[:, 3:12]
+    composition_df.index = [sample_name]
 
-    return df
+    return ic_wavelengths, composition_df
+
+
+# This is a function that finds the correlation between loadings and a set of columns
+# The idea is to somewhat automate identifying which element the loading corresponds to.
+def correlate_loadings(df, corrcols, icacols):
+    corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
+    ids = []
+
+    for ic_label in icacols:
+        tmp = corrdf.loc[ic_label]
+        match = tmp.values == np.max(tmp)
+        col = corrcols[np.where(match)[0][-1]]
+
+        ids.append(col + ' (r=' + str(np.max(tmp)) + ')')
+
+    return corrdf, ids
