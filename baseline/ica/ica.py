@@ -11,6 +11,7 @@ from scipy.optimize import curve_fit
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 from collections import Counter
+from lib.data_handling import CompositionData
 
 
 def main():
@@ -19,9 +20,17 @@ def main():
     runs = 0
     num_components = 8
 
+    composition_data = CompositionData("./data/data/ccam_calibration_compositions.csv")
     aggregated_dfs = pd.DataFrame()
 
     for sample_name in os.listdir(data_path):
+        # Check if we have composition data for this sample
+        composition_data_for_sample = composition_data.get_composition_for_sample(sample_name)
+
+        if composition_data_for_sample.empty:
+            print(f"No composition data found for {sample_name}. Skipping...")
+            continue
+
         print(f"Processing {sample_name}...")
 
         # Preprocess the data
@@ -50,7 +59,7 @@ def main():
 
             ic_wavelengths.loc[sample_name, wavelength] = corr
 
-        # aggregated_dfs = pd.concat([aggregated_dfs, ic_wavelengths])
+        aggregated_dfs = pd.concat([aggregated_dfs, ic_wavelengths])
         runs += 1
 
         if runs >= max_runs:

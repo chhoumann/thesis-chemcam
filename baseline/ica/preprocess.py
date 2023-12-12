@@ -16,18 +16,11 @@ def preprocess_data(sample_name, data_path):
     wmt = WavelengthMaskTransformer(masks)
     df = wmt.fit_transform(df)
 
-    # Apply non-negative transformation
-    nnt = NonNegativeTransformer()
-    df = nnt.fit_transform(df)
-
     # set the wave column as the index
     df.set_index("wave", inplace=True)
 
     # Normalize the data
     scaler = Norm1Scaler()
     df = pd.DataFrame(scaler.fit_transform(df))
-
-    # Drop all rows where the sum of the values is zero
-    df = df.loc[(df != 0).any(axis=1)]
 
     return df.transpose()
