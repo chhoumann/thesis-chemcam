@@ -34,19 +34,19 @@ class JADE():
     def fit(self,X, corrdata = None):
         X = np.array(X)
         scores = jadeR(X, m = self.num_components, verbose = self.verbose)
-        loadings = np.dot(scores, X)
+        mixing_matrix = np.dot(scores, X)
 
         for i in list(range(1, len(scores[:, 0]) + 1)):
-            if np.abs(np.max(loadings[i - 1, :])) < np.abs(
-                    np.min(loadings[i - 1, :])):  # flip the sign if necessary to look nicer
-                loadings[i - 1, :] = loadings[i - 1, :] * -1
+            if np.abs(np.max(mixing_matrix[i - 1, :])) < np.abs(
+                    np.min(mixing_matrix[i - 1, :])):  # flip the sign if necessary to look nicer
+                mixing_matrix[i - 1, :] = mixing_matrix[i - 1, :] * -1
                 scores[i - 1, :] = scores[i - 1, :] * -1
 
-        self.ica_jade_loadings = loadings
-        return scores.T
+        self.ica_jade_mixing_matrix = mixing_matrix
+        return mixing_matrix
 
     def transform(self, X):
-        return np.dot(self.ica_jade_loadings, X.T).T
+        return np.dot(self.ica_jade_mixing_matrix, X.T).T
 
     #this is a function that finds the correlation between loadings and a set of columns
     #The idea is to somewhat automate identifying which element the loading corresponds to.
