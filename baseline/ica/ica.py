@@ -3,21 +3,17 @@ import pandas as pd
 import numpy as np
 
 from pathlib import Path
-from ica.preprocess import preprocess_data
-from ica.postprocess import postprocess_data
+from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
 from sklearn.decomposition import FastICA
-from lib.data_handling import CompositionData
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from lib.reproduction import major_oxides
 
-NUM_COMPONENTS = 8
-
 
 def main():
-    ica_df, compositions_df = get_train_data()
+    ica_df, compositions_df = get_train_data(num_components=8)
 
     # Split the data into training and testing sets
     ica_train, ica_test, comp_train, comp_test = train_test_split(ica_df, compositions_df, test_size=0.2, random_state=42)
@@ -39,7 +35,7 @@ def main():
         print(f"Testing RMSE for {oxide}: {test_rmse}\n")
 
 
-def get_train_data():
+def get_train_data(num_components: int) -> (pd.DataFrame, pd.DataFrame):
     calib_data_path = Path("./data/calib_2015/1600mm/pls")
 
     ica_df_csv_loc = Path("./data/ica_data.csv")
@@ -50,7 +46,7 @@ def get_train_data():
         compositions_df = pd.read_csv(compositions_csv_loc, index_col=0)
     else:
         print("No preprocessed data found. Creating and saving preprocessed data...")
-        ica_df, compositions_df = create_train_data(calib_data_path, num_components=NUM_COMPONENTS)
+        ica_df, compositions_df = create_train_data(calib_data_path, num_components=num_components)
         ica_df.to_csv(ica_df_csv_loc)
         compositions_df.to_csv(compositions_csv_loc)
         print(f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n")
@@ -59,37 +55,36 @@ def get_train_data():
 
 
 def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_components: int = 8) -> (pd.DataFrame, pd.DataFrame):
-    composition_data = CompositionData("./data/data/ccam_calibration_compositions.csv")
+    composition_data_loc = "./data/data/ccam_calibration_compositions.csv"
     ica_df = pd.DataFrame()
     compositions_df = pd.DataFrame()
 
+    runs = 0
+
     for sample_name in os.listdir(calib_data_path):
-        # Check if we have composition data for this sample
-        composition_df = composition_data.get_composition_for_sample(sample_name)
+        processor = ICASampleProcessor(sample_name, num_components)
 
-        if composition_df.empty:
-            print(f"No composition data found for {sample_name}. Skipping...")
-            continue
-
-        # Check if the composition data contains NaN values
-        if composition_df.isnull().values.any():
-            print(f"NaN values found in composition data for {sample_name}. Skipping...")
+        if not processor.try_load_composition_df(composition_data_loc):
             continue
 
         print(f"Processing {sample_name}...")
 
-        # Preprocess the data
-        df = preprocess_data(sample_name, calib_data_path)
+        processor.preprocess(calib_data_path)
 
         # Run ICA and get the estimated sources
-        estimated_sources = run_ica(df, model=ica_model, num_components=num_components)
+        ica_estimated_sources = run_ica(processor.df, model=ica_model, num_components=num_components)
 
         # Postprocess the data
-        ic_wavelengths, composition_df = postprocess_data(df, composition_df, sample_name, estimated_sources, num_components)
+        processor.postprocess(ica_estimated_sources)
 
         # Aggregate the ICA results and composition data to their respective DataFrames
-        compositions_df = pd.concat([compositions_df, composition_df])
-        ica_df = pd.concat([ica_df, ic_wavelengths])
+        compositions_df = pd.concat([compositions_df, processor.composition_df])
+        ica_df = pd.concat([ica_df, processor.ic_wavelengths])
+
+        runs += 1
+
+        if runs == 10:
+            break
 
     return ica_df, compositions_df
 
