@@ -8,17 +8,21 @@ from ica.postprocess import postprocess_data
 from ica.jade import JADE
 from sklearn.decomposition import FastICA
 from lib.data_handling import CompositionData
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from lib.reproduction import major_oxides
 
 
 def main():
     data_path = Path("./data/calib_2015/1600mm/pls")
-    max_runs = 3
+    max_runs = 30
     runs = 0
     num_components = 8
 
     composition_data = CompositionData("./data/data/ccam_calibration_compositions.csv")
 
-    ica_dfs = pd.DataFrame()
+    ica_df = pd.DataFrame()
     compositions = pd.DataFrame()
 
     for sample_name in os.listdir(data_path):
@@ -27,6 +31,11 @@ def main():
 
         if composition_data_for_sample.empty:
             print(f"No composition data found for {sample_name}. Skipping...")
+            continue
+
+        # Check if the composition data contains NaN values
+        if composition_data_for_sample.isnull().values.any():
+            print(f"NaN values found in composition data for {sample_name}. Skipping...")
             continue
 
         print(f"Processing {sample_name}...")
@@ -62,17 +71,36 @@ def main():
         composition_data_for_sample.index = [sample_name]
 
         compositions = pd.concat([compositions, composition_data_for_sample])
-        ica_dfs = pd.concat([ica_dfs, ic_wavelengths])
+        ica_df = pd.concat([ica_df, ic_wavelengths])
 
         runs += 1
 
         if runs >= max_runs:
             break
 
-    print(f"ICA results shape = {ica_dfs.shape}, composition data shape = {compositions.shape}.\n")
+    print(f"ICA results shape = {ica_df.shape}, composition data shape = {compositions.shape}.\n")
 
-    print(f"ICA results:\n{ica_dfs}\n")
+    print(f"ICA results:\n{ica_df}\n")
     print(f"Composition data:\n{compositions}\n")
+
+    # Split the data into training and testing sets
+    ica_train, ica_test, comp_train, comp_test = train_test_split(ica_df, compositions, test_size=0.2, random_state=42)
+
+    # Train a linear regression model for each oxide
+    for oxide in major_oxides:
+        X_train = ica_train
+        y_train = comp_train[oxide]
+
+        X_test = ica_test
+        y_test = comp_test[oxide]
+
+        model = LinearRegression()
+        model.fit(X_train, y_train)
+
+        model.predict(X_test)
+        test_rmse = np.sqrt(mean_squared_error(y_test, model.predict(X_test)))
+
+        print(f"Testing RMSE for {oxide}: {test_rmse}\n")
 
 
 def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -> np.ndarray:
