@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 def main():
     data_path = Path("./data/calib/calib_2015/1600mm/pls/")
-    max_runs = 1
+    max_runs = 4
     runs = 0
     num_components = 15
     all_estimated_sources = []
@@ -83,49 +83,38 @@ def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -
     if model == "jade":
         jade_model = JADE(num_components)
         df = df.transpose()
-        #print("Original data shape: ", df)
         mixing_matrix = jade_model.fit(df)
-        #print("mixing matrix", mixing_matrix)
         estimated_sources = jade_model.transform(df)
-        #print("DF shape", df.shape)
-        #print("mixing matrix shape: ", mixing_matrix.shape)
-        #print("estimated sources: ", estimated_sources)
+        
 
-        #linear_regression(estimated_sources)
+        ## _____ All this is just verification ____ ##
+        
         # Find correlation:
         feature_indices = df.columns.values
         unfiltered_correlation_matrix = np.corrcoef(df, estimated_sources, rowvar=False)
-        #print("correlation matrix shape ", unfiltered_correlation_matrix.shape)
-
         number_of_ics = estimated_sources.shape[1] 
         number_of_features = df.shape[1]
         filtered_correlation_matrix = unfiltered_correlation_matrix[-number_of_ics:, :number_of_features]
-
-        #print(filtered_correlation_matrix)
-
         final_results = summarize_and_identify_oxides(filtered_correlation_matrix, feature_indices, oxide_ranges)
         #print(final_results)
-
-        #filtered_estimated_sources = calculate_relative_intensity(df, filtered_correlation_matrix, oxide_ranges)
-        #print(filtered_estimated_sources)
-
 
         # Verification that the output is correct
         #print("transposed: ", mixing_matrix.shape)
         mixing_matrix = mixing_matrix.T
         unmixing_matrix = np.linalg.pinv(mixing_matrix)
         reconstructed = np.dot(estimated_sources, unmixing_matrix)
-
         #print("Reconstructed shape Jade: ", reconstructed.shape)
+
         squared_differences = (reconstructed - df) ** 2
         mean_squared_error = squared_differences.values.flatten().mean()
         rmse = np.sqrt(mean_squared_error)
         #print("RMSE for Jade: ", rmse)
-
         #linear_regression()
         #print(correlation_matrix)
         #print(reconstructed)
         #print(df)
+        
+        ## ___ Verification End ___ ##
 
     elif model == "fastica":
         fastica_model = FastICA(n_components=num_components, max_iter=5000)
@@ -136,14 +125,10 @@ def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -
         reconstructed = fastica_model.inverse_transform(estimated_sources)
         print("Reconstructed shape FastICA ", reconstructed.shape)
 
-        #print('ICA reconstruction error L2 norm: \n', np.sqrt((X_reconstructed - df).apply(np.square).mean()))
-        #print('ICA reconstruction error L1 norm: \n', np.sqrt((X_reconstructed - df).apply(np.absolute).mean()))
-
         squared_differences = (reconstructed - df) ** 2
         mean_squared_error = squared_differences.values.flatten().mean()
         rmse = np.sqrt(mean_squared_error)
         print("RMSE for FastICA: ", rmse)
-
         #print(reconstructed)
         #print(df)
     else:
@@ -222,8 +207,10 @@ def mad_based_outlier(points, thresh=3.5):
     return modified_z_score > thresh
 
 def linear_regression(estimated_sources):
+    print("Shape", estimated_sources.shape)
     scores = np.array(estimated_sources)
-    composition_data = {"SiO2": [57.9, 53.94, 77.94, 72.2], 
+    composition_data = {
+         "SiO2": [57.9, 53.94, 77.94, 72.2], 
          "TiO2": [0.65, 0.9, 0.31, 0.32],
          "Al2O3": [16.6, 26.15, 10.97, 13.07], 
          "FeOT": [7.22, 4.29, 2.76, 3.21],
@@ -245,7 +232,7 @@ def linear_regression(estimated_sources):
 
     for element, values in composition_data.items():
         y = np.log((np.array(values) + epsilon)**2)  # Log-square transformation
-
+        print(y)
         outlier_mask = np.zeros(len(scores), dtype=bool)
 
         # Iteratively remove outliers
@@ -254,11 +241,10 @@ def linear_regression(estimated_sources):
 
         # Filter out the outliers
         filtered_scores = scores[~outlier_mask]
-        filtered_y = y[~outlier_mask]
 
         # Create and fit the linear regression model
         model = LinearRegression()
-        model.fit(filtered_scores, filtered_y)
+        model.fit(filtered_scores, y)
         models[element] = model
 
         print(f"Model for {element}:")
@@ -297,39 +283,6 @@ def linear_regression(estimated_sources):
     predicted_original = np.sqrt(np.exp(predicted_log_square)) - epsilon
     
     # Plot the results
-    
-
-def logsquare_model(x, a, b, c):
-    return a + b * np.log(x + c)**2
-
-def calculate_relative_intensity(df, correlation_matrix, oxide_ranges):
-    # Sum the contributions across all ICs for each wavelength to get total intensity per wavelength
-    total_intensity_per_wavelength = np.sum(correlation_matrix, axis=0)
-
-    wavelengths = np.array(df.columns.astype(float))
-
-    # Initialize a dictionary to store total intensity for each oxide
-    oxide_intensities = {oxide: 0 for oxide in oxide_ranges}
-
-    # Calculate total intensity for each oxide range
-    for oxide, ranges in oxide_ranges.items():
-        for w_range in ranges:
-            mask = (wavelengths >= w_range[0]) & (wavelengths <= w_range[1])
-            oxide_intensities[oxide] += np.sum(total_intensity_per_wavelength[mask])
-
-    # Calculate the sum of all oxide intensities to normalize
-    total_oxides_intensity = np.sum(list(oxide_intensities.values()))
-
-    # Normalize the intensities to calculate relative contributions
-    normalized_oxide_intensities = {oxide: (intensity / total_oxides_intensity) * 100 
-                                    for oxide, intensity in oxide_intensities.items()}
-
-    return normalized_oxide_intensities
-
-
-# Example usage
-# df is your original data with wavelengths as
-
 
 if __name__ == "__main__":
     main()
