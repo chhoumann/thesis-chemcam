@@ -7,10 +7,6 @@ from ica.preprocess import preprocess_data
 from ica.postprocess import postprocess_data
 from ica.jade import JADE
 from sklearn.decomposition import FastICA
-from scipy.optimize import curve_fit
-from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
-from collections import Counter
 from lib.data_handling import CompositionData
 
 
@@ -50,6 +46,7 @@ def main():
 
         # Create the wavelengths matrix for each component
         ic_wavelengths = pd.DataFrame(index=[sample_name], columns=columns)
+        ic_wavelengths.index.name = 'wavelenghts'
 
         for i in range(len(ids)):
             ic = ids[i].split(' ')[0]
@@ -59,6 +56,10 @@ def main():
 
             ic_wavelengths.loc[sample_name, wavelength] = corr
 
+        oxides = composition_data_for_sample.iloc[:, 3:12]
+        oxides.index = [sample_name]
+
+        ic_wavelengths = ic_wavelengths.join(oxides)
         aggregated_dfs = pd.concat([aggregated_dfs, ic_wavelengths])
         runs += 1
 
