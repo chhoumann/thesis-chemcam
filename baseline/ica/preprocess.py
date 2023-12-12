@@ -30,4 +30,4 @@ def preprocess_data(sample_name, data_path):
     # Drop all rows where the sum of the values is zero
     df = df.loc[(df != 0).any(axis=1)]
 
-    return df
+    return df.transpose()

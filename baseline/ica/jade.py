@@ -43,25 +43,12 @@ class JADE():
                 scores[i - 1, :] = scores[i - 1, :] * -1
 
         self.ica_jade_mixing_matrix = mixing_matrix
+
         return mixing_matrix
 
     def transform(self, X):
         return np.dot(self.ica_jade_mixing_matrix, X.T).T
 
-    #this is a function that finds the correlation between loadings and a set of columns
-    #The idea is to somewhat automate identifying which element the loading corresponds to.
-    def correlate_loadings(self, df, corrcols, icacols):
-        corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
-        ica_jade_ids = []
-
-        for ic_label in icacols:
-            tmp = corrdf.loc[ic_label]
-            match = tmp.values == np.max(tmp)
-            col = corrcols[np.where(match)[0][-1]]
-            ica_jade_ids.append(col + ' (r=' + str(np.max(tmp)) + ')')
-
-        self.ica_jade_corr = corrdf
-        self.ica_jade_ids = ica_jade_ids
 
 def jadeR(X, m=None, verbose=True):
     """

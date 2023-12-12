@@ -19,22 +19,37 @@ def main():
     runs = 0
     num_components = 8
 
-    df = pd.DataFrame()
+    aggregated_dfs = pd.DataFrame()
 
     for sample_name in os.listdir(data_path):
         if(sample_name != "agv2"):
             continue
+
         print(f"Processing {sample_name}...")
-        X = preprocess_data(sample_name, data_path)
-        estimated_sources = run_ica(X, model="jade", num_components=num_components)
-        df = pd.concat([df, postprocess_data(sample_name, estimated_sources)])
+
+        # Preprocess the data
+        df = preprocess_data(sample_name, data_path)
+        columns = df.columns
+
+        # Run ICA and get the estimated sources
+        estimated_sources = run_ica(df, model="jade", num_components=num_components)
+
+        #  Add the estimated sources to the DataFrame for postprocessing
+        corrcols = [f'IC{i+1}' for i in range(num_components)]
+        df_ics = pd.DataFrame(estimated_sources, index=[f'shot{i+6}' for i in range(45)], columns=corrcols)
+        df = pd.concat([df, df_ics], axis=1)
+
+        # Correlate the loadings
+        corrdf, ids = correlate_loadings(df, corrcols, columns)
+
+        # aggregated_dfs = pd.concat([df, postprocess_data(sample_name, estimated_sources)])
 
         runs += 1
 
         if runs >= max_runs:
             break
 
-    df.to_csv("./ica_results.csv")
+    aggregated_dfs.to_csv("./ica_results.csv")
 
 
 def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -> np.ndarray:
@@ -67,46 +82,36 @@ def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -
         close to the identity matrix or the sum of squares of correlations not being close to one.
     """
     estimated_sources = None
-    df = df.transpose()
 
     if model == "jade":
-        cols = df.columns
+        # cols = df.columns
         jade_model = JADE(num_components)
         mixing_matrix = jade_model.fit(df)
         estimated_sources = jade_model.transform(df)
-
-        corrcols = [f'IC{i+1}' for i in range(num_components)]
-
-        df_ica = pd.DataFrame(estimated_sources, index=[f'shot{i+6}' for i in range(45)], columns=corrcols)
-        df = pd.concat([df, df_ica], axis=1)
-
-        # print("Duplicates:\n", df[df.duplicated()])
-
-        # append estimated sources to df
-
-        jade_model.correlate_loadings(df, corrcols, cols)
-        # print("Correlation matrix:\n", jade_model.ica_jade_corr)
-        # print("IDs:\n", jade_model.ica_jade_ids)
-        ids = jade_model.ica_jade_ids
-
-        ic_counts = Counter(entry.split(' ')[0] for entry in ids)
-
-        # Calculating the total number of entries
-        total_entries = sum(ic_counts.values())
-
-        # Calculating the percentage for each IC
-        ic_percentages = {ic: (count / total_entries) * 100 for ic, count in ic_counts.items()}
-
-        print(ic_percentages)
-
     elif model == "fastica":
         fastica_model = FastICA(n_components=num_components, max_iter=5000)
         estimated_sources = fastica_model.fit_transform(df)
     else:
         raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
 
-
     return estimated_sources
+
+
+# This is a function that finds the correlation between loadings and a set of columns
+# The idea is to somewhat automate identifying which element the loading corresponds to.
+def correlate_loadings(df, corrcols, icacols):
+    corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
+    ids = []
+
+    for ic_label in icacols:
+        tmp = corrdf.loc[ic_label]
+        match = tmp.values == np.max(tmp)
+        col = corrcols[np.where(match)[0][-1]]
+
+        ids.append(col + ' (r=' + str(np.max(tmp)) + ')')
+
+    return corrdf, ids
+
 
 if __name__ == "__main__":
     main()
