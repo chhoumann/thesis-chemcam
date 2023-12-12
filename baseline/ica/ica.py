@@ -17,7 +17,9 @@ def main():
     num_components = 8
 
     composition_data = CompositionData("./data/data/ccam_calibration_compositions.csv")
-    aggregated_dfs = pd.DataFrame()
+
+    ica_dfs = pd.DataFrame()
+    compositions = pd.DataFrame()
 
     for sample_name in os.listdir(data_path):
         # Check if we have composition data for this sample
@@ -46,7 +48,6 @@ def main():
 
         # Create the wavelengths matrix for each component
         ic_wavelengths = pd.DataFrame(index=[sample_name], columns=columns)
-        ic_wavelengths.index.name = 'wavelenghts'
 
         for i in range(len(ids)):
             ic = ids[i].split(' ')[0]
@@ -56,18 +57,22 @@ def main():
 
             ic_wavelengths.loc[sample_name, wavelength] = corr
 
-        oxides = composition_data_for_sample.iloc[:, 3:12]
-        oxides.index = [sample_name]
+        # Aggregate the composition data and the ICA results to their respective DataFrames
+        composition_data_for_sample = composition_data_for_sample.iloc[:, 3:12]
+        composition_data_for_sample.index = [sample_name]
 
-        ic_wavelengths = ic_wavelengths.join(oxides)
-        aggregated_dfs = pd.concat([aggregated_dfs, ic_wavelengths])
+        compositions = pd.concat([compositions, composition_data_for_sample])
+        ica_dfs = pd.concat([ica_dfs, ic_wavelengths])
+
         runs += 1
 
         if runs >= max_runs:
             break
 
-    print(aggregated_dfs.head())
-    aggregated_dfs.to_csv("./ica_results.csv")
+    print(f"ICA results shape = {ica_dfs.shape}, composition data shape = {compositions.shape}.\n")
+
+    print(f"ICA results:\n{ica_dfs}\n")
+    print(f"Composition data:\n{compositions}\n")
 
 
 def run_ica(df: pd.DataFrame, model: str = "fastica", num_components: int = 8) -> np.ndarray:
