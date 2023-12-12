@@ -90,7 +90,6 @@ def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_compon
         # Aggregate the ICA results and composition data to their respective DataFrames
         compositions_df = pd.concat([compositions_df, composition_df])
         ica_df = pd.concat([ica_df, ic_wavelengths])
-        break
 
     return ica_df, compositions_df
 
