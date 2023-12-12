@@ -71,11 +71,7 @@ def plot_leverage_residuals(leverage, Q, outliers, plot_file_path=None) -> None:
     ax.set_xlabel("Leverage")
     ax.set_ylabel("Residuals")
     ax.set_title("Leverage-Residuals Plot")
-    plt.show()
+    # plt.show()
 
     if plot_file_path:
         fig.savefig(plot_file_path)
-
-
-def test():
-    print(123)
