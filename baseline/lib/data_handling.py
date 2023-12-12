@@ -292,7 +292,7 @@ class CompositionData:
         )
         composition = self.composition_data.loc[match_condition]
 
-        return composition
+        return composition.head(1)
 
     def create_sample_compositions_dict(self, sample_names) -> dict[str, pd.DataFrame]:
         sample_compositions = {}
