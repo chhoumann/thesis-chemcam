@@ -15,16 +15,13 @@ from collections import Counter
 
 def main():
     data_path = Path("./data/calib_2015/1600mm/pls")
-    max_runs = 1
+    max_runs = 3
     runs = 0
     num_components = 8
 
     aggregated_dfs = pd.DataFrame()
 
     for sample_name in os.listdir(data_path):
-        if(sample_name != "agv2"):
-            continue
-
         print(f"Processing {sample_name}...")
 
         # Preprocess the data
@@ -42,13 +39,24 @@ def main():
         # Correlate the loadings
         corrdf, ids = correlate_loadings(df, corrcols, columns)
 
-        # aggregated_dfs = pd.concat([df, postprocess_data(sample_name, estimated_sources)])
+        # Create the wavelengths matrix for each component
+        ic_wavelengths = pd.DataFrame(index=[sample_name], columns=columns)
 
+        for i in range(len(ids)):
+            ic = ids[i].split(' ')[0]
+            component_idx = int(ic[2]) - 1
+            wavelength = corrdf.index[i]
+            corr = corrdf.iloc[i][component_idx]
+
+            ic_wavelengths.loc[sample_name, wavelength] = corr
+
+        # aggregated_dfs = pd.concat([aggregated_dfs, ic_wavelengths])
         runs += 1
 
         if runs >= max_runs:
             break
 
+    print(aggregated_dfs.head())
     aggregated_dfs.to_csv("./ica_results.csv")
 
 
