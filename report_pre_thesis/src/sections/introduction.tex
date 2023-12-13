@@ -7,10 +7,16 @@ It has various instruments and cameras, including a laser instrument called Chem
 The primary interest are rocks that either formed in water or show indications of organic materials.\cite{chemcamNasaWebsite}
 
 ChemCam is a remote-sensing laser instrument developed by NASA in collaboration with the French national space agency (CNES).
-The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars. The data itself consists of a series of spectral readings, each forming a spectrum. These spectra represent the emitted light from a plasma created when the laser interacts with the target sample. Captured over a range of wavelengths, each spectrum is composed of various emission lines. Each emission line is associated with a specific element, and its intensity reflects the concentration of that element in the sample. Consequently, the collection of spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological formations.
+The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars.
+
+The laser pulses to ablate and remove any surface contaminants, such as dust and weathering layers, to expose the underlying material. The laser generates a plasma plume from the now-exposed sample material.
+This plasma plume emits light, and the data collected from this process consists of a series of spectral readings. Captured over a range of wavelengths, each spectrum is composed of various emission lines. Each emission line is associated with a specific element, and its intensity reflects the concentration of that element in the sample.
+Consequently, the collection of spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological formations.
 This data is then used to determine the elemental composition of these samples.\cite{cleggRecalibrationMarsScience2017}
 
-LIBS is a versatile analytical tool with broad applicability across various fields. In environmental monitoring, its spectral data are effectively used with machine learning and statistical methods like partial least squares and neural networks for detecting and quantifying soil pollutants. In industrial contexts, it is also utilized for quality control processes involving metals and alloys\cite{huang_progress_2023}.
+Due to its capability for remote analysis, LIBS enables processesing of materials without needing sample preparation. This feature allows for rapid analysis because of the immediate spectrum collection from the subsequent plasma. It does this while maintaining high spatial resolution due to its small observation footprints. This high resolution is essential for pinpointing and investigating small features. \cite{wiensChemcam2012}
+
+LIBS is a versatile analytical tool with broad applicability across various other fields. In environmental monitoring, its spectral data are effectively used with machine learning and statistical methods like partial least squares and neural networks for detecting and quantifying soil pollutants. In industrial contexts, it is also utilized for quality control processes involving metals and alloys\cite{huang_progress_2023}.
 
 The ChemCam team uses an analytical system called the \textit{Multivariate Oxide Composition} (MOC) model to predict the composition of major oxides based on LIBS data from geological samples. 
 The system is comprised of various components, each responsible for a specific task in predicting the composition of major oxides in geological samples.
@@ -19,15 +25,20 @@ The system utilizes a series of submodels to predict individual oxide concentrat
 As part of their preprocessing, they use various techniques to remove noise and outliers from the data.\cite{cleggRecalibrationMarsScience2017}
 The model is trained on a calibration dataset consisting of LIBS data from 408 terrestrial rock samples, simulated to mimic Martian conditions\cite{cleggRecalibrationMarsScience2017}.
 
+The interpretation of LIBS data poses significant computational challenges.
+First, a high degree of multicollinearity exists within the spectral data, rendering traditional linear analysis methods less effective.
+The multicollinearity arises due to the correlation among different spectral channels, influenced both by the multi-line emission characteristics of individual elements and by geochemical correlations between elements.
+Secondly, the complexity of LIBS spectra is increased by multiple interacting physical processes because of \textit{matrix effects}. 'Matrix effects' refer to any effect that can cause the intensity of emission lines from an element to vary, independent of that element's concentration. Such variability complicates the direct interpretation of the spectra and poses challenges for computational models aiming for accurate elemental quantification.
+It is possible to partially account for these effects by using multivariate algorithms that make use of the information contained in the entire spectrum, rather than individual lines.\cite{andersonImprovedAccuracyQuantitative2017}
+
 The Mars Science Laboratory has made notable progress in planetary exploration, largely relying on models like the Multivariate Oxide Composition (MOC) to interpret Laser-Induced Breakdown Spectroscopy (LIBS) data from Martian geological samples.
 Despite its utility, a domain expert from the ChemCam team has observed that the existing MOC model exhibits limitations in both predictive accuracy and robustness.
 Enhancing the predictive accuracy and robustness of the MOC model is crucial for achieving more reliable composition predictions, thereby furthering the scientific objectives of the Mars Science Laboratory in understanding Martian geology and potential habitability.
 Accuracy, in this context, is measured as Root Mean Squared Error (RMSE).
 Robustness refers to the model's ability to handle the variations in the data.
-We use a term 'matrix effects' as a catch-all term for any effect that can cause the intensity of emission lines from an element to vary independent of that element's concentration.
-The complexity of LIBS spectra is increased by multiple interacting physical processes.
-These interactions introduce variability into the emission line intensities independent of the elements' concentrations.
-Such variability complicates the direct interpretation of the spectra and poses challenges for computational models aiming for accurate elemental quantification.\cite{andersonImprovedAccuracyQuantitative2017}
+
+The challenges posed by the inherent complexities in interpreting LIBS spectra underscore the need for refinement of models like the MOC. 
+Despite its current capabilities, the domain expert from the ChemCam team, emphasizes room for improvement in how the model handles data variability and predicts elemental compositions.
 
 \textit{In this work, we aim to solve the problem of identifying issues within the components of the current Multivariate Oxide Composition (MOC) model that limit its predictive accuracy and robustness, particularly in relation to matrix effects. Following this, we will propose improvements to the model's components that addresses these issues, thereby enhancing its overall accuracy and robustness.}
 
