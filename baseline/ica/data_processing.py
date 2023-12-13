@@ -3,7 +3,7 @@ import numpy as np
 from lib.data_handling import CompositionData
 from lib.data_handling import get_preprocessed_sample_data, WavelengthMaskTransformer
 from lib.reproduction import masks
-from lib.norms import Norm1Scaler
+from lib.norms import Norm1Scaler, Norm3Scaler
 
 
 class ICASampleProcessor:
@@ -34,7 +34,10 @@ class ICASampleProcessor:
         return True
 
 
-    def preprocess(self, calib_data_path: str) -> None:
+    def preprocess(self, calib_data_path: str, norm: int = 1) -> None:
+        if norm != 1 and norm != 3:
+            raise ValueError("Invalid Norm value. Must be 1 or 3.")
+
         sample_data = get_preprocessed_sample_data(
             self.sample_name, calib_data_path, average_shots=False
         )
@@ -50,7 +53,7 @@ class ICASampleProcessor:
         df.set_index("wave", inplace=True)
 
         # Normalize the data
-        scaler = Norm1Scaler()
+        scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
         df = pd.DataFrame(scaler.fit_transform(df))
 
         self.df = df.transpose()
