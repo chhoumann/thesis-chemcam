@@ -10,29 +10,118 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from lib.reproduction import major_oxides
+from scipy.stats import median_abs_deviation
+
+
+def remove_outliers(df, threshold=25):
+    # Calculate median and MAD for each column
+    medians = df.median()
+    mad = df.apply(median_abs_deviation)
+
+    # Identify outliers: a row is an outlier if any of its values are outliers in their respective column
+    outlier_mask = ((df - medians).abs() > threshold * mad).any(axis=1)
+
+    print(f"Removing {outlier_mask.sum()} outliers from {len(df)} samples.")
+
+    # Remove outliers and return the cleaned DataFrame
+    return df[~outlier_mask]
+
+
+def fit_and_evaluate_model(model, X_train, y_train, X_test, y_test):
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    return np.sqrt(mean_squared_error(y_test, predictions))
 
 
 def main():
     ica_df, compositions_df = get_train_data(num_components=8)
-
-    # Split the data into training and testing sets
     ica_train, ica_test, comp_train, comp_test = train_test_split(ica_df, compositions_df, test_size=0.2, random_state=42)
+    max_iterations = 10
 
-    # Train a linear regression model for each oxide
+    oxide_rmses = {}
+    oxide_models = {
+        "SiO2": "Log-square",
+        "TiO2": "Geometric",
+        "Al2O3": "Geometric",
+        "FeOT": "Geometric",
+        "MgO": "Exponential",
+        "CaO": "Parabolic",
+        "Na2O": "Parabolic",
+        "K2O": "Geometric"
+    }
+
     for oxide in major_oxides:
+        model_name = oxide_models[oxide]
+
+        if model_name is None:
+            print(f"No model specified for {oxide}. Skipping...")
+            continue
+
+        print(f"Training model {model_name} for {oxide}...")
+
         X_train = ica_train
         y_train = comp_train[oxide]
 
         X_test = ica_test
         y_test = comp_test[oxide]
 
+        if model_name == "Log-square":
+            y_train = np.log(y_train**2)
+            y_test = np.log(y_test**2)
+        elif model_name == "Exponential":
+            y_train = np.log(y_train)
+            y_test = np.log(y_test)
+        elif model_name == "Geometric":
+            # Presence of negative values prevents log transformation of data from working, so we add a constant for now
+            X_train = np.log(X_train + 1)
+            X_test = np.log(X_test + 1)
+        elif model_name == "Parabolic":
+            X_train = np.column_stack((X_train, X_train**2))
+            X_test = np.column_stack((X_test, X_test**2))
+
         model = LinearRegression()
         model.fit(X_train, y_train)
 
-        model.predict(X_test)
-        test_rmse = np.sqrt(mean_squared_error(y_test, model.predict(X_test)))
+        pred = model.predict(X_test)
+        rmse = np.sqrt(mean_squared_error(y_test, pred))
 
-        print(f"Testing RMSE for {oxide}: {test_rmse}\n")
+        oxide_rmses[oxide] = rmse
+
+        # test_rmse = np.sqrt(mean_squared_error(y_test, best_model.predict(X_test)))
+        # min_rmse = test_rmse
+        # no_improvement_count = 0
+        # tolerance = 3  # Number of iterations to continue without improvement
+
+        # for i in range(max_iterations):
+        #     X_train_filtered = remove_outliers(X_train)
+        #     y_train_filtered = comp_train.loc[X_train_filtered.index][oxide]
+
+        #     if len(X_train_filtered) < len(X_train):
+        #         new_model = LinearRegression()
+        #         new_model.fit(X_train_filtered, y_train_filtered)
+
+        #         new_rmse = np.sqrt(mean_squared_error(y_test, new_model.predict(X_test)))
+
+        #         if new_rmse < min_rmse:
+        #             print(f"RMSE improved from {min_rmse} to {new_rmse} for {oxide}.")
+        #             min_rmse = new_rmse
+        #             best_model = new_model
+        #             X_train = X_train_filtered
+        #             no_improvement_count = 0
+        #         else:
+        #             no_improvement_count += 1
+        #             if no_improvement_count >= tolerance:
+        #                 print(f"No improvement for {oxide} after {i+1} iterations. Stopping early.")
+        #                 break
+
+
+        # oxide_rmses[oxide] = min_rmse
+
+    for oxide, rmse in oxide_rmses.items():
+        print(f"RMSE for {oxide} with {oxide_models[oxide]} model: {rmse}")
+
 
 
 def get_train_data(num_components: int) -> (pd.DataFrame, pd.DataFrame):
@@ -56,6 +145,7 @@ def get_train_data(num_components: int) -> (pd.DataFrame, pd.DataFrame):
 
 def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_components: int = 8) -> (pd.DataFrame, pd.DataFrame):
     composition_data_loc = "./data/data/ccam_calibration_compositions.csv"
+
     ica_df = pd.DataFrame()
     compositions_df = pd.DataFrame()
 
@@ -78,6 +168,13 @@ def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_compon
         # Aggregate the ICA results and composition data to their respective DataFrames
         compositions_df = pd.concat([compositions_df, processor.composition_df])
         ica_df = pd.concat([ica_df, processor.ic_wavelengths])
+
+    # Set the index and column names for the DataFrames
+    ica_df.index.name = "target"
+    ica_df.columns.name = "wavelegths"
+
+    compositions_df.index.name = "target"
+    compositions_df.columns.name = "oxide"
 
     return ica_df, compositions_df
 
