@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import scipy.stats as stats
 from sklearn.cross_decomposition import PLSRegression
 
@@ -8,12 +7,6 @@ from sklearn.cross_decomposition import PLSRegression
 def calculate_mahalanobis(x, mean, cov):
     x_minus_mu = x - mean
     return np.sqrt(np.dot(np.dot(x_minus_mu, np.linalg.inv(cov)), x_minus_mu.T))
-
-
-def train_model(X: pd.DataFrame, y: pd.DataFrame, n_components: int) -> PLSRegression:
-    model = PLSRegression(n_components=n_components)
-    model.fit(X, y)
-    return model
 
 
 def calculate_leverage_residuals(model: PLSRegression, X: np.ndarray):
@@ -75,3 +68,5 @@ def plot_leverage_residuals(leverage, Q, outliers, plot_file_path=None) -> None:
 
     if plot_file_path:
         fig.savefig(plot_file_path)
+
+    # plt.close()
