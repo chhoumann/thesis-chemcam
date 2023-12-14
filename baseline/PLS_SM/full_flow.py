@@ -34,7 +34,9 @@ logger = logging.getLogger("train")
 
 mlflow.set_tracking_uri("http://localhost:5000")
 
-preformatted_data_path = Path("./data/data/calib/calib_2015/1600mm/pls/all_processed.csv")
+preformatted_data_path = Path(
+    "./data/data/calib/calib_2015/1600mm/pls/all_processed.csv"
+)
 
 if not preformatted_data_path.exists():
     dataset_loc = Path("./data/data/calib/calib_2015/1600mm/pls/")
@@ -56,7 +58,7 @@ if not preformatted_data_path.exists():
     logger.info("Data processing complete.")
 
     processed_data.to_csv(preformatted_data_path, index=False)
-else :
+else:
     logger.info("Loading preformatted data from location: %s", preformatted_data_path)
     processed_data = pd.read_csv(preformatted_data_path)
 
@@ -150,6 +152,8 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
 
             best_or_model = pls_OR
 
+            train_no_outliers = train.copy()
+
             while True:
                 outlier_removal_iterations += 1
                 leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
@@ -157,6 +161,8 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
 
                 if len(outliers) == 0:
                     break
+
+                outliers_indices = np.where(outliers)[0]
 
                 # Plotting the influence plot
                 plot_path = Path(
@@ -170,8 +176,8 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
                 plot_leverage_residuals(leverage, Q, outliers, str(plot_path))
                 mlflow.log_artifact(str(plot_path))
 
-                X_train_OR = np.delete(X_train_OR, outliers, axis=0)
-                y_train_OR = np.delete(y_train_OR, outliers, axis=0)
+                X_train_OR = np.delete(X_train_OR, outliers_indices, axis=0)
+                y_train_OR = np.delete(y_train_OR, outliers_indices, axis=0)
 
                 pls_OR = PLSRegression(n_components=n_components)
                 pls_OR.fit(X_train_OR, y_train_OR)
@@ -183,13 +189,22 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
                 mlflow.log_metric(
                     "RMSEOR", float(new_performance), step=outlier_removal_iterations
                 )
+
+                number_of_outliers = np.sum(
+                    outliers
+                )  # Counting the number of True values
                 mlflow.log_metric(
-                    "outliers_removed", len(outliers), step=outlier_removal_iterations
+                    "outliers_removed",
+                    float(number_of_outliers),
+                    step=outlier_removal_iterations,
                 )
 
                 # Check if error has increased: early stop if so
                 if new_performance >= current_performance:
                     break
+
+                # Update to only have best set
+                train_no_outliers = train.drop(index=train.index[outliers_indices])
 
                 current_performance = new_performance
                 best_or_model = pls_OR
@@ -205,12 +220,6 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
             best_CV_rmse = np.inf
 
             logger.info("Performing custom k-fold cross-validation.")
-
-            # use data from outlier removal
-            train_no_outliers = pd.DataFrame(
-                X_train_OR, columns=train_cols
-            )
-            train_no_outliers[oxide] = y_train_OR
 
             kf = custom_kfold_cross_validation(
                 train_no_outliers,
