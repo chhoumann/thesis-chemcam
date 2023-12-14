@@ -111,7 +111,6 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
         logger.debug("Fitting and transforming training data.")
         train = scaler.fit_transform(train)
         logger.debug("Transforming test data.")
-        # TODO: Maybe only transform?
         test = scaler.fit_transform(test)
 
         # turn back into dataframe
