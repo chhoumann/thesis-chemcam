@@ -138,12 +138,12 @@ def plot_outliers_for_run(mlflow_run_id: str, figure_name=""):
 if __name__ == "__main__":
     # Example
     plot_outliers_for_run(
-        "16b0b228ada94577b15b658890ea1dc4", "outlier_removal_over_time"
+        "6538590f11b649368e30ebb200b42ea4", "outlier_removal_over_time"
     )
 
     # Example
-    plot_spectra(
-        "cadillac",
-        "data/data/calib/calib_2015/1600mm/pls",
-        fig_name="cadillac_spectra.png",
-    )
+    # plot_spectra(
+    #     "cadillac",
+    #     "data/data/calib/calib_2015/1600mm/pls",
+    #     fig_name="cadillac_spectra.png",
+    # )
