@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from lib.data_handling import CompositionData
 from lib.data_handling import get_preprocessed_sample_data, WavelengthMaskTransformer
-from lib.reproduction import masks
+from lib.reproduction import masks, spectrometer_wavelength_ranges
 from lib.norms import Norm1Scaler, Norm3Scaler
 
 
@@ -53,7 +53,7 @@ class ICASampleProcessor:
         df.set_index("wave", inplace=True)
 
         # Normalize the data
-        scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
+        scaler = Norm1Scaler() if norm == 1 else Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
         df = pd.DataFrame(scaler.fit_transform(df))
 
         self.df = df.transpose()
