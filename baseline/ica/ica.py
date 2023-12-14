@@ -71,16 +71,18 @@ def main():
 
 
 def get_train_data(num_components: int) -> (pd.DataFrame, pd.DataFrame):
-    calib_data_path = Path("./data/calib_2015/1600mm/pls")
+    calib_data_path = Path("./data/calib_2015/1600mm/ica")
+    output_dir = Path("./data/jade/ica/norm3")
 
-    ica_df_csv_loc = Path("./data/jade/norm1/ica_data.csv")
-    compositions_csv_loc = Path("./data/jade/norm1/composition_data.csv")
+    ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
+    compositions_csv_loc = Path(f"{output_dir}/composition_data.csv")
 
     if ica_df_csv_loc.exists() and compositions_csv_loc.exists():
         ica_df = pd.read_csv(ica_df_csv_loc, index_col=0)
         compositions_df = pd.read_csv(compositions_csv_loc, index_col=0)
     else:
         print("No preprocessed data found. Creating and saving preprocessed data...")
+        output_dir.mkdir(parents=True, exist_ok=True)
         ica_df, compositions_df = create_train_data(calib_data_path, num_components=num_components)
         ica_df.to_csv(ica_df_csv_loc)
         compositions_df.to_csv(compositions_csv_loc)
@@ -103,7 +105,7 @@ def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_compon
 
         print(f"Processing {sample_name}...")
 
-        processor.preprocess(calib_data_path, norm=1)
+        processor.preprocess(calib_data_path, norm=3)
 
         # Run ICA and get the estimated sources
         ica_estimated_sources = run_ica(processor.df, model=ica_model, num_components=num_components)
