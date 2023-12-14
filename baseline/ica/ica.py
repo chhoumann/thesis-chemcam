@@ -1,14 +1,15 @@
 import os
-import pandas as pd
-import numpy as np
-
 from pathlib import Path
-from ica.data_processing import ICASampleProcessor
-from ica.jade import JADE
+
+import numpy as np
+import pandas as pd
 from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+
+from ica.data_processing import ICASampleProcessor
+from ica.jade import JADE
 from lib.reproduction import major_oxides
 
 
@@ -16,7 +17,9 @@ def main():
     ica_df, compositions_df = get_train_data(num_components=8)
     ica_df = ica_df.abs()
 
-    ica_train, ica_test, comp_train, comp_test = train_test_split(ica_df, compositions_df, test_size=0.2, random_state=42)
+    ica_train, ica_test, comp_train, comp_test = train_test_split(
+        ica_df, compositions_df, test_size=0.2, random_state=42
+    )
 
     oxide_rmses = {}
     oxide_models = {
@@ -27,7 +30,7 @@ def main():
         "MgO": "Exponential",
         "CaO": "Parabolic",
         "Na2O": "Parabolic",
-        "K2O": "Geometric"
+        "K2O": "Geometric",
     }
 
     for oxide in major_oxides:
@@ -46,8 +49,8 @@ def main():
         y_test = comp_test[oxide]
 
         if model_name == "Log-square":
-            X_train = np.log(X_train ** 2)
-            X_test = np.log(X_test ** 2)
+            X_train = np.log(X_train**2)
+            X_test = np.log(X_test**2)
         elif model_name == "Exponential":
             X_train = np.log(X_train)
             X_test = np.log(X_test)
@@ -55,8 +58,8 @@ def main():
             X_train = np.sqrt(X_train)
             X_test = np.sqrt(X_test)
         elif model_name == "Parabolic":
-            X_train = X_train ** 2
-            X_test = X_test ** 2
+            X_train = X_train**2
+            X_test = X_test**2
 
         model = LinearRegression()
         model.fit(X_train, y_train)
@@ -83,15 +86,21 @@ def get_train_data(num_components: int) -> (pd.DataFrame, pd.DataFrame):
     else:
         print("No preprocessed data found. Creating and saving preprocessed data...")
         output_dir.mkdir(parents=True, exist_ok=True)
-        ica_df, compositions_df = create_train_data(calib_data_path, num_components=num_components)
+        ica_df, compositions_df = create_train_data(
+            calib_data_path, num_components=num_components
+        )
         ica_df.to_csv(ica_df_csv_loc)
         compositions_df.to_csv(compositions_csv_loc)
-        print(f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n")
+        print(
+            f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
+        )
 
     return ica_df, compositions_df
 
 
-def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_components: int = 8) -> (pd.DataFrame, pd.DataFrame):
+def create_train_data(
+    calib_data_path: Path, ica_model: str = "jade", num_components: int = 8
+) -> (pd.DataFrame, pd.DataFrame):
     composition_data_loc = "./data/data/ccam_calibration_compositions.csv"
 
     ica_df = pd.DataFrame()
@@ -108,7 +117,9 @@ def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_compon
         processor.preprocess(calib_data_path, norm=3)
 
         # Run ICA and get the estimated sources
-        ica_estimated_sources = run_ica(processor.df, model=ica_model, num_components=num_components)
+        ica_estimated_sources = run_ica(
+            processor.df, model=ica_model, num_components=num_components
+        )
 
         # Postprocess the data
         processor.postprocess(ica_estimated_sources)
@@ -127,7 +138,9 @@ def create_train_data(calib_data_path: Path, ica_model: str = "jade", num_compon
     return ica_df, compositions_df
 
 
-def run_ica(df: pd.DataFrame, model: str = "jade", num_components: int = 8) -> np.ndarray:
+def run_ica(
+    df: pd.DataFrame, model: str = "jade", num_components: int = 8
+) -> np.ndarray:
     """
     Performs Independent Component Analysis (ICA) on a given dataset using JADE or FastICA algorithms.
 
@@ -164,7 +177,9 @@ def run_ica(df: pd.DataFrame, model: str = "jade", num_components: int = 8) -> n
         mixing_matrix = jade_model.fit(df)
         estimated_sources = jade_model.transform(df)
     elif model == "fastica":
-        fastica_model = FastICA(n_components=num_components, whiten="unit-variance", max_iter=5000)
+        fastica_model = FastICA(
+            n_components=num_components, whiten="unit-variance", max_iter=5000
+        )
         estimated_sources = fastica_model.fit_transform(df)
     else:
         raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
