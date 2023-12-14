@@ -5,10 +5,15 @@ import matplotlib.pyplot as plt
 import mlflow
 import pandas as pd
 import seaborn as sns
+import typer
+
 from lib.data_handling import WavelengthMaskTransformer, get_preprocessed_sample_data
 from lib.reproduction import masks, spectrometer_wavelength_ranges
 
+app = typer.Typer()
 
+
+@app.command(name="plot_spectra", help="Plot the spectra for a given sample.")
 def plot_spectra(
     sample_name: str,
     data_path: str,
@@ -90,6 +95,7 @@ def plot_spectra(
         plt.savefig(fig_name, bbox_inches="tight")
 
 
+@app.command(name="plot_outliers", help="Plot the outliers for a given run.")
 def plot_outliers_for_run(mlflow_run_id: str, figure_name=""):
     mlflow.set_tracking_uri("http://localhost:5000")
     client = mlflow.MlflowClient()
@@ -133,17 +139,3 @@ def plot_outliers_for_run(mlflow_run_id: str, figure_name=""):
         plt.savefig(save_file_path, bbox_inches="tight")
 
     # plt.show()
-
-
-if __name__ == "__main__":
-    # Example
-    plot_outliers_for_run(
-        "6538590f11b649368e30ebb200b42ea4", "outlier_removal_over_time"
-    )
-
-    # Example
-    # plot_spectra(
-    #     "cadillac",
-    #     "data/data/calib/calib_2015/1600mm/pls",
-    #     fig_name="cadillac_spectra.png",
-    # )
