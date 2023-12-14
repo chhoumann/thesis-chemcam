@@ -202,3 +202,17 @@ paper_individual_sm_rmses = {
         "K2O": 0.74,
     },
 }
+
+# Weights for blending PLS1-SM and ICA predictions
+weighted_sum_oxide_percentages = {
+    "Al2O3": {"PLS1-SM": 75, "ICA": 25},
+    "FeOT": {"PLS1-SM": 75, "ICA": 25},
+    # SiO2: Initial mix, changes to 75/25 based on conditions
+    "SiO2": {"PLS1-SM": 50, "ICA": 50},
+    "Na2O": {"PLS1-SM": 40, "ICA": 60},
+    "K2O": {"PLS1-SM": 25, "ICA": 75},
+    # DON'T KNOW - NOT MENTIONED
+    "TiO2": {"PLS1-SM": 50, "ICA": 50},
+    "MgO": {"PLS1-SM": 50, "ICA": 50},
+    "CaO": {"PLS1-SM": 50, "ICA": 50},
+}
