@@ -68,6 +68,11 @@ class ICASampleProcessor:
     def postprocess(self, ica_estimated_sources: np.ndarray) -> None:
         columns = self.df.columns
 
+        assert len(columns) == len(ica_estimated_sources[0]) == 45, (
+            f"Expected 45 columns, got {len(columns)} in the data and "
+            f"{len(ica_estimated_sources[0])} in the estimated sources."
+        )
+
         corrcols = [f"IC{i+1}" for i in range(self.num_components)]
         df_ics = pd.DataFrame(
             ica_estimated_sources,
