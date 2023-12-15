@@ -1,6 +1,12 @@
+import enum
 from typing import Dict, Tuple
 
 from sklearn.base import BaseEstimator, TransformerMixin
+
+
+class Norm(enum.Enum):
+    NORM_1 = 1
+    NORM_3 = 3
 
 
 class Norm1Scaler(BaseEstimator, TransformerMixin):
