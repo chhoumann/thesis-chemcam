@@ -1,9 +1,15 @@
-import pandas as pd
+from pathlib import Path
+
 import numpy as np
-from lib.data_handling import CompositionData
-from lib.data_handling import get_preprocessed_sample_data, WavelengthMaskTransformer
+import pandas as pd
+
+from lib.data_handling import (
+    CompositionData,
+    WavelengthMaskTransformer,
+    get_preprocessed_sample_data,
+)
+from lib.norms import Norm, Norm1Scaler, Norm3Scaler
 from lib.reproduction import masks, spectrometer_wavelength_ranges
-from lib.norms import Norm1Scaler, Norm3Scaler
 
 
 class ICASampleProcessor:
@@ -13,7 +19,6 @@ class ICASampleProcessor:
         self.compositions_df = None
         self.df = None
         self.ic_wavelengths = None
-
 
     def try_load_composition_df(self, composition_data_loc: str) -> bool:
         # Check if we have composition data for this sample
@@ -26,18 +31,16 @@ class ICASampleProcessor:
 
         # Check if the composition data contains NaN values
         if composition_df.isnull().values.any():
-            print(f"NaN values found in composition data for {self.sample_name}. Skipping...")
+            print(
+                f"NaN values found in composition data for {self.sample_name}. Skipping..."
+            )
             return False
 
         self.composition_df = composition_df
 
         return True
 
-
-    def preprocess(self, calib_data_path: str, norm: int = 1) -> None:
-        if norm != 1 and norm != 3:
-            raise ValueError("Invalid Norm value. Must be 1 or 3.")
-
+    def preprocess(self, calib_data_path: Path, norm: Norm = Norm.NORM_1) -> None:
         sample_data = get_preprocessed_sample_data(
             self.sample_name, calib_data_path, average_shots=False
         )
@@ -53,17 +56,29 @@ class ICASampleProcessor:
         df.set_index("wave", inplace=True)
 
         # Normalize the data
-        scaler = Norm1Scaler() if norm == 1 else Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+        scaler = (
+            Norm1Scaler()
+            if norm.value == 1
+            else Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+        )
         df = pd.DataFrame(scaler.fit_transform(df))
 
         self.df = df.transpose()
 
-
     def postprocess(self, ica_estimated_sources: np.ndarray) -> None:
         columns = self.df.columns
 
-        corrcols = [f'IC{i+1}' for i in range(self.num_components)]
-        df_ics = pd.DataFrame(ica_estimated_sources, index=[f'shot{i+6}' for i in range(45)], columns=corrcols)
+        assert len(columns) == len(ica_estimated_sources[0]) == 45, (
+            f"Expected 45 columns, got {len(columns)} in the data and "
+            f"{len(ica_estimated_sources[0])} in the estimated sources."
+        )
+
+        corrcols = [f"IC{i+1}" for i in range(self.num_components)]
+        df_ics = pd.DataFrame(
+            ica_estimated_sources,
+            index=[f"shot{i+6}" for i in range(45)],
+            columns=corrcols,
+        )
 
         self.df = pd.concat([self.df, df_ics], axis=1)
 
@@ -74,10 +89,10 @@ class ICASampleProcessor:
         self.ic_wavelengths = pd.DataFrame(index=[self.sample_name], columns=columns)
 
         for i in range(len(ids)):
-            ic = ids[i].split(' ')[0]
+            ic = ids[i].split(" ")[0]
             component_idx = int(ic[2]) - 1
             wavelength = corrdf.index[i]
-            corr = corrdf.iloc[i][component_idx]
+            corr = corrdf.iloc[i].iloc[component_idx]
 
             self.ic_wavelengths.loc[self.sample_name, wavelength] = corr
 
@@ -85,11 +100,14 @@ class ICASampleProcessor:
         self.composition_df = self.composition_df.iloc[:, 3:12]
         self.composition_df.index = [self.sample_name]
 
-
     # This is a function that finds the correlation between loadings and a set of columns
     # The idea is to somewhat automate identifying which element the loading corresponds to.
-    def __correlate_loadings__(self, corrcols: list, icacols: list) -> (pd.DataFrame, list):
-        corrdf = self.df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
+    def __correlate_loadings__(
+        self, corrcols: list, icacols: list
+    ) -> (pd.DataFrame, list):
+        corrdf = (
+            self.df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
+        )
         ids = []
 
         for ic_label in icacols:
@@ -97,6 +115,6 @@ class ICASampleProcessor:
             match = tmp.values == np.max(tmp)
             col = corrcols[np.where(match)[0][-1]]
 
-            ids.append(col + ' (r=' + str(np.max(tmp)) + ')')
+            ids.append(col + " (r=" + str(np.max(tmp)) + ")")
 
         return corrdf, ids

@@ -25,20 +25,22 @@ import numpy as np
 from numpy import *
 from numpy.linalg import eig, pinv
 
-#JADE class created for compatibility with PyHAT
-class JADE():
+
+# JADE class created for compatibility with PyHAT
+class JADE:
     def __init__(self, num_components=4, verbose=False):
         self.num_components = num_components
         self.verbose = verbose
 
-    def fit(self,X, corrdata = None):
+    def fit(self, X, corrdata=None):
         X = np.array(X)
-        scores = jadeR(X, m = self.num_components, verbose = self.verbose)
+        scores = jadeR(X, m=self.num_components, verbose=self.verbose)
         mixing_matrix = np.dot(scores, X)
 
         for i in list(range(1, len(scores[:, 0]) + 1)):
             if np.abs(np.max(mixing_matrix[i - 1, :])) < np.abs(
-                    np.min(mixing_matrix[i - 1, :])):  # flip the sign if necessary to look nicer
+                np.min(mixing_matrix[i - 1, :])
+            ):  # flip the sign if necessary to look nicer
                 mixing_matrix[i - 1, :] = mixing_matrix[i - 1, :] * -1
                 scores[i - 1, :] = scores[i - 1, :] * -1
 
@@ -118,20 +120,24 @@ def jadeR(X, m=None, verbose=True):
     # variables to avoid messing with the original input. We also require double
     # precision (float64) and a numpy matrix type for X.
 
-    assert isinstance(X, ndarray), \
-        "X (input data matrix) is of the wrong type (%s)" % type(X)
+    assert isinstance(
+        X, ndarray
+    ), "X (input data matrix) is of the wrong type (%s)" % type(X)
     origtype = X.dtype  # remember to return matrix B of the same type
     X = matrix(X.astype(float64))
     assert X.ndim == 2, "X has %d dimensions, should be 2" % X.ndim
-    assert (verbose == True) or (verbose == False), \
-        "verbose parameter should be either True or False"
+    assert (verbose == True) or (
+        verbose == False
+    ), "verbose parameter should be either True or False"
 
     [n, T] = X.shape  # GB: n is number of input signals, T is number of samples
 
     if m == None:
         m = n  # Number of sources defaults to # of sensors
-    assert m <= n, \
-        "jade -> Do not ask more sources (%d) than sensors (%d )here!!!" % (m, n)
+    assert m <= n, "jade -> Do not ask more sources (%d) than sensors (%d )here!!!" % (
+        m,
+        n,
+    )
 
     if verbose:
         print("jade -> Looking for " + str(m) + " sources")
@@ -142,17 +148,21 @@ def jadeR(X, m=None, verbose=True):
     # ===========================================
     if verbose:
         print("jade -> Whitening the data")
-    [D, U] = eig((X * X.T) / float(T))  # An eigen basis for the sample covariance matrix
+    [D, U] = eig(
+        (X * X.T) / float(T)
+    )  # An eigen basis for the sample covariance matrix
     k = D.argsort()
     Ds = D[k]  # Sort by increasing variances
-    PCs = arange(n - 1, n - m - 1, -1)  # The m most significant princip. comp. by decreasing variance
+    PCs = arange(
+        n - 1, n - m - 1, -1
+    )  # The m most significant princip. comp. by decreasing variance
 
     # --- PCA  ----------------------------------------------------------
     B = U[:, k[PCs]].T  # % At this stage, B does the PCA on m components
 
     # --- Scaling  ------------------------------------------------------
     scales = sqrt(Ds[PCs])  # The scales of the principal components .
-    B = diag(1. / scales) * B  # Now, B does PCA followed by a rescaling = sphering
+    B = diag(1.0 / scales) * B  # Now, B does PCA followed by a rescaling = sphering
     # B[-1,:] = -B[-1,:] # GB: to make it compatible with octave
     # --- Sphering ------------------------------------------------------
     X = B * X  # %% We have done the easy part: B is a whitening matrix and X is white.
@@ -171,7 +181,6 @@ def jadeR(X, m=None, verbose=True):
     # cumulant matrices.  The code below finds the `missing rotation " as the matrix which
     # best diagonalizes a particular set of cumulant matrices.
 
-
     # Estimation of the cumulant matrices.
     # ====================================
     if verbose:
@@ -181,7 +190,9 @@ def jadeR(X, m=None, verbose=True):
     X = X.T
     dimsymm = (m * (m + 1)) / 2  # Dim. of the space of real symm matrices
     nbcm = dimsymm  # number of cumulant matrices
-    CM = matrix(zeros([m, int(m * nbcm)], dtype=float64))  # Storage for cumulant matrices
+    CM = matrix(
+        zeros([m, int(m * nbcm)], dtype=float64)
+    )  # Storage for cumulant matrices
     R = matrix(eye(m, dtype=float64))
     Qij = matrix(zeros([m, m], dtype=float64))  # Temp for a cum. matrix
     Xim = zeros(m, dtype=float64)  # Temp
@@ -198,14 +209,16 @@ def jadeR(X, m=None, verbose=True):
         Xijm = multiply(Xim, Xim)
         # Note to myself: the -R on next line can be removed: it does not affect
         # the joint diagonalization criterion
-        Qij = multiply(Xijm, X).T * X / float(T) \
-              - R - 2 * dot(R[:, im], R[:, im].T)
+        Qij = multiply(Xijm, X).T * X / float(T) - R - 2 * dot(R[:, im], R[:, im].T)
         CM[:, Range] = Qij
         Range = Range + m
         for jm in range(im):
             Xijm = multiply(Xim, X[:, jm])
-            Qij = sqrt(2) * multiply(Xijm, X).T * X / float(T) \
-                  - R[:, im] * R[:, jm].T - R[:, jm] * R[:, im].T
+            Qij = (
+                sqrt(2) * multiply(Xijm, X).T * X / float(T)
+                - R[:, im] * R[:, jm].T
+                - R[:, jm] * R[:, im].T
+            )
             CM[:, Range] = Qij
             Range = Range + m
 
@@ -252,9 +265,8 @@ def jadeR(X, m=None, verbose=True):
 
         for p in range(m - 1):
             for q in range(p + 1, m):
-
-                Ip = np.array(arange(p, m * nbcm, m), dtype='int')
-                Iq = np.array(arange(q, m * nbcm, m), dtype='int')
+                Ip = np.array(arange(p, m * nbcm, m), dtype="int")
+                Iq = np.array(arange(q, m * nbcm, m), dtype="int")
 
                 # computation of Givens angle
                 g = concatenate([CM[p, Ip] - CM[q, Iq], CM[p, Iq] + CM[q, Ip]])
@@ -274,9 +286,11 @@ def jadeR(X, m=None, verbose=True):
                     pair = array([p, q])
                     V[:, pair] = V[:, pair] * G
                     CM[pair, :] = G.T * CM[pair, :]
-                    CM[:, concatenate([Ip, Iq])] = \
-                        append(c * CM[:, Ip] + s * CM[:, Iq], -s * CM[:, Ip] + c * CM[:, Iq], \
-                               axis=1)
+                    CM[:, concatenate([Ip, Iq])] = append(
+                        c * CM[:, Ip] + s * CM[:, Iq],
+                        -s * CM[:, Ip] + c * CM[:, Iq],
+                        axis=1,
+                    )
                     On = On + Gain
                     Off = Off - Gain
 
