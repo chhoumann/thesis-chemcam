@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -6,7 +8,7 @@ from lib.data_handling import (
     WavelengthMaskTransformer,
     get_preprocessed_sample_data,
 )
-from lib.norms import Norm1Scaler, Norm3Scaler
+from lib.norms import Norm, Norm1Scaler, Norm3Scaler
 from lib.reproduction import masks, spectrometer_wavelength_ranges
 
 
@@ -38,10 +40,7 @@ class ICASampleProcessor:
 
         return True
 
-    def preprocess(self, calib_data_path: str, norm: int = 1) -> None:
-        if norm != 1 and norm != 3:
-            raise ValueError("Invalid Norm value. Must be 1 or 3.")
-
+    def preprocess(self, calib_data_path: Path, norm: Norm = Norm.NORM_1) -> None:
         sample_data = get_preprocessed_sample_data(
             self.sample_name, calib_data_path, average_shots=False
         )
@@ -59,7 +58,7 @@ class ICASampleProcessor:
         # Normalize the data
         scaler = (
             Norm1Scaler()
-            if norm == 1
+            if norm.value == 1
             else Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
         )
         df = pd.DataFrame(scaler.fit_transform(df))
@@ -88,7 +87,7 @@ class ICASampleProcessor:
             ic = ids[i].split(" ")[0]
             component_idx = int(ic[2]) - 1
             wavelength = corrdf.index[i]
-            corr = corrdf.iloc[i][component_idx]
+            corr = corrdf.iloc[i].iloc[component_idx]
 
             self.ic_wavelengths.loc[self.sample_name, wavelength] = corr
 
