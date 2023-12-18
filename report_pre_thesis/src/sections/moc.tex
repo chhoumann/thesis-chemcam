@@ -51,13 +51,15 @@ In this context, the deviation, or the error, are known as residuals and the inf
     h_t = \text{diag}\left[ t(t^T t)^{-1} t^T \right]
 \end{equation}
 
-Given that leverage quantifies the distance of each observation from the model's center, it can be interpreted as the square Mahalanobis distance — a measure of the distance of a point from the center of mass of points in multivariate space. The Mahalanobis distance is defined as follows:
+Given that leverage quantifies the distance of each observation from the model's center, it can be interpreted as the square Mahalanobis distance — a measure of the distance of a point from the center of mass of points in multivariate space. 
+An important property of the Mahalanobis distances is the fact that, if data follows a multivariate normal distribution, the distances form a chi-squared distribution. Using this property, outliers can be removed using the chi-square test \cite{brereton_chi_2015}.
+The Mahalanobis distance is defined as follows:
 
 \begin{equation}
     D_M(p)^2 = (p - \mu)^T \cdot \Sigma^{-1} (p - \mu)
 \end{equation}
 
-Where $p$ is the point in question, $\mu$ is the mean of the distribution and $\Sigma$ is the covariance matrix of the distribution.
+Where $p$ is the point in question, $\mu$ is the mean of the distribution and $\Sigma^{-1}$ is the inverse of the covariance matrix of the distribution, known as the precision matrix. 
 Variables exhibiting a high leverage score are indicative of predictors that deviate more significantly from the others, thereby have a greater influence on the model.
 Hotelling's \( T^2 \) statistic extends the concept of the squared Mahalanobis distance by incorporating sample size, enabling hypothesis testing. 
 This statistic assesses if a sample's mean vector significantly differs from a hypothesized mean. Hotelling's \( T^2 \) is defined as follows:
