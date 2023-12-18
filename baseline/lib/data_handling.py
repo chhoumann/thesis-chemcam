@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Optional
 
+from lib.reproduction import folder_to_composition_sample_name
+
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from tqdm import tqdm
@@ -33,7 +35,7 @@ def get_dataset_frame(dataset_path):
         # read csv from that line - columns also start wih "#"
         return pd.read_csv(dataset_path, skiprows=target - 1)
 
-
+ 
 def get_preprocessed_sample_data(
     sample_name: str, data_path: Path, average_shots=True
 ) -> list[pd.DataFrame]:
@@ -284,7 +286,9 @@ class CompositionData:
         return pd.read_csv(composition_data_loc)
 
     def get_composition_for_sample(self, sample_name) -> pd.DataFrame:
-        sample_name_lower = sample_name.lower()
+        _sample_name = folder_to_composition_sample_name.get(sample_name, sample_name)
+
+        sample_name_lower = _sample_name.lower()
         match_condition = (
             (self.composition_data["Spectrum Name"].str.lower() == sample_name_lower)
             | (self.composition_data["Target"].str.lower() == sample_name_lower)

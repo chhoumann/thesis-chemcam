@@ -216,3 +216,40 @@ weighted_sum_oxide_percentages = {
     "MgO": {"PLS1-SM": 50, "ICA": 50},
     "CaO": {"PLS1-SM": 50, "ICA": 50},
 }
+
+
+# Manual mapping of sample names to composition names for samples that don't match folder names
+# Sample (dir) name -> composition name
+folder_to_composition_sample_name = {
+    "vs211681": "VS-2116-81",
+    "sancs2": "SANC-S",  # guess due to text in csv describing it, and it's the only unused SAN-C
+    "sh5": "SH-5",
+    # "7tio2": "",
+    "sh59": "SH-59",
+    # "75tio2": "",
+    "ncsdc28041": "NCS-DC28041",
+    "sanck": "SanC-K",
+    # "3tio2": "",
+    "sanca": "SanC-A",
+    "sh73": "SH-73",
+    # "50tio2": "",
+    # "10tio2": "",
+    "ncsdc47008": "NCS-DC47008",
+    "nau1": "NAU-1",
+    "sancb": "SanC-B",
+    "kga2meds": "KGa-2-med-S",
+    "nat18": "NAT-18",
+    "idbdf": "ID_BDF",
+    # "5tio2": "",
+    "sancc": "SanC-C",
+    "sancj": "SanC-J",
+    # "0.1tio2": "",
+    "nau2los": "NAu-2-low-s",
+    "icel009010": "icel009-010",
+    "nau2meds": "NAu-2-mid-s",
+    "ncsdc47009": "NCS-DC47009",
+    "sanci": "SanC-I",
+    # "25tio2": "",
+    # "1tio2": "",
+    "bir1a": "BIR-1a",
+}
