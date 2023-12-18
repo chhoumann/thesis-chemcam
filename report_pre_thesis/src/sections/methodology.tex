@@ -11,7 +11,7 @@ Furthermore, we delve into the experiments we have conducted to evaluate the per
 \subsection{PLS}
 This section describes the PLS aspect of the pipeline.
 
-\subsectionsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
+\subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
 % Differences in outlier detection (automatic/quantitative vs manual/qualitative)
 % Missing information about how three of the oxides are weighted in MOC result
@@ -45,7 +45,7 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 \subsection{ICA}
 This section describes the ICA aspect of the pipeline.
 
-\subsectionsection{Data Preprocessing}
+\subsubsection{Data Preprocessing}
 Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
 However, because \citeauthor{cleggRecalibrationMarsScience2017} does not mention how each of the five datasets are used for each target, we have decided to only use the first dataset for each target.
 We are aware that this does not produce as good results as using all five datasets, however in the interest of not skewing the results in the wrong direction, we decided not to make any assumptions about how \citeauthor{cleggRecalibrationMarsScience2017} used the five datasets to produce their results.
