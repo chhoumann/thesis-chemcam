@@ -8,16 +8,19 @@ Consequently, our pipeline is not identical to the original, but we have strived
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
-\subsection{Assumptions and Design Choices}
-% Differences in outlier detection (automatic/quantitative vs manual/qualitative)
-% No inverse IRF weighing weighting in ICA
-% Missing information about how three of the oxides are weighted in MOC result
-% Missing information about outlier removal in ICA - therefore we decided to not do it
-% Missing information about how ICA uses each of the five datasets for each target
+\subsection{PLS}
+This section describes the PLS aspect of the pipeline.
+
+\subsectionsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
-% How we do regression in ICA (since there are not enough details about it in the papers)
+% Differences in outlier detection (automatic/quantitative vs manual/qualitative)
+% Missing information about how three of the oxides are weighted in MOC result
 % No manual cross validation in PLS
 % Holdout split 80/20
+% No inverse IRF weighing weighting in ICA
+% Missing information about outlier removal in ICA - therefore we decided to not do it
+% Missing information about how ICA uses each of the five datasets for each target
+% How we do regression in ICA (since there are not enough details about it in the papers)
 
 As mentioned in section \ref{sec:background}, if the Mahalanobis distances can be shown to form a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
 Since we do not have the expertize to make a qualitative assessment of the outliers, we have instead decided to use this property of the Mahalanobis distances to automatically detect outliers.
@@ -38,6 +41,17 @@ The process is as follows:
 
 It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
+
+\subsection{ICA}
+This section describes the ICA aspect of the pipeline.
+
+\subsectionsection{Data Preprocessing}
+Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
+However, because \citeauthor{cleggRecalibrationMarsScience2017} does not mention how each of the five datasets are used for each target, we have decided to only use the first dataset for each target.
+We are aware that this does not produce as good results as using all five datasets, however in the interest of not skewing the results in the wrong direction, we decided not to make any assumptions about how \citeauthor{cleggRecalibrationMarsScience2017} used the five datasets to produce their results.
+Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
+The fact that we are able to perform Independent Component Analysis with the same algorithm as \citeauthor{cleggRecalibrationMarsScience2017} indicates that our recreation is accurate enough for our purposes of identifying the components that contribute the most to the overall error.
+
 
 
 % \textit{Recreate the current model. Reproduce the results of the original papers. Investigate the limitations of the model and propose improvements.}
