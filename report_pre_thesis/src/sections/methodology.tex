@@ -1,15 +1,46 @@
 \section{Methodology}\label{sec:methodology}
 % Method / Our Contribution (Detailed main part of the story, or how the analysis was done)
-% Purpose: To explain the differences between the original pipeline and our attempt at reproducing it.
-Since we did not have access to the original pipeline, we have attempted to recreate it based on the available information in \cite{}.
+Since we did not have access to the original pipeline, we have recreated it at accurately as we could based on the available information in \citeauthor{andersonImprovedAccuracyQuantitative2017} and \citeauthor{cleggRecalibrationMarsScience2017}.
 However, these papers did not include all the details of the pipeline, so we have had to make some assumptions and creative decisions ourselves.
-In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors - something we cannot do because we are not domain experts.
-Consequently, our pipeline is not identical to the original, but we have tried to make it as close as possible.
+In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors --- something we cannot do because we are not domain experts.
+Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible.
 
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
-\textit{Recreate the current model. Reproduce the results of the original papers. Investigate the limitations of the model and propose improvements.}
+\subsection{Assumptions and Design Choices}
+% Differences in outlier detection (automatic/quantitative vs manual/qualitative)
+% No inverse IRF weighing weighting in ICA
+% Missing information about how three of the oxides are weighted in MOC result
+% Missing information about outlier removal in ICA - therefore we decided to not do it
+% Missing information about how ICA uses each of the five datasets for each target
+% General programming language differences and implementation details
+% How we do regression in ICA (since there are not enough details about it in the papers)
+% No manual cross validation in PLS
+% Holdout split 80/20
+
+As mentioned in section \ref{sec:background}, if the Mahalanobis distances can be shown to form a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
+Since we do not have the expertize to make a qualitative assessment of the outliers, we have instead decided to use this property of the Mahalanobis distances to automatically detect outliers.
+This works by computing the Mahalanobis distances for each sample in the training set, and then computing the chi-squared statistic for the Mahalanobis distances.
+If the chi-squared statistic is greater than the critical value for the chi-squared distribution with $df$ degrees of freedom, then the sample is considered an outlier.
+The critical value is determined by the significance level $\alpha$ and the number of degrees of freedom $df$.
+% TODO: Describe why we chose the degrees of freedom we did, and how we used this chi-squared test to determine outliers.
+
+The outlier removal process is done iteratively because of the phenomenon described in \citeauthor{cleggRecalibrationMarsScience2017} where removing outliers can cause new outliers to appear.
+The process is as follows:
+\begin{enumerate}
+	\item Compute the Mahalanobis distances for each sample in the training set.
+	\item Compute the chi-squared statistic for the Mahalanobis distances.
+	\item Remove the samples that are outliers.
+	\item Train a new model on the remaining samples.
+	\item Repeat from step 1 until the chi-squared statistic is less than the critical value.
+\end{enumerate}
+
+It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
+This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
+
+
+% \textit{Recreate the current model. Reproduce the results of the original papers. Investigate the limitations of the model and propose improvements.}
 
 
 \section{Framework for at kunne analysere data}
@@ -18,9 +49,9 @@ Hold out split 80/20 - har lavet cross validation på træningssæt
 
 
 \section{Outlier removal}
-\section{Hvordan har vi lavet outlier removal i ICA}
+\section{Ikke lavet outlier removal i ICA}
 \section{Har ikke lavet inverse IRF}
-\section{Ved ikke hvordan 3 oxider er vægtet i ICA}
+\section{Ved ikke hvordan 3 oxider er vægtet i MOC}
 % This section explains how the research was conducted.
 % - Purpose: To detail the experiments, algorithms, and data sets used, enabling reproducibility.
 % - Subsections: Can include Experiment Design, Algorithm Descriptions, Data Sources, and Evaluation Metrics.
