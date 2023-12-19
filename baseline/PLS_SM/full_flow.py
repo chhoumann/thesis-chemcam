@@ -4,12 +4,13 @@ from pathlib import Path
 import mlflow
 import numpy as np
 import pandas as pd
+from dotenv import dotenv_values
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 
 # from config import logger
-from lib.data_handling import CustomSpectralPipeline, load_data  # type: ignore
+from lib.data_handling import CustomSpectralPipeline, load_split_data  # type: ignore
 from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.outlier_removal import (
     calculate_leverage_residuals,
@@ -26,46 +27,66 @@ from lib.reproduction import (
 )
 from lib.utils import (
     custom_kfold_cross_validation,
-    custom_train_test_split,
     filter_data_by_compositional_range,
 )
+
+env = dotenv_values()
+comp_data_loc = env.get("COMPOSITION_DATA_PATH")
+dataset_loc = env.get("DATA_PATH")
+
+if not comp_data_loc:
+    print("Please set COMPOSITION_DATA_PATH in .env file")
+    exit(1)
+
+if not dataset_loc:
+    print("Please set DATA_PATH in .env file")
+    exit(1)
 
 logger = logging.getLogger("train")
 
 mlflow.set_tracking_uri("http://localhost:5000")
 
 preformatted_data_path = Path(
-    "./data/data/calib/calib_2015/1600mm/pls/all_processed.csv"
+    "./data/_preformatted_sm/"
 )
+train_path = preformatted_data_path / "train.csv"
+test_path = preformatted_data_path / "test.csv"
 
 if not preformatted_data_path.exists():
-    dataset_loc = Path("./data/data/calib/calib_2015/1600mm/pls/")
-    calib_loc = Path("./data/data/calib/ccam_calibration_compositions.csv")
     take_samples = None
 
     logger.info("Loading data from location: %s", dataset_loc)
-    data = load_data(str(dataset_loc))
+    # data = load_data(str(dataset_loc))
+    train_data, test_data = load_split_data(
+        str(dataset_loc), split_loc="./train_test_split.csv", average_shots=True
+    )
     logger.info("Data loaded successfully.")
 
     logger.info("Initializing CustomSpectralPipeline.")
     pipeline = CustomSpectralPipeline(
         masks=masks,
-        composition_data_loc=calib_loc,
+        composition_data_loc=comp_data_loc,
         major_oxides=major_oxides,
     )
     logger.info("Pipeline initialized. Fitting and transforming data.")
-    processed_data = pipeline.fit_transform(data)
+    train_processed = pipeline.fit_transform(train_data)
+    test_processed = pipeline.fit_transform(test_data)
     logger.info("Data processing complete.")
 
-    processed_data.to_csv(preformatted_data_path, index=False)
+    preformatted_data_path.mkdir(parents=True, exist_ok=True)
+
+    train_processed.to_csv(train_path, index=False)
+    test_processed.to_csv(test_path, index=False)
 else:
     logger.info("Loading preformatted data from location: %s", preformatted_data_path)
-    processed_data = pd.read_csv(preformatted_data_path)
+    train_processed = pd.read_csv(train_path)
+    test_processed = pd.read_csv(test_path)
 
 k_folds = 4
 random_state = 42
 influence_plot_dir = Path("plots/")
-experiment_name = f"PLS_Models_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+# experiment_name = f"PLS_Models_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+experiment_name = "PLS_Models_Train_Test_Split"
 
 mlflow.set_experiment(experiment_name)
 mlflow.autolog()
@@ -84,20 +105,24 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
         )
 
         logger.info("Filtering data by compositional range.")
-        data_filtered = filter_data_by_compositional_range(
-            processed_data, compositional_range, oxide, oxide_ranges
+        train_data_filtered = filter_data_by_compositional_range(
+            train_processed, compositional_range, oxide, oxide_ranges
+        )
+
+        test_data_filtered = filter_data_by_compositional_range(
+            train_processed, compositional_range, oxide, oxide_ranges
         )
 
         # Separate 20% of the data for testing
-        train, test = custom_train_test_split(
-            data_filtered,
-            group_by="Sample Name",
-            test_size=0.2,
-            random_state=random_state,
-        )
+        # train, test = custom_train_test_split(
+        #     data_filtered,
+        #     group_by="Sample Name",
+        #     test_size=0.2,
+        #     random_state=random_state,
+        # )
 
-        train_cols = train.columns
-        test_cols = test.columns
+        train_cols = train_data_filtered.columns
+        test_cols = test_data_filtered.columns
 
         n_components = training_info[oxide][compositional_range]["n_components"]
         norm = training_info[oxide][compositional_range]["normalization"]
@@ -109,9 +134,9 @@ for oxide in tqdm(major_oxides, desc="Processing oxides"):
         logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
         logger.debug("Fitting and transforming training data.")
-        train = scaler.fit_transform(train)
+        train = scaler.fit_transform(train_data_filtered)
         logger.debug("Transforming test data.")
-        test = scaler.fit_transform(test)
+        test = scaler.fit_transform(test_data_filtered)
 
         # turn back into dataframe
         train = pd.DataFrame(train, columns=train_cols)
