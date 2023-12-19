@@ -47,7 +47,12 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 The ICA phase in our pipeline represents a largely authentic replication of the original, with a few considered adjustments and exclusions due to incomplete details about the original implementation.
 In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
 
-% In summary, we have effectively recreated the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
+\subsubsection{Data Preprocessing}
+Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
+Before performing ICA, we have to preprocess this data, which is illustrated in figure \ref{fig:ica_data}.
+As in section \ref{sec:...}, we start by masking the data such that the spectral-range edges are removed. %TODO: update reference when PLS section is done
+Then we normalize the data using either Norm1 or Norm3.
+These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}.
 
 \begin{figure}
 	\centering
@@ -55,13 +60,6 @@ In this section, we delve into these differences and the rationale behind our ch
 	\caption{The ICA phase in our recreation of the pipeline.}
 	\label{fig:ica_data}
 \end{figure}
-
-\subsubsection{Data Preprocessing}
-Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
-Before performing ICA, we have to preprocess this data, which is illustrated in figure \ref{fig:ica_data}.
-As in section \ref{sec:...}, we start by masking the data such that the spectral-range edges are removed. %TODO: update reference when PLS section is done
-Then we normalize the data using either Norm1 or Norm3.
-These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}.
 
 However, we do not weigh by the inverse of the instrument response function (IRF) as mentioned in \citeauthor{cleggRecalibrationMarsScience2017} before normalizing.
 The reason for this is that the practical implications of weighing by the inverse of the IRF has been subject to criticism by some of the original authors since it effectively reintroduces the noise that was removed by applying the IRF in the first place.
@@ -71,12 +69,12 @@ Therefore, weighing by the inverse of the IRF seems counterproductive based on t
 In addition, because \citeauthor{cleggRecalibrationMarsScience2017} does not mention how each of the five datasets are used for each target, we have decided to only use the first dataset for each target.
 We are aware that this does not produce as good results as using all five datasets, however in the interest of not skewing the results in the wrong direction, we decided not to make any assumptions about how \citeauthor{cleggRecalibrationMarsScience2017} used the five datasets to produce their results.
 Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
-The fact that we are able to perform Independent Component Analysis with the same algorithm as \citeauthor{cleggRecalibrationMarsScience2017} indicates that our recreation is accurate enough for our purposes of identifying the components that contribute the most to the overall error.
+The fact that we are able to perform ICA with the same algorithm as \citeauthor{cleggRecalibrationMarsScience2017} indicates that our recreation is accurate enough for our purposes of identifying the components that contribute the most to the overall error.
 
 Similarly, in our recreation of the pipeline, we have not incorporated outlier detection in the ICA part of the pipeline primarily because \citeauthor{cleggRecalibrationMarsScience2017} does not describe their implementation sufficiently enough for precise replication.
 They mention the use of Median Absolute Deviation for this purpose, but the specifics of their approach remain unclear.
 Our decision to omit outlier detection in the ICA phase of our pipeline is also influenced by a preference for retaining a more comprehensive dataset, despite the potential inclusion of outliers.
-Further supporting this decision is input from one of the original authors involved in the PLS aspect of the project.
+Further supporting this decision is input from one of the original authors involved in the PLS1-SM aspect of the project.
 This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low probability of significant outlier presence.
 Given this context, introducing outlier detection for the ICA phase based on mere assumptions would be counterproductive, potentially compromising the integrity of our analysis.
 
@@ -104,8 +102,6 @@ This can be seen in table \ref{tab:regression_types}, which is taken from \citea
 
 \begin{table}[h]
 \centering
-\caption{The summary of each ICA model characteristics from \citeauthor{cleggRecalibrationMarsScience2017}.}
-\label{tab:regression_types}
 \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccc}
 \toprule
 Element & Norm & Law type    & RMS \\ \midrule
@@ -119,6 +115,8 @@ Na      & 3    & Parabolic   & 0.6 \\
 K       & 3    & Geometric   & 0.4 \\
 \bottomrule
 \end{tabular*}
+\caption{The summary of each ICA model characteristics from \citeauthor{cleggRecalibrationMarsScience2017}.}
+\label{tab:regression_types}
 \end{table}
 
 % Because \texttt{scikit-learn} does not support these types of regression, we instead opted to transform the data to fit the linear regression model.
@@ -147,14 +145,42 @@ K       & 3    & Geometric   & 0.4 \\
 
 In summary, we have effectively recreated the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
 
+\subsection{MOC}
+As mentioned in section \ref{sec:moc}, the result of the PLS1-SM and ICA are combined to produce the final MOC model.
+This is done by taking a weighted average of the two models, where the weights are determined based on the fact that one technique is be better suited for certain elements than the other.
+These weights can be seen in table \ref{tab:weighted_sum_oxide}.
+Note that the weights for Ti, Mg and Ca have been set to 50/50 since \citeauthor{cleggRecalibrationMarsScience2017} does not mention the weights they used for these elements.
+
+\begin{table}[h]
+\centering
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc}
+\toprule
+Element  & PLS1-SM (\%) & ICA (\%) \\ \midrule
+Al       & 75           & 25      \\
+Fe       & 75           & 25      \\
+Si       & 50           & 50      \\
+Na       & 40           & 60      \\
+K2       & 25           & 75      \\
+Ti*      & 50           & 50      \\
+Mg*      & 50           & 50      \\
+Ca*      & 50           & 50      \\
+\bottomrule
+\end{tabular*}
+\caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified.}
+\label{tab:weighted_sum_oxide}
+\end{table}
+
+
+
+
+%While both PLS1-SM and ICA use the laboratory training set, each technique uses different preprocessing steps to enable comparison between laboratory and Mars data, and approaches the fundamental challenge of quantitative LIBS regression differently. A simple average of both techniques might seem like the best approach. However, after reviewing the geochemical results, certain elements appeared better suited to one technique or the other. This is probably most apparent for aluminum, where the ICA RMSE (4.77 wt.%) of the training set was significantly higher than for PLS1-SM (2.97 wt.%). The ICA method also appears to under-estimate relatively high values of Al2O3 as depicted in Fig. 4. The solution selected for Al2O3 is to ramp progressively the proportion from 0/100 PLS1/ICA to 75/25 PLS1/ICA. To achieve this result, a preliminary estimate is made with 75/25 PLS1/ICA, and if the result is strictly b 15 wt.%, then the PLS1 proportion is increased linearly from 0 to 75 as a function of the preliminary estimate. Still, the final test set trends toward a lower Al2O3 composition at higher certificate values as depicted in Fig. 4 with a 0.83 r2. In spite of that, the resulting Al2O3 Mars values appear well suited toward reality based on comparison with known mineral abundances and Alpha Particle Xray Spectrometer (APXS) comparisons
+
 
 % \textit{Recreate the current model. Reproduce the results of the original papers. Investigate the limitations of the model and propose improvements.}
 
 
 % \section{Framework for at kunne analysere data}
 % Hold out split 80/20 - har lavet cross validation på træningssæt
-
-
 
 % \section{Outlier removal}
 % \section{Ikke lavet outlier removal i ICA}
