@@ -66,7 +66,7 @@ PLS1-SM blends predictions from sub-models with overlapping concentration ranges
 \begin{align*}
 w_{\text{mid}} &= \frac{y_{\text{full}}-y_{\text{blend range, min}}}{y_{\text{blend range, max}} - y_{\text{blend range, min}}} \\
 w_{\text{low}} &= 1 - w_{\text{mid}} \\
-y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}} 
+y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}}
 \end{align*}
 
 This applies analogously for predictions in the "mid-high" range to prevent prediction discontinuities.
@@ -83,3 +83,7 @@ After the extraction of independent components, the key task is to associate eac
 To ascertain the accuracy of this calibration, a regression analysis is performed using multiple regression functions. The function that provides the most reliable fit (often assessed through chi-square values) is used to predict the composition for each element.
 
 Model refinement is facilitated by techniques such as normalization, outlier removal (via Median Absolute Deviation), and k-fold cross-validation. These methods ensure the robustness and reliability of the predictive model constructed through ICA.
+
+% TODO: Add a paragraph about the IRF
+% "In simpler terms, the IRF in a spectrometer represents how the instrument's inherent characteristics alter the appearance of the spectral data it measures. By understanding and minimizing the IRF, scientists can obtain more accurate and precise spectroscopic data."
+% Source: https://www.sciencedirect.com/science/article/pii/S0022407304002523?via=ihub

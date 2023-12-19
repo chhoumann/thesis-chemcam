@@ -27,6 +27,7 @@ Since we do not have the expertize to make a qualitative assessment of the outli
 This works by computing the Mahalanobis distances for each sample in the training set, and then computing the chi-squared statistic for the Mahalanobis distances.
 If the chi-squared statistic is greater than the critical value for the chi-squared distribution with $df$ degrees of freedom, then the sample is considered an outlier.
 The critical value is determined by the significance level $\alpha$ and the number of degrees of freedom $df$.
+Since we have leverage and residuals as our two dimensions, we have $df = 2$, because the number of dimensions is equal to the number of degrees of freedom\cite{aggarwal_outlier_2017}.
 % TODO: Describe why we chose the degrees of freedom we did, and how we used this chi-squared test to determine outliers.
 
 The outlier removal process is done iteratively because of the phenomenon described in \citeauthor{cleggRecalibrationMarsScience2017} where removing outliers can cause new outliers to appear.
@@ -44,13 +45,48 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 
 \subsection{ICA}
 This section describes the ICA aspect of the pipeline.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.275\textwidth]{images/ica_data.png}
+	\caption{The ICA phase in our recreation of the pipeline.}
+	\label{fig:ica_data}
+\end{figure}
 
 \subsubsection{Data Preprocessing}
 Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
-However, because \citeauthor{cleggRecalibrationMarsScience2017} does not mention how each of the five datasets are used for each target, we have decided to only use the first dataset for each target.
+Before performing ICA, we have to preprocess this data.
+As in section \ref{sec:...}, we start by masking the data such that the spectral-range edges are removed. %TODO: update reference when PLS section is done
+Then we normalize the data using either Norm1 or Norm3.
+These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}.
+
+However, we do not weigh by the inverse of the instrument response function (IRF) as mentioned in \citeauthor{cleggRecalibrationMarsScience2017} before normalizing.
+The reason for this is twofold.
+First of all, we do not actually have access to the IRF, so we cannot use it.
+Secondly, and perhaps more importantly, even if we did have access to the IRF, the practical implications of weighing by the inverse of the IRF has been subject to criticism by some of the original authors since it effectively reintroduces the noise that was removed by applying the IRF in the first place.
+As previously mentioned, the IRF is applied specifically to remove noise from the data during the processing of the EDR to CCS data.
+Therefore, the weighing by the inverse of the IRF is not only unnecessary, but also counterproductive.
+
+In addition, because \citeauthor{cleggRecalibrationMarsScience2017} does not mention how each of the five datasets are used for each target, we have decided to only use the first dataset for each target.
 We are aware that this does not produce as good results as using all five datasets, however in the interest of not skewing the results in the wrong direction, we decided not to make any assumptions about how \citeauthor{cleggRecalibrationMarsScience2017} used the five datasets to produce their results.
 Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
 The fact that we are able to perform Independent Component Analysis with the same algorithm as \citeauthor{cleggRecalibrationMarsScience2017} indicates that our recreation is accurate enough for our purposes of identifying the components that contribute the most to the overall error.
+
+Similarly, in our recreation of the pipeline, we have not incorporated outlier detection in the ICA part of the pipeline primarily because \citeauthor{cleggRecalibrationMarsScience2017} does not describe their implementation sufficiently enough for precise replication.
+They mention the use of Median Absolute Deviation for this purpose, but the specifics of their approach remain unclear.
+Our decision to omit outlier detection in the ICA phase of our pipeline is also influenced by a preference for retaining a more comprehensive dataset, despite the potential inclusion of outliers.
+Further supporting this decision is input from one of the original authors involved in the PLS aspect of the project.
+This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low probability of significant outlier presence.
+Given this context, introducing outlier detection for the ICA phase based on mere assumptions would be counterproductive, potentially compromising the integrity of our analysis.
+
+\subsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
+After preprocessing the data, we are ready to perform ICA.
+This is done using the JADE algorithm, which is the same algorithm used by \citeauthor{cleggRecalibrationMarsScience2017}.
+After performing ICA, we perform regression on the independent components to predict the oxide composition.
+
+
+
+
+% TODO: Mention that we do not use inverse IRF weighting in ICA
 
 
 
