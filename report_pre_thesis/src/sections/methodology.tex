@@ -117,7 +117,29 @@ K       & 3    & Geometric   & 0.4 \\
 \end{tabular*}
 \end{table}
 
+Because \texttt{scikit-learn} does not support these types of regression, we instead opted to transform the data to fit the linear regression model.
+For example, to perform exponential regression, we take the natural logarithm of the data, perform linear regression, and then take the exponential of the result.
+This is done for each of the four types of regression mentioned above.
+The code for this can be seen in listing \ref{lst:data_transformation}.
 
+\begin{lstlisting}[
+	language=Python,
+	caption={The code for transforming the data to fit the linear regression model.},
+	label={lst:data_transformation}
+	]
+if model_name == "Log-square":
+	X_train = np.log(X_train**2)
+	X_test = np.log(X_test**2)
+elif model_name == "Exponential":
+	X_train = np.log(X_train)
+	X_test = np.log(X_test)
+elif model_name == "Geometric":
+	X_train = np.sqrt(X_train)
+	X_test = np.sqrt(X_test)
+elif model_name == "Parabolic":
+	X_train = np.column_stack((X_train, X_train**2))
+	X_test = np.column_stack((X_test, X_test**2))
+\end{lstlisting}
 
 
 
