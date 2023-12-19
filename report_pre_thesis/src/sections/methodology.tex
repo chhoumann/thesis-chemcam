@@ -44,7 +44,11 @@ It should be noted that our outlier removal process is conservative to avoid rem
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
 
 \subsection{ICA}
-This section describes the ICA aspect of the pipeline.
+The ICA phase in our pipeline represents a largely authentic replication of the original, with a few considered adjustments and exclusions due to incomplete details about the original implementation.
+In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
+
+% In summary, we have effectively recreated the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
+
 \begin{figure}
 	\centering
 	\includegraphics[width=0.2675\textwidth]{images/ica_data.png}
@@ -54,7 +58,7 @@ This section describes the ICA aspect of the pipeline.
 
 \subsubsection{Data Preprocessing}
 Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
-Before performing ICA, we have to preprocess this data.
+Before performing ICA, we have to preprocess this data, which is illustrated in figure \ref{fig:ica_data}.
 As in section \ref{sec:...}, we start by masking the data such that the spectral-range edges are removed. %TODO: update reference when PLS section is done
 Then we normalize the data using either Norm1 or Norm3.
 These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}.
@@ -117,29 +121,29 @@ K       & 3    & Geometric   & 0.4 \\
 \end{tabular*}
 \end{table}
 
-Because \texttt{scikit-learn} does not support these types of regression, we instead opted to transform the data to fit the linear regression model.
-For example, to perform exponential regression, we take the natural logarithm of the data, perform linear regression, and then take the exponential of the result.
-This is done for each of the four types of regression mentioned above.
-The code for this can be seen in listing \ref{lst:data_transformation}.
+% Because \texttt{scikit-learn} does not support these types of regression, we instead opted to transform the data to fit the linear regression model.
+% For example, to perform exponential regression, we take the natural logarithm of the data, perform linear regression, and then take the exponential of the result.
+% This is done for each of the four types of regression mentioned above.
+% The code for this can be seen in listing \ref{lst:data_transformation}.
 
-\begin{lstlisting}[
-	language=Python,
-	caption={The code for transforming the data to fit the linear regression model.},
-	label={lst:data_transformation}
-	]
-if model_name == "Log-square":
-	X_train = np.log(X_train**2)
-	X_test = np.log(X_test**2)
-elif model_name == "Exponential":
-	X_train = np.log(X_train)
-	X_test = np.log(X_test)
-elif model_name == "Geometric":
-	X_train = np.sqrt(X_train)
-	X_test = np.sqrt(X_test)
-elif model_name == "Parabolic":
-	X_train = np.column_stack((X_train, X_train**2))
-	X_test = np.column_stack((X_test, X_test**2))
-\end{lstlisting}
+% \begin{lstlisting}[
+% 	language=Python,
+% 	caption={The code for transforming the data to fit the linear regression model.},
+% 	label={lst:data_transformation}
+% 	]
+% if model_name == "Log-square":
+% 	X_train = np.log(X_train**2)
+% 	X_test = np.log(X_test**2)
+% elif model_name == "Exponential":
+% 	X_train = np.log(X_train)
+% 	X_test = np.log(X_test)
+% elif model_name == "Geometric":
+% 	X_train = np.sqrt(X_train)
+% 	X_test = np.sqrt(X_test)
+% elif model_name == "Parabolic":
+% 	X_train = np.column_stack((X_train, X_train**2))
+% 	X_test = np.column_stack((X_test, X_test**2))
+% \end{lstlisting}
 
 In summary, we have effectively recreated the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
 
