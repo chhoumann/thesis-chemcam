@@ -8,8 +8,8 @@ Consequently, our pipeline is not identical to the original, but we have strived
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
-\subsection{PLS}
-This section describes the PLS aspect of the pipeline.
+\subsection{PLS1-SM}
+This section describes the PLS1-SM aspect of the pipeline.
 
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
@@ -170,10 +170,6 @@ Ca*      & 50           & 50      \\
 \label{tab:weighted_sum_oxide}
 \end{table}
 
-
-
-
-%While both PLS1-SM and ICA use the laboratory training set, each technique uses different preprocessing steps to enable comparison between laboratory and Mars data, and approaches the fundamental challenge of quantitative LIBS regression differently. A simple average of both techniques might seem like the best approach. However, after reviewing the geochemical results, certain elements appeared better suited to one technique or the other. This is probably most apparent for aluminum, where the ICA RMSE (4.77 wt.%) of the training set was significantly higher than for PLS1-SM (2.97 wt.%). The ICA method also appears to under-estimate relatively high values of Al2O3 as depicted in Fig. 4. The solution selected for Al2O3 is to ramp progressively the proportion from 0/100 PLS1/ICA to 75/25 PLS1/ICA. To achieve this result, a preliminary estimate is made with 75/25 PLS1/ICA, and if the result is strictly b 15 wt.%, then the PLS1 proportion is increased linearly from 0 to 75 as a function of the preliminary estimate. Still, the final test set trends toward a lower Al2O3 composition at higher certificate values as depicted in Fig. 4 with a 0.83 r2. In spite of that, the resulting Al2O3 Mars values appear well suited toward reality based on comparison with known mineral abundances and Alpha Particle Xray Spectrometer (APXS) comparisons
 
 
 % \textit{Recreate the current model. Reproduce the results of the original papers. Investigate the limitations of the model and propose improvements.}
