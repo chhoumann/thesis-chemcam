@@ -1,6 +1,5 @@
 \section{Methodology}\label{sec:methodology}
-% Method / Our Contribution (Detailed main part of the story, or how the analysis was done)
-Since we did not have access to the original pipeline, we have recreated it at accurately as we could based on the available information in \citeauthor{andersonImprovedAccuracyQuantitative2017} and \citeauthor{cleggRecalibrationMarsScience2017}.
+Since we did not have access to the original source code implementing the pipeline, we have replicated it at accurately as we could based on the available information in \citeauthor{andersonImprovedAccuracyQuantitative2017} and \citeauthor{cleggRecalibrationMarsScience2017}.
 However, these papers did not include all the details of the pipeline, so we have had to make some assumptions and creative decisions ourselves.
 In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors --- something we cannot do because we are not domain experts.
 Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible.
@@ -22,7 +21,7 @@ This section describes the PLS1-SM aspect of the pipeline.
 % Missing information about how ICA uses each of the five datasets for each target
 % How we do regression in ICA (since there are not enough details about it in the papers)
 
-As mentioned in section \ref{sec:background}, if the Mahalanobis distances can be shown to form a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
+As mentioned in section \ref{sec:background}, if the Mahalanobis distances can be shown to follow a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
 Since we do not have the expertize to make a qualitative assessment of the outliers, we have instead decided to use this property of the Mahalanobis distances to automatically detect outliers.
 This works by computing the Mahalanobis distances for each sample in the training set, and then computing the chi-squared statistic for the Mahalanobis distances.
 If the chi-squared statistic is greater than the critical value for the chi-squared distribution with $df$ degrees of freedom, then the sample is considered an outlier.
@@ -44,14 +43,17 @@ It should be noted that our outlier removal process is conservative to avoid rem
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
 
 \subsection{ICA}
-The ICA phase in our pipeline represents a largely authentic replication of the original, with a few considered adjustments and exclusions due to incomplete details about the original implementation.
+The ICA phase in our pipeline, which can be seen in figure \ref{fig:ica_data}, represents a largely authentic replication of the original, with a few considered adjustments and exclusions due to incomplete details about the original implementation.
 In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
 
 \subsubsection{Data Preprocessing}
 Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
 Before performing ICA, we have to preprocess this data, which is illustrated in figure \ref{fig:ica_data}.
 As in section \ref{sec:...}, we start by masking the data such that the spectral-range edges are removed. %TODO: update reference when PLS section is done
-Then we normalize the data using either Norm1 or Norm3.
+Then we normalize the data --- once using Norm1 and once using Norm3.
+This gives us two datasets with normalized data.
+Both of these datasets are then used for ICA separately because, as \citeauthor{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
+The independent components from each of these two datasets are saved to a file and used for regression later.
 These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}.
 
 \begin{figure}
@@ -67,9 +69,9 @@ As previously mentioned, the IRF is applied specifically to remove noise from th
 Therefore, weighing by the inverse of the IRF seems counterproductive based on this information.
 
 In addition, because \citeauthor{cleggRecalibrationMarsScience2017} does not mention how each of the five datasets are used for each target, we have decided to only use the first dataset for each target.
-We are aware that this does not produce as good results as using all five datasets, however in the interest of not skewing the results in the wrong direction, we decided not to make any assumptions about how \citeauthor{cleggRecalibrationMarsScience2017} used the five datasets to produce their results.
+This likely does not produce as accurate results as using all five datasets would, since we do not get a full representation of the sample that was shot at by the laser, instead only getting a partial representation from a single location.
+Nevertheless, to avoid deviating significantly from \citeauthor{cleggRecalibrationMarsScience2017}'s methodology or making unfounded assumptions about their data processing, we have opted for this more conservative approach.
 Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
-The fact that we are able to perform ICA with the same algorithm as \citeauthor{cleggRecalibrationMarsScience2017} indicates that our recreation is accurate enough for our purposes of identifying the components that contribute the most to the overall error.
 
 Similarly, in our recreation of the pipeline, we have not incorporated outlier detection in the ICA part of the pipeline primarily because \citeauthor{cleggRecalibrationMarsScience2017} does not describe their implementation sufficiently enough for precise replication.
 They mention the use of Median Absolute Deviation for this purpose, but the specifics of their approach remain unclear.
@@ -77,6 +79,8 @@ Our decision to omit outlier detection in the ICA phase of our pipeline is also 
 Further supporting this decision is input from one of the original authors involved in the PLS1-SM aspect of the project.
 This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low probability of significant outlier presence.
 Given this context, introducing outlier detection for the ICA phase based on mere assumptions would be counterproductive, potentially compromising the integrity of our analysis.
+
+After examining the results in section \ref{sec:results}, we will discuss the implications of these design choices in section \ref{sec:discussion}.
 
 \subsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
 After preprocessing the data, we are ready to perform ICA.
@@ -143,7 +147,7 @@ K       & 3    & Geometric   & 0.4 \\
 % 	X_test = np.column_stack((X_test, X_test**2))
 % \end{lstlisting}
 
-In summary, we have effectively recreated the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
+In summary, we have created a replica of the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
 
 \subsection{MOC}
 As mentioned in section \ref{sec:moc}, the result of the PLS1-SM and ICA are combined to produce the final MOC model.
