@@ -26,7 +26,7 @@ Since we do not have the expertize to make a qualitative assessment of the outli
 This works by computing the Mahalanobis distances for each sample in the training set, and then computing the chi-squared statistic for the Mahalanobis distances.
 If the chi-squared statistic is greater than the critical value for the chi-squared distribution with $df$ degrees of freedom, then the sample is considered an outlier.
 The critical value is determined by the significance level $\alpha$ and the number of degrees of freedom $df$.
-Since we have leverage and residuals as our two dimensions, we have $df = 2$, because the number of dimensions is equal to the number of degrees of freedom\cite{aggarwal_outlier_2017}.
+Since we have leverage and spectral residuals as our two dimensions, we have $df = 2$, because the number of dimensions is equal to the number of degrees of freedom\cite{aggarwal_outlier_2017}.
 % TODO: Describe why we chose the degrees of freedom we did, and how we used this chi-squared test to determine outliers.
 
 The outlier removal process is done iteratively because of the phenomenon described in \citeauthor{cleggRecalibrationMarsScience2017} where removing outliers can cause new outliers to appear.
