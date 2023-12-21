@@ -21,7 +21,7 @@ This section describes the PLS1-SM aspect of the pipeline.
 % Missing information about how ICA uses each of the five datasets for each target
 % How we do regression in ICA (since there are not enough details about it in the papers)
 
-As mentioned in section \ref{sec:background}, if the Mahalanobis distances can be shown to follow a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
+As mentioned in section \ref{sec:outlier_removal}, if the Mahalanobis distances can be shown to follow a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
 Since we do not have the expertize to make a qualitative assessment of the outliers, we have instead decided to use this property of the Mahalanobis distances to automatically detect outliers.
 This works by computing the Mahalanobis distances for each sample in the training set, and then computing the chi-squared statistic for the Mahalanobis distances.
 If the chi-squared statistic is greater than the critical value for the chi-squared distribution with $df$ degrees of freedom, then the sample is considered an outlier.
