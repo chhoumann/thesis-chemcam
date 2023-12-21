@@ -44,12 +44,14 @@ The optimal normalization technique is selected based on its efficacy in model p
 \subsubsection{Outlier Removal}\label{sec:outlier_removal}
 
 In their analysis, \citet{andersonImprovedAccuracyQuantitative2017} employed a methodical outlier removal process to enhance model accuracy in multivariate regression. To detect outliers, they utilized influence plots, employing statistical measures that reflect each data point's deviation from the model's predictions and their influence on the model due to their position in the predictor space. 
-In this context, the deviation, or the error, are known as residuals and the influence a data point has on the model is known as leverage. By applying the following equation to the latent variables a vector of observation leverages (\(h_t\)) can be computed:
+In this context, the deviation, or the error, are known as residuals and the influence a data point has on the model is known as leverage.
+The application of the following equation to latent variables enables the computation of an observation leverages vector (\(h_t\)):
 
 \begin{equation}
     h_t = \text{diag}\left[ t(t^T t)^{-1} t^T \right]
 \end{equation}
 
+Where $t$ represents the PLS scores.
 Given that leverage quantifies the distance of each observation from the model's center, it can be interpreted as the square Mahalanobis distance — a measure of the distance of a point from the center of mass of points in multivariate space. 
 An important property of the Mahalanobis distances is the fact that, if the original data follows a multivariate normal distribution, the distances form a chi-squared distribution. Using this property, outliers can be removed using the chi-square test \cite{brereton_chi_2015}.
 The Mahalanobis distance is defined as follows:
