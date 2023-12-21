@@ -77,8 +77,8 @@ Similarly, in our replica of the pipeline, we have not incorporated outlier dete
 They mention the use of Median Absolute Deviation for this purpose, but the specifics of their approach remain unclear.
 Our decision to omit outlier detection in the ICA phase of our pipeline is also influenced by a preference for retaining a more comprehensive dataset, despite the potential inclusion of outliers.
 Further supporting this decision is input from one of the original authors involved in the ChemCam project.
-This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low probability of significant outlier presence.
-Given this context, introducing outlier detection for the ICA phase based on mere assumptions would be counterproductive, potentially compromising the integrity of our analysis.
+This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low presence of significant outliers.
+While it would be ideal to include outlier detection in the ICA phase to ensure alignment with the original pipeline, implementing it based on substantial assumptions would be counterproductive, potentially compromising the integrity of our analysis.
 
 After examining the results in section \ref{sec:results}, we will discuss the implications of these design choices in section \ref{sec:discussion}.
 
@@ -110,6 +110,7 @@ For each oxide, they used the type of regression and normalization that produced
 % \centering
 % \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccc}
 % \toprule
+
 % Element & Norm & Law type    & RMS \\ \midrule
 % Si      & 1    & Logsqaure   & 6.7 \\
 % Ti      & 3    & Geometric   & 0.6 \\
