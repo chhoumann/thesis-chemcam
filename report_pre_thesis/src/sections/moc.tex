@@ -10,7 +10,6 @@ In Figure \ref{fig:libs_data_processing} we illustrate the data processing and c
 
 \subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
 
-It is important to note that the preprocessing phase occurs before the data is fed into the MOC model.
 The resulting data format is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
 This format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength. An example of this data format is shown in Table~\ref{tab:example_data}. There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample. The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
 
