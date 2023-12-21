@@ -1,5 +1,5 @@
 \section{Methodology}\label{sec:methodology}
-As part of our goal to evaluate the performance of each of the components in the pipeline, our first step was to create a replica of the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}.
+As part of our goal to evaluate the performance of each of the components in the pipeline, the first step was to create a replica of the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}
 Since we did not have access to the original source code implementing the pipeline, we have replicated it at accurately as we could based on the available information.
 However, not all details were included in this report, so we have had to make some assumptions, which we detail here.
 In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors --- something we cannot do because we are not domain experts.
@@ -55,7 +55,7 @@ Then we normalize the data --- once using Norm1 and once using Norm3.
 This gives us two datasets with normalized data.
 Both of these datasets are then used for ICA separately because, as \citeauthor{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 The independent components from each of these two datasets are saved to a file and used for regression later.
-These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}.
+These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}
 
 \begin{figure}
 	\centering
@@ -174,7 +174,7 @@ Mg*      & 50           & 50      \\
 Ca*      & 50           & 50      \\
 \bottomrule
 \end{tabular*}
-\caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citeauthor{cleggRecalibrationMarsScience2017}.}
+\caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citeauthor{cleggRecalibrationMarsScience2017}}
 \label{tab:weighted_sum_oxide}
 \end{table}
 
