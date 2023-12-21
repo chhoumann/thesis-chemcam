@@ -49,7 +49,7 @@ In this section, we delve into these differences and the rationale behind our ch
 \subsubsection{Data Preprocessing}
 Similar to the original pipeline, we have used the 408 samples from the ChemCam calibration dataset.
 Before performing ICA, we have to preprocess this data, which is illustrated in figure \ref{fig:ica_data}.
-As in section \ref{sec:...}, we start by masking the data such that the spectral-range edges are removed. %TODO: update reference when PLS section is done
+As in section \ref{sec:...}, we start by masking the data such that the emission lines in the spectral-range edges are removed. %TODO: update reference when PLS section is done
 Then we normalize the data --- once using Norm1 and once using Norm3.
 This gives us two datasets with normalized data.
 Both of these datasets are then used for ICA separately because, as \citeauthor{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
