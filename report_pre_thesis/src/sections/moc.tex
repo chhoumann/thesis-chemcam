@@ -62,21 +62,6 @@ The Mahalanobis distance is defined as follows:
 
 Where $p$ is the point in question, $\mu$ is the mean of the distribution and $\Sigma^{-1}$ is the inverse of the covariance matrix of the distribution, known as the precision matrix. 
 Variables exhibiting a high leverage score are indicative of predictors that deviate more significantly from the others, thereby have a greater influence on the model.
-Hotelling's \( T^2 \) statistic extends the concept of the squared Mahalanobis distance by incorporating sample size, enabling hypothesis testing. 
-This statistic assesses if a sample's mean vector significantly differs from a hypothesized mean. Hotelling's \( T^2 \) is defined as follows:
-
-\begin{equation}
-    T^2 = n \cdot (\overline{X} - \mu_0)^T \cdot S^{-1}(\overline{X} - \mu_0)
-\end{equation}
-
-where $n$ is the sample size, $\overline{X}$ is the sample mean vector, $\mu_0$ is the hypothesized population mean vector and $S$ is the covariance matrix.
-
-The relationship between Hotelling's \( T^2 \) and leverages can then be expressed as:
-\begin{equation}
-    \text{Hotelling's } T^2 = (N - 1) (h_i - \frac{1}{N})
-\end{equation}
-
-Where $N$ is the sample size. The equation suggests that Hotelling's $T^2$ is proportional to the leverage of an observation, adjusted by the mean ($\frac{1}{N}$) and scaled by $N - 1$, where $N - 1$ represents the degrees of freedom adjustment.
 The measure of model fit, denoted as $Q$, is calculated by squaring the differences between the actual spectrum $x$ and the spectrum predicted by the model. This prediction uses the model's scores $t$ and loadings ($P$) to calculate the residuals $e$:
 
 \begin{equation}
