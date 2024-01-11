@@ -90,9 +90,9 @@ After examining the results in section \ref{sec:results}, we will discuss the im
 \subsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
 After preprocessing the data, we are ready to perform ICA.
 This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE) algorithm, which is used to calculate the mixing matrix.
-This mixing matrix has the shape $N \times M$, where $N$ is the number of samples and $M$ is the number of independent components.
+This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
 By taking the product of the mixing matrix and the normalized data, we get the estimated sources.
-This new matrix has the shape $X \times Y$, where $X$ is the number of wavelengths and $Y$ is the number of independent components.
+This new matrix is an $M \times P$ matrix, where $M$ is the number of independent components, and $P$ is the number of wavelengths.
 
 After performing ICA, we post-process by computing the correlation between the independent components and the wavelengths.
 Using this, we can identify which wavelengths are associated with which independent components by computing the maximum correlation for each wavelength.
