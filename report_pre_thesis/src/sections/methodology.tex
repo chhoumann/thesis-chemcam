@@ -66,9 +66,12 @@ These steps are identical to the original pipeline described by \citeauthor{cleg
 \end{figure}
 
 However, we do not weigh by the inverse of the instrument response function (IRF) as mentioned in \citeauthor{cleggRecalibrationMarsScience2017} before normalizing.
-The reason for this is that the practical implications of weighing by the inverse of the IRF has been subject to criticism by some of the original authors since it effectively reintroduces the noise that was removed by applying the IRF in the first place.
-As previously mentioned, the IRF is applied specifically to remove noise from the data during the processing of the EDR to CCS data.
-Therefore, weighing by the inverse of the IRF seems counterproductive based on this information.
+The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities.
+For example, pixels located at the edge of a CCS usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
+One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
+However, the issue with this method is that it discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
+If the same instrument were used for all analyses, one could argue that the IRF (apart from the inverse square law correction) part is irrelevant, but that is not the case here; there are two different instruments --- one in Los Alamos and one on Mars.
+Based on these considerations, we have decided to not weigh by the inverse of the IRF.
 
 In addition, because \citeauthor{cleggRecalibrationMarsScience2017} does not mention how each of the five location datasets are used for each target, we have decided to only use one for each target.
 This likely does not produce as accurate results as using all five location datasets would, since we do not get a full representation of the sample that was shot at by the laser, instead only getting a partial representation from a single location.
