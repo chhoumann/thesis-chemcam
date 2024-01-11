@@ -8,10 +8,14 @@ Consequently, our pipeline is not identical to the original, but we have strived
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
+Section \ref{sec:shared_preprocessing} outlines the preprocessing steps common to both the PLS1-SM and ICA phases of the pipeline.
+In Section \ref{sec:methodology_pls1}, we focus on the specifics of the PLS1-SM phase, detailing its associated data preprocessing procedures.
+Section \ref{sec:methodology_ica} then details the ICA phase, including its unique data preprocessing steps.
+Lastly, Section \ref{sec:methodology_moc} presents a description of the MOC phase of the pipeline.
+
 \subsection{Shared Preprocessing}\label{sec:shared_preprocessing}
 Part of the data preprocessing is shared between the PLS1-SM and ICA phases of the pipeline.
 However, each phase also has its own preprocessing steps, which are described in sections \ref{sec:pls1_data_preprocessing} and \ref{sec:ica_data_preprocessing} respectively.
-This section describes the preprocessing steps that are common to both phases.
 
 For each target, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
 Each dataset contains CCS data stored in a \texttt{.csv} file, which is read into a Pandas dataframe\cite{pandas} using the \texttt{read\_csv} function.
@@ -23,7 +27,7 @@ The masked regions, which do not contain unique major element diagnostic peaks, 
 These regions are defined in \citeauthor{cleggRecalibrationMarsScience2017} 40.811 - 246.635, 338.457 - 340.797, 382.138 - 387.859, 473.184 - 492.427, and 849 - 905.574 nm.
 An illustration of these masked regions can be seen in figure \ref{fig:masked_regions}.
 
-\subsection{PLS1-SM}
+\subsection{PLS1-SM}\label{sec:methodology_pls1}
 This section describes the PLS1-SM aspect of the pipeline.
 
 \subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
@@ -61,7 +65,7 @@ The process is as follows:
 It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
 
-\subsection{ICA}
+\subsection{ICA}\label{sec:methodology_ica}
 The ICA phase in our pipeline, which can be seen in figure \ref{fig:ica_data}, represents a mostly faithful replication of the original, with a few considered adjustments and exclusions due to incomplete details about the original implementation.
 In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
 
@@ -104,7 +108,7 @@ While it would be ideal to include outlier detection in the ICA phase to ensure 
 
 After examining the results in section \ref{sec:results}, we will discuss the implications of these design choices in section \ref{sec:discussion}.
 
-\subsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
+\subsubsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
 After preprocessing the data, we are ready to perform ICA.
 This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE) algorithm, which is used to calculate the mixing matrix.
 This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
@@ -178,7 +182,7 @@ For each oxide, they used the type of regression and normalization that produced
 
 In summary, we have created a replica of the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
 
-\subsection{MOC}
+\subsection{MOC}\label{sec:methodology_moc}
 As mentioned in section \ref{sec:moc}, the result of the PLS1-SM and ICA are combined to produce the final MOC model.
 This is done by taking a weighted average of the two models, where the weights are determined based on the fact that one technique is be better suited for certain elements than the other.
 These weights can be seen in table \ref{tab:weighted_sum_oxide}.
