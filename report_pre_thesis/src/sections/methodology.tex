@@ -28,15 +28,19 @@ The masked regions, which do not contain unique major element diagnostic peaks, 
 These regions are defined in \citeauthor{cleggRecalibrationMarsScience2017} 40.811 - 246.635, 338.457 - 340.797, 382.138 - 387.859, 473.184 - 492.427, and 849 - 905.574 nm.
 An illustration of these masked regions can be seen in figure \ref{fig:masked_regions}.
 
+Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
+This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
+ICA and PLS-SM are then performed on each of these datasets separately.
+The reason for this is that, as \citeauthor{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
+
 \subsection{PLS1-SM}\label{sec:methodology_pls1}
 This section describes the PLS1-SM aspect of the pipeline.
 
 \subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
-For the PLS1-SM phase, the 50 laser shots for each location are averaged together, resulting in 5 spectra per target.
-
-
-% Each target was analyzed using 50 laser shots in 5 separate locations.
-% The 50 spectra for each location are averaged together, resulting in 5 spectra per target.
+After the shared preprocessing steps described in section \ref{sec:shared_preprocessing}, the data undergoes a further step of averaging.
+Recall that each target is shot at five different locations, and each location is shot at 50 times.
+As mentioned in section \ref{sec:shared_preprocessing}, the first five shots are removed, leaving 45 shots per location.
+For PLS1-SM, the 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
 
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
@@ -75,12 +79,8 @@ The ICA phase in our pipeline, which can be seen in figure \ref{fig:ica_data}, r
 In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
 
 \subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
+The preprocessing steps for the ICA phase are illustrated in figure \ref{fig:ica_data}.
 As previously mentioned, the shared preprocessing steps described in section \ref{sec:shared_preprocessing} are also used for the ICA phase.
-After the shared preprocessing, we apply two different normalization techniques, Norm1 and Norm3, to the data.
-This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
-Both of these datasets are then used for ICA separately because, as \citeauthor{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
-The independent components from each of these two datasets are saved to a file and used for regression later.
-These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017} and are illustrated in figure \ref{fig:ica_data}.
 
 \begin{figure}
 	\centering
@@ -112,6 +112,7 @@ While it would be ideal to include outlier detection in the ICA phase to ensure 
 After examining the results in section \ref{sec:results}, we will discuss the implications of these design choices in section \ref{sec:discussion}.
 
 \subsubsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
+% TODO: Describe whitening and PCA
 After preprocessing the data, we are ready to perform ICA.
 This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE) algorithm, which is used to calculate the mixing matrix.
 This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
