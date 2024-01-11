@@ -14,6 +14,7 @@ Section \ref{sec:methodology_ica} then details the ICA phase, including its uniq
 Lastly, Section \ref{sec:methodology_moc} presents a description of the MOC phase of the pipeline.
 
 \subsection{Shared Preprocessing}\label{sec:shared_preprocessing}
+Similar to the original pipeline, we have used the samples from the ChemCam calibration dataset.
 Part of the data preprocessing is shared between the PLS1-SM and ICA phases of the pipeline.
 However, each phase also has its own preprocessing steps, which are described in sections \ref{sec:pls1_data_preprocessing} and \ref{sec:ica_data_preprocessing} respectively.
 
@@ -31,6 +32,11 @@ An illustration of these masked regions can be seen in figure \ref{fig:masked_re
 This section describes the PLS1-SM aspect of the pipeline.
 
 \subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
+For the PLS1-SM phase, the 50 laser shots for each location are averaged together, resulting in 5 spectra per target.
+
+
+% Each target was analyzed using 50 laser shots in 5 separate locations.
+% The 50 spectra for each location are averaged together, resulting in 5 spectra per target.
 
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
@@ -61,7 +67,6 @@ The process is as follows:
     \item Repeat until model no longer improves as measured by the RMSE.
 \end{enumerate}
 
-
 It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
 
@@ -70,14 +75,12 @@ The ICA phase in our pipeline, which can be seen in figure \ref{fig:ica_data}, r
 In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
 
 \subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
-Similar to the original pipeline, we have used the samples from the ChemCam calibration dataset.
-Before performing ICA, we have to preprocess this data, which is illustrated in figure \ref{fig:ica_data}.
-First, we preprocess the data using the shared preprocessing steps described in section \ref{sec:shared_preprocessing}.
-
-This gives us two datasets with normalized data.
+As previously mentioned, the shared preprocessing steps described in section \ref{sec:shared_preprocessing} are also used for the ICA phase.
+After the shared preprocessing, we apply two different normalization techniques, Norm1 and Norm3, to the data.
+This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
 Both of these datasets are then used for ICA separately because, as \citeauthor{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 The independent components from each of these two datasets are saved to a file and used for regression later.
-These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017}
+These steps are identical to the original pipeline described by \citeauthor{cleggRecalibrationMarsScience2017} and are illustrated in figure \ref{fig:ica_data}.
 
 \begin{figure}
 	\centering
