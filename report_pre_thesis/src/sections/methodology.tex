@@ -25,7 +25,7 @@ We then remove the first five shots from the data similarly to \citet{cleggRecal
 These first five shots are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Finally, we mask the edges of the spectral regions of the data to eliminate increased noise, especially in areas where small intensity changes lead to large variations in the calibrated signal.
 The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis.
-These regions are defined in \citet{cleggRecalibrationMarsScience2017} 40.811 - 246.635, 338.457 - 340.797, 382.138 - 387.859, 473.184 - 492.427, and 849 - 905.574 nm.
+These regions are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm.
 An illustration of these masked regions can be seen in figure \ref{fig:masked_regions}.
 
 Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
@@ -86,11 +86,7 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 \subsection{ICA}\label{sec:methodology_ica}
 The ICA phase in our pipeline, which can be seen in figure \ref{fig:ica_data}, represents a mostly faithful replication of the original, with a few considered adjustments and exclusions due to incomplete details about the original implementation.
 In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
-
-\subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
-The preprocessing steps for the ICA phase are illustrated in figure \ref{fig:ica_data}.
-As previously mentioned, the shared preprocessing steps described in section \ref{sec:shared_preprocessing} are also used for the ICA phase.
-% TODO: Mention that we only use one of the five datasets for each target for now because of missing information about how each of the five datasets are used for each target for ICA.
+An illustration of the ICA phase of our pipeline can be seen in figure \ref{fig:ica_data}.
 
 \begin{figure}
 	\centering
@@ -99,7 +95,11 @@ As previously mentioned, the shared preprocessing steps described in section \re
 	\label{fig:ica_data}
 \end{figure}
 
-However, we do not weigh by the inverse of the instrument response function (IRF) as mentioned in \citet{cleggRecalibrationMarsScience2017} before normalizing.
+\subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
+As previously mentioned, the shared preprocessing steps described in section \ref{sec:shared_preprocessing} are also used for the ICA phase.
+However, there are some additional preprocessing steps that are unique to the ICA phase and some differences to the original pipeline that we will describe here.
+
+In contrast to \citet{cleggRecalibrationMarsScience2017}, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
 The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities.
 For example, pixels located at the edge of a CCS usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
 One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
