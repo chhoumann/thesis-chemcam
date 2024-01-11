@@ -33,6 +33,15 @@ This results in two separate datasets, each normalized in a distinct manner but 
 ICA and PLS-SM are then performed on each of these datasets separately.
 The reason for this is that, as \citeauthor{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 
+The pipeline for the shared preprocessing steps can be seen in figure \ref{fig:shared_preprocessing}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.2675\textwidth]{images/shared_preprocessing.png}
+	\caption{The preprocessing steps shared by both the PLS1-SM and ICA phases of the pipeline.}
+	\label{fig:shared_preprocessing}
+\end{figure}
+
 \subsection{PLS1-SM}\label{sec:methodology_pls1}
 This section describes the PLS1-SM aspect of the pipeline.
 
@@ -81,6 +90,7 @@ In this section, we delve into these differences and the rationale behind our ch
 \subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
 The preprocessing steps for the ICA phase are illustrated in figure \ref{fig:ica_data}.
 As previously mentioned, the shared preprocessing steps described in section \ref{sec:shared_preprocessing} are also used for the ICA phase.
+% TODO: Mention that we only use one of the five datasets for each target for now because of missing information about how each of the five datasets are used for each target for ICA.
 
 \begin{figure}
 	\centering
@@ -112,7 +122,6 @@ While it would be ideal to include outlier detection in the ICA phase to ensure 
 After examining the results in section \ref{sec:results}, we will discuss the implications of these design choices in section \ref{sec:discussion}.
 
 \subsubsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
-% TODO: Describe whitening and PCA
 After preprocessing the data, we are ready to perform ICA.
 This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE) algorithm, which is used to calculate the mixing matrix.
 This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
