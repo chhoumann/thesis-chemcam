@@ -26,7 +26,15 @@ These first five shots are typically contaminated by dust that covers the target
 Finally, we mask the edges of the spectral regions of the data to eliminate increased noise, especially in areas where small intensity changes lead to large variations in the calibrated signal.
 The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis.
 These regions are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm.
-An illustration of these masked regions can be seen in figure \ref{fig:masked_regions}.
+% An illustration of these masked regions can be seen in figure \ref{fig:masked_regions}.
+An example of these masked regions for the \texttt{cadillac} target can be seen in figure \ref{fig:masked_regions}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/masked_regions.png}
+	\caption{The masked regions of the spectral data for the \texttt{cadillac} target.}
+	\label{fig:masked_regions}
+\end{figure}
 
 Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
 This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
@@ -100,10 +108,11 @@ As previously mentioned, the shared preprocessing steps described in section \re
 However, there are some additional preprocessing steps that are unique to the ICA phase and some differences to the original pipeline that we will describe here.
 
 In contrast to \citet{cleggRecalibrationMarsScience2017}, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
-The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities.
+The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities\cite{chemcam_instrument_suite}.
 For example, pixels located at the edge of a CCS usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
 One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
-However, the issue with this method is that it discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
+However, during a conversation with one of the original authors of \citet{cleggRecalibrationMarsScience2017}, criticism was raised against this.
+Specifically, the author pointed out that weighing by the inverse of the discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
 If the same instrument were used for all analyses, one could argue that the IRF (apart from the inverse square law correction) part is irrelevant, but that is not the case here; there are two different instruments --- one in Los Alamos and one on Mars.
 Based on these considerations, we have decided to not weigh by the inverse of the IRF.
 
