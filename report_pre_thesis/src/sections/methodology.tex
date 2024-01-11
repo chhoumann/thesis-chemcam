@@ -8,8 +8,35 @@ Consequently, our pipeline is not identical to the original, but we have strived
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
+\subsection{Data Shape and Preprocessing}
+Part of the data preprocessing is shared between the PLS1-SM and ICA phases of the pipeline.
+However, each phase also has its own preprocessing steps, which are described in sections \ref{sec:pls1_data_preprocessing} and \ref{sec:ica_data_preprocessing} respectively.
+This section describes the preprocessing steps that are common to both phases.
+
+For each target, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
+Each dataset contains CCS data stored in a \texttt{.csv} file, which is read into a Pandas dataframe\cite{pandas} using the \texttt{read\_csv} function.
+Because the CCS data includes several lines of header information, we skip these lines using the \texttt{skiprows} parameter.
+We then remove the first five shots from the data similarly to \citeauthor{cleggRecalibrationMarsScience2017}.
+These first five shots are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
+Finally, we mask the edges of the spectral regions of the data to eliminate increased noise, especially in areas where small intensity changes lead to large variations in the calibrated signal.
+The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis.
+These regions are defined in \citeauthor{cleggRecalibrationMarsScience2017} 40.811 - 246.635, 338.457 - 340.797, 382.138 - 387.859, 473.184 - 492.427, and 849 - 905.574 nm.
+An illustration of these masked regions can be seen in figure \ref{fig:masked_regions}.
+
+\begin{itemize}
+	\item The code starts by setting up criteria to exclude specific columns (like "wave", "mean", and "median") from certain operations and identifies the first five shots in the data.
+	\item For each sample dataset, the code cleans the column names by stripping whitespace and removing specific characters. It also ensures the consistency of wavelength data across different datasets.
+	\item The code removes certain predefined columns and re-inserts wavelength data to maintain its structure in the dataframe.
+	\item If enabled, the code computes the average of certain columns (related to shots) and adds this average back into the dataset, while removing the original shot columns.
+	\item Each processed dataset is compiled into a list, which is then returned for further use.
+	\item Masking is performed on the data to remove the spectral-range edges.
+\end{itemize}
+
+
 \subsection{PLS1-SM}
 This section describes the PLS1-SM aspect of the pipeline.
+
+\subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
 
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
@@ -48,7 +75,7 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 The ICA phase in our pipeline, which can be seen in figure \ref{fig:ica_data}, represents a mostly faithful replication of the original, with a few considered adjustments and exclusions due to incomplete details about the original implementation.
 In this section, we delve into these differences and the rationale behind our choices, maintaining a strong alignment with the overall methodology of the original pipeline.
 
-\subsubsection{Data Preprocessing}
+\subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
 Similar to the original pipeline, we have used the samples from the ChemCam calibration dataset.
 Before performing ICA, we have to preprocess this data, which is illustrated in figure \ref{fig:ica_data}.
 As in section \ref{sec:...}, we start by masking the data such that the emission lines in the spectral-range edges are removed. %TODO: update reference when PLS section is done
