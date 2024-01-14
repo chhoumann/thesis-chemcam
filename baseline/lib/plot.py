@@ -56,7 +56,7 @@ def plot_spectra(
     # Plot segments with gaps smaller than max_gap_threshold
     start_idx = 0
     for i in range(1, len(wave)):
-        if wave.iloc[i] - wave.iloc[i - 1] > max_gap_threshold:
+        if wave.iloc[i] - wave.iloc[i - 1] > float(max_gap_threshold):
             sns.lineplot(
                 x=wave.iloc[start_idx:i], y=intensity.iloc[start_idx:i], color="blue"
             )
@@ -80,7 +80,7 @@ def plot_spectra(
 
     for i, (start, end) in enumerate(masks):
         plt.axvspan(
-            start, end, alpha=0.1, color="black", label="Mask" if i == 0 else None
+            start, end, alpha=0.25, color="#0099ff", label="Mask" if i == 0 else None
         )
 
     # Labeling and title
@@ -92,7 +92,7 @@ def plot_spectra(
     # plt.show()
 
     if fig_name != "":
-        plt.savefig(fig_name, bbox_inches="tight")
+        plt.savefig(fig_name, bbox_inches="tight", dpi=300)
 
 
 @app.command(name="plot_outliers", help="Plot the outliers for a given run.")
@@ -139,3 +139,6 @@ def plot_outliers_for_run(mlflow_run_id: str, figure_name=""):
         plt.savefig(save_file_path, bbox_inches="tight")
 
     # plt.show()
+
+if __name__ == "__main__":
+    app()
