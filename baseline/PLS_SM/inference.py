@@ -64,7 +64,7 @@ def predict_composition_with_blending(oxide: str, X1, X3, models, ranges):
                 predictions.append(
                     models[oxide][range_name].predict([X_range_norm_row])[0]
                 )
-                print(f"y_full: {y_full}, range: {range_name}_{oxide}")
+                # print(f"y_full: {y_full}, range: {range_name}_{oxide}")
                 prediction_made = True
                 break
 
