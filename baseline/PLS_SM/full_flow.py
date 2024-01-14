@@ -345,11 +345,15 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 if SHOULD_PREDICT:
     models = get_models(experiment_id='164614136207675379')
 
+    # save na to csv
+    test_processed[test_processed.isna().any(axis=1)].to_csv(
+        "data/data/PLS_SM/na.csv", index=False
+    )
     count_pre_drop = len(test_processed)
-    test_processed.dropna(inplace=True)
+    test_processed.dropna(inplace=True, axis='index')
     count_post_drop = len(test_processed)
 
-    logger.info(
+    logger.warn(
         "Dropped %d rows with NaNs from test data. %d rows remaining.",
         count_pre_drop - count_post_drop,
         count_post_drop,
@@ -357,6 +361,8 @@ if SHOULD_PREDICT:
 
     Y = test_processed[major_oxides]
     drop_cols = major_oxides + ["Sample Name"]
+
+    target_predictions = pd.DataFrame(test_processed["Sample Name"])
 
     n1_scaler = Norm1Scaler(reshaped=True)
     n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
@@ -396,12 +402,15 @@ if SHOULD_PREDICT:
             print("NaNs in pred_df:")
             print(pred_df[nan_in_pred_df])
 
-        
         # calculate RMSEP
         rmsep = mean_squared_error(Y[oxide], pred_df, squared=False)
         # save
         with open(save_path / "rmsep.txt", "a") as f:
             f.write(f"{oxide}: {rmsep}\n")
+
+        target_predictions[oxide] = pred
+    
+    target_predictions.to_csv(save_path / "tar_pred.csv")
 
 
 # endregion
