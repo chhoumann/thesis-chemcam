@@ -17,8 +17,8 @@ from ica.jade import JADE
 from lib.norms import Norm
 
 mlflow.set_tracking_uri("http://localhost:5000")
-# experiment_name = f"ICA_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
-experiment_name = "ICA_Train_Test_Split"
+experiment_name = f"ICA_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+# experiment_name = "ICA_Train_Test_Split"
 mlflow.set_experiment(experiment_name)
 mlflow.autolog()
 
@@ -131,58 +131,61 @@ def main():
             print(f"No model specified for {oxide}. Skipping...")
             continue
 
-        # with mlflow.start_run(run_name=f"ICA_{oxide}"):
-        print(f"Training model {model_name} for {oxide}...")
+        with mlflow.start_run(run_name=f"ICA_{oxide}"):
+            print(f"Training model {model_name} for {oxide}...")
 
-        X_train = ica_train_n1 if norm == Norm.NORM_1 else ica_train_n3
-        y_train = (
-            comp_train_n1[oxide] if norm == Norm.NORM_1 else comp_train_n3[oxide]
-        )
+            X_train = ica_train_n1 if norm == Norm.NORM_1 else ica_train_n3
+            y_train = (
+                comp_train_n1[oxide] if norm == Norm.NORM_1 else comp_train_n3[oxide]
+            )
 
-        X_test = ica_test_n1 if norm == Norm.NORM_1 else ica_test_n3
-        y_test = comp_test_n1[oxide] if norm == Norm.NORM_1 else comp_test_n3[oxide]
+            X_test = ica_test_n1 if norm == Norm.NORM_1 else ica_test_n3
+            y_test = comp_test_n1[oxide] if norm == Norm.NORM_1 else comp_test_n3[oxide]
 
-        # if model_name == "Log-square":
-        #     params, params_covariance = curve_fit(
-        #         log_square_model, X_train, y_train
-        #     )
-        # if model_name == "Exponential":
-        #     params, params_covariance = curve_fit(
-        #         exponential_model, X_train, y_train
-        #     )
-        # elif model_name == "Geometric":
-        #     params, params_covariance = curve_fit(geometric_model, X_train, y_train)
-        # elif model_name == "Parabolic":
-        #     params, params_covariance = curve_fit(parabolic_model, X_train, y_train)
+            # if model_name == "Log-square":
+            #     params, params_covariance = curve_fit(
+            #         log_square_model, X_train, y_train
+            #     )
+            # if model_name == "Exponential":
+            #     params, params_covariance = curve_fit(
+            #         exponential_model, X_train, y_train
+            #     )
+            # elif model_name == "Geometric":
+            #     params, params_covariance = curve_fit(geometric_model, X_train, y_train)
+            # elif model_name == "Parabolic":
+            #     params, params_covariance = curve_fit(parabolic_model, X_train, y_train)
 
-        if model_name == "Log-square":
-            X_train = np.log(X_train**2)
-            X_test = np.log(X_test**2)
-        elif model_name == "Exponential":
-            X_train = np.log(X_train)
-            X_test = np.log(X_test)
-        elif model_name == "Geometric":
-            X_train = np.sqrt(X_train)
-            X_test = np.sqrt(X_test)
-        elif model_name == "Parabolic":
-            X_train = X_train**2
-            X_test = X_test**2
+            if model_name == "Log-square":
+                X_train = np.log(X_train**2)
+                X_test = np.log(X_test**2)
+            elif model_name == "Exponential":
+                X_train = np.log(X_train)
+                X_test = np.log(X_test)
+            elif model_name == "Geometric":
+                X_train = np.sqrt(X_train)
+                X_test = np.sqrt(X_test)
+            elif model_name == "Parabolic":
+                X_train = X_train**2
+                X_test = X_test**2
 
-        # model = LinearRegression()
-        # model.fit(X_train, y_train)
+            # model = LinearRegression()
+            # model.fit(X_train, y_train)
 
-        pred = models[oxide].predict(X_test)
-        rmse = np.sqrt(mean_squared_error(y_test, pred))
+            pred = models[oxide].predict(X_test)
+            rmse = np.sqrt(mean_squared_error(y_test, pred))
 
-        oxide_rmses[oxide] = rmse
+            print(X_test.columns)
+            print(X_test.shape, y_test.shape, pred.shape)
 
-        oxide_prediction_path = Path(f"./data/data/jade/ica/predictions")
-        oxide_prediction_path.mkdir(parents=True, exist_ok=True)
-        pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred.csv")
-        # mlflow.log_metric("RMSE", float(rmse))
-        # mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
+            oxide_rmses[oxide] = rmse
 
-        # mlflow.sklearn.log_model(model, f"ICA_{oxide}")
+            oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
+            oxide_prediction_path.mkdir(parents=True, exist_ok=True)
+            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred.csv")
+            mlflow.log_metric("RMSE", float(rmse))
+            mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
+
+            # mlflow.sklearn.log_model(model, f"ICA_{oxide}")
 
     for oxide, rmse in oxide_rmses.items():
         print(f"RMSE for {oxide} with {oxide_models[oxide]['law']} model: {rmse}")
@@ -204,7 +207,7 @@ def get_train_data(num_components: int, norm: Norm) -> (pd.DataFrame, pd.DataFra
         print("No preprocessed data found. Creating and saving preprocessed data...")
         output_dir.mkdir(parents=True, exist_ok=True)
         ica_df, compositions_df = create_train_data(
-            calib_data_path, num_components=num_components
+            calib_data_path, num_components=num_components, norm=norm
         )
         ica_df.to_csv(ica_df_csv_loc)
         compositions_df.to_csv(compositions_csv_loc)
