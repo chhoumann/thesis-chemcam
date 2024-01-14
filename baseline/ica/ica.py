@@ -123,6 +123,8 @@ def main():
                 model = mlflow.sklearn.load_model(model_uri)
                 models[oxide_value] = model
 
+    target_predictions = pd.DataFrame(comp_test_n1.index)
+
     for oxide, info in tqdm.tqdm(oxide_models.items()):
         model_name = info["law"]
         norm = info["norm"]
@@ -181,7 +183,10 @@ def main():
 
             oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
             oxide_prediction_path.mkdir(parents=True, exist_ok=True)
-            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred.csv")
+
+            target_predictions[oxide] = pd.Series(pred)
+
+            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred1.csv")
             mlflow.log_metric("RMSE", float(rmse))
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
@@ -189,6 +194,8 @@ def main():
 
     for oxide, rmse in oxide_rmses.items():
         print(f"RMSE for {oxide} with {oxide_models[oxide]['law']} model: {rmse}")
+
+    target_predictions.to_csv("./data/data/jade/ica/tar_pred.csv")
 
 
 def get_train_data(num_components: int, norm: Norm) -> (pd.DataFrame, pd.DataFrame):
