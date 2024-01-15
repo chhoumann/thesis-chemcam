@@ -1,5 +1,91 @@
 \section{Data Overview}\label{subsec:data_overview}
+In this section, we provide an overview of the data used in this study.
+The ChemCam callibration data is stored in a directory structure as shown in Figure~\ref{fig:directory_structure}.
 
-For each target, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
-Each dataset contains CCS data stored in a \texttt{.csv} file, which is read into a Pandas dataframe\cite{pandas} using the \texttt{read\_csv} function.
-Because the CCS data includes several lines of header information, we skip these lines using the \texttt{skiprows} parameter.
+\begin{figure}
+    \begin{forest}
+        for tree={
+            font=\ttfamily,
+            grow'=0,
+            child anchor=west,
+            parent anchor=south,
+            anchor=west,
+            calign=first,
+            inner xsep=7pt,
+            edge path={
+                \noexpand\path [draw, \forestoption{edge}]
+                (!u.south west) +(7.5pt,0) |- (.child anchor) pic {folder} \forestoption{edge label};
+            },
+            % style for your file node 
+            file/.style={edge path={\noexpand\path [draw, \forestoption{edge}]
+                (!u.south west) +(7.5pt,0) |- (.child anchor) \forestoption{edge label};},
+                inner xsep=2pt,font=\small\ttfamily
+                            },
+            before typesetting nodes={
+                if n=1
+                {insert before={[,phantom]}}
+                {}
+            },
+            fit=band,
+            before computing xy={l=15pt},
+            }  
+        [calib\_2015
+            [1600mm
+                [ica
+                    [0.1tio2
+                        [2015\_03\_27\_132008\_ccs.csv, file]
+                        [2015\_03\_27\_132008\_ccs.lbl, file]
+                        [2015\_03\_27\_132210\_ccs.csv, file]
+                        [2015\_03\_27\_132210\_ccs.lbl, file]
+                        [2015\_03\_27\_132331\_ccs.csv, file]
+                        [2015\_03\_27\_132331\_ccs.lbl, file]
+                        [2015\_03\_27\_132453\_ccs.csv, file]
+                        [2015\_03\_27\_132453\_ccs.lbl, file]
+                        [2015\_03\_27\_132624\_ccs.csv, file]
+                        [2015\_03\_27\_132624\_ccs.lbl, file]
+                    ]
+                    [1tio2]
+                    [$\vdots$, file]
+                    [wc1]
+                    [wc3]
+                ]
+                [pls
+                    [0.1tio2]
+                    [1tio2]
+                    [$\vdots$, file]
+                    [wc3]
+                    [wm]
+                ]
+                [ccam\_calibration\_compositions.csv, file
+                ]
+            ]
+        ]
+    \end{forest}
+\caption{Directory structure of the data.}
+\label{fig:directory_structure}
+\end{figure}
+
+As shown in the figure, the data used to train the ICA and PLS models are stored in two different directories, \texttt{ica} and \texttt{pls}, respectively, however many of the datasets are shared between the two models.
+For each sample, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
+Each dataset contains CCS data stored in a \texttt{.csv} file and a corresponding \texttt{.lbl} file containing metadata.
+We do not use the metadata in the \texttt{.lbl} files in this study.
+
+Each \texttt{.csv} file contains the following columns:
+
+
+\begin{table*}[ht]
+\centering
+\begin{tabular}{rrrrrrrr}
+\toprule
+     wave &        shot1 &      shot2 &      $\cdots$ &       shot49 &       shot50 & median & mean \\
+\midrule
+241.66901 & 2.820443e+11 & 1.3349191e+16 & $\cdots$ & 9.3383243e+15 & 9.4850282e+15 & 9.6073916e+15 & 1.0412862e+16 \\
+241.72301 & 3.279678e+11 & 3.9035181e+12 & $\cdots$ & 3.5982364e+12, & 4.7538387e+12 & 2.9107688e+12 & 3.2675139e+12 \\
+$\vdots$  & $\vdots$     & $\vdots$ & $\cdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
+905.38062 & 9.2772428e+09 & 1.1861747e+10 & $\cdots$ & 3.4135089e+09 & 2.8770024e+09 & 6.7861770e+09 & 1.7767384e+09 \\
+905.57349 & 1.9527751e+10 & 2.4984806e+10 & $\cdots$ & 7.1648592e+09 & 6.0560959e+09 & 1.4299386e+10 & 2.7702141e+09 \\ 
+\bottomrule
+\end{tabular}
+\caption{Example of the structure of the \texttt{.csv} containing the CCS data.}
+\label{tab:ccs_data_example}
+\end{table*}
