@@ -149,10 +149,11 @@ This gives us a matrix of ICA scores that we then use for regression.
 \end{figure}
 
 The regression process is illustrated in figure \ref{fig:ica_regression}.
-Since we are implementing this recreation in Python, a different programming language than the original pipeline, we cannot use the same libraries for regression.
-We use the \texttt{LinearRegression} class from the \texttt{scikit-learn} library\cite{scikit-learn}.
-However, \citet{cleggRecalibrationMarsScience2017} mentions performing four more types of regression in addition to linear regression, namely parabolic, exponential, geometric and logsquare.
+\citet{cleggRecalibrationMarsScience2017} perform four more types of regression in addition to linear regression, namely parabolic, exponential, geometric and logsquare.
 For each oxide, they used the type of regression and normalization that produced the best results.
+
+We use Linear Regression for all oxides and instead transform the data to fit the model similar to \citet{kuo_detecting_2018}.
+Initially, it might appear limiting, but by applying transformations to the features --— for example by taking logs, square roots, etc. --- it's possible to achieve an almost linear relationship with the target variable.
 
 % TODO: Move this table to the results section and embed our own results in it as well to show the baseline results compared to the original results.
 % This can be seen in table \ref{tab:regression_types}, which is taken from \citet{cleggRecalibrationMarsScience2017}.
@@ -176,33 +177,6 @@ For each oxide, they used the type of regression and normalization that produced
 % \caption{The summary of each ICA model characteristics from \citet{cleggRecalibrationMarsScience2017}.}
 % \label{tab:regression_types}
 % \end{table}
-
-% TODO: Update/rewrite this to reflect the new curve-fit implementation.
-% Because \texttt{scikit-learn} does not support these types of regression, we instead opted to transform the data to fit the linear regression model.
-% For example, to perform exponential regression, we take the natural logarithm of the data, perform linear regression, and then take the exponential of the result.
-% This is done for each of the four types of regression mentioned above.
-% The code for this can be seen in listing \ref{lst:data_transformation}.
-
-% \begin{lstlisting}[
-% 	language=Python,
-% 	caption={The code for transforming the data to fit the linear regression model.},
-% 	label={lst:data_transformation}
-% 	]
-% if model_name == "Log-square":
-% 	X_train = np.log(X_train**2)
-% 	X_test = np.log(X_test**2)
-% elif model_name == "Exponential":
-% 	X_train = np.log(X_train)
-% 	X_test = np.log(X_test)
-% elif model_name == "Geometric":
-% 	X_train = np.sqrt(X_train)
-% 	X_test = np.sqrt(X_test)
-% elif model_name == "Parabolic":
-% 	X_train = np.column_stack((X_train, X_train**2))
-% 	X_test = np.column_stack((X_test, X_test**2))
-% \end{lstlisting}
-
-In summary, we have created a replica of the ICA phase of the pipeline with strategic adaptations to accommodate the differences in programming language and the missing or unclear information about the original implementation.
 
 \subsection{MOC}\label{sec:methodology_moc}
 As mentioned in section \ref{sec:moc}, the result of the PLS1-SM and ICA are combined to produce the final MOC model.
@@ -228,29 +202,3 @@ Ca*      & 50           & 50      \\
 \caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citet{cleggRecalibrationMarsScience2017}}
 \label{tab:weighted_sum_oxide}
 \end{table}
-
-
-
-% \textit{Recreate the current model. Reproduce the results of the original papers. Investigate the limitations of the model and propose improvements.}
-
-
-% \section{Framework for at kunne analysere data}
-% Hold out split 80/20 - har lavet cross validation på træningssæt
-
-% \section{Outlier removal}
-% \section{Ikke lavet outlier removal i ICA}
-% \section{Har ikke lavet inverse IRF}
-% \section{Ved ikke hvordan 3 oxider er vægtet i MOC}
-% This section explains how the research was conducted.
-% - Purpose: To detail the experiments, algorithms, and data sets used, enabling reproducibility.
-% - Subsections: Can include Experiment Design, Algorithm Descriptions, Data Sources, and Evaluation Metrics.
-% - Best Practices: Be explicit about every aspect of your methodology, including any limitations.
-
-% Research Design
-% - Overall plan for conducting the study
-% Data Collection Methods
-% - Description of how data was collected
-% Algorithms and Models
-% - Detailed explanation of algorithms, models, or frameworks used
-% Evaluation Criteria
-% - Metrics used to evaluate the outcomes
