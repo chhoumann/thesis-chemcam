@@ -1,4 +1,4 @@
-\section{Data Overview}\label{subsec:data_overview}
+\section{Data Overview}\label{sec:data_overview}
 In this section, we provide an overview of the data used in this study.
 
 The ChemCam callibration data is stored in a directory structure as shown in Figure~\ref{fig:directory_structure}.
@@ -81,6 +81,9 @@ They contain the following columns:
 \end{itemize}
 
 The rows in the location dataset represent which wavelength the intensity measurements were taken at.
+There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample.
+The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
+
 Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{0.1tio2} sample.
 
 \begin{table*}[ht]
