@@ -1,6 +1,11 @@
 \section{Data Overview}\label{subsec:data_overview}
 In this section, we provide an overview of the data used in this study.
+
 The ChemCam callibration data is stored in a directory structure as shown in Figure~\ref{fig:directory_structure}.
+As shown in the figure, the data used to train the ICA and PLS models are stored in two different directories, \texttt{ica} and \texttt{pls}, respectively, however many of the datasets are shared between the two models.
+For each sample, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
+Each dataset contains CCS data stored in a \texttt{.csv} file and a corresponding \texttt{.lbl} file containing metadata.
+We do not use the metadata in the \texttt{.lbl} files in this study.
 
 \begin{figure}
     \begin{forest}
@@ -65,12 +70,8 @@ The ChemCam callibration data is stored in a directory structure as shown in Fig
 \label{fig:directory_structure}
 \end{figure}
 
-As shown in the figure, the data used to train the ICA and PLS models are stored in two different directories, \texttt{ica} and \texttt{pls}, respectively, however many of the datasets are shared between the two models.
-For each sample, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
-Each dataset contains CCS data stored in a \texttt{.csv} file and a corresponding \texttt{.lbl} file containing metadata.
-We do not use the metadata in the \texttt{.lbl} files in this study.
-
-Each \texttt{.csv} file contains the following columns:
+Each \texttt{.csv} file represents a location on the sample that was shot at by the laser.
+They contain the following columns:
 
 \begin{itemize}
     \item \texttt{wave}: The wavelength of the spectral data measured in nanometers (nm).
@@ -79,7 +80,8 @@ Each \texttt{.csv} file contains the following columns:
     \item \texttt{mean}: The mean of the intensity measurements for each wavelength.
 \end{itemize}
 
-Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location in the \texttt{0.1tio2} directory.
+The rows in the location dataset represent which wavelength the intensity measurements were taken at.
+Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{0.1tio2} sample.
 
 \begin{table*}[ht]
 \centering
