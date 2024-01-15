@@ -109,7 +109,7 @@ However, there are some additional preprocessing steps that are unique to the IC
 
 In contrast to \citet{cleggRecalibrationMarsScience2017}, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
 The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities\cite{chemcam_instrument_suite}.
-For example, pixels located at the edge of a CCS usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
+For example, pixels located at the edge of the charge-coupled device (CCD)\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy.\cite{radionuclide_imaging}} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
 One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
 However, during a conversation with one of the original authors of \citet{cleggRecalibrationMarsScience2017}, criticism was raised against this.
 Specifically, the author pointed out that weighing by the inverse of the discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
