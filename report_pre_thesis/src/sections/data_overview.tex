@@ -1,1 +1,5 @@
 \section{Data Overview}\label{subsec:data_overview}
+
+For each target, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
+Each dataset contains CCS data stored in a \texttt{.csv} file, which is read into a Pandas dataframe\cite{pandas} using the \texttt{read\_csv} function.
+Because the CCS data includes several lines of header information, we skip these lines using the \texttt{skiprows} parameter.

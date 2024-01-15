@@ -8,25 +8,19 @@ Consequently, our pipeline is not identical to the original, but we have strived
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
-Section \ref{sec:shared_preprocessing} outlines the preprocessing steps common to both the PLS1-SM and ICA phases of the pipeline.
-In Section \ref{sec:methodology_pls1}, we focus on the specifics of the PLS1-SM phase, detailing its associated data preprocessing procedures.
-Section \ref{sec:methodology_ica} then details the ICA phase, including its unique data preprocessing steps.
+Section \ref{sec:methodology_pls1}, we focus on the specifics of the PLS1-SM phase, detailing its associated data preprocessing procedures.
+In Section \ref{sec:methodology_ica} then details the ICA phase, including its unique data preprocessing steps.
 Lastly, Section \ref{sec:methodology_moc} presents a description of the MOC phase of the pipeline.
 
-\subsection{Shared Preprocessing}\label{sec:shared_preprocessing}
-Similar to the original pipeline, we have used the samples from the ChemCam calibration dataset.
-Part of the data preprocessing is shared between the PLS1-SM and ICA phases of the pipeline.
-However, each phase also has its own preprocessing steps, which are described in sections \ref{sec:pls1_data_preprocessing} and \ref{sec:ica_data_preprocessing} respectively.
+\subsection{PLS1-SM}\label{sec:methodology_pls1}
+This section describes the PLS1-SM aspect of the pipeline.
 
-For each target, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
-Each dataset contains CCS data stored in a \texttt{.csv} file, which is read into a Pandas dataframe\cite{pandas} using the \texttt{read\_csv} function.
-Because the CCS data includes several lines of header information, we skip these lines using the \texttt{skiprows} parameter.
-We then remove the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017}.
-These first five shots are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
-Finally, we mask the edges of the spectral regions of the data to eliminate increased noise, especially in areas where small intensity changes lead to large variations in the calibrated signal.
+\subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
+We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
+Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
+Afterwards, we mask the edges of the spectral regions of the data to eliminate increased noise, especially in areas where small intensity changes lead to large variations in the calibrated signal.
 The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis.
 These regions are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm.
-% An illustration of these masked regions can be seen in figure \ref{fig:masked_regions}.
 An example of these masked regions for the \texttt{cadillac} target can be seen in figure \ref{fig:masked_regions}.
 
 \begin{figure}
@@ -36,28 +30,15 @@ An example of these masked regions for the \texttt{cadillac} target can be seen 
 	\label{fig:masked_regions}
 \end{figure}
 
+The dataframe is then transformed through a transpose operation, swapping the rows and columns.
+This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
+All negative values are then transformed into zeros since negative values are not physically possible.
+Given the pre-defined compositional ranges for each oxide in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out wavelengths outside of these ranges.
+The range is defined by an upper and a lower bound, and any wavelength outside of this range is removed.
 Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
 This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
 ICA and PLS-SM are then performed on each of these datasets separately.
 The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
-
-The pipeline for the shared preprocessing steps can be seen in figure \ref{fig:shared_preprocessing}.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.2675\textwidth]{images/shared_preprocessing.png}
-	\caption{The preprocessing steps shared by both the PLS1-SM and ICA phases of the pipeline.}
-	\label{fig:shared_preprocessing}
-\end{figure}
-
-\subsection{PLS1-SM}\label{sec:methodology_pls1}
-This section describes the PLS1-SM aspect of the pipeline.
-
-\subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
-After the shared preprocessing steps described in section \ref{sec:shared_preprocessing}, the data undergoes a further step of averaging.
-Recall that each target is shot at five different locations, and each location is shot at 50 times.
-As mentioned in section \ref{sec:shared_preprocessing}, the first five shots are removed, leaving 45 shots per location.
-For PLS1-SM, the 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
 
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
@@ -104,10 +85,12 @@ An illustration of the ICA phase of our pipeline can be seen in figure \ref{fig:
 \end{figure}
 
 \subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
-As previously mentioned, the shared preprocessing steps described in section \ref{sec:shared_preprocessing} are also used for the ICA phase.
-However, there are some additional preprocessing steps that are unique to the ICA phase and some differences to the original pipeline that we will describe here.
+For ICA, the first five shots are removed from the data.
+We then apply masking to the data to remove the same regions as in the PLS1-SM phase.
+Afterwards, we transform all negative values into zeros.
+Then we normalize the data using Norm1 and Norm3.
 
-In contrast to \citet{cleggRecalibrationMarsScience2017}, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
+In contrast to \citet{cleggRecalibrationMarsScience2017} however, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
 The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities\cite{chemcam_instrument_suite}.
 For example, pixels located at the edge of the charge-coupled device (CCD)\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy.\cite{radionuclide_imaging}} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
 One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
