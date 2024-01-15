@@ -6,7 +6,6 @@ import mlflow
 import numpy as np
 import pandas as pd
 import tqdm
-from scipy.optimize import curve_fit
 from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
@@ -29,23 +28,6 @@ MLFLOW_TRACKING_URI = env.get("MLFLOW_TRACKING_URI", "")
 
 if CALIB_DATA_PATH is None or CALIB_COMP_PATH is None or MLFLOW_TRACKING_URI is None:
     exit()
-
-
-def log_square_model(x, a, b):
-    return a * np.log(x**2) + b
-
-
-def exponential_model(x, a, b):
-    return a * np.exp(x) + b
-
-
-def geometric_model(x, a, b):
-    return a * np.sqrt(x) + b
-
-
-def parabolic_model(x, a, b):
-    return a * x**2 + b
-
 
 def main():
     ica_df_n1, compositions_df_n1 = get_train_data(num_components=8, norm=Norm.NORM_1)
@@ -143,19 +125,6 @@ def main():
 
             X_test = ica_test_n1 if norm == Norm.NORM_1 else ica_test_n3
             y_test = comp_test_n1[oxide] if norm == Norm.NORM_1 else comp_test_n3[oxide]
-
-            # if model_name == "Log-square":
-            #     params, params_covariance = curve_fit(
-            #         log_square_model, X_train, y_train
-            #     )
-            # if model_name == "Exponential":
-            #     params, params_covariance = curve_fit(
-            #         exponential_model, X_train, y_train
-            #     )
-            # elif model_name == "Geometric":
-            #     params, params_covariance = curve_fit(geometric_model, X_train, y_train)
-            # elif model_name == "Parabolic":
-            #     params, params_covariance = curve_fit(parabolic_model, X_train, y_train)
 
             if model_name == "Log-square":
                 X_train = np.log(X_train**2)
