@@ -6,13 +6,12 @@
     \label{fig:libs_data_processing}
 \end{figure}
 
-We illustrate the data processing and calibration steps for LIBS data leading to the derivation of Multivariate Oxide Composition (MOC) in Figure \ref{fig:libs_data_processing}. The MOC model is described in details by \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}, but we provide a brief overview here, which will serve as a foundation for the subsequent discussion of our work.
+In Figure \ref{fig:libs_data_processing} we illustrate the data processing and calibration steps for LIBS data leading to the derivation of Multivariate Oxide Composition (MOC). The MOC model is described in details by \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}, but we provide a brief overview here, which will serve as a foundation for the subsequent discussion of our work.
 
 \subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
 
-Since we do not consider the data preprocessing phase, we omit detailing the process. However, it is important to note that the preprocessing phase occurs before the data is fed into the MOC model.
 The resulting data format is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
-This format is a matrix of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength. An example of this data format is shown in Table~\ref{tab:example_data}. There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample. The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
+This format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength. An example of this data format is shown in Table~\ref{tab:example_data}. There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample. The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
 
 \begin{table}[ht]
 \centering
@@ -44,10 +43,36 @@ The optimal normalization technique is selected based on its efficacy in model p
 
 \subsubsection{Outlier Removal}\label{sec:outlier_removal}
 
-In their analysis, \citet{andersonImprovedAccuracyQuantitative2017} employed a methodical outlier removal process to enhance model accuracy in multivariate regression. To detect outliers, they utilized influence plots, leveraging statistical measures that reflect each data point's deviation from the model's predictions and their influence on the model due to their position in the predictor space.
+In their analysis, \citet{andersonImprovedAccuracyQuantitative2017} employed a methodical outlier removal process to enhance model accuracy in multivariate regression. To detect outliers, they utilized influence plots, employing statistical measures that reflect each data point's deviation from the model's predictions and their influence on the model due to their position in the predictor space. 
+In this context, the deviation, or the error, are known as residuals and the influence a data point has on the model is known as leverage.
+The application of the following equation to latent variables enables the computation of an observation leverages vector (\(h_t\)):
 
-% The process involves using influence plots, which display points by their spectral residual, or $Q$ statistic, and leverage, $h_{T}$. Leverage is computed as $h_{t} = \text{diag}\left[ t(t^{T}t)^{-1}t^{T} \right]$, reflecting the distance of an observation's predictors from those of other observations. High leverage points are prospective outliers with respect to independent variables. The relationship between leverage and Hotelling's $T^{2}$ statistic indicates that leverage can serve as a measure of spectral distance from the center of space defined by the latent variables of the model.
-% The residual $Q$ is a metric of fit, quantifying the sum of the squared differences between the observed spectrum $X$ and the model-reconstructed spectrum using scores $t$ and loadings $P$, with $e = X - tP'$ and $Q_{i} = e_{i}e_{i}'$. By marking each spectrum from the training dataset on an influence plot with coordinates based on leverage and residual $Q$, outliers stand out distinctly from the cloud of points either along the leverage, residual, or both axes.
+\begin{equation}
+    h_t = \text{diag}\left[ t(t^T t)^{-1} t^T \right]
+\end{equation}
+
+Where $t$ represents the PLS scores.
+Given that leverage quantifies the distance of each observation from the model's center, it can be interpreted as the square Mahalanobis distance — a measure of the distance of a point from the center of mass of points in multivariate space. 
+If the original data follows a multivariate normal distribution, the distances form a chi-squared distribution. Using this property, outliers can be detected using the chi-square test \cite{brereton_chi_2015}.
+The Mahalanobis distance is defined as follows:
+
+\begin{equation}
+    D_M(p)^2 = (p - \mu)^T \cdot \Sigma^{-1} (p - \mu)
+\end{equation}
+
+Where $p$ is the point in question, $\mu$ is the mean of the distribution and $\Sigma^{-1}$ is the inverse of the covariance matrix of the distribution, known as the precision matrix. 
+Variables exhibiting a high leverage score are indicative of predictors that deviate more significantly from the others, thereby have a greater influence on the model.
+The measure of model fit, denoted as $Q$, is calculated by squaring the differences between the actual spectrum $x$ and the spectrum predicted by the model. This prediction uses the model's scores $t$ and loadings ($P$) to calculate the residuals $e$:
+
+\begin{equation}
+    e = x - t \cdot P^T
+\end{equation}
+
+The fit of model for the $i$th observation is then computed by taking the residual vector $e_i$ and multiplying it by the transpose of itself $e^T$, which gives you the sum of squared differences: 
+
+\begin{equation}
+    Q_i = e_{i}e_{i}^T
+\end{equation} \cite{marini_chemometrics_2013} \citet{andersonImprovedAccuracyQuantitative2017}
 
 Outlier removal is performed iteratively; an initial PLS model is conceived with cross-validation to determine the optimum number of latent variables, followed by an inspection of the influence plot to pinpoint outliers. Identified outliers are removed, and the model is re-evaluated. This procedure is repeated as needed, ensuring that any removals do not degrade the model's general performance.
 
@@ -78,7 +103,10 @@ The exact delineations of the blending ranges are adjustable, with optimization 
 
 ICA yields independent source components and the affiliated mixing matrix which illustrates how the independent sources are combined to form the observed spectral data.
 
-After the extraction of independent components, the key task is to associate each independent component with a single elemental emission line. This involves examining the elements' emission lines and determining the ICA scores, which are then utilized to derive a calibration curve relating the ICA score to the composition.
+After extracting the independent components, the key task is to associate each independent component with a specific elemental emission line. 
+This process involves examining the emission lines of the elements and evaluating the ICA scores. 
+These scores reflect the correlation between each Independent Component and the entire spectrum of wavelengths. 
+Subsequently, these correlation values (ICA scores) are employed to establish a calibration curve, which correlates the ICA score to the elemental composition.
 
 To ascertain the accuracy of this calibration, a regression analysis is performed using multiple regression functions. The function that provides the most reliable fit (often assessed through chi-square values) is used to predict the composition for each element.
 
