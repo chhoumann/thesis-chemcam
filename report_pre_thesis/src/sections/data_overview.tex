@@ -72,6 +72,14 @@ We do not use the metadata in the \texttt{.lbl} files in this study.
 
 Each \texttt{.csv} file contains the following columns:
 
+\begin{itemize}
+    \item \texttt{wave}: The wavelength of the spectral data measured in nanometers (nm).
+    \item \texttt{shot1}, \texttt{shot2}, ..., \texttt{shot50}: The intensity measurement for each wavelength at the corresponding shot measured in photons/pulse/mm²/sr/nm.
+    \item \texttt{median}: The median of the intensity measurements for each wavelength.
+    \item \texttt{mean}: The mean of the intensity measurements for each wavelength.
+\end{itemize}
+
+Table \ref{fig:ccs_data_example} shows an example of the CCS data for the first sample in the \texttt{0.1tio2} directory.
 
 \begin{table*}[ht]
 \centering
@@ -86,6 +94,6 @@ $\vdots$  & $\vdots$     & $\vdots$ & $\cdots$ & $\vdots$ & $\vdots$ & $\vdots$ 
 905.57349 & 1.9527751e+10 & 2.4984806e+10 & $\cdots$ & 7.1648592e+09 & 6.0560959e+09 & 1.4299386e+10 & 2.7702141e+09 \\ 
 \bottomrule
 \end{tabular}
-\caption{Example of the structure of the \texttt{.csv} containing the CCS data.}
+\caption{Example of CCS data for the first sample in the \texttt{0.1tio2} directory.}
 \label{tab:ccs_data_example}
 \end{table*}
