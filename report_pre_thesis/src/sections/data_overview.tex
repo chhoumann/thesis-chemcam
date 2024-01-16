@@ -61,13 +61,7 @@ They contain the following columns:
     \item \texttt{mean}: The mean of the intensity measurements for each wavelength.
 \end{itemize}
 
-The rows in the location dataset represent which wavelength the intensity measurements were taken at.
-There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample.
-The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
-
-Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{0.1tio2} sample.
-
-\begin{table*}[ht]
+\begin{table*}[!b]
 \centering
 \begin{tabular}{rrrrrrrr}
 \toprule
@@ -83,6 +77,12 @@ $\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$
 \caption{Example of CCS data for the first sample in the \texttt{0.1tio2} directory.}
 \label{tab:ccs_data_example}
 \end{table*}
+
+The rows in the location dataset represent which wavelength the intensity measurements were taken at.
+There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample.
+The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
+
+Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{0.1tio2} sample.
 
 In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
 There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
