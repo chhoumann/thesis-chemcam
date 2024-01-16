@@ -21,11 +21,11 @@ from lib.outlier_removal import (
 from lib.reproduction import (
     major_oxides,
     masks,
+    optimized_blending_ranges,
     oxide_ranges,
     paper_individual_sm_rmses,
     spectrometer_wavelength_ranges,
     training_info,
-    optimized_blending_ranges,
 )
 from lib.utils import (
     custom_kfold_cross_validation,
@@ -53,7 +53,11 @@ preformatted_data_path = Path("./data/_preformatted_sm/")
 train_path = preformatted_data_path / "train.csv"
 test_path = preformatted_data_path / "test.csv"
 
-if not preformatted_data_path.exists():
+if (
+    not preformatted_data_path.exists()
+    or not train_path.exists()
+    or not test_path.exists()
+):
     take_samples = None
 
     logger.info("Loading data from location: %s", dataset_loc)
@@ -83,8 +87,8 @@ else:
     train_processed = pd.read_csv(train_path)
     test_processed = pd.read_csv(test_path)
 
-SHOULD_TRAIN = False
-SHOULD_PREDICT = True
+SHOULD_TRAIN = True
+SHOULD_PREDICT = False
 
 if SHOULD_TRAIN:
     k_folds = 4
@@ -118,6 +122,7 @@ if SHOULD_TRAIN:
                 train_processed, compositional_range, oxide, oxide_ranges
             )
 
+            # We don't do this anymore because we already have the split in train_test_split.csv
             # Separate 20% of the data for testing
             # train, test = custom_train_test_split(
             #     data_filtered,
@@ -343,14 +348,14 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    models = get_models(experiment_id='164614136207675379')
+    models = get_models(experiment_id="164614136207675379")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
         "data/data/PLS_SM/na.csv", index=False
     )
     count_pre_drop = len(test_processed)
-    test_processed.dropna(inplace=True, axis='index')
+    test_processed.dropna(inplace=True, axis="index")
     count_post_drop = len(test_processed)
 
     logger.warn(
@@ -409,7 +414,7 @@ if SHOULD_PREDICT:
             f.write(f"{oxide}: {rmsep}\n")
 
         target_predictions[oxide] = pred
-    
+
     target_predictions.to_csv(save_path / "tar_pred.csv")
 
 
