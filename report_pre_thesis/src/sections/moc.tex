@@ -11,28 +11,12 @@ In Figure \ref{fig:libs_data_processing} we illustrate the data processing and c
 \subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
 
 The resulting data format is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
-This format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength. An example of this data format is shown in Table~\ref{tab:example_data}. There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample. The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
-
-\begin{table}[ht]
-\centering
-\caption{Exemplary Data of Wavelengths and Shots}
-\label{tab:example_data}
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-\hline
-Wavelength & Shot 1   & Shot 2 & \ldots & Shot 50  \\ \hline
-240.81     & 6.40e+15 & 4.04e+15 & \ldots& 1.75e+15 \\ \hline
-240.86     & 3.85e+12 & 2.29e+12& \ldots & 7.28e+11 \\ \hline
-\ldots     & \ldots & \ldots & \ldots & \ldots \\ \hline
-905.38     & 1.88e+8 & 5.85e+7 & \ldots & 5.21e+9 \\ \hline
-905.57     & 1.98e+10 & 1.29e+10& \ldots & 1.22e+10 \\ \hline
-\end{tabular}
-\end{table}
-
-
+This format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength.
+We give a detailed description of the entire ChemCam calibration dataset in Section \ref{sec:data_overview}.
 
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
-
-The multivariate analysis employs a composite approach integrating partial least squares regression with submodels (PLS-SM) and independent component analysis (ICA) to derive the Multivariate Oxide Composition (MOC).
+The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Submodels (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
+The outcomes of these two techniques are merged using a weighted average for each oxide, with the weighting skewed in favor of the technique that demonstrates superior performance for the specific oxide.
 The PLS-SM approach utilizes tailored sub-models for distinct composition ranges, enhancing accuracy at the boundaries of these ranges.
 Independent Component Analysis assists in distinguishing elemental emission lines, contributing to a refined multivariate model.
 
@@ -91,7 +75,7 @@ PLS1-SM blends predictions from sub-models with overlapping concentration ranges
 \begin{align*}
 w_{\text{mid}} &= \frac{y_{\text{full}}-y_{\text{blend range, min}}}{y_{\text{blend range, max}} - y_{\text{blend range, min}}} \\
 w_{\text{low}} &= 1 - w_{\text{mid}} \\
-y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}} 
+y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}}
 \end{align*}
 
 This applies analogously for predictions in the "mid-high" range to prevent prediction discontinuities.
@@ -111,3 +95,7 @@ Subsequently, these correlation values (ICA scores) are employed to establish a 
 To ascertain the accuracy of this calibration, a regression analysis is performed using multiple regression functions. The function that provides the most reliable fit (often assessed through chi-square values) is used to predict the composition for each element.
 
 Model refinement is facilitated by techniques such as normalization, outlier removal (via Median Absolute Deviation), and k-fold cross-validation. These methods ensure the robustness and reliability of the predictive model constructed through ICA.
+
+% TODO: Add a paragraph about the IRF
+% "In simpler terms, the IRF in a spectrometer represents how the instrument's inherent characteristics alter the appearance of the spectral data it measures. By understanding and minimizing the IRF, scientists can obtain more accurate and precise spectroscopic data."
+% Source: https://www.sciencedirect.com/science/article/pii/S0022407304002523?via=ihub

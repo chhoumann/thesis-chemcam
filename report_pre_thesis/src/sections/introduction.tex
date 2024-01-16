@@ -18,7 +18,7 @@ Due to its capability for remote analysis, LIBS enables processesing of material
 
 LIBS is a versatile analytical tool with broad applicability across various other fields. In environmental monitoring, its spectral data are effectively used with machine learning and statistical methods like partial least squares and neural networks for detecting and quantifying soil pollutants. In industrial contexts, it is also utilized for quality control processes involving metals and alloys\cite{huang_progress_2023}.
 
-The ChemCam team uses an analytical system called the \textit{Multivariate Oxide Composition} (MOC) model to predict the composition of major oxides based on LIBS data from geological samples. 
+The ChemCam team uses an analytical system called the \textit{Multivariate Oxide Composition} (MOC) model to predict the composition of major oxides based on LIBS data from geological samples.
 The system is comprised of various components, each responsible for a specific task in predicting the composition of major oxides in geological samples.
 In this context, a 'component' refers to a distinct, isolatable process or model affecting the system's overall predictive function.
 The system utilizes a series of submodels to predict individual oxide concentrations, which are then combined with regression models that are based on ICA scores.
@@ -37,7 +37,7 @@ Enhancing the predictive accuracy and robustness of the MOC model is crucial for
 Accuracy, in this context, is measured as Root Mean Squared Error (RMSE).
 Robustness refers to the model's ability to handle the variations in the data.
 
-The challenges posed by the inherent complexities in interpreting LIBS spectra underscore the need for refinement of models like the MOC. 
+The challenges posed by the inherent complexities in interpreting LIBS spectra underscore the need for refinement of models like the MOC.
 Despite its current capabilities, the domain expert from the ChemCam team, emphasizes room for improvement in how the model handles data variability and predicts elemental compositions.
 
 \textit{In this work, we aim to solve the problem of identifying issues within the components of the current Multivariate Oxide Composition (MOC) model that limit its predictive accuracy and robustness, particularly in relation to matrix effects. Following this, we will propose improvements to the model's components that addresses these issues, thereby enhancing its overall accuracy and robustness.}
@@ -45,6 +45,6 @@ Despite its current capabilities, the domain expert from the ChemCam team, empha
 The remainder of this paper is organized as follows:
 Section~\ref{sec:background} sets the context, while Section~\ref{sec:related_works} reviews existing literature.
 The problem is formalized in Section~\ref{sec:definition}.
-We analyze ChemCam sample data in Section~\ref{subsec:data_analysis} and present our methodology in Section~\ref{sec:methodology}.
+We provide an overview of the ChemCam calibration data in Section~\ref{sec:data_overview} and present our methodology in Section~\ref{sec:methodology}.
 Results are reported in Section~\ref{sec:results} and discussed in Section~\ref{sec:discussion}.
 We conclude on our findings in Section~\ref{sec:conclusion} and suggest future research directions in Section~\ref{sec:recommendations_for_future_work}.
