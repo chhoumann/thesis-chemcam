@@ -145,9 +145,6 @@ def main():
             pred = models[oxide].predict(X_test)
             rmse = np.sqrt(mean_squared_error(y_test, pred))
 
-            print(X_test.columns)
-            print(X_test.shape, y_test.shape, pred.shape)
-
             oxide_rmses[oxide] = rmse
 
             oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
