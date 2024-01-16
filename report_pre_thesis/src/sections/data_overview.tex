@@ -70,17 +70,19 @@ Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first 
 \centering
 \begin{tabular}{rrrrrrrr}
 \toprule
-     wave &        shot1 &      shot2 &      $\cdots$ &       shot49 &       shot50 & median & mean \\
+     wave &         shot1 &         shot2 &  $\cdots$ &        shot49 &       shot50  & median        & mean          \\
 \midrule
-241.66901 & 2.820443e+11 & 1.3349191e+16 & $\cdots$ & 9.3383243e+15 & 9.4850282e+15 & 9.6073916e+15 & 1.0412862e+16 \\
-241.72301 & 3.279678e+11 & 3.9035181e+12 & $\cdots$ & 3.5982364e+12 & 4.7538387e+12 & 2.9107688e+12 & 3.2675139e+12 \\
-$\vdots$  & $\vdots$     & $\vdots$ & $\cdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
-905.38062 & 9.2772428e+09 & 1.1861747e+10 & $\cdots$ & 3.4135089e+09 & 2.8770024e+09 & 6.7861770e+09 & 1.7767384e+09 \\
-905.57349 & 1.9527751e+10 & 2.4984806e+10 & $\cdots$ & 7.1648592e+09 & 6.0560959e+09 & 1.4299386e+10 & 2.7702141e+09 \\
+241.66901 & 2.820443e+11  & 1.3349191e+16 & $\cdots$  & 9.3383243e+15 & 9.4850282e+15 & 9.6073916e+15 & 1.0412862e+16 \\
+241.72301 & 3.279678e+11  & 3.9035181e+12 & $\cdots$  & 3.5982364e+12 & 4.7538387e+12 & 2.9107688e+12 & 3.2675139e+12 \\
+$\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$      & $\vdots$      & $\vdots$      \\
+905.38062 & 9.2772428e+09 & 1.1861747e+10 & $\cdots$  & 3.4135089e+09 & 2.8770024e+09 & 6.7861770e+09 & 1.7767384e+09 \\
+905.57349 & 1.9527751e+10 & 2.4984806e+10 & $\cdots$  & 7.1648592e+09 & 6.0560959e+09 & 1.4299386e+10 & 2.7702141e+09 \\
 \bottomrule
 \end{tabular}
 \caption{Example of CCS data for the first sample in the \texttt{0.1tio2} directory.}
 \label{tab:ccs_data_example}
 \end{table*}
 
-% TODO: Describe the ccam_calibration_compositions.csv file.
+In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
+There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
+For each major oxide, the ground truth data contains how much of the oxide is present in the sample as a percentage.
