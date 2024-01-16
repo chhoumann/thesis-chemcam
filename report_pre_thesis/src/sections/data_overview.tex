@@ -85,6 +85,19 @@ Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first 
 As can be seen in the table, the second final row of the \texttt{cadillac} sample contains negative values, which is not physically possible.
 These negative values represent noise and are a result of the processing step that is applied to the EDR data to remove the background noise during transformation to RDR data, which is illustrated in Figure~\ref{fig:libs_data_processing}.
 
+Figure \ref{fig:masked_regions} shows a spectral plot of the CCS data for the \texttt{cadillac} sample.
+Note how it comprises of three different spectral regions - ultra-violet (UV), violet (VIO), and visible and near infrared (VNIR).
+For each of these regions, separate instruments are used.
+Consequently, the edges of the spectral regions are noisy because pixels at the edges of the CCD\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy.\cite{radionuclide_imaging}} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
+These regions are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm and are highlighted in blue in Figure~\ref{fig:masked_regions}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/masked_regions.png}
+	\caption{Spectral plot of the CCS data for the \texttt{cadillac} sample. The blue regions represent the noisy edges of the spectral regions.}
+	\label{fig:masked_regions}
+\end{figure}
+
 In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
 There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
 For each of these oxides, the data specifies their respective concentrations in each sample, expressed as a weight percentage (wt. \%) of the total composition.
