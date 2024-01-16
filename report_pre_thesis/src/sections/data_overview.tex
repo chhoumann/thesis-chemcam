@@ -1,11 +1,12 @@
 \section{Data Overview}\label{sec:data_overview}
-The ChemCam calibration data is stored in a directory structure as shown in Figure~\ref{fig:directory_structure}.
+For calibrating the ChemCam instrument, the ChemCam team has collected a large amount of data from a variety of samples on Earth\cite{wiensPreFlight3}.
+This data is stored in a directory structure as shown in Figure~\ref{fig:directory_structure}.
 As illustrated in the figure, the datasets for training the ICA and PLS models are located in the \texttt{ica} and \texttt{pls} directories, respectively, with several datasets common to both.
 For each sample, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
 Each dataset contains CCS data stored in a \texttt{.csv} file.
 
-\begin{figure}
-    \scalebox{0.8}{% Scale down to 75%
+\begin{figure}[ht]
+    \scalebox{0.8}{
     \begin{forest}
         for tree={
             font=\ttfamily,
@@ -85,4 +86,4 @@ $\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$
 
 In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
 There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
-For each major oxide, the ground truth data contains how much of the oxide is present in the sample as a percentage.
+For each of these oxides, the data specifies their respective concentrations in each sample, expressed as a percentage of the total composition.
