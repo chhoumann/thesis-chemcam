@@ -31,7 +31,7 @@ ICA and PLS-SM are then performed on each of these datasets separately.
 The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 
 \subsubsection{PLS1-SM Regression}
-As previously mentioned in Section~\ref{sec:introduction}, the PLS aspect of the pipeline follows a submodel approach to make oxide predictions.
+The PLS phase of the pipeline follows a submodel approach to make wt. \% predictions for each oxide, as previously mentioned in Section~\ref{sec:introduction}.
 A PLS model is trained on all the data to make an initial prediction for each oxide.
 This model is referred to as the \textit{full model}.
 Based on the full model's initial predictions, each prediction is then "binned" into one of five concentration ranges.
