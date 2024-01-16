@@ -87,8 +87,8 @@ else:
     train_processed = pd.read_csv(train_path)
     test_processed = pd.read_csv(test_path)
 
-SHOULD_TRAIN = True
-SHOULD_PREDICT = False
+SHOULD_TRAIN = False
+SHOULD_PREDICT = True
 
 if SHOULD_TRAIN:
     k_folds = 4
@@ -170,7 +170,7 @@ if SHOULD_TRAIN:
 
                 outlier_removal_iterations = 0
                 pls_OR = PLSRegression(n_components=n_components)
-                drop_cols = major_oxides + ["Sample Name"]
+                drop_cols = major_oxides + ["Sample Name", "ID"]
                 X_train_OR = train.drop(columns=drop_cols).to_numpy()
                 y_train_OR = train[oxide].to_numpy()
 
@@ -348,7 +348,7 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    models = get_models(experiment_id="164614136207675379")
+    models = get_models(experiment_id="662227889769696275")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
@@ -365,9 +365,9 @@ if SHOULD_PREDICT:
     )
 
     Y = test_processed[major_oxides]
-    drop_cols = major_oxides + ["Sample Name"]
+    drop_cols = major_oxides + ["Sample Name", "ID"]
 
-    target_predictions = pd.DataFrame(test_processed["Sample Name"])
+    target_predictions = pd.DataFrame(test_processed[["Sample Name", "ID"]])
 
     n1_scaler = Norm1Scaler(reshaped=True)
     n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
