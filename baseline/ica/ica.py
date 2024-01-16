@@ -25,6 +25,7 @@ env = dotenv.dotenv_values(dotenv.find_dotenv())
 CALIB_DATA_PATH = env.get("DATA_PATH", "")
 CALIB_COMP_PATH = env.get("COMPOSITION_DATA_PATH", "")
 MLFLOW_TRACKING_URI = env.get("MLFLOW_TRACKING_URI", "")
+TEST = True
 
 if CALIB_DATA_PATH is None or CALIB_COMP_PATH is None or MLFLOW_TRACKING_URI is None:
     exit()
@@ -166,7 +167,6 @@ def main():
 
 def get_train_data(num_components: int, norm: Norm) -> (pd.DataFrame, pd.DataFrame):
     calib_data_path = Path(CALIB_DATA_PATH)
-    TEST = True
     output_dir = Path(f"./data/data/jade/ica/norm{norm.value}{'-test' if TEST else ''}")
 
     ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
