@@ -11,24 +11,8 @@ In Figure \ref{fig:libs_data_processing} we illustrate the data processing and c
 \subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
 
 The resulting data format is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
-This format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength. An example of this data format is shown in Table~\ref{tab:example_data}. There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample. The number of shots taken for each sample can vary, but is typically between $15$ and $50$.
-
-\begin{table}[ht]
-\centering
-\caption{Exemplary Data of Wavelengths and Shots}
-\label{tab:example_data}
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-\hline
-Wavelength & Shot 1   & Shot 2 & \ldots & Shot 50  \\ \hline
-240.81     & 6.40e+15 & 4.04e+15 & \ldots& 1.75e+15 \\ \hline
-240.86     & 3.85e+12 & 2.29e+12& \ldots & 7.28e+11 \\ \hline
-\ldots     & \ldots & \ldots & \ldots & \ldots \\ \hline
-905.38     & 1.88e+8 & 5.85e+7 & \ldots & 5.21e+9 \\ \hline
-905.57     & 1.98e+10 & 1.29e+10& \ldots & 1.22e+10 \\ \hline
-\end{tabular}
-\end{table}
-
-
+This format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength.
+We give a detailed description of the entire ChemCam calibration dataset in Section \ref{sec:data_overview}.
 
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
 The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Submodels (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
