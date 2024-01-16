@@ -31,27 +31,32 @@ ICA and PLS-SM are then performed on each of these datasets separately.
 The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 
 \subsubsection{PLS-SM Regression}
-As mentioned in the \ref{sec:introduction} the PLS aspect of the pipeline utilizes a submodel approach to make oxide predictions. 
-It is structured such that each of the eight oxides in consideration will have either three or four, corresponding PLS models. 
-The core concept being that a PLS model, referred to as the \texttt{full model}, will be responsible for making an initial prediction for each oxide and in this case, eight initial predictions will be made. 
-In similar fashion to the full model, each oxide also has a set of corresponding PLS model, referred to as the \texttt{submodels} and each submodel will be specialized to make predictions based on the concentration of a given oxide as predicted by the full model.
-The submodels are specialized 
-
-
-
-
 % Describe full model into submodel
 % Describe filter data by composition ranges (wt% ranges) - Also the adjustments made
+% Load all models (full, low, mid, high) for each oxide
+% Make full model prediction
+% Using blending configuration, calculate weights and then return weighted blend
+As mentioned in the \ref{sec:introduction} the PLS aspect of the pipeline utilizes a submodel approach to make oxide predictions.
+It is structured such that each of the eight oxides in consideration will have either three or four, corresponding PLS models.
+The core concept being that a PLS model, referred to as the \textit{full model}, will be responsible for making an initial prediction for each oxide and in this case, eight initial predictions will be made.
+In similar fashion to the full model, each oxide also has a set of corresponding PLS model, referred to as the \textit{submodels} and each submodel will be specialized to make predictions based on the concentration of a given oxide as predicted by the full model.
+The submodels are specialized in either low, low-mid, mid, mid-high, high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
+If the full model predicts a concentration that falls within low-mid or mid-high, the blending approach described in Section~\ref{sec:pls_submodels} is used to combine the predictions from the corresponding submodels.
+
+The training of the models follows the same approach as described in \citet{andersonImprovedAccuracyQuantitative2017}.
+However, assumptions have been made regarding the k-fold cross-validation process, as the authors are ambiguous in their description of the number of folds used.
+We interpreted their description as using a 20\% holdout split and a 4-fold on the remaining 80\% of the data --- resulting in a total of 5 folds.
+Furthermore, we have decided to automate outlier removal as described in Section~\ref{methodology_outlier_removal} rather than performing it manually.
+Finally, similar hyperparameters have been used for the PLS models as described in \citet{andersonImprovedAccuracyQuantitative2017}.
+
+% TODO: Describe training of PLS-SM:
 % Describe k-fold
-% Describe train test split 
+% Describe train test split
 % (Maybe) describe influence plots
 % Explain prediction setup - including outlier removal process
 % Hyperparameters for PLS - Same as authors
-%Load all models (full, low, mid, high) for each oxide
-%Make full model prediction
-%Using blending configuration, calculate weights and then return weighted blend
 
-\subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
+\subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}\label{sec:methodology_outlier_removal}
 % General programming language differences and implementation details
 % Differences in outlier detection (automatic/quantitative vs manual/qualitative)
 % Missing information about how three of the oxides are weighted in MOC result
