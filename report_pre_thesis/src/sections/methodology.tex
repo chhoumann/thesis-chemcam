@@ -41,12 +41,25 @@ ICA and PLS-SM are then performed on each of these datasets separately.
 The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 
 \subsubsection{PLS-SM Regression}
+As mentioned in the \ref{sec:introduction} the PLS aspect of the pipeline utilizes a submodel approach to make oxide predictions. 
+It is structured such that each of the eight oxides in consideration will have either three or four, corresponding PLS models. 
+The core concept being that a PLS model, referred to as the \texttt{full model}, will be responsible for making an initial prediction for each oxide and in this case, eight initial predictions will be made. 
+In similar fashion to the full model, each oxide also has a set of corresponding PLS model, referred to as the \texttt{submodels} and each submodel will be specialized to make predictions based on the concentration of a given oxide as predicted by the full model.
+The submodels are specialized 
+
+
+
+
 % Describe full model into submodel
 % Describe filter data by composition ranges (wt% ranges) - Also the adjustments made
 % Describe k-fold
 % Describe train test split 
 % (Maybe) describe influence plots
 % Explain prediction setup - including outlier removal process
+% Hyperparameters for PLS - Same as authors
+%Load all models (full, low, mid, high) for each oxide
+%Make full model prediction
+%Using blending configuration, calculate weights and then return weighted blend
 
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
 % General programming language differences and implementation details
