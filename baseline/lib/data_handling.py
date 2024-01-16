@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict
 
 from lib.reproduction import folder_to_composition_sample_name
 
@@ -35,10 +35,10 @@ def get_dataset_frame(dataset_path):
         # read csv from that line - columns also start wih "#"
         return pd.read_csv(dataset_path, skiprows=target - 1)
 
- 
+
 def get_preprocessed_sample_data(
     sample_name: str, data_path: Path, average_shots=True
-) -> list[pd.DataFrame]:
+) -> Dict[str, pd.DataFrame]:
     """
     Get preprocessed sample data.
 
@@ -56,7 +56,7 @@ def get_preprocessed_sample_data(
     wavelengths = pd.Series(dtype="float64")
 
     sample_dataset_paths = get_location_dataset_paths_for_sample(sample_name, data_path)
-    sample_spectra = []
+    sample_spectra = {}
 
     for i, sample_set in enumerate(sample_dataset_paths):
         df = get_dataset_frame(sample_set)
@@ -84,7 +84,7 @@ def get_preprocessed_sample_data(
             df.drop(shot_cols, axis=1, inplace=True)
             df.insert(1, "shot_avg", shot_avg)
 
-        sample_spectra.append(df)
+        sample_spectra[sample_set.stem] = df
 
     return sample_spectra
 
@@ -93,7 +93,7 @@ def load_data(
     dataset_loc: str,
     num_samples: Optional[int] = None,
     average_shots=True,
-) -> dict[str, list[pd.DataFrame]]:
+) -> Dict[str, Dict[str, pd.DataFrame]]:
     """
     Load data from the specified dataset location.
 
@@ -108,7 +108,7 @@ def load_data(
     a location on the sample.
     """
 
-    sample_data: dict[str, list[pd.DataFrame]] = {}
+    sample_data: Dict[str, Dict[str, pd.DataFrame]] = {}
     data_path = Path(dataset_loc).resolve(strict=True)
     sample_names = [f.name for f in data_path.iterdir() if f.is_dir()]
 
@@ -422,7 +422,7 @@ class CustomSpectralPipeline:
 
         return final_df
 
-    def fit_transform(self, sample_data: dict[str, list[pd.DataFrame]]):
+    def fit_transform(self, sample_data: dict[str, Dict[str, pd.DataFrame]]):
         """
         Fit and transform the sample data.
 
