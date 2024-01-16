@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Optional
 
+from lib.reproduction import folder_to_composition_sample_name
+
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from tqdm import tqdm
@@ -33,7 +35,7 @@ def get_dataset_frame(dataset_path):
         # read csv from that line - columns also start wih "#"
         return pd.read_csv(dataset_path, skiprows=target - 1)
 
-
+ 
 def get_preprocessed_sample_data(
     sample_name: str, data_path: Path, average_shots=True
 ) -> list[pd.DataFrame]:
@@ -88,7 +90,9 @@ def get_preprocessed_sample_data(
 
 
 def load_data(
-    dataset_loc: str, num_samples: Optional[int] = None, average_shots=True
+    dataset_loc: str,
+    num_samples: Optional[int] = None,
+    average_shots=True,
 ) -> dict[str, list[pd.DataFrame]]:
     """
     Load data from the specified dataset location.
@@ -116,6 +120,33 @@ def load_data(
         )
 
     return sample_data
+
+
+def load_split_data(dataset_loc: str, split_loc: str, average_shots=True):
+    sample_data = load_data(dataset_loc, average_shots=average_shots)
+
+    train_test_split_path = Path(split_loc)
+
+    if not train_test_split_path.exists():
+        raise ValueError(f"Could not find train/test split at {split_loc}")
+
+    train_test_split_df = pd.read_csv(train_test_split_path)
+
+    train_samples = train_test_split_df.loc[
+        train_test_split_df["train_test"] == "train"
+    ]["sample_name"].to_list()
+    test_samples = train_test_split_df.loc[train_test_split_df["train_test"] == "test"][
+        "sample_name"
+    ].to_list()
+
+    train_sample_data = {
+        sample_name: sample_data[sample_name] for sample_name in train_samples
+    }
+    test_sample_data = {
+        sample_name: sample_data[sample_name] for sample_name in test_samples
+    }
+
+    return train_sample_data, test_sample_data
 
 
 class WavelengthMaskTransformer(BaseEstimator, TransformerMixin):
@@ -284,7 +315,9 @@ class CompositionData:
         return pd.read_csv(composition_data_loc)
 
     def get_composition_for_sample(self, sample_name) -> pd.DataFrame:
-        sample_name_lower = sample_name.lower()
+        _sample_name = folder_to_composition_sample_name.get(sample_name, sample_name)
+
+        sample_name_lower = _sample_name.lower()
         match_condition = (
             (self.composition_data["Spectrum Name"].str.lower() == sample_name_lower)
             | (self.composition_data["Target"].str.lower() == sample_name_lower)
