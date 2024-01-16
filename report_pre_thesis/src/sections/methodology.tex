@@ -1,18 +1,185 @@
 \section{Methodology}\label{sec:methodology}
-Method / Our Contribution (Detailed main part of the story, or how the analysis was done)
+As part of our goal to evaluate the performance of each of the components in the pipeline, the first step was to create a replica of the original pipeline described by \citet{cleggRecalibrationMarsScience2017}
+Since we did not have access to the original source code implementing the pipeline, we have replicated it at accurately as we could based on the available information.
+We have had to make some assumptions due to insufficient information regarding some components, which we detail in this section.
+In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors --- something we cannot do because we are not domain experts.
+Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible.
 
-\textit{Recreate the current model. Reproduce the results of the original papers. Investigate the limitations of the model and propose improvements.}
+This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
+Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
-% This section explains how the research was conducted.
-% - Purpose: To detail the experiments, algorithms, and data sets used, enabling reproducibility.
-% - Subsections: Can include Experiment Design, Algorithm Descriptions, Data Sources, and Evaluation Metrics.
-% - Best Practices: Be explicit about every aspect of your methodology, including any limitations.
+Section \ref{sec:methodology_pls1}, we focus on the specifics of the PLS1-SM phase, detailing its associated data preprocessing procedures.
+In Section \ref{sec:methodology_ica} then details the ICA phase, including its unique data preprocessing steps.
+Lastly, Section \ref{sec:methodology_moc} presents a description of the MOC phase of the pipeline.
 
-% Research Design
-% - Overall plan for conducting the study
-% Data Collection Methods
-% - Description of how data was collected
-% Algorithms and Models
-% - Detailed explanation of algorithms, models, or frameworks used
-% Evaluation Criteria
-% - Metrics used to evaluate the outcomes
+\subsection{PLS1-SM}\label{sec:methodology_pls1}
+This section describes the PLS1-SM aspect of the pipeline.
+
+\subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
+We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
+Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
+Afterwards, we mask the edges of the spectral regions of the data to eliminate increased noise, especially in areas where small intensity changes lead to large variations in the calibrated signal.
+The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
+These regions are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm.
+An example of these masked regions for the \texttt{cadillac} sample can be seen in figure \ref{fig:masked_regions}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/masked_regions.png}
+	\caption{The masked regions of the spectral data for the \texttt{cadillac} sample.}
+	\label{fig:masked_regions}
+\end{figure}
+
+The dataframe is then transformed through a transpose operation, swapping the rows and columns.
+This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
+All negative values are then transformed into zeros since negative values are not physically possible.
+Given the pre-defined compositional ranges for each oxide in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out wavelengths outside of these ranges.
+The range is defined by an upper and a lower bound, and any wavelength outside of this range is removed.
+Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
+This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
+ICA and PLS-SM are then performed on each of these datasets separately.
+The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
+
+\subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}
+% General programming language differences and implementation details
+% Differences in outlier detection (automatic/quantitative vs manual/qualitative)
+% Missing information about how three of the oxides are weighted in MOC result
+% No manual cross validation in PLS
+% Holdout split 80/20
+% No inverse IRF weighing weighting in ICA
+% Missing information about outlier removal in ICA - therefore we decided to not do it
+% Missing information about how ICA uses each of the five datasets for each target
+% How we do regression in ICA (since there are not enough details about it in the papers)
+
+As mentioned in section \ref{sec:outlier_removal}, if the Mahalanobis distances can be shown to follow a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
+Since we do not have the expertise to make a qualitative assessment of the outliers, we have instead decided to use this property of the Mahalanobis distances to automatically detect outliers.
+This works by computing the Mahalanobis distance for each data point in the training set, followed by a comparison of these distances against a chi-squared distribution.
+A data point is classified as an outlier if its Mahalanobis distance corresponds to a chi-squared statistic that exceeds the critical value of the chi-squared distribution, which is determined by the specified degrees of freedom $\nu$.
+The critical value is determined by the significance level $\alpha$ and $\nu$.
+Since we have leverage and spectral residuals as our two dimensions, we have $\nu = 2$, because the number of dimensions is equal to the number of degrees of freedom\cite{aggarwal_outlier_2017}.
+% TODO: Describe why we chose the degrees of freedom we did, and how we used this chi-squared test to determine outliers.
+
+The outlier removal process is done iteratively because of the phenomenon described in \citet{cleggRecalibrationMarsScience2017} where removing outliers can cause new outliers to appear.
+The process is as follows:
+\begin{enumerate}
+    \item Compute the Mahalanobis distances for each sample in the training set.
+    \item Determine chi-squared statistics for these distances.
+    \item Eliminate outliers exceeding the chi-squared critical value.
+    \item Train a new model on the remaining samples.
+    \item Repeat until model no longer improves as measured by the RMSE.
+\end{enumerate}
+
+It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
+This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
+
+\subsection{ICA}\label{sec:methodology_ica}
+The ICA phase in our pipeline can be seen in figure \ref{fig:ica_data}.
+In this section, we delve into the differences between our pipeline and the original, and we discuss the rationale behind our choices.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.2675\textwidth]{images/ica_data.png}
+	\caption{The ICA phase in our recreation of the pipeline.}
+	\label{fig:ica_data}
+\end{figure}
+
+\subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
+For ICA, the first five shots are removed from the data.
+We then apply masking to the data to remove the same regions as in the PLS1-SM phase.
+Afterwards, we transform all negative values into zeros.
+Then we normalize the data using Norm1 and Norm3.
+
+In contrast to \citet{cleggRecalibrationMarsScience2017} however, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
+The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities\cite{chemcam_instrument_suite}.
+For example, pixels located at the edge of the charge-coupled device (CCD)\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy.\cite{radionuclide_imaging}} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
+One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
+However, during a conversation with one of the original authors of \citet{cleggRecalibrationMarsScience2017}, criticism was raised against this.
+Specifically, the author pointed out that weighing by the inverse of the discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
+If the same instrument were used for all analyses, one could argue that the IRF (apart from the inverse square law correction) part is irrelevant, but that is not the case here; there are two different instruments --- one in Los Alamos and one on Mars.
+Based on these considerations, we have decided to not weigh by the inverse of the IRF.
+
+In addition, because \citet{cleggRecalibrationMarsScience2017} does not mention how each of the five location datasets are used for each sample, we have decided to only use one for each sample.
+This likely does not produce as accurate results as using all five location datasets would, since we do not get a full representation of the sample that was shot at by the laser, instead only getting a partial representation from a single location.
+Nevertheless, to avoid deviating significantly from \citet{cleggRecalibrationMarsScience2017}'s methodology or making unfounded assumptions about their data processing, we have opted for this more conservative approach.
+Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
+
+Similarly, in our replica of the pipeline, we have not incorporated outlier detection in the ICA part of the pipeline primarily because \citet{cleggRecalibrationMarsScience2017} does not describe their implementation sufficiently enough for replication without unsubstantiated assumptions.
+They mention the use of Median Absolute Deviation for this purpose, but the specifics of their approach remain unclear.
+Our decision to omit outlier detection in the ICA phase of our pipeline is also influenced by a preference for retaining a more comprehensive dataset, despite the potential inclusion of outliers.
+Further supporting this decision is input from one of the original authors involved in the ChemCam project.
+This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low presence of significant outliers.
+While it would be ideal to include outlier detection in the ICA phase to ensure alignment with the original pipeline, implementing it based on substantial assumptions would be counterproductive, potentially compromising the integrity of our analysis.
+
+After examining the results in section \ref{sec:results}, we will discuss the implications of these design choices in section \ref{sec:discussion}.
+
+\subsubsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
+After preprocessing the data, we are ready to perform ICA.
+This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE) algorithm, which is used to calculate the mixing matrix.
+This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
+By taking the product of the mixing matrix and the normalized data, we get the estimated sources.
+This new matrix is an $M \times P$ matrix, where $M$ is the number of independent components, and $P$ is the number of wavelengths.
+
+After performing ICA, we post-process by computing the correlation between the independent components and the wavelengths.
+Using this, we can identify which wavelengths are associated with which independent components by computing the maximum correlation for each wavelength.
+This gives us a matrix of ICA scores that we then use for regression.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.45\textwidth]{images/ica_regression.png}
+	\caption{Regression in the ICA phase of our recreation of the pipeline.}
+	\label{fig:ica_regression}
+\end{figure}
+
+The regression process is illustrated in figure \ref{fig:ica_regression}.
+\citet{cleggRecalibrationMarsScience2017} perform four more types of regression in addition to linear regression, namely parabolic, exponential, geometric and logsquare.
+For each oxide, they used the type of regression and normalization that produced the best results.
+
+We use Linear Regression for all oxides and instead transform the data to fit the model similar to \citet{kuo_detecting_2018}.
+Initially, it might appear limiting, but by applying transformations to the features --— for example by taking logs, square roots, etc. --- it's possible to achieve an almost linear relationship with the target variable.
+
+% TODO: Move this table to the results section and embed our own results in it as well to show the baseline results compared to the original results.
+% This can be seen in table \ref{tab:regression_types}, which is taken from \citet{cleggRecalibrationMarsScience2017}.
+
+% \begin{table}[h]
+% \centering
+% \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccc}
+% \toprule
+
+% Element & Norm & Law type    & RMS \\ \midrule
+% Si      & 1    & Logsqaure   & 6.7 \\
+% Ti      & 3    & Geometric   & 0.6 \\
+% Al      & 3    & Geometric   & 4.4 \\
+% Fe      & 1    & Geometric   & 2.2 \\
+% Mg      & 1    & Exponential & 3.0 \\
+% Ca      & 1    & Parabolic   & 1.0 \\
+% Na      & 3    & Parabolic   & 0.6 \\
+% K       & 3    & Geometric   & 0.4 \\
+% \bottomrule
+% \end{tabular*}
+% \caption{The summary of each ICA model characteristics from \citet{cleggRecalibrationMarsScience2017}.}
+% \label{tab:regression_types}
+% \end{table}
+
+\subsection{MOC}\label{sec:methodology_moc}
+As described in section \ref{sec:moc_derivation}, the result of the PLS1-SM and ICA are combined to produce the final MOC model, which weights the results of the two techniques in favor of the one that performs best for each oxide.
+The specific weights used for each oxide can be seen in table \ref{tab:weighted_sum_oxide}.
+Note that the weights for Ti, Mg and Ca have been set to 50/50 since \citet{cleggRecalibrationMarsScience2017} does not mention the weights they used for these elements.
+
+\begin{table}[h]
+\centering
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc}
+\toprule
+Element  & PLS1-SM (\%) & ICA (\%) \\ \midrule
+Al       & 75           & 25      \\
+Fe       & 75           & 25      \\
+Si       & 50           & 50      \\
+Na       & 40           & 60      \\
+K2       & 25           & 75      \\
+Ti*      & 50           & 50      \\
+Mg*      & 50           & 50      \\
+Ca*      & 50           & 50      \\
+\bottomrule
+\end{tabular*}
+\caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citet{cleggRecalibrationMarsScience2017}}
+\label{tab:weighted_sum_oxide}
+\end{table}

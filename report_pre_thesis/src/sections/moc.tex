@@ -31,8 +31,8 @@ Wavelength & Shot 1   & Shot 2 & \ldots & Shot 50  \\ \hline
 
 
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
-
-The multivariate analysis employs a composite approach integrating partial least squares regression with submodels (PLS-SM) and independent component analysis (ICA) to derive the Multivariate Oxide Composition (MOC).
+The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Submodels (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
+The outcomes of these two techniques are merged using a weighted average for each oxide, with the weighting skewed in favor of the technique that demonstrates superior performance for the specific oxide.
 The PLS-SM approach utilizes tailored sub-models for distinct composition ranges, enhancing accuracy at the boundaries of these ranges.
 Independent Component Analysis assists in distinguishing elemental emission lines, contributing to a refined multivariate model.
 
@@ -91,7 +91,7 @@ PLS1-SM blends predictions from sub-models with overlapping concentration ranges
 \begin{align*}
 w_{\text{mid}} &= \frac{y_{\text{full}}-y_{\text{blend range, min}}}{y_{\text{blend range, max}} - y_{\text{blend range, min}}} \\
 w_{\text{low}} &= 1 - w_{\text{mid}} \\
-y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}} 
+y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}}
 \end{align*}
 
 This applies analogously for predictions in the "mid-high" range to prevent prediction discontinuities.
@@ -111,3 +111,7 @@ Subsequently, these correlation values (ICA scores) are employed to establish a 
 To ascertain the accuracy of this calibration, a regression analysis is performed using multiple regression functions. The function that provides the most reliable fit (often assessed through chi-square values) is used to predict the composition for each element.
 
 Model refinement is facilitated by techniques such as normalization, outlier removal (via Median Absolute Deviation), and k-fold cross-validation. These methods ensure the robustness and reliability of the predictive model constructed through ICA.
+
+% TODO: Add a paragraph about the IRF
+% "In simpler terms, the IRF in a spectrometer represents how the instrument's inherent characteristics alter the appearance of the spectral data it measures. By understanding and minimizing the IRF, scientists can obtain more accurate and precise spectroscopic data."
+% Source: https://www.sciencedirect.com/science/article/pii/S0022407304002523?via=ihub
