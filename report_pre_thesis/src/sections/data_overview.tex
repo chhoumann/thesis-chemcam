@@ -66,14 +66,14 @@ They contain the following columns:
 \toprule
      wave &         shot1 &         shot2 &  $\cdots$ &        shot49 &       shot50  & median        & mean          \\
 \midrule
-241.66901 & 2.820443e+11  & 1.3349191e+16 & $\cdots$  & 9.3383243e+15 & 9.4850282e+15 & 9.6073916e+15 & 1.0412862e+16 \\
-241.72301 & 3.279678e+11  & 3.9035181e+12 & $\cdots$  & 3.5982364e+12 & 4.7538387e+12 & 2.9107688e+12 & 3.2675139e+12 \\
+240.81100 & 6.4026649e+15 & 4.0429349e+15 & $\cdots$  & 1.7922483e+15 & 1.7126615e+15 & 1.9892956e+15 & 1.7561699e+15 \\
+240.86501 & 3.8557462e+12 & 2.2923680e+12 & $\cdots$  & 1.1355429e+12 & 8.6930379e+11 & 7.8172542e+11 & 7.2805052e+11 \\
 $\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$      & $\vdots$      & $\vdots$      \\
-905.38062 & 9.2772428e+09 & 1.1861747e+10 & $\cdots$  & 3.4135089e+09 & 2.8770024e+09 & 6.7861770e+09 & 1.7767384e+09 \\
-905.57349 & 1.9527751e+10 & 2.4984806e+10 & $\cdots$  & 7.1648592e+09 & 6.0560959e+09 & 1.4299386e+10 & 2.7702141e+09 \\
+905.38062 & 1.8823427e+08 & 58500403.     & $\cdots$  & -8449286.6    & 8710775.0     & 4.0513312e+09 & 5.2188327e+09 \\
+905.57349 & 1.9864713e+10 & 1.2956832e+10 & $\cdots$  & 1.9785415e+10 & 7.1994239e+09 & 1.1311150e+10 & 1.2201224e+10 \\
 \bottomrule
 \end{tabular}
-\caption{Example of CCS data for the first sample in the \texttt{0.1tio2} directory.}
+\caption{Example of CCS data for the first location in the \texttt{cadillac} sample directory.}
 \label{tab:ccs_data_example}
 \end{table*}
 
@@ -81,7 +81,9 @@ The rows in the location dataset represent which wavelength the intensity measur
 There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample.
 While $N=50$ for each sample in the calibration data, the number of shots taken on Mars for each sample can vary but is typically between $15$ and $50$.
 
-Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{0.1tio2} sample.
+Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{cadillac} sample.
+As can be seen in the table, the second final row of the \texttt{cadillac} sample contains negative values, which is not physically possible.
+These negative values represent noise and are a result of the processing step that is applied to the EDR data to remove the background noise during transformation to RDR data, which is illustrated in Figure~\ref{fig:libs_data_processing}.
 
 In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
 There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
