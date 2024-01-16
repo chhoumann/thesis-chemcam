@@ -18,7 +18,7 @@ This section describes the PLS1-SM aspect of the pipeline.
 \subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
 We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
-As mentioned in section \ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to remove these regions.
+As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to remove these regions.
 The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
 The dataframe is then transformed through a transpose operation, swapping the rows and columns.
 This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
