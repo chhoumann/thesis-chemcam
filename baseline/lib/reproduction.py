@@ -8,7 +8,7 @@ masks = [
 
 spectrometer_wavelength_ranges = {
     "UV": (223.4, 325.97),
-    "VIS": (381.86, 471.03),
+    "VIO": (381.86, 471.03),
     "VNIR": (494.93, 927.06),
 }
 

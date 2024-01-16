@@ -29,7 +29,7 @@ def plot_spectra(
     sample_data = get_preprocessed_sample_data(
         sample_name, _data_path, average_shots=average_shots
     )
-    first_location = sample_data[0]
+    first_location = list(sample_data.values())[0]
 
     # Transform the data using WavelengthMaskTransformer
     wmt = WavelengthMaskTransformer(masks)
@@ -68,7 +68,7 @@ def plot_spectra(
     # Colors for the spectral ranges
     spectral_colors = {
         "UV": "#BA55D3",  # Medium Orchid
-        "VIS": "#00FF00",  # Bright Green
+        "VIO": "#00FF00",  # Bright Green
         "VNIR": "#8B0000",  # Deep Red
     }
 
