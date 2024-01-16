@@ -18,18 +18,8 @@ This section describes the PLS1-SM aspect of the pipeline.
 \subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
 We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
-Afterwards, we mask the edges of the spectral regions of the data to eliminate increased noise, especially in areas where small intensity changes lead to large variations in the calibrated signal.
+As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to remove these regions.
 The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
-These regions are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm.
-An example of these masked regions for the \texttt{cadillac} sample can be seen in figure \ref{fig:masked_regions}.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/masked_regions.png}
-	\caption{The masked regions of the spectral data for the \texttt{cadillac} sample.}
-	\label{fig:masked_regions}
-\end{figure}
-
 The dataframe is then transformed through a transpose operation, swapping the rows and columns.
 This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
 All negative values are then transformed into zeros since negative values are not physically possible.
@@ -90,8 +80,7 @@ Afterwards, we transform all negative values into zeros.
 Then we normalize the data using Norm1 and Norm3.
 
 In contrast to \citet{cleggRecalibrationMarsScience2017} however, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
-The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities\cite{chemcam_instrument_suite}.
-For example, pixels located at the edge of the charge-coupled device (CCD)\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy.\cite{radionuclide_imaging}} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
+The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities\cite{wiensChemcam2012}.
 One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
 However, during a conversation with one of the original authors of \citet{cleggRecalibrationMarsScience2017}, criticism was raised against this.
 Specifically, the author pointed out that weighing by the inverse of the discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
