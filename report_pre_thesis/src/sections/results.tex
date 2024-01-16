@@ -1,11 +1,29 @@
 \section{Results}\label{sec:results}
-Analysis / Experimental / Empirical Evaluation (the analysis, comparing our method to SoA or a baseline, ablation study)
-\begin{itemize}
-    \item System used (for repeatability)
-    \item Datasets / people used
-    \item Metrics used
-    \item Results: a list of potential improvements or alterations that would enhance the model's predictive accuracy and robustness, as well as explanations as to why these improvements would be beneficial.
-\end{itemize}
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+        Oxides & PLS-SM (RMSEP) & ICA (Test RMSE) & MOC (Test RMSE) \\ \hline
+        K20 & 0.85 & 1.71 & 1.38 \\ \hline
+        Na2O & 0.84 & 1.45 & 0.97 \\ \hline
+        CaO & 9.90 & 3.62 & 4.54 \\ \hline
+        MgO & 1.42 & 3.44 & 2.01 \\ \hline
+        FeOT & 7.21 & 6.05 & 6.71 \\ \hline
+        Al2O3 & 3.00 & 4.11 & 3.05 \\ \hline
+        TiO2 & 0.76 & 0.51 & 0.51 \\ \hline
+        SiO2 & 10.87 & 10.67 & 7.85 \\ \hline
+    \end{tabular}
+    \caption{These results are intermediate and will be adjusted shortly. We are tweaking the system to account for missing values that caused some of the results to be skewed.}
+\end{table}
+
+% Analysis / Experimental / Empirical Evaluation (the analysis, comparing our method to SoA or a baseline, ablation study)
+% \begin{itemize}
+%     \item System used (for repeatability)
+%     \item Datasets / people used
+%     \item Metrics used
+%     \item Results: a list of potential improvements or alterations that would enhance the model's predictive accuracy and robustness, as well as explanations as to why these improvements would be beneficial.
+% \end{itemize}
 
 % Data Presentation
 % - Tables, graphs, and any other illustrations of the collected data
