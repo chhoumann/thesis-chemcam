@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Optional, Dict
-
-from lib.reproduction import folder_to_composition_sample_name
+from typing import Dict, Optional
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from tqdm import tqdm
+
+from lib.reproduction import folder_to_composition_sample_name
 
 
 def get_location_dataset_paths_for_sample(sample_name: str, data_path: Path):
@@ -395,6 +395,7 @@ class CustomSpectralPipeline:
         self,
         sample_df: pd.DataFrame,
         sample_name: str,
+        location_name: str,
     ):
         """
         Process a single sample.
@@ -419,6 +420,7 @@ class CustomSpectralPipeline:
         )
 
         final_df["Sample Name"] = sample_name
+        final_df["ID"] = f"{sample_name}_{location_name}"
 
         return final_df
 
@@ -433,13 +435,15 @@ class CustomSpectralPipeline:
             pd.DataFrame: Transformed DataFrame.
         """
         transformed_samples = []
-        for sample_name, sample_dfs in tqdm(
+        for sample_name, sample_location_dfs in tqdm(
             sample_data.items(), desc="Transforming samples"
         ):
-            for _, sample_df in enumerate(sample_dfs):
+            for _, (location_name, sample_df) in enumerate(sample_location_dfs.items()):
                 if self.composition_data.get_composition_for_sample(sample_name).empty:
                     continue
-                transformed_df = self.process_sample(sample_df, sample_name)
+                transformed_df = self.process_sample(
+                    sample_df, sample_name, location_name
+                )
                 transformed_samples.append(transformed_df)
         df_out = pd.concat(transformed_samples, ignore_index=True).rename(columns=str)
         return df_out
