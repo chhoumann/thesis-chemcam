@@ -13,9 +13,19 @@ In Section \ref{sec:methodology_ica} then details the ICA phase, including its u
 Lastly, Section \ref{sec:methodology_moc} presents a description of the MOC phase of the pipeline.
 
 \subsection{PLS1-SM}\label{sec:methodology_pls1}
-This section describes the PLS1-SM aspect of the pipeline.
+The PLS1-SM phase in our pipeline largely follows the same approach as described in \citet{andersonImprovedAccuracyQuantitative2017} with a few exceptions.
+We detail our approach and the differences from the original pipeline in this section.
 
 \subsubsection{Data Preprocessing}\label{sec:pls1_data_preprocessing}
+The preprocessing of the data is illustrated in Figure~\ref{fig:pls_data_preprocessing}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.175\textwidth]{images/pls_preprocessing.png}
+	\caption{The PLS1-SM data preprocessing phase in our recreation of the pipeline. The filtering and normalization steps are done independently for each oxide.}
+	\label{fig:pls_data_preprocessing}
+\end{figure}
+\noindent
 We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
 As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to remove these regions.
@@ -32,12 +42,26 @@ The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found,
 
 \subsubsection{PLS1-SM Regression}
 The PLS phase of the pipeline follows a submodel approach to make wt. \% predictions for each oxide, as previously mentioned in Section~\ref{sec:introduction}.
+
+The training of the models follows the same approach as described in \citet{andersonImprovedAccuracyQuantitative2017} and is illustrated in Figure~\ref{fig:pls_training}.
+However, assumptions have been made regarding the k-fold cross-validation process, as the authors are ambiguous in their description of the number of folds used.
+We interpreted their description as using a 20\% holdout split and a 4-fold on the remaining 80\% of the data --- resulting in a total of 5 folds.
+Furthermore, we have decided to automate outlier removal as described in Section~\ref{sec:methodology_outlier_removal} rather than performing it manually.
+Finally, similar hyperparameters have been used for the PLS models as described in \citet{andersonImprovedAccuracyQuantitative2017}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.175\textwidth]{images/pls_training.png}
+	\caption{The PLS1-SM training phase in our recreation of the pipeline. This phase is repeated for each oxide's compositional range.}
+	\label{fig:pls_training}
+\end{figure}
+
 Obtaining predictions for each of the eight oxides, for a single spectrum, requires a separate predictions for each oxide. While PLS regression is capable of multivariate regression, each oxide calls for different hyperparameter configurations and normalization procedures.
 The submodels for an oxide generally include a full model, a low, mid, and high model. They are named after the compositional range in the data they are trained on. Here, compositional range refers to the known compositional values for a sample, which we use to filter the sample data to include samples data within that range.
 These compositional ranges overlap, which creates a blending range.
 Some oxides have only two compositional ranges, which means the model may have low-high as a blending range.
 
-As mentioned, the PLS submodels approach is repeated for each oxide. It proceeds as follows.
+As mentioned, the PLS submodels approach is repeated for each oxide and is illustrated in Figure~\ref{fig:pls_inference}.
 Given some new data sample, the full model gives an initial compositional prediction for its oxide.
 Based on this prediction, the data is then "binned" into one of five concentration ranges -- the three submodel ranges and two blending ranges.
 For each of these five concentration ranges, there is one or two corresponding \textit{submodel(s)}.
@@ -45,11 +69,12 @@ These submodels are used to make predictions in the corresponding concentration 
 The submodels are specialized in either low, low-mid, mid, mid-high, high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
 If the full model predicts a concentration that falls within a blending range, the approach described in Section~\ref{sec:pls_submodels} is used to combine the predictions from the corresponding submodels.
 
-The training of the models follows the same approach as described in \citet{andersonImprovedAccuracyQuantitative2017}.
-However, assumptions have been made regarding the k-fold cross-validation process, as the authors are ambiguous in their description of the number of folds used.
-We interpreted their description as using a 20\% holdout split and a 4-fold on the remaining 80\% of the data --- resulting in a total of 5 folds.
-Furthermore, we have decided to automate outlier removal as described in Section~\ref{methodology_outlier_removal} rather than performing it manually.
-Finally, similar hyperparameters have been used for the PLS models as described in \citet{andersonImprovedAccuracyQuantitative2017}.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.45\textwidth]{images/pls_inference.png}
+	\caption{The PLS1-SM inference phase in our recreation of the pipeline.}
+	\label{fig:pls_inference}
+\end{figure}
 
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}\label{sec:methodology_outlier_removal}
 As mentioned in section \ref{sec:outlier_removal}, if the Mahalanobis distances can be shown to follow a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
