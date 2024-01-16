@@ -30,16 +30,13 @@ This results in two separate datasets, each normalized in a distinct manner but 
 ICA and PLS-SM are then performed on each of these datasets separately.
 The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 
-\subsubsection{PLS-SM Regression}
-% Describe full model into submodel
-% Describe filter data by composition ranges (wt% ranges) - Also the adjustments made
-% Load all models (full, low, mid, high) for each oxide
-% Make full model prediction
-% Using blending configuration, calculate weights and then return weighted blend
-As mentioned in the \ref{sec:introduction} the PLS aspect of the pipeline utilizes a submodel approach to make oxide predictions.
-It is structured such that each of the eight oxides in consideration will have either three or four, corresponding PLS models.
-The core concept being that a PLS model, referred to as the \textit{full model}, will be responsible for making an initial prediction for each oxide and in this case, eight initial predictions will be made.
-In similar fashion to the full model, each oxide also has a set of corresponding PLS model, referred to as the \textit{submodels} and each submodel will be specialized to make predictions based on the concentration of a given oxide as predicted by the full model.
+\subsubsection{PLS1-SM Regression}
+As previously mentioned in Section~\ref{sec:introduction}, the PLS aspect of the pipeline follows a submodel approach to make oxide predictions.
+A PLS model is trained on all the data to make an initial prediction for each oxide.
+This model is referred to as the \textit{full model}.
+Based on the full model's initial predictions, each prediction is then "binned" into one of five concentration ranges.
+For each of these five concentration ranges, there is a corresponding \textit{submodel} for each oxide.
+These submodels are used to make predictions in the corresponding concentration range after the full model has made its initial predictions.
 The submodels are specialized in either low, low-mid, mid, mid-high, high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
 If the full model predicts a concentration that falls within low-mid or mid-high, the blending approach described in Section~\ref{sec:pls_submodels} is used to combine the predictions from the corresponding submodels.
 
@@ -49,31 +46,13 @@ We interpreted their description as using a 20\% holdout split and a 4-fold on t
 Furthermore, we have decided to automate outlier removal as described in Section~\ref{methodology_outlier_removal} rather than performing it manually.
 Finally, similar hyperparameters have been used for the PLS models as described in \citet{andersonImprovedAccuracyQuantitative2017}.
 
-% TODO: Describe training of PLS-SM:
-% Describe k-fold
-% Describe train test split
-% (Maybe) describe influence plots
-% Explain prediction setup - including outlier removal process
-% Hyperparameters for PLS - Same as authors
-
 \subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}\label{sec:methodology_outlier_removal}
-% General programming language differences and implementation details
-% Differences in outlier detection (automatic/quantitative vs manual/qualitative)
-% Missing information about how three of the oxides are weighted in MOC result
-% No manual cross validation in PLS
-% Holdout split 80/20
-% No inverse IRF weighing weighting in ICA
-% Missing information about outlier removal in ICA - therefore we decided to not do it
-% Missing information about how ICA uses each of the five datasets for each target
-% How we do regression in ICA (since there are not enough details about it in the papers)
-
 As mentioned in section \ref{sec:outlier_removal}, if the Mahalanobis distances can be shown to follow a chi-squared distribution, then the chi-squared test can be used to determine whether a sample is an outlier.
 Since we do not have the expertise to make a qualitative assessment of the outliers, we have instead decided to use this property of the Mahalanobis distances to automatically detect outliers.
 This works by computing the Mahalanobis distance for each data point in the training set, followed by a comparison of these distances against a chi-squared distribution.
 A data point is classified as an outlier if its Mahalanobis distance corresponds to a chi-squared statistic that exceeds the critical value of the chi-squared distribution, which is determined by the specified degrees of freedom $\nu$.
 The critical value is determined by the significance level $\alpha$ and $\nu$.
 Since we have leverage and spectral residuals as our two dimensions, we have $\nu = 2$, because the number of dimensions is equal to the number of degrees of freedom\cite{aggarwal_outlier_2017}.
-% TODO: Describe why we chose the degrees of freedom we did, and how we used this chi-squared test to determine outliers.
 
 The outlier removal process is done iteratively because of the phenomenon described in \citet{cleggRecalibrationMarsScience2017} where removing outliers can cause new outliers to appear.
 The process is as follows:
