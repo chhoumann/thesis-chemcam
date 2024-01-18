@@ -3,7 +3,8 @@ As part of our goal to evaluate the performance of each of the components in the
 Since we did not have access to the original source code implementing the pipeline, we have replicated it at accurately as we could based on the available information.
 We have had to make some assumptions due to insufficient information regarding some components, which we detail in this section.
 In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors --- something we cannot do because we are not domain experts.
-Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible.
+Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible while favoring conservative choices and omitting implementations where information about the original pipeline was unclear.
+This decision was driven by the aspiration to ensure that the baseline results remained minimally influenced by our methodological choices.
 
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
@@ -249,7 +250,10 @@ In order to ensure that any potential improvements were uncovered we decided to 
 Similarly, the authors describe selecting eight independent components for their ICA algorithm, but do not provide any experimental results justifying that this is the optimal number of components.
 Therefore, improvements in the result of the algorithm could potentially be obtained by experimenting with a variety of components. 
 
-For the PLS1-SM model we decided to use xx for automating the test. The benefit...
+For the PLS1-SM model we decided to use the common grid search algorithm for testing different hyperparameters for the PLS models. 
+% Explain set up...
 
 Since each independent component does not necessarily correlate one-to-one with the number of elements that one wishes to identify in a spectra, we decided to experiment with a number of components ranging between 4 and 25. 
 This range is within the vicinity of the original selection of components whilst providing us with a set of reasonable extremes.
+
+% Probably show the setup in some way
