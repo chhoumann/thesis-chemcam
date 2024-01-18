@@ -222,6 +222,7 @@ To evaluate the performance of each of the components in the pipeline, we focus 
 We recognize that these three aspects are commonly used to evaluate the performance and identify potential improvements of a machine learning pipeline.
 However, since the original authors did not conduct any experiments with alternative methods to demonstrate that their selected approach was superior, we feel that we have an incomplete picture of the potential performance of the pipeline.
 Additionally, a benefit of experimenting with alternative methods is that we can uncover which components contribute the most to the overall error and therefore would benefit the most from further research and development.
+
 % TODO: mention the reason we are doing experiments (to try and align our replication with the original pipeline as closely as possible)
 
 \subsubsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
@@ -236,6 +237,8 @@ For the ICA phase, the original authors used Median Absolute Deviation for outli
 Therefore, we omitted outlier removal in the ICA phase of our pipeline.
 However, implementing outlier removal using MAD would still be an interesting experiment to see if it improves the performance of the pipeline.
 To this extent, we would try to align the implementation with the original authors' approach as closely as possible, and also experiment with different significance levels for the MAD test.
+
+% TODO: If there's time, include other outlier removal methods as well, such as Isolation Forest, Local Outlier Factor, etc.
 
 \subsubsection{Experiment: Feature Engineering}\label{sec:experiment_feature_engineering}
 
