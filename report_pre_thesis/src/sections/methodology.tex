@@ -245,15 +245,17 @@ To this extent, we would try to align the implementation with the original autho
 
 
 \subsubsection{Experiment: Hyperparameter Tuning}\label{sec:experiment_hyperparameter_tuning}
-\citet{cleggRecalibrationMarsScience2017} outlined their method of identifying hyperparameters for their PLS1-SM model using qualitative judgement. 
-In order to ensure that any potential improvements were uncovered we decided to use automated approaches.
-Similarly, the authors describe selecting eight independent components for their ICA algorithm, but do not provide any experimental results justifying that this is the optimal number of components.
-Therefore, improvements in the result of the algorithm could potentially be obtained by experimenting with a variety of components. 
+\citet{cleggRecalibrationMarsScience2017} use qualitative judgement to identify hyperparameters for their PLS1-SM model.
+This can be an error-prone approach, as it is difficult to ensure that the selected hyperparameters are optimal.
+We therefore decided to use a more systematic and automated approach to identify hyperparameters for our PLS1-SM model.
 
-For the PLS1-SM model we decided to use the common grid search algorithm for testing different hyperparameters for the PLS models. 
+Similarly, the authors use eight independent components for their ICA algorithm, but do not provide any experimental results justifying that this is the optimal number of components.
+As such, it is possible that the performance of the ICA phase could be improved by experimenting with a variety of components.
+
+For the PLS1-SM model we decided to use the common grid search algorithm for testing different hyperparameters for the PLS models.
 % Explain set up...
 
-Since each independent component does not necessarily correlate one-to-one with the number of elements that one wishes to identify in a spectra, we decided to experiment with a number of components ranging between 4 and 25. 
+Since each independent component does not necessarily correlate one-to-one with the number of elements that one wishes to identify in a spectra, we decided to experiment with a number of components ranging between 4 and 25.
 This range is within the vicinity of the original selection of components whilst providing us with a set of reasonable extremes.
 
 % Probably show the setup in some way
