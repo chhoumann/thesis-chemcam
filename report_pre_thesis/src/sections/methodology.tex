@@ -207,3 +207,31 @@ Ca*      & 50           & 50      \\
 \caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citet{cleggRecalibrationMarsScience2017}}
 \label{tab:weighted_sum_oxide}
 \end{table}
+
+\subsection{Experiments}\label{sec:methodology_experiments}
+To evaluate the performance of each of the components in the pipeline, we focus our experiments on three main aspects:
+
+\begin{itemize}
+	\item \textbf{Outlier removal} to assess the impact of leaving outliers in the dataset or using a different outlier removal method.
+	\item \textbf{Feature engineering} to assess the impact of different preprocessing steps.
+	\item \textbf{Hyperparameter tuning} to assess the impact of different hyperparameter configurations.
+\end{itemize}
+
+\noindent
+We recognize that these three aspects are commonly used to evaluate the performance and identify potential improvements of a machine learning pipeline.
+However, since the original authors did not conduct any experiments with alternative methods to demonstrate that their selected approach was superior, we feel that we have an incomplete picture of the potential performance of the pipeline.
+% Additionally, by experimenting with alternative methods, we can gain a better understanding of which components contribute the most to the overall error and therefore would benefit the most from further research and development.
+Additionally, a benefit of experimenting with alternative methods is that we can uncover which components contribute the most to the overall error and therefore would benefit the most from further research and development.
+
+\subsubsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
+For outlier removal, there are a few key experiments to perform.
+
+- no outlier removal in PLS1-SM (why? because a significant effort has gone into collecting the calibration dataset with as few outliers as possible)
+- add outlier removal to ICA and try a few different approaches (we know they used MAD, but we don't know how they used it - try and improve the performance using MAD)
+- try different significance levels for the chi-squared test (make it even more conservative? or less conservative?)
+- try alternative outlier removal methods (e.g. Isolation Forest, Local Outlier Factor, etc.)
+
+\subsubsection{Experiment: Feature Engineering}\label{sec:experiment_feature_engineering}
+
+
+\subsubsection{Experiment: Hyperparameter Tuning}\label{sec:experiment_hyperparameter_tuning}
