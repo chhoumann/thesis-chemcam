@@ -220,16 +220,21 @@ To evaluate the performance of each of the components in the pipeline, we focus 
 \noindent
 We recognize that these three aspects are commonly used to evaluate the performance and identify potential improvements of a machine learning pipeline.
 However, since the original authors did not conduct any experiments with alternative methods to demonstrate that their selected approach was superior, we feel that we have an incomplete picture of the potential performance of the pipeline.
-% Additionally, by experimenting with alternative methods, we can gain a better understanding of which components contribute the most to the overall error and therefore would benefit the most from further research and development.
 Additionally, a benefit of experimenting with alternative methods is that we can uncover which components contribute the most to the overall error and therefore would benefit the most from further research and development.
+% TODO: mention the reason we are doing experiments (to try and align our replication with the original pipeline as closely as possible)
 
 \subsubsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
-For outlier removal, there are a few key experiments to perform.
+The original PLS1-SM identified outliers manually by inspecting the leverage and spectral residuals plots.
+However, we have chosen to automate this based on the reasons described in Section~\ref{sec:methodology_outlier_removal}.
+It would therefore be interesting to see how the performance of the pipeline is affected by adjusting this process.
+Firstly, to see if a more or less conservative approach would be beneficial, it would be interesting to try out different significance levels for the chi-squared test.
+Secondly, it would be interesting to see how the performance is affected by omitting outlier removal altogether.
+This is a reasonable experiment because of the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low presence of significant outliers.
 
-- no outlier removal in PLS1-SM (why? because a significant effort has gone into collecting the calibration dataset with as few outliers as possible)
-- add outlier removal to ICA and try a few different approaches (we know they used MAD, but we don't know how they used it - try and improve the performance using MAD)
-- try different significance levels for the chi-squared test (make it even more conservative? or less conservative?)
-- try alternative outlier removal methods (e.g. Isolation Forest, Local Outlier Factor, etc.)
+For the ICA phase, the original authors used Median Absolute Deviation for outlier removal, but the specifics of their approach remain unclear.
+Therefore, we omitted outlier removal in the ICA phase of our pipeline.
+However, implementing outlier removal using MAD would still be an interesting experiment to see if it improves the performance of the pipeline.
+To this extent, we would try to align the implementation with the original authors' approach as closely as possible, and also experiment with different significance levels for the MAD test.
 
 \subsubsection{Experiment: Feature Engineering}\label{sec:experiment_feature_engineering}
 
