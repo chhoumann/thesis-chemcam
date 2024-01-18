@@ -27,10 +27,7 @@ from lib.reproduction import (
     spectrometer_wavelength_ranges,
     training_info,
 )
-from lib.utils import (
-    custom_kfold_cross_validation,
-    filter_data_by_compositional_range,
-)
+from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
 from PLS_SM.inference import predict_composition_with_blending
 
 env = dotenv_values()
@@ -348,6 +345,11 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
+    experiment_name = f"PLS_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+
+    mlflow.set_experiment(experiment_name)
+    mlflow.autolog(log_models=False, log_datasets=False)
+
     models = get_models(experiment_id="662227889769696275")
 
     # save na to csv
@@ -381,39 +383,41 @@ if SHOULD_PREDICT:
     predictions_save_path.mkdir(parents=True, exist_ok=True)
 
     for oxide in tqdm(major_oxides, desc="Predicting oxides"):
-        _oxide_ranges = oxide_ranges.get(oxide, None)
-        if _oxide_ranges is None:
-            logger.info("Skipping oxide: %s", oxide)
-            continue
+        with mlflow.start_run(run_name=f"PLS_TEST_{oxide}"):
+            _oxide_ranges = oxide_ranges.get(oxide, None)
+            if _oxide_ranges is None:
+                logger.info("Skipping oxide: %s", oxide)
+                continue
 
-        pred = predict_composition_with_blending(
-            oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
-        )
+            pred = predict_composition_with_blending(
+                oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
+            )
 
-        # save
-        pred_df = pd.DataFrame(pred, index=Y.index)
-        pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
+            # save
+            pred_df = pd.DataFrame(pred, index=Y.index)
+            pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
 
-        # ???
-        # Check for NaNs in Y[oxide]
-        nan_in_Y = Y[oxide].isna()
-        if nan_in_Y.any():
-            print("NaNs in Y[oxide]:")
-            print(Y[oxide][nan_in_Y])
+            # ???
+            # Check for NaNs in Y[oxide]
+            nan_in_Y = Y[oxide].isna()
+            if nan_in_Y.any():
+                print("NaNs in Y[oxide]:")
+                print(Y[oxide][nan_in_Y])
 
-        # Check for NaNs in pred_df
-        nan_in_pred_df = pred_df.isna()
-        if nan_in_pred_df.any().any():  # Note the double .any() here
-            print("NaNs in pred_df:")
-            print(pred_df[nan_in_pred_df])
+            # Check for NaNs in pred_df
+            nan_in_pred_df = pred_df.isna()
+            if nan_in_pred_df.any().any():  # Note the double .any() here
+                print("NaNs in pred_df:")
+                print(pred_df[nan_in_pred_df])
 
-        # calculate RMSEP
-        rmsep = mean_squared_error(Y[oxide], pred_df, squared=False)
-        # save
-        with open(save_path / "rmsep.txt", "a") as f:
-            f.write(f"{oxide}: {rmsep}\n")
+            # calculate RMSEP
+            rmsep = mean_squared_error(Y[oxide], pred_df, squared=False)
+            mlflow.log_metric("RMSEP", float(rmsep))
+            # save
+            with open(save_path / "rmsep.txt", "a") as f:
+                f.write(f"{oxide}: {rmsep}\n")
 
-        target_predictions[oxide] = pred
+            target_predictions[oxide] = pred
 
     target_predictions.to_csv(save_path / "tar_pred.csv")
 
