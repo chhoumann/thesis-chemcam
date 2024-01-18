@@ -30,85 +30,48 @@ TEST = True
 if CALIB_DATA_PATH is None or CALIB_COMP_PATH is None or MLFLOW_TRACKING_URI is None:
     exit()
 
-def main():
-    ica_df_n1, compositions_df_n1 = get_train_data(num_components=8, norm=Norm.NORM_1)
-    ica_df_n1 = ica_df_n1.abs()
+model_configs = {
+    "SiO2": {"law": "Log-square", "norm": Norm.NORM_1},
+    "TiO2": {"law": "Geometric", "norm": Norm.NORM_3},
+    "Al2O3": {"law": "Geometric", "norm": Norm.NORM_3},
+    "FeOT": {"law": "Geometric", "norm": Norm.NORM_1},
+    "MgO": {"law": "Exponential", "norm": Norm.NORM_1},
+    "CaO": {"law": "Parabolic", "norm": Norm.NORM_1},
+    "Na2O": {"law": "Parabolic", "norm": Norm.NORM_3},
+    "K2O": {"law": "Geometric", "norm": Norm.NORM_3},
+}
 
-    ica_df_n3, compositions_df_n3 = get_train_data(num_components=8, norm=Norm.NORM_3)
-    ica_df_n3 = ica_df_n3.abs()
 
-    assert len(ica_df_n1) == len(
-        ica_df_n3
-    ), "The number of rows in the two DataFrames must be equal."
+def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
+    # This is not suited for more than a single location per sample.
+    n_rows = len(ica_df_n1)
 
-    # n_rows = len(ica_df_n1)
+    # Split indices
+    train_indices, test_indices = train_test_split(
+        range(n_rows), test_size=0.2, random_state=42
+    )
 
-    # ---
-    ica_train_n1 = ica_df_n1
-    ica_test_n1 = ica_df_n1
-    
-    ica_train_n3 = ica_df_n3
-    ica_test_n3 = ica_df_n3
-    
-    comp_train_n1 = compositions_df_n1
-    comp_test_n1 = compositions_df_n1
-    
-    comp_train_n3 = compositions_df_n3
-    comp_test_n3 = compositions_df_n3
-    # ---
+    # Split ica_df_n1
+    ica_train_n1 = ica_df_n1.iloc[train_indices]
+    ica_test_n1 = ica_df_n1.iloc[test_indices]
 
-    # # Split indices
-    # train_indices, test_indices = train_test_split(
-    #     range(n_rows), test_size=0.2, random_state=42
-    # )
+    # Split ica_df_n3
+    ica_train_n3 = ica_df_n3.iloc[train_indices]
+    ica_test_n3 = ica_df_n3.iloc[test_indices]
 
-    # # Split ica_df_n1
-    # ica_train_n1 = ica_df_n1.iloc[train_indices]
-    # ica_test_n1 = ica_df_n1.iloc[test_indices]
+    # Assuming compositions_df_n1 and compositions_df_n3 are aligned with ica_df_n1 and ica_df_n3
+    comp_train_n1 = compositions_df_n1.iloc[train_indices]
+    comp_test_n1 = compositions_df_n1.iloc[test_indices]
 
-    # # Split ica_df_n3
-    # ica_train_n3 = ica_df_n3.iloc[train_indices]
-    # ica_test_n3 = ica_df_n3.iloc[test_indices]
-
-    # # Assuming compositions_df_n1 and compositions_df_n3 are aligned with ica_df_n1 and ica_df_n3
-    # comp_train_n1 = compositions_df_n1.iloc[train_indices]
-    # comp_test_n1 = compositions_df_n1.iloc[test_indices]
-
-    # comp_train_n3 = compositions_df_n3.iloc[train_indices]
-    # comp_test_n3 = compositions_df_n3.iloc[test_indices]
+    comp_train_n3 = compositions_df_n3.iloc[train_indices]
+    comp_test_n3 = compositions_df_n3.iloc[test_indices]
 
     oxide_rmses = {}
-    oxide_models = {
-        "SiO2": {"law": "Log-square", "norm": Norm.NORM_1},
-        "TiO2": {"law": "Geometric", "norm": Norm.NORM_3},
-        "Al2O3": {"law": "Geometric", "norm": Norm.NORM_3},
-        "FeOT": {"law": "Geometric", "norm": Norm.NORM_1},
-        "MgO": {"law": "Exponential", "norm": Norm.NORM_1},
-        "CaO": {"law": "Parabolic", "norm": Norm.NORM_1},
-        "Na2O": {"law": "Parabolic", "norm": Norm.NORM_3},
-        "K2O": {"law": "Geometric", "norm": Norm.NORM_3},
-    }
 
     models = {}
-    experiment_id = '549682258983743113'
-    runs = mlflow.search_runs(experiment_ids=[experiment_id])
-
-    for _, run in runs.iterrows():
-        run_id = run['run_id']
-        oxide_value = run['params.oxide']  # Assuming 'oxide' is stored as a parameter
-
-        # Fetch the model artifact if it's a scikit-learn model
-        client = mlflow.tracking.MlflowClient()
-        artifacts = client.list_artifacts(run_id)
-        for artifact in artifacts:
-            if 'model' in artifact.path.lower():
-                model_uri = f"runs:/{run_id}/{artifact.path}"
-                model = mlflow.sklearn.load_model(model_uri)
-                models[oxide_value] = model
-
     target_predictions = pd.DataFrame(comp_test_n1.index)
 
-    for oxide, info in tqdm.tqdm(oxide_models.items()):
+    for oxide, info in tqdm.tqdm(model_configs.items()):
         model_name = info["law"]
         norm = info["norm"]
 
@@ -116,7 +79,7 @@ def main():
             print(f"No model specified for {oxide}. Skipping...")
             continue
 
-        with mlflow.start_run(run_name=f"ICA_{oxide}"):
+        with mlflow.start_run(run_name=f"ICA_TRAIN_{oxide}"):
             print(f"Training model {model_name} for {oxide}...")
 
             X_train = ica_train_n1 if norm == Norm.NORM_1 else ica_train_n3
@@ -140,8 +103,80 @@ def main():
                 X_train = X_train**2
                 X_test = X_test**2
 
-            # model = LinearRegression()
-            # model.fit(X_train, y_train)
+            model = LinearRegression()
+            model.fit(X_train, y_train)
+
+            pred = model.predict(X_test)
+            rmse = np.sqrt(mean_squared_error(y_test, pred))
+
+            oxide_rmses[oxide] = rmse
+
+            oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
+            oxide_prediction_path.mkdir(parents=True, exist_ok=True)
+
+            target_predictions[oxide] = pd.Series(pred)
+
+            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred1.csv")
+            mlflow.log_metric("RMSE", float(rmse))
+            mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
+
+            mlflow.sklearn.log_model(model, f"ICA_{oxide}")
+
+    for oxide, rmse in oxide_rmses.items():
+        print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
+
+    target_predictions.to_csv("./data/data/jade/ica/TRAIN_tar_pred.csv")
+
+
+def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
+    ica_test_n1 = ica_df_n1
+    ica_test_n3 = ica_df_n3
+
+    comp_test_n1 = compositions_df_n1
+    comp_test_n3 = compositions_df_n3
+
+    models = {}
+    experiment_id = '549682258983743113'
+    runs = mlflow.search_runs(experiment_ids=[experiment_id])
+
+    for _, run in runs.iterrows():
+        run_id = run['run_id']
+        oxide_value = run['params.oxide']  # Assuming 'oxide' is stored as a parameter
+
+        # Fetch the model artifact if it's a scikit-learn model
+        client = mlflow.tracking.MlflowClient()
+        artifacts = client.list_artifacts(run_id)
+        for artifact in artifacts:
+            if 'model' in artifact.path.lower():
+                model_uri = f"runs:/{run_id}/{artifact.path}"
+                model = mlflow.sklearn.load_model(model_uri)
+                models[oxide_value] = model
+
+    target_predictions = pd.DataFrame(comp_test_n1.index)
+
+    oxide_rmses = {}
+    for oxide, info in tqdm.tqdm(model_configs.items()):
+        model_name = info["law"]
+        norm = info["norm"]
+
+        if model_name is None:
+            print(f"No model specified for {oxide}. Skipping...")
+            continue
+
+        with mlflow.start_run(run_name=f"ICA_TEST_{oxide}"):
+            print(f"Testing model {model_name} for {oxide}...")
+
+            X_test = ica_test_n1 if norm == Norm.NORM_1 else ica_test_n3
+            y_test = comp_test_n1[oxide] if norm == Norm.NORM_1 else comp_test_n3[oxide]
+
+            if model_name == "Log-square":
+                X_test = np.log(X_test**2)
+            elif model_name == "Exponential":
+                X_test = np.log(X_test)
+            elif model_name == "Geometric":
+                X_test = np.sqrt(X_test)
+            elif model_name == "Parabolic":
+                X_test = X_test**2
 
             pred = models[oxide].predict(X_test)
             rmse = np.sqrt(mean_squared_error(y_test, pred))
@@ -157,12 +192,27 @@ def main():
             mlflow.log_metric("RMSE", float(rmse))
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
-            # mlflow.sklearn.log_model(model, f"ICA_{oxide}")
-
     for oxide, rmse in oxide_rmses.items():
-        print(f"RMSE for {oxide} with {oxide_models[oxide]['law']} model: {rmse}")
+        print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
 
     target_predictions.to_csv("./data/data/jade/ica/tar_pred.csv")
+
+
+def main():
+    ica_df_n1, compositions_df_n1 = get_train_data(num_components=8, norm=Norm.NORM_1)
+    ica_df_n1 = ica_df_n1.abs()
+
+    ica_df_n3, compositions_df_n3 = get_train_data(num_components=8, norm=Norm.NORM_3)
+    ica_df_n3 = ica_df_n3.abs()
+
+    assert len(ica_df_n1) == len(
+        ica_df_n3
+    ), "The number of rows in the two DataFrames must be equal."
+
+    if TEST:
+        test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
+    else:
+        train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
 
 
 def get_train_data(num_components: int, norm: Norm) -> (pd.DataFrame, pd.DataFrame):
