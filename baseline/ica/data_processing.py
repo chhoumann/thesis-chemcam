@@ -15,6 +15,7 @@ from lib.reproduction import masks, spectrometer_wavelength_ranges
 class ICASampleProcessor:
     def __init__(self, sample_name: str, num_components: int):
         self.sample_name = sample_name
+        self.sample_id = None
         self.num_components = num_components
         self.compositions_df = None
         self.df = None
@@ -46,7 +47,8 @@ class ICASampleProcessor:
         )
 
         # For now, we just use the first of the datasets
-        df = sample_data[0]
+        sample_location, df = list(sample_data.items())[0]
+        self.sample_id = f"{self.sample_name}_{sample_location}"
 
         # Apply masking
         wmt = WavelengthMaskTransformer(masks)
