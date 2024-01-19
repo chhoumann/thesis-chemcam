@@ -245,8 +245,8 @@ This experiment would also offer insights into the robustness of the ICA phase a
 
 \subsubsection{Experiment: Hyperparameter Tuning}\label{sec:experiment_hyperparameter_tuning}
 \citet{cleggRecalibrationMarsScience2017} use qualitative judgement to identify hyperparameters for their PLS1-SM model.
-This can be an error-prone approach, as it is difficult to ensure that the selected hyperparameters are optimal.
-We therefore decided to use a more systematic and automated approach to identify hyperparameters for our PLS1-SM model.
+This approach carries a risk of inaccuracies without sufficient domain expertise, given the challenges in guaranteeing the optimality of chosen hyperparameters.
+Lacking such expertise, we opted for a more systematic and automated methodology to determine hyperparameters for our PLS1-SM model.
 
 Similarly, the authors use eight independent components for their ICA algorithm, but do not provide any experimental results justifying that this is the optimal number of components.
 As such, it is possible that the performance of the ICA phase could be improved by experimenting with a variety of components.
