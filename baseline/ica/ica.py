@@ -10,7 +10,6 @@ import tqdm
 from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
 
 from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
@@ -47,35 +46,13 @@ model_configs = {
 
 def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     # This is not suited for more than a single location per sample.
-    n_rows = len(ica_df_n1)
-
-    # Split indices
-    train_indices, test_indices = train_test_split(
-        range(n_rows), test_size=0.2, random_state=42
-    )
-
     id_col = ica_df_n1["id"]
     ica_df_n1.drop(columns=["id"], inplace=True)
     ica_df_n3.drop(columns=["id"], inplace=True)
 
-    # Split ica_df_n1
-    ica_train_n1 = ica_df_n1.iloc[train_indices]
-    ica_test_n1 = ica_df_n1.iloc[test_indices]
-
-    # Split ica_df_n3
-    ica_train_n3 = ica_df_n3.iloc[train_indices]
-    ica_test_n3 = ica_df_n3.iloc[test_indices]
-
-    # Assuming compositions_df_n1 and compositions_df_n3 are aligned with ica_df_n1 and ica_df_n3
-    comp_train_n1 = compositions_df_n1.iloc[train_indices]
-    comp_test_n1 = compositions_df_n1.iloc[test_indices]
-
-    comp_train_n3 = compositions_df_n3.iloc[train_indices]
-    comp_test_n3 = compositions_df_n3.iloc[test_indices]
-
     oxide_rmses = {}
 
-    target_predictions = pd.DataFrame(comp_test_n1.index)
+    target_predictions = pd.DataFrame(compositions_df_n1.index)
     target_predictions["id"] = id_col
 
     for oxide, info in tqdm.tqdm(model_configs.items()):
@@ -89,13 +66,19 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
         with mlflow.start_run(run_name=f"ICA_TRAIN_{oxide}"):
             print(f"Training model {model_name} for {oxide}...")
 
-            X_train = ica_train_n1 if norm == Norm.NORM_1 else ica_train_n3
+            X_train = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
             y_train = (
-                comp_train_n1[oxide] if norm == Norm.NORM_1 else comp_train_n3[oxide]
+                compositions_df_n1[oxide]
+                if norm == Norm.NORM_1
+                else compositions_df_n3[oxide]
             )
 
-            X_test = ica_test_n1 if norm == Norm.NORM_1 else ica_test_n3
-            y_test = comp_test_n1[oxide] if norm == Norm.NORM_1 else comp_test_n3[oxide]
+            X_test = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
+            y_test = (
+                compositions_df_n1[oxide]
+                if norm == Norm.NORM_1
+                else compositions_df_n3[oxide]
+            )
 
             if model_name == "Log-square":
                 X_train = np.log(X_train**2)
@@ -137,7 +120,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
 def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     models = {}
-    experiment_id = "192827451771272593"
+    experiment_id = "900146533494810195"
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
     for _, run in runs.iterrows():
@@ -202,7 +185,7 @@ def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
     for oxide, rmse in oxide_rmses.items():
         print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
-        
+
     target_predictions = pd.DataFrame()
     target_predictions["ID"] = id_col
     for oxide, pred in oxide_preds.items():
@@ -323,7 +306,7 @@ def create_processed_data(
         # Aggregate the ICA results and composition data to their respective DataFrames
         compositions_df = pd.concat([compositions_df, processor.composition_df])
         # Add the sample ID to the ICA DataFrame
-        processor.ic_wavelengths['id'] = processor.sample_id
+        processor.ic_wavelengths["id"] = processor.sample_id
         ica_df = pd.concat([ica_df, processor.ic_wavelengths])
 
     # Set the index and column names for the DataFrames
