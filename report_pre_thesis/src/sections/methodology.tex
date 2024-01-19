@@ -239,8 +239,6 @@ Therefore, we omitted outlier removal in the ICA phase of our pipeline.
 However, implementing outlier removal using MAD would still be an interesting experiment to see if it improves the performance of the pipeline.
 To this extent, we would try to align the implementation with the original authors' approach as closely as possible, and also experiment with different significance levels for the MAD test.
 
-% TODO: If there's time, include other outlier removal methods as well, such as Isolation Forest, Local Outlier Factor, etc.
-
 \subsubsection{Experiment: Hyperparameter Tuning}\label{sec:experiment_hyperparameter_tuning}
 \citet{cleggRecalibrationMarsScience2017} use qualitative judgement to identify hyperparameters for their PLS1-SM model.
 This can be an error-prone approach, as it is difficult to ensure that the selected hyperparameters are optimal.
@@ -258,7 +256,7 @@ This range is within the vicinity of the original selection of components whilst
 % Probably show the setup in some way
 
 \subsubsection{Experiment: Other Models}\label{sec:experiment_other_models}
-\citet{cleggRecalibrationMarsScience2017} have not demonstrated any experiments with alternative methods to demonstrate that their selected approach is superior.
+\citet{cleggRecalibrationMarsScience2017} have only compared their new approach with the original method presented by \citet{wiensPreFlight3}, and have not conducted experiments using alternative methods to establish the superiority of their chosen approach.
 Therefore, we decided to compare the performance of the PLS1-SM and ICA models to other models.
 The objective is to evaluate two distinct scenarios. In the first scenario, we aim to conduct a direct comparison between the MOC model and an alternative model. The second scenario revolves around substituting either PLS or ICA with a different model and then calculating a weighted average.
 We have decided to conduct the experiments using the following models:
