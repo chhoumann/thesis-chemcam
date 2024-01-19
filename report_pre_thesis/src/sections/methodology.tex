@@ -232,7 +232,8 @@ However, we have chosen to automate this based on the reasons described in Secti
 It would therefore be intriguing to examine the impact on the pipeline's performance when this process is adjusted.
 Firstly, it would be interesting to see how the performance is affected by omitting outlier removal altogether.
 examining the performance implications of completely omitting outlier removal would be worthwhile.
-This experiment is justified given the substantial efforts dedicated to developing the ChemCam calibration dataset, which implies a minimal presence of significant outliers.Furthermore, experimenting with various significance levels for the chi-squared test could reveal whether a more or less conservative approach is advantageous.
+This experiment is justified given the substantial efforts dedicated to developing the ChemCam calibration dataset as mentioned in Section~\ref{sec:ica_data_preprocessing}, which implies a minimal presence of significant outliers.
+Furthermore, experimenting with various significance levels for the chi-squared test could reveal whether a more or less conservative approach is advantageous.
 
 For the ICA phase, the original authors used Median Absolute Deviation for outlier removal, but the specifics of their approach remain unclear.
 Therefore, we omitted outlier removal in the ICA phase of our pipeline.
