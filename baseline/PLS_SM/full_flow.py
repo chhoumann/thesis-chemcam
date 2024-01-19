@@ -174,7 +174,7 @@ if SHOULD_TRAIN:
                 pls_OR.fit(X_train_OR, y_train_OR)
 
                 current_performance = mean_squared_error(
-                    y_train_OR, pls_OR.predict(X_train_OR)
+                    y_train_OR, pls_OR.predict(X_train_OR), squared=False
                 )
 
                 mlflow.log_metric(
@@ -216,7 +216,7 @@ if SHOULD_TRAIN:
                     pls_OR.fit(X_train_OR, y_train_OR)
 
                     new_performance = mean_squared_error(
-                        y_train_OR, pls_OR.predict(X_train_OR)
+                        y_train_OR, pls_OR.predict(X_train_OR), squared=False
                     )
 
                     mlflow.log_metric(
@@ -350,7 +350,7 @@ if SHOULD_PREDICT:
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="662227889769696275")
+    models = get_models(experiment_id="288133286244787831")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
