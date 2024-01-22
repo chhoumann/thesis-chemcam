@@ -397,7 +397,6 @@ if SHOULD_PREDICT:
             pred_df = pd.DataFrame(pred, index=Y.index)
             pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
 
-            # ???
             # Check for NaNs in Y[oxide]
             nan_in_Y = Y[oxide].isna()
             if nan_in_Y.any():
