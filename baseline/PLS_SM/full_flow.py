@@ -50,6 +50,11 @@ preformatted_data_path = Path("./data/_preformatted_sm/")
 train_path = preformatted_data_path / "train.csv"
 test_path = preformatted_data_path / "test.csv"
 
+train_n1_path = preformatted_data_path / "train_n1.csv"
+train_n3_path = preformatted_data_path / "train_n3.csv"
+test_n1_path = preformatted_data_path / "test_n1.csv"
+test_n3_path = preformatted_data_path / "test_n3.csv"
+
 if (
     not preformatted_data_path.exists()
     or not train_path.exists()
@@ -79,19 +84,51 @@ if (
 
     train_processed.to_csv(train_path, index=False)
     test_processed.to_csv(test_path, index=False)
+
+    n1_scaler = Norm1Scaler(reshaped=True)
+    n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+
+    train_cols = train_processed.columns
+    test_cols = test_processed.columns
+
+    train_processed_n1 = n1_scaler.fit_transform(train_processed)
+    train_processed_n3 = n3_scaler.fit_transform(train_processed)
+    test_processed_n1 = n1_scaler.fit_transform(test_processed)
+    test_processed_n3 = n3_scaler.fit_transform(test_processed)
+
+    # turn back into dataframe
+    train_processed_n1 = pd.DataFrame(train_processed_n1, columns=train_cols)
+    train_processed_n3 = pd.DataFrame(train_processed_n3, columns=train_cols)
+    test_processed_n1 = pd.DataFrame(test_processed_n1, columns=test_cols)
+    test_processed_n3 = pd.DataFrame(test_processed_n3, columns=test_cols)
+
+    train_processed_n1.to_csv(preformatted_data_path / "train_n1.csv", index=False)
+    train_processed_n3.to_csv(preformatted_data_path / "train_n3.csv", index=False)
+
+    test_processed_n1.to_csv(preformatted_data_path / "test_n1.csv", index=False)
+    test_processed_n3.to_csv(preformatted_data_path / "test_n3.csv", index=False)
+
+    logger.info("Preformatted data saved to %s", preformatted_data_path)
 else:
     logger.info("Loading preformatted data from location: %s", preformatted_data_path)
     train_processed = pd.read_csv(train_path)
     test_processed = pd.read_csv(test_path)
 
-SHOULD_TRAIN = False
-SHOULD_PREDICT = True
+    # train_processed_n1 = pd.read_csv(train_n1_path)
+    # train_processed_n3 = pd.read_csv(train_n3_path)
+    # test_processed_n1 = pd.read_csv(test_n1_path)
+    # test_processed_n3 = pd.read_csv(test_n3_path)
+
+SHOULD_TRAIN = True
+SHOULD_PREDICT = False
+
+DO_OUTLIER_REMOVAL = True
 
 if SHOULD_TRAIN:
     k_folds = 4
     random_state = 42
     influence_plot_dir = Path("plots/")
-    experiment_name = f"PLS_Models_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_Models_NO-OR_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
     # experiment_name = "PLS_Models_Train_Test_Split"
 
     mlflow.set_experiment(experiment_name)
@@ -116,7 +153,7 @@ if SHOULD_TRAIN:
             )
 
             test_data_filtered = filter_data_by_compositional_range(
-                train_processed, compositional_range, oxide, oxide_ranges
+                test_processed, compositional_range, oxide, oxide_ranges
             )
 
             # We don't do this anymore because we already have the split in train_test_split.csv
@@ -154,7 +191,6 @@ if SHOULD_TRAIN:
                     "paper_rmse", paper_individual_sm_rmses[compositional_range][oxide]
                 )
 
-                # region OUTLIER REMOVAL
                 mlflow.log_params(
                     {
                         "masks": masks,
@@ -162,12 +198,14 @@ if SHOULD_TRAIN:
                         "compositional_range": compositional_range,
                         "oxide": oxide,
                         "n_spectra": len(train),
+                        "outlier_removal": DO_OUTLIER_REMOVAL,
                     }
                 )
 
+                drop_cols = major_oxides + ["Sample Name", "ID"]
+                # region OUTLIER REMOVAL
                 outlier_removal_iterations = 0
                 pls_OR = PLSRegression(n_components=n_components)
-                drop_cols = major_oxides + ["Sample Name", "ID"]
                 X_train_OR = train.drop(columns=drop_cols).to_numpy()
                 y_train_OR = train[oxide].to_numpy()
 
@@ -187,7 +225,7 @@ if SHOULD_TRAIN:
 
                 train_no_outliers = train.copy()
 
-                while True:
+                while True and DO_OUTLIER_REMOVAL:
                     outlier_removal_iterations += 1
                     leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
                     outliers = identify_outliers(leverage, Q)
@@ -258,8 +296,13 @@ if SHOULD_TRAIN:
 
                 logger.info("Performing custom k-fold cross-validation.")
 
+                train_processed = train_no_outliers
+
+                print(f"train_processed: {len(train_processed)}")
+                print(train_processed.head())
+
                 kf = custom_kfold_cross_validation(
-                    train_no_outliers,
+                    train_processed,
                     k=k_folds,
                     group_by="Sample Name",
                     random_state=random_state,
@@ -296,8 +339,8 @@ if SHOULD_TRAIN:
                 X_test = test.drop(columns=drop_cols).to_numpy()
                 y_test = test[oxide].to_numpy()
 
-                X_train_NO = train_no_outliers.drop(columns=drop_cols).to_numpy()
-                y_train_NO = train_no_outliers[oxide].to_numpy()
+                X_train_NO = train_processed.drop(columns=drop_cols).to_numpy()
+                y_train_NO = train_processed[oxide].to_numpy()
 
                 pls_all = PLSRegression(n_components=n_components)
                 pls_all.fit(X_train_NO, y_train_NO)
