@@ -3,7 +3,8 @@ As part of our goal to evaluate the performance of each of the components in the
 Since we did not have access to the original source code implementing the pipeline, we have replicated it at accurately as we could based on the available information.
 We have had to make some assumptions due to insufficient information regarding some components, which we detail in this section.
 In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors --- something we cannot do because we are not domain experts.
-Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible.
+Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible while favoring conservative choices and omitting implementations where information about the original pipeline was unclear.
+This decision was driven by the aspiration to ensure that the baseline results remained minimally influenced by our methodological choices.
 
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
 Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
@@ -40,9 +41,10 @@ This results in two separate datasets, each normalized in a distinct manner but 
 ICA and PLS-SM are then performed on each of these datasets separately.
 The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
 
-\subsubsection{PLS1-SM Regression}
+\subsubsection{PLS1-SM Regression}\label{sec:methodology_pls1-sm_regression}
 The PLS phase of the pipeline follows a submodel approach to make wt. \% predictions for each oxide, as previously mentioned in Section~\ref{sec:introduction}.
 
+%TODO add information about the hyperparameters used
 The training of the models follows the same approach as described in \citet{andersonImprovedAccuracyQuantitative2017} and is illustrated in Figure~\ref{fig:pls_training}.
 However, assumptions have been made regarding the k-fold cross-validation process, as the authors are ambiguous in their description of the number of folds used.
 We interpreted their description as using a 20\% holdout split and a 4-fold on the remaining 80\% of the data --- resulting in a total of 5 folds.
@@ -207,3 +209,63 @@ Ca*      & 50           & 50      \\
 \caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citet{cleggRecalibrationMarsScience2017}}
 \label{tab:weighted_sum_oxide}
 \end{table}
+
+\subsection{Experiments}\label{sec:methodology_experiments}
+To evaluate the performance of each of the components in the pipeline, we focus our experiments on three main aspects:
+
+\begin{itemize}
+	\item \textbf{Outlier removal} to assess the impact of leaving outliers in the dataset or using a different outlier removal method.
+	\item \textbf{Hyperparameter tuning} to assess the impact of different hyperparameter configurations.
+	\item \textbf{Other models} to compare the performance of the PLS1-SM and ICA models to other models.
+\end{itemize}
+
+\noindent
+Given that the original authors did not perform experiments using alternative methods to demonstrate the efficacy of their chosen approach, this omission results in a lack of comprehensive understanding regarding the full potential of the pipeline's performance.
+While they did perform hyperparameter tuning, they did not conduct experiments using different outlier removal methods or alternative models.
+This raises questions about the optimality of the chosen methodology, as a comparative analysis with different methodologies could reveal superior approaches.
+Experimenting with alternative methods means that we can uncover which components contribute the most to the overall error and therefore would benefit the most from further research and development.
+Should a substitution of a component within the pipeline with an alternative method yield improved outcomes, it would indicate that the currently employed method represents a limitation in the overall pipeline, thus highlighting an area that necessitates enhancement.
+
+\subsubsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
+The original PLS1-SM identified outliers manually by inspecting the leverage and spectral residuals plots.
+We have instead chosen to automate this based on the reasons described in Section~\ref{sec:methodology_outlier_removal}.
+It would therefore be intriguing to examine the impact on the pipeline's performance when this process is adjusted.
+Firstly, examining the performance implications of completely omitting outlier removal would be worthwhile.
+This experiment is justified given the substantial efforts dedicated to developing the ChemCam calibration dataset as mentioned in Section~\ref{sec:ica_data_preprocessing}, which implies a minimal presence of significant outliers.
+Furthermore, experimenting with various significance levels for the chi-squared test could reveal whether a more or less conservative approach is advantageous.
+
+In the ICA phase, the original authors employed the Median Absolute Deviation (MAD) for outlier removal, yet the detailed methodology of their approach was not fully delineated.
+Consequently, in our version of the pipeline, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
+This decision allows us to evaluate the intrinsic effectiveness of the ICA phase without the influence of outlier removal.
+Introducing outlier removal using MAD in our replication of the pipeline presents an opportunity to assess its impact on the pipeline's efficacy.
+By comparing the results with and without MAD, we can quantitatively measure the utility of this step.
+Such an experiment is crucial for understanding whether MAD significantly contributes to reducing noise and improving data quality, thereby enhancing the overall performance of the machine learning pipeline.
+This experiment would also offer insights into the robustness of the ICA phase against outliers, providing a more comprehensive understanding of the pipeline's capabilities and limitations.
+
+\subsubsection{Experiment: Hyperparameter Tuning}\label{sec:experiment_hyperparameter_tuning}
+\citet{cleggRecalibrationMarsScience2017} use qualitative judgement to identify hyperparameters for their PLS1-SM model.
+This approach carries a risk of inaccuracies without sufficient domain expertise, given the challenges in guaranteeing the optimality of chosen hyperparameters.
+Lacking such expertise, we opted for a more systematic and automated methodology to determine hyperparameters for our PLS1-SM model.
+
+Similarly, the authors use eight independent components for their ICA algorithm, but do not provide any experimental results justifying that this is the optimal number of components.
+As such, it is possible that the performance of the ICA phase could be improved by experimenting with a variety of components.
+
+For the PLS1-SM model we decided to use the common grid search algorithm for testing different hyperparameters for the PLS models.
+% Explain set up...
+
+Since each independent component does not necessarily correlate one-to-one with the number of elements that one wishes to identify in a spectra, we decided to experiment with a number of components ranging between 4 and 25.
+This range is within the vicinity of the original selection of components whilst providing us with a set of reasonable extremes.
+
+% Probably show the setup in some way
+
+\subsubsection{Experiment: Other Models}\label{sec:experiment_other_models}
+\citet{cleggRecalibrationMarsScience2017} have only compared their new approach with the original method presented by \citet{wiensPreFlight3}, and have not conducted experiments using alternative methods to establish the superiority of their chosen approach.
+Therefore, we decided to compare the performance of the PLS1-SM and ICA models to other models.
+The objective is to evaluate two distinct scenarios. In the first scenario, we aim to conduct a direct comparison between the MOC model and an alternative model. The second scenario revolves around substituting either PLS or ICA with a different model and then calculating a weighted average.
+We have decided to conduct the experiments using the following models:
+
+\begin{itemize}
+	\item \textbf{XGBoost}, a gradient boosting algorithm, \cite{chen_xgboost_2016}.
+	\item \textbf{ANN}, a neural network model, \cite{scikit-learn}.
+	% More? Random Forest, SVM, etc.
+\end{itemize}

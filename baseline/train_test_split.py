@@ -38,7 +38,7 @@ def get_composition_for_sample(cd, sample_name):
 if __name__ == "__main__":
     save_path = Path("train_test_split.csv")
 
-    if save_path.exists() and False:
+    if save_path.exists():
         print("train_test_split.csv already exists. Skipping...")
         exit()
 
