@@ -1,21 +1,56 @@
 \section{Results}\label{sec:results}
+In this section, we detail the outcomes of our MOC pipeline replica and the experiments described in Section~\ref{sec:methodology}.
+The performance of our replica serves as baseline for comparison with the original MOC pipeline and as a basis for assessing experimental results.
 
-\begin{table}[!ht]
-    \centering
-    \begin{tabular}{|l|l|l|l|}
-    \hline
-        Oxides & PLS-SM (RMSEP) & ICA (Test RMSE) & MOC (Test RMSE) \\ \hline
-        K20 & 0.85 & 1.71 & 1.38 \\ \hline
-        Na2O & 0.84 & 1.45 & 0.97 \\ \hline
-        CaO & 9.90 & 3.62 & 4.54 \\ \hline
-        MgO & 1.42 & 3.44 & 2.01 \\ \hline
-        FeOT & 7.21 & 6.05 & 6.71 \\ \hline
-        Al2O3 & 3.00 & 4.11 & 3.05 \\ \hline
-        TiO2 & 0.76 & 0.51 & 0.51 \\ \hline
-        SiO2 & 10.87 & 10.67 & 7.85 \\ \hline
-    \end{tabular}
-    \caption{These results are intermediate and will be adjusted shortly. We are tweaking the system to account for missing values that caused some of the results to be skewed.}
+\subsection{MOC Results}
+Table \ref{tab:results_rmses} shows the RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models.
+
+% TODO: Comment on the results
+% TODO: Test if there is a statistically significant difference between the original and replica models
+
+\begin{table*}[t]
+\centering
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc}
+\hline
+Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (replica) & MOC (original) & MOC (replica) \\
+\hline
+\ce{SiO2}  & 3.39               & 11.91             & 8.31           & 9.89          & 5.30           & 6.97 \\
+\ce{TiO2}  & 1.33               & 0.81              & 1.44           & 0.55          & 1.03           & 0.52 \\
+\ce{Al2O3} & 2.97               & 3.72              & 4.77           & 4.25          & 3.47           & 3.66 \\
+\ce{FeO_T} & 2.71               & 7.26              & 5.17           & 3.74          & 2.31           & 3.45 \\
+\ce{MgO}   & 1.28               & 3.13              & 4.08           & 3.13          & 2.21           & 1.75 \\
+\ce{CaO}   & 0.35               & 3.58              & 3.07           & 3.58          & 2.72           & 5.75 \\
+\ce{Na2O}  & 1.09               & 3.02              & 2.29           & 3.02          & 0.62           & 2.38 \\
+\ce{K2O}   & 0.62               & 1.40              & 0.98           & 1.40          & 0.82           & 0.91 \\
+\hline
+\end{tabular*}
+\caption{RMSE of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
+\label{tab:results_rmses}
+\end{table*}
+
+\subsection{ANN Results}
+Table \ref{tab:results_ann} shows the RMSEs of the original MOC model and our ANN model.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{lcc}
+\hline
+Element    & MOC (original) & ANN \\
+\hline
+\ce{SiO2}  & 5.30           & \textbf{4.56} \\
+\ce{TiO2}  & 1.03           & \textbf{0.57} \\
+\ce{Al2O3} & 3.47           & \textbf{2.47} \\
+\ce{FeO_T} & \textbf{2.31}  & 2.45          \\
+\ce{MgO}   & 2.21           & \textbf{1.35} \\
+\ce{CaO}   & 2.72           & \textbf{1.50} \\
+\ce{Na2O}  & \textbf{0.62}  & 3.05          \\
+\ce{K2O}   & \textbf{0.82}  & 0.93          \\
+\hline
+\end{tabular}
+\caption{RMSE of the original MOC model and our ANN model.}
+\label{tab:results_ann}
 \end{table}
+
 
 % Analysis / Experimental / Empirical Evaluation (the analysis, comparing our method to SoA or a baseline, ablation study)
 % \begin{itemize}
