@@ -28,6 +28,17 @@ Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (repl
 \label{tab:results_rmses}
 \end{table*}
 
+As can be seen in Table~\ref{tab:results_rmses} we have presented a pairwise comparison between the errors obtained by the original models and our own.
+From the table it is clear that the errors obtained from our ICA and MOC replication are similar to the originals, while the errors obtained from our PLS1-SM replication are quite different.
+Performing a T-test between the models confirm these observations:
+\begin{itemize}
+    \item p-value for PLS1-SM: 3.44\%
+    \item p-value for ICA: 85.57\%
+    \item p-value for MOC: 9.13\%
+\end{itemize}
+
+
+
 \subsection{ANN Results}
 Table \ref{tab:results_ann} shows the RMSEs of the original MOC model and our ANN model.
 
