@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Optional
-
-from lib.reproduction import folder_to_composition_sample_name
+from typing import Dict, Optional
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from tqdm import tqdm
+
+from lib.reproduction import folder_to_composition_sample_name
 
 
 def get_location_dataset_paths_for_sample(sample_name: str, data_path: Path):
@@ -35,10 +35,10 @@ def get_dataset_frame(dataset_path):
         # read csv from that line - columns also start wih "#"
         return pd.read_csv(dataset_path, skiprows=target - 1)
 
- 
+
 def get_preprocessed_sample_data(
     sample_name: str, data_path: Path, average_shots=True
-) -> list[pd.DataFrame]:
+) -> Dict[str, pd.DataFrame]:
     """
     Get preprocessed sample data.
 
@@ -56,7 +56,7 @@ def get_preprocessed_sample_data(
     wavelengths = pd.Series(dtype="float64")
 
     sample_dataset_paths = get_location_dataset_paths_for_sample(sample_name, data_path)
-    sample_spectra = []
+    sample_spectra = {}
 
     for i, sample_set in enumerate(sample_dataset_paths):
         df = get_dataset_frame(sample_set)
@@ -84,7 +84,7 @@ def get_preprocessed_sample_data(
             df.drop(shot_cols, axis=1, inplace=True)
             df.insert(1, "shot_avg", shot_avg)
 
-        sample_spectra.append(df)
+        sample_spectra[sample_set.stem] = df
 
     return sample_spectra
 
@@ -93,7 +93,7 @@ def load_data(
     dataset_loc: str,
     num_samples: Optional[int] = None,
     average_shots=True,
-) -> dict[str, list[pd.DataFrame]]:
+) -> Dict[str, Dict[str, pd.DataFrame]]:
     """
     Load data from the specified dataset location.
 
@@ -108,7 +108,7 @@ def load_data(
     a location on the sample.
     """
 
-    sample_data: dict[str, list[pd.DataFrame]] = {}
+    sample_data: Dict[str, Dict[str, pd.DataFrame]] = {}
     data_path = Path(dataset_loc).resolve(strict=True)
     sample_names = [f.name for f in data_path.iterdir() if f.is_dir()]
 
@@ -395,6 +395,7 @@ class CustomSpectralPipeline:
         self,
         sample_df: pd.DataFrame,
         sample_name: str,
+        location_name: str,
     ):
         """
         Process a single sample.
@@ -419,10 +420,11 @@ class CustomSpectralPipeline:
         )
 
         final_df["Sample Name"] = sample_name
+        final_df["ID"] = f"{sample_name}_{location_name}"
 
         return final_df
 
-    def fit_transform(self, sample_data: dict[str, list[pd.DataFrame]]):
+    def fit_transform(self, sample_data: dict[str, Dict[str, pd.DataFrame]]):
         """
         Fit and transform the sample data.
 
@@ -433,13 +435,15 @@ class CustomSpectralPipeline:
             pd.DataFrame: Transformed DataFrame.
         """
         transformed_samples = []
-        for sample_name, sample_dfs in tqdm(
+        for sample_name, sample_location_dfs in tqdm(
             sample_data.items(), desc="Transforming samples"
         ):
-            for _, sample_df in enumerate(sample_dfs):
+            for _, (location_name, sample_df) in enumerate(sample_location_dfs.items()):
                 if self.composition_data.get_composition_for_sample(sample_name).empty:
                     continue
-                transformed_df = self.process_sample(sample_df, sample_name)
+                transformed_df = self.process_sample(
+                    sample_df, sample_name, location_name
+                )
                 transformed_samples.append(transformed_df)
         df_out = pd.concat(transformed_samples, ignore_index=True).rename(columns=str)
         return df_out

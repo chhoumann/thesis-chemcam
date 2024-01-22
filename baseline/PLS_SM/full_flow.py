@@ -21,16 +21,13 @@ from lib.outlier_removal import (
 from lib.reproduction import (
     major_oxides,
     masks,
+    optimized_blending_ranges,
     oxide_ranges,
     paper_individual_sm_rmses,
     spectrometer_wavelength_ranges,
     training_info,
-    optimized_blending_ranges,
 )
-from lib.utils import (
-    custom_kfold_cross_validation,
-    filter_data_by_compositional_range,
-)
+from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
 from PLS_SM.inference import predict_composition_with_blending
 
 env = dotenv_values()
@@ -53,7 +50,11 @@ preformatted_data_path = Path("./data/_preformatted_sm/")
 train_path = preformatted_data_path / "train.csv"
 test_path = preformatted_data_path / "test.csv"
 
-if not preformatted_data_path.exists():
+if (
+    not preformatted_data_path.exists()
+    or not train_path.exists()
+    or not test_path.exists()
+):
     take_samples = None
 
     logger.info("Loading data from location: %s", dataset_loc)
@@ -118,6 +119,7 @@ if SHOULD_TRAIN:
                 train_processed, compositional_range, oxide, oxide_ranges
             )
 
+            # We don't do this anymore because we already have the split in train_test_split.csv
             # Separate 20% of the data for testing
             # train, test = custom_train_test_split(
             #     data_filtered,
@@ -165,14 +167,14 @@ if SHOULD_TRAIN:
 
                 outlier_removal_iterations = 0
                 pls_OR = PLSRegression(n_components=n_components)
-                drop_cols = major_oxides + ["Sample Name"]
+                drop_cols = major_oxides + ["Sample Name", "ID"]
                 X_train_OR = train.drop(columns=drop_cols).to_numpy()
                 y_train_OR = train[oxide].to_numpy()
 
                 pls_OR.fit(X_train_OR, y_train_OR)
 
                 current_performance = mean_squared_error(
-                    y_train_OR, pls_OR.predict(X_train_OR)
+                    y_train_OR, pls_OR.predict(X_train_OR), squared=False
                 )
 
                 mlflow.log_metric(
@@ -214,7 +216,7 @@ if SHOULD_TRAIN:
                     pls_OR.fit(X_train_OR, y_train_OR)
 
                     new_performance = mean_squared_error(
-                        y_train_OR, pls_OR.predict(X_train_OR)
+                        y_train_OR, pls_OR.predict(X_train_OR), squared=False
                     )
 
                     mlflow.log_metric(
@@ -343,14 +345,19 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    models = get_models(experiment_id='164614136207675379')
+    experiment_name = f"PLS_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+
+    mlflow.set_experiment(experiment_name)
+    mlflow.autolog(log_models=False, log_datasets=False)
+
+    models = get_models(experiment_id="288133286244787831")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
         "data/data/PLS_SM/na.csv", index=False
     )
     count_pre_drop = len(test_processed)
-    test_processed.dropna(inplace=True, axis='index')
+    test_processed.dropna(inplace=True, axis="index")
     count_post_drop = len(test_processed)
 
     logger.warn(
@@ -360,9 +367,9 @@ if SHOULD_PREDICT:
     )
 
     Y = test_processed[major_oxides]
-    drop_cols = major_oxides + ["Sample Name"]
+    drop_cols = major_oxides + ["Sample Name", "ID"]
 
-    target_predictions = pd.DataFrame(test_processed["Sample Name"])
+    target_predictions = pd.DataFrame(test_processed[["Sample Name", "ID"]])
 
     n1_scaler = Norm1Scaler(reshaped=True)
     n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
@@ -376,40 +383,41 @@ if SHOULD_PREDICT:
     predictions_save_path.mkdir(parents=True, exist_ok=True)
 
     for oxide in tqdm(major_oxides, desc="Predicting oxides"):
-        _oxide_ranges = oxide_ranges.get(oxide, None)
-        if _oxide_ranges is None:
-            logger.info("Skipping oxide: %s", oxide)
-            continue
+        with mlflow.start_run(run_name=f"PLS_TEST_{oxide}"):
+            _oxide_ranges = oxide_ranges.get(oxide, None)
+            if _oxide_ranges is None:
+                logger.info("Skipping oxide: %s", oxide)
+                continue
 
-        pred = predict_composition_with_blending(
-            oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
-        )
+            pred = predict_composition_with_blending(
+                oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
+            )
 
-        # save
-        pred_df = pd.DataFrame(pred, index=Y.index)
-        pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
+            # save
+            pred_df = pd.DataFrame(pred, index=Y.index)
+            pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
 
-        # ???
-        # Check for NaNs in Y[oxide]
-        nan_in_Y = Y[oxide].isna()
-        if nan_in_Y.any():
-            print("NaNs in Y[oxide]:")
-            print(Y[oxide][nan_in_Y])
+            # Check for NaNs in Y[oxide]
+            nan_in_Y = Y[oxide].isna()
+            if nan_in_Y.any():
+                print("NaNs in Y[oxide]:")
+                print(Y[oxide][nan_in_Y])
 
-        # Check for NaNs in pred_df
-        nan_in_pred_df = pred_df.isna()
-        if nan_in_pred_df.any().any():  # Note the double .any() here
-            print("NaNs in pred_df:")
-            print(pred_df[nan_in_pred_df])
+            # Check for NaNs in pred_df
+            nan_in_pred_df = pred_df.isna()
+            if nan_in_pred_df.any().any():  # Note the double .any() here
+                print("NaNs in pred_df:")
+                print(pred_df[nan_in_pred_df])
 
-        # calculate RMSEP
-        rmsep = mean_squared_error(Y[oxide], pred_df, squared=False)
-        # save
-        with open(save_path / "rmsep.txt", "a") as f:
-            f.write(f"{oxide}: {rmsep}\n")
+            # calculate RMSEP
+            rmsep = mean_squared_error(Y[oxide], pred_df, squared=False)
+            mlflow.log_metric("RMSEP", float(rmsep))
+            # save
+            with open(save_path / "rmsep.txt", "a") as f:
+                f.write(f"{oxide}: {rmsep}\n")
 
-        target_predictions[oxide] = pred
-    
+            target_predictions[oxide] = pred
+
     target_predictions.to_csv(save_path / "tar_pred.csv")
 
 

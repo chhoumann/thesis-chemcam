@@ -5,7 +5,7 @@ from dotenv import dotenv_values
 from sklearn.model_selection import train_test_split
 
 from lib.data_handling import CompositionData, load_data
-from lib.reproduction import folder_to_composition_sample_name
+from lib.reproduction import folder_to_composition_sample_name, major_oxides
 
 env = dotenv_values()
 comp_data_loc = env.get("COMPOSITION_DATA_PATH")
@@ -52,6 +52,10 @@ if __name__ == "__main__":
         composition = get_composition_for_sample(cd.composition_data, sample_name)
 
         if composition.empty:
+            continue
+
+        # drop samples with NaNs for any of the oxides
+        if composition[major_oxides].isnull().values.any():
             continue
 
         used_2015 = composition["Used for 2015 calibration"].values[0]
