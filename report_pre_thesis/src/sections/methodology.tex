@@ -67,7 +67,7 @@ Given some new data sample, the full model gives an initial compositional predic
 Based on this prediction, the data is then "binned" into one of five concentration ranges -- the three submodel ranges and two blending ranges.
 For each of these five concentration ranges, there is one or two corresponding \textit{submodel(s)}.
 These submodels are used to make predictions in the corresponding concentration range after the full model has made its initial predictions.
-The submodels are specialized in either low, low-mid, mid, mid-high, high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
+The submodels are specialized in either low, mid, or high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
 If the full model predicts a concentration that falls within a blending range, the approach described in Section~\ref{sec:pls_submodels} is used to combine the predictions from the corresponding submodels.
 
 \begin{figure}
