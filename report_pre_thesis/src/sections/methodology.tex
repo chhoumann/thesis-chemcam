@@ -33,7 +33,7 @@ As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regio
 The dataframe is then transformed through a transpose operation, swapping the rows and columns.
 This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
 All negative values are then transformed into zeros since negative values are not physically possible.
-Given the pre-defined compositional ranges for each oxide in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out wavelengths outside of these ranges.
+Given the compositional ranges for each submodel defined in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out the samples whose compositional values are outside of these ranges.
 The range is defined by an upper and a lower bound, and any wavelength outside of this range is removed.
 Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
 This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
