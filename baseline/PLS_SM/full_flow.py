@@ -391,12 +391,12 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    experiment_name = f"PLS_TEST_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_TEST_NO-OUT-OF-RANGE_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
 
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="479233079534008621")
+    models = get_models(experiment_id="691892636467835743")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
@@ -435,9 +435,14 @@ if SHOULD_PREDICT:
                 logger.info("Skipping oxide: %s", oxide)
                 continue
 
-            pred = predict_composition_with_blending(
+            pred = np.array(predict_composition_with_blending(
                 oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
-            )
+            ))
+
+            # remove nans in pred from both pred and test
+            nan_in_pred = np.isnan(pred)
+            pred = pred[~nan_in_pred]
+            Y = Y[~nan_in_pred]
 
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)

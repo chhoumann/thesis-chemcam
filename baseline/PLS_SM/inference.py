@@ -83,7 +83,7 @@ def predict_composition_with_blending(oxide: str, X1, X3, models, ranges):
 
                 lower, upper = blend_range.split("-")
 
-                # if the model has Mid-High but no mid, inference would fail otherwise  (K2O and Na2O)
+                # if the model has Mid-High but no mid, inference would fail otherwise (K2O and Na2O)
                 if lower not in models[oxide] and lower == "Mid":
                     lower = "Low"
 
@@ -112,8 +112,10 @@ def predict_composition_with_blending(oxide: str, X1, X3, models, ranges):
                 break
 
         if not prediction_made:
-            raise ValueError(
-                f"{i}: y_full value {y_full} for oxide {oxide} is outside defined blending ranges."
-            )
+            # raise ValueError(
+            #     f"{i}: y_full value {y_full} for oxide {oxide} is outside defined blending ranges."
+            # )
+            # don't include this sample in the final predictions
+            predictions.append(np.nan)
 
     return predictions
