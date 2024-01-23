@@ -64,7 +64,9 @@ Outlier removal is performed iteratively; an initial PLS model is conceived with
 \subsubsection{Partial Least Squares Sub-Models}\label{sec:pls_submodels}
 
 \citet{andersonImprovedAccuracyQuantitative2017} proposed an approach referred to as the Partial Least Squares Sub-Models (PLS1-SM).
-The inherent variability of LIBS spectral responses to different element concentrations necessitates a nuanced analysis. High element concentrations tend to obscure the spectral signal, and the presence of other elements further complicates the spectral response. A single regression model typically falls short in accounting for such variations, leading to compromises in predictive precision for specific samples.
+The inherent variability of LIBS spectral responses to different element concentrations necessitates a nuanced analysis.
+High element concentrations can lead to spectral signal obscuration, often due to phenomena like self-absorption in strong lines, while at lower concentrations, there is a risk of spectral lines disappearing.
+A single regression model typically falls short in accounting for such variations, leading to compromises in predictive precision for specific samples.
 
 They deployed multiple regression models, each tailored to subsets of the entire composition range, targeting "low," "mid," and "high" concentrations along with a comprehensive "full model." This led to the formation of 32 distinct models, with selected sub-model ranges that prioritize both a robust dataset and precise compositional response.
 
