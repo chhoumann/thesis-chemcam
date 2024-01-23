@@ -91,11 +91,13 @@ def filter_data_by_compositional_range(data, compositional_range, oxide, oxide_r
     # Get the lower and upper bounds for the specified compositional range and oxide
     lower_bound, upper_bound = oxide_ranges[oxide][compositional_range]
 
-    data[oxide] = pd.to_numeric(data[oxide], errors="coerce")
-    data = data.dropna(subset=[oxide])
+    _data = data.copy(deep=True)
+
+    _data[oxide] = pd.to_numeric(data[oxide], errors="coerce")
+    _data = data.dropna(subset=[oxide])
 
     # Filter the dataset based on the oxide concentration within the specified range
-    filtered_data = data[(data[oxide] >= lower_bound) & (data[oxide] <= upper_bound)]
+    filtered_data = _data[(_data[oxide] >= lower_bound) & (_data[oxide] <= upper_bound)]
 
     # Check if empty now
     if filtered_data.empty:
