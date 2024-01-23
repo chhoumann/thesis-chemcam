@@ -55,8 +55,8 @@ if __name__ == "__main__":
             continue
 
         used_2015 = composition["Used for 2015 calibration"].values[0]
-        if used_2015 == 1:
-            samples_used_2015.append(sample)
+        # if used_2015 == 1:
+        samples_used_2015.append(sample)
 
     train, test = train_test_split(samples_used_2015, test_size=0.2, random_state=41)
 
