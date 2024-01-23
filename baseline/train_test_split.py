@@ -58,7 +58,7 @@ if __name__ == "__main__":
         # if used_2015 == 1:
         samples_used_2015.append(sample)
 
-    train, test = train_test_split(samples_used_2015, test_size=0.2, random_state=41)
+    train, test = train_test_split(samples_used_2015, test_size=0.2, random_state=42)
 
     train_df = pd.DataFrame(train, columns=["sample_name"])
     train_df["train_test"] = "train"
