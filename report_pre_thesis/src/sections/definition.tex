@@ -9,9 +9,9 @@ This section introduces the LIBS dataset and the hypothesis function for predict
 \end{definition}
 
 \begin{definition}\label{def:hypothesis_function}
-    Given a set of major oxides \(O\) where \(k=|O|\), define a model \(M\) that learns a hypothesis function \(f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k\), using the dataset \(D\), defined in Definition \ref{def:dataset}, as input. 
-    This input, comprising wavelengths and intensity values, is used to predict the composition of the \(k\) major oxides in geological samples. 
-    The output of the hypothesis function is a vector \(\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{8}]\) where \(\hat{y}_{i}\) is the predicted weight percentage of the major oxide \(o_i \in O\).
+    Given a set of major oxides \(O\) where \(k=|O|\), define a model \(M\) that learns a hypothesis function \(f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k\), using the dataset \(D\), defined in Definition \ref{def:dataset}, as input.
+    This input, comprising wavelengths and intensity values, is used to predict the composition of the \(k\) major oxides in geological samples.
+    The output of the hypothesis function is a vector \(\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{k}]\) where \(\hat{y}_{i}\) is the predicted weight percentage of the major oxide \(o_i \in O\).
 \end{definition}
 
 The sum of the predicted weight percentages is not necessarily equal to 100\%, but is not expected to surpass 100\%.
@@ -36,4 +36,4 @@ The goal is to measure how each experiment affects the model's performance by lo
 
 This leads us to the following challenge:
 
-\textbf{Problem}: Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error $E(M)$. 
+\textbf{Problem}: Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error $E(M)$.
