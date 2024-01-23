@@ -12,7 +12,7 @@ In Figure \ref{fig:libs_data_processing} we illustrate the data processing and c
 As shown in Figure~\ref{fig:libs_data_processing}, the raw LIBS data goes through a series of initial preprocessing steps to produce a clean calibrated spectrum (CCS) for each shot, which is used as the input for the system.
 We do not go into further details about this process here, however a full description can be found in \citet{wiensPreFlight3}.
 The CCS data format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample.
-We give a detailed description of the entire ChemCam calibration dataset in Section \ref{sec:data_overview}.
+We give a more detailed description of the CCS data format in Section \ref{sec:data_overview} where we also describe the ChemCam calibration dataset as a whole.
 
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
 The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Submodels (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
