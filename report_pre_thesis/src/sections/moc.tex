@@ -70,7 +70,10 @@ A single regression model typically falls short in accounting for such variation
 
 They deployed multiple regression models, each tailored to subsets of the entire composition range, targeting "low," "mid," and "high" concentrations along with a comprehensive "full model." This led to the formation of 32 distinct models, with selected sub-model ranges that prioritize both a robust dataset and precise compositional response.
 
-Each sub-model was subjected to training, cross-validation, and optimization phases, which included the iterative outlier removal strategy mentioned in section~\ref{sec:outlier_removal}. The full model's preliminary composition estimation of unknown targets dictates the choice of subsequent sub-model(s) for refined prediction.
+Each sub-model was subjected to training, cross-validation, and optimization phases, which included the iterative outlier removal strategy mentioned in section~\ref{sec:outlier_removal}.
+The full model's preliminary composition estimation of unknown targets dictates the choice of subsequent sub-model(s) for refined prediction.
+If the full model's prediction falls within the "low", "mid", or "high" ranges, the corresponding sub-model is selected for the final prediction.
+However, if a prediction falls within two ranges, the sub-models corresponding to the two ranges are blended to produce the final prediction.
 For example, a prediction falling within the "low" and "mid" ranges would be calculated by blending the predictions from the "low" and "mid" sub-models as follows:
 
 \begin{align*}
