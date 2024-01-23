@@ -30,7 +30,7 @@ from lib.reproduction import (
     spectrometer_wavelength_ranges,
     training_info,
 )
-from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
+from lib.utils import filter_data_by_compositional_range
 from PLS_SM.inference import predict_composition_with_blending
 
 # ignore all future warnings
@@ -125,10 +125,10 @@ else:
     # test_processed_n1 = pd.read_csv(test_n1_path)
     # test_processed_n3 = pd.read_csv(test_n3_path)
 
-SHOULD_TRAIN = False
-SHOULD_PREDICT = True
+SHOULD_TRAIN = True
+SHOULD_PREDICT = False
 
-DO_OUTLIER_REMOVAL = True
+DO_OUTLIER_REMOVAL = False
 
 if SHOULD_TRAIN:
     k_folds = 4
@@ -161,7 +161,7 @@ if SHOULD_TRAIN:
             )
 
             test_data_filtered = filter_data_by_compositional_range(
-                test_processed, compositional_range, oxide, oxide_ranges
+                train_processed, compositional_range, oxide, oxide_ranges
             )
 
             # We don't do this anymore because we already have the split in train_test_split.csv
@@ -299,51 +299,51 @@ if SHOULD_TRAIN:
 
                 # endregion
                 # region Cross-Validation
-                best_CV_model = None
-                best_CV_rmse = np.inf
+                # best_CV_model = None
+                # best_CV_rmse = np.inf
 
-                logger.info("Performing custom k-fold cross-validation.")
+                # logger.info("Performing custom k-fold cross-validation.")
 
-                kf = custom_kfold_cross_validation(
-                    train_no_outliers,
-                    k=k_folds,
-                    group_by="Sample Name",
-                    random_state=random_state,
-                )
+                # kf = custom_kfold_cross_validation(
+                #     train_no_outliers,
+                #     k=k_folds,
+                #     group_by="Sample Name",
+                #     random_state=random_state,
+                # )
 
-                fold_rmses = []
-                for i, (train_data, test_data) in enumerate(kf):
-                    pls_CV = PLSRegression(n_components=n_components)
-                    X_train_CV = train_data.drop(columns=drop_cols).to_numpy()
-                    y_train_CV = train_data[oxide].to_numpy()
-                    X_test = test_data.drop(columns=drop_cols).to_numpy()
-                    y_test = test_data[oxide].to_numpy()
+                # fold_rmses = []
+                # for i, (train_data, test_data) in enumerate(kf):
+                #     pls_CV = PLSRegression(n_components=n_components)
+                #     X_train_CV = train_data.drop(columns=drop_cols).to_numpy()
+                #     y_train_CV = train_data[oxide].to_numpy()
+                #     X_test = test_data.drop(columns=drop_cols).to_numpy()
+                #     y_test = test_data[oxide].to_numpy()
 
-                    pls_CV.fit(X_train_CV, y_train_CV)
-                    y_pred = pls_CV.predict(X_test)
-                    fold_rmse = mean_squared_error(y_test, y_pred, squared=False)
-                    fold_rmses.append(fold_rmse)
+                #     pls_CV.fit(X_train_CV, y_train_CV)
+                #     y_pred = pls_CV.predict(X_test)
+                #     fold_rmse = mean_squared_error(y_test, y_pred, squared=False)
+                #     fold_rmses.append(fold_rmse)
 
-                    mlflow.log_metric(f"fold_{i}_RMSE", float(fold_rmse))
+                #     mlflow.log_metric(f"fold_{i}_RMSE", float(fold_rmse))
 
-                    if fold_rmse < best_CV_rmse:
-                        best_CV_rmse = fold_rmse
-                        best_CV_model = pls_CV
+                #     if fold_rmse < best_CV_rmse:
+                #         best_CV_rmse = fold_rmse
+                #         best_CV_model = pls_CV
 
-                avg_rmse = np.mean(fold_rmses)
-                mlflow.log_metric("RMSECV", float(avg_rmse))
-                mlflow.log_metric("RMSECV_MIN", float(np.min(fold_rmses)))
-                mlflow.sklearn.log_model(
-                    best_CV_model, f"PLS_CV_{oxide}_{compositional_range}"
-                )
+                # avg_rmse = np.mean(fold_rmses)
+                # mlflow.log_metric("RMSECV", float(avg_rmse))
+                # mlflow.log_metric("RMSECV_MIN", float(np.min(fold_rmses)))
+                # mlflow.sklearn.log_model(
+                #     best_CV_model, f"PLS_CV_{oxide}_{compositional_range}"
+                # )
                 # endregion
 
                 # region Train model on all data (outliers removed) & get RMSEP
                 X_test = test.drop(columns=drop_cols).to_numpy()
                 y_test = test[oxide].to_numpy()
 
-                X_train_NO = train_processed.drop(columns=drop_cols).to_numpy()
-                y_train_NO = train_processed[oxide].to_numpy()
+                X_train_NO = train_no_outliers.drop(columns=drop_cols).to_numpy()
+                y_train_NO = train_no_outliers[oxide].to_numpy()
 
                 pls_all = PLSRegression(n_components=n_components)
                 pls_all.fit(X_train_NO, y_train_NO)
@@ -435,14 +435,16 @@ if SHOULD_PREDICT:
                 logger.info("Skipping oxide: %s", oxide)
                 continue
 
-            pred = np.array(predict_composition_with_blending(
-                oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
-            ))
+            pred = np.array(
+                predict_composition_with_blending(
+                    oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
+                )
+            )
 
             # remove nans in pred from both pred and test
-            nan_in_pred = np.isnan(pred)
-            pred = pred[~nan_in_pred]
-            Y = Y[~nan_in_pred]
+            # nan_in_pred = np.isnan(pred)
+            # pred = pred[~nan_in_pred]
+            # Y = Y[~nan_in_pred]
 
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
