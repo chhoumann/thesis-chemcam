@@ -189,7 +189,6 @@ Initially, it might appear limiting, but by applying transformations to the feat
 \subsection{MOC}\label{sec:methodology_moc}
 As described in section \ref{sec:moc_derivation}, the result of the PLS1-SM and ICA are combined to produce the final MOC model, which weights the results of the two techniques in favor of the one that performs best for each oxide.
 The specific weights used for each oxide can be seen in table \ref{tab:weighted_sum_oxide}.
-Note that the weights for Ti, Mg and Ca have been set to 50/50 since \citet{cleggRecalibrationMarsScience2017} does not mention the weights they used for these elements.
 
 \begin{table}[h]
 \centering
@@ -201,12 +200,12 @@ Fe       & 75           & 25      \\
 Si       & 50           & 50      \\
 Na       & 40           & 60      \\
 K2       & 25           & 75      \\
-Ti*      & 50           & 50      \\
-Mg*      & 50           & 50      \\
-Ca*      & 50           & 50      \\
+Ti       & 50           & 50      \\
+Mg       & 50           & 50      \\
+Ca       & 50           & 50      \\
 \bottomrule
 \end{tabular*}
-\caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citet{cleggRecalibrationMarsScience2017}}
+\caption{Weighted Sum of Oxide Percentages.}
 \label{tab:weighted_sum_oxide}
 \end{table}
 
