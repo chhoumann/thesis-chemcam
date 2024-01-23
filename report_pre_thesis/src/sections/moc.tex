@@ -9,9 +9,9 @@
 In Figure \ref{fig:libs_data_processing} we illustrate the data processing and calibration steps for LIBS data leading to the derivation of Multivariate Oxide Composition (MOC). The MOC model is described in details by \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}, but we provide a brief overview here, which will serve as a foundation for the subsequent discussion of our work.
 
 \subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
-
-The resulting data format is referred to as cleaned and calibrated spectra (CCS), which serves as the input for the system.
-This format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample, at that particular wavelength.
+As shown in Figure~\ref{fig:libs_data_processing}, the raw LIBS data goes through a series of initial preprocessing steps to produce a clean calibrated spectrum (CCS) for each shot, which is used as the input for the system.
+We do not go into further details about this process here, however a full description can be found in \citet{wiensPreFlight3}.
+The CCS data format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample.
 We give a detailed description of the entire ChemCam calibration dataset in Section \ref{sec:data_overview}.
 
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
@@ -27,7 +27,7 @@ The optimal normalization technique is selected based on its efficacy in model p
 
 \subsubsection{Outlier Removal}\label{sec:outlier_removal}
 
-In their analysis, \citet{andersonImprovedAccuracyQuantitative2017} employed a methodical outlier removal process to enhance model accuracy in multivariate regression. To detect outliers, they utilized influence plots, employing statistical measures that reflect each data point's deviation from the model's predictions and their influence on the model due to their position in the predictor space. 
+In their analysis, \citet{andersonImprovedAccuracyQuantitative2017} employed a methodical outlier removal process to enhance model accuracy in multivariate regression. To detect outliers, they utilized influence plots, employing statistical measures that reflect each data point's deviation from the model's predictions and their influence on the model due to their position in the predictor space.
 In this context, the deviation, or the error, are known as residuals and the influence a data point has on the model is known as leverage.
 The application of the following equation to latent variables enables the computation of an observation leverages vector (\(h_t\)):
 
@@ -36,7 +36,7 @@ The application of the following equation to latent variables enables the comput
 \end{equation}
 
 Where $t$ represents the PLS scores.
-Given that leverage quantifies the distance of each observation from the model's center, it can be interpreted as the square Mahalanobis distance — a measure of the distance of a point from the center of mass of points in multivariate space. 
+Given that leverage quantifies the distance of each observation from the model's center, it can be interpreted as the square Mahalanobis distance — a measure of the distance of a point from the center of mass of points in multivariate space.
 If the original data follows a multivariate normal distribution, the distances form a chi-squared distribution. Using this property, outliers can be detected using the chi-square test \cite{brereton_chi_2015}.
 The Mahalanobis distance is defined as follows:
 
@@ -44,7 +44,7 @@ The Mahalanobis distance is defined as follows:
     D_M(p)^2 = (p - \mu)^T \cdot \Sigma^{-1} (p - \mu)
 \end{equation}
 
-Where $p$ is the point in question, $\mu$ is the mean of the distribution and $\Sigma^{-1}$ is the inverse of the covariance matrix of the distribution, known as the precision matrix. 
+Where $p$ is the point in question, $\mu$ is the mean of the distribution and $\Sigma^{-1}$ is the inverse of the covariance matrix of the distribution, known as the precision matrix.
 Variables exhibiting a high leverage score are indicative of predictors that deviate more significantly from the others, thereby have a greater influence on the model.
 The measure of model fit, denoted as $Q$, is calculated by squaring the differences between the actual spectrum $x$ and the spectrum predicted by the model. This prediction uses the model's scores $t$ and loadings ($P$) to calculate the residuals $e$:
 
@@ -52,7 +52,7 @@ The measure of model fit, denoted as $Q$, is calculated by squaring the differen
     e = x - t \cdot P^T
 \end{equation}
 
-The fit of model for the $i$th observation is then computed by taking the residual vector $e_i$ and multiplying it by the transpose of itself $e^T$, which gives you the sum of squared differences: 
+The fit of model for the $i$th observation is then computed by taking the residual vector $e_i$ and multiplying it by the transpose of itself $e^T$, which gives you the sum of squared differences:
 
 \begin{equation}
     Q_i = e_{i}e_{i}^T
@@ -87,9 +87,9 @@ The exact delineations of the blending ranges are adjustable, with optimization 
 
 ICA yields independent source components and the affiliated mixing matrix which illustrates how the independent sources are combined to form the observed spectral data.
 
-After extracting the independent components, the key task is to associate each independent component with a specific elemental emission line. 
-This process involves examining the emission lines of the elements and evaluating the ICA scores. 
-These scores reflect the correlation between each Independent Component and the entire spectrum of wavelengths. 
+After extracting the independent components, the key task is to associate each independent component with a specific elemental emission line.
+This process involves examining the emission lines of the elements and evaluating the ICA scores.
+These scores reflect the correlation between each Independent Component and the entire spectrum of wavelengths.
 Subsequently, these correlation values (ICA scores) are employed to establish a calibration curve, which correlates the ICA score to the elemental composition.
 
 To ascertain the accuracy of this calibration, a regression analysis is performed using multiple regression functions. The function that provides the most reliable fit (often assessed through chi-square values) is used to predict the composition for each element.
