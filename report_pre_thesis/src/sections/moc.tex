@@ -17,7 +17,7 @@ We give a more detailed description of the CCS data format in Section \ref{sec:d
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
 The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Submodels (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
 The outcomes of these two techniques are merged using a weighted average for each oxide, with the weighting skewed in favor of the technique that demonstrates superior performance for the specific oxide.
-The PLS-SM approach utilizes tailored sub-models for distinct composition ranges, enhancing accuracy at the boundaries of these ranges.
+The PLS-SM approach utilizes tailored sub-models that specialize in targeting distinct composition ranges, along with a comprehensive full model used for initial composition estimation.
 Independent Component Analysis assists in distinguishing elemental emission lines, contributing to a refined multivariate model.
 
 Two normalization methods are employed in the analysis: Norm 1 and Norm 3.
