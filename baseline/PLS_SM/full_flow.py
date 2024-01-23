@@ -2,6 +2,9 @@ import logging
 from pathlib import Path
 from typing import Dict
 
+# import warnings filter
+from warnings import simplefilter
+
 import mlflow
 import numpy as np
 import pandas as pd
@@ -29,6 +32,9 @@ from lib.reproduction import (
 )
 from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
 from PLS_SM.inference import predict_composition_with_blending
+
+# ignore all future warnings
+simplefilter(action="ignore", category=FutureWarning)
 
 env = dotenv_values()
 comp_data_loc = env.get("COMPOSITION_DATA_PATH")
@@ -85,28 +91,28 @@ if (
     train_processed.to_csv(train_path, index=False)
     test_processed.to_csv(test_path, index=False)
 
-    n1_scaler = Norm1Scaler(reshaped=True)
-    n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+    # n1_scaler = Norm1Scaler(reshaped=True)
+    # n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
 
-    train_cols = train_processed.columns
-    test_cols = test_processed.columns
+    # train_cols = train_processed.columns
+    # test_cols = test_processed.columns
 
-    train_processed_n1 = n1_scaler.fit_transform(train_processed)
-    train_processed_n3 = n3_scaler.fit_transform(train_processed)
-    test_processed_n1 = n1_scaler.fit_transform(test_processed)
-    test_processed_n3 = n3_scaler.fit_transform(test_processed)
+    # train_processed_n1 = n1_scaler.fit_transform(train_processed)
+    # train_processed_n3 = n3_scaler.fit_transform(train_processed)
+    # test_processed_n1 = n1_scaler.fit_transform(test_processed)
+    # test_processed_n3 = n3_scaler.fit_transform(test_processed)
 
-    # turn back into dataframe
-    train_processed_n1 = pd.DataFrame(train_processed_n1, columns=train_cols)
-    train_processed_n3 = pd.DataFrame(train_processed_n3, columns=train_cols)
-    test_processed_n1 = pd.DataFrame(test_processed_n1, columns=test_cols)
-    test_processed_n3 = pd.DataFrame(test_processed_n3, columns=test_cols)
+    # # turn back into dataframe
+    # train_processed_n1 = pd.DataFrame(train_processed_n1, columns=train_cols)
+    # train_processed_n3 = pd.DataFrame(train_processed_n3, columns=train_cols)
+    # test_processed_n1 = pd.DataFrame(test_processed_n1, columns=test_cols)
+    # test_processed_n3 = pd.DataFrame(test_processed_n3, columns=test_cols)
 
-    train_processed_n1.to_csv(preformatted_data_path / "train_n1.csv", index=False)
-    train_processed_n3.to_csv(preformatted_data_path / "train_n3.csv", index=False)
+    # train_processed_n1.to_csv(preformatted_data_path / "train_n1.csv", index=False)
+    # train_processed_n3.to_csv(preformatted_data_path / "train_n3.csv", index=False)
 
-    test_processed_n1.to_csv(preformatted_data_path / "test_n1.csv", index=False)
-    test_processed_n3.to_csv(preformatted_data_path / "test_n3.csv", index=False)
+    # test_processed_n1.to_csv(preformatted_data_path / "test_n1.csv", index=False)
+    # test_processed_n3.to_csv(preformatted_data_path / "test_n3.csv", index=False)
 
     logger.info("Preformatted data saved to %s", preformatted_data_path)
 else:
@@ -119,8 +125,8 @@ else:
     # test_processed_n1 = pd.read_csv(test_n1_path)
     # test_processed_n3 = pd.read_csv(test_n3_path)
 
-SHOULD_TRAIN = True
-SHOULD_PREDICT = False
+SHOULD_TRAIN = False
+SHOULD_PREDICT = True
 
 DO_OUTLIER_REMOVAL = True
 
@@ -128,7 +134,7 @@ if SHOULD_TRAIN:
     k_folds = 4
     random_state = 42
     influence_plot_dir = Path("plots/")
-    experiment_name = f"PLS_Models_NO-OR_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_Models_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
     # experiment_name = "PLS_Models_Train_Test_Split"
 
     mlflow.set_experiment(experiment_name)
@@ -147,7 +153,9 @@ if SHOULD_TRAIN:
                 oxide,
             )
 
-            logger.info("Filtering data by compositional range.")
+            logger.info(
+                f"Filtering {oxide} for {compositional_range} compositional range..."
+            )
             train_data_filtered = filter_data_by_compositional_range(
                 train_processed, compositional_range, oxide, oxide_ranges
             )
@@ -296,13 +304,8 @@ if SHOULD_TRAIN:
 
                 logger.info("Performing custom k-fold cross-validation.")
 
-                train_processed = train_no_outliers
-
-                print(f"train_processed: {len(train_processed)}")
-                print(train_processed.head())
-
                 kf = custom_kfold_cross_validation(
-                    train_processed,
+                    train_no_outliers,
                     k=k_folds,
                     group_by="Sample Name",
                     random_state=random_state,
@@ -388,12 +391,12 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    experiment_name = f"PLS_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_TEST_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
 
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="288133286244787831")
+    models = get_models(experiment_id="479233079534008621")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
