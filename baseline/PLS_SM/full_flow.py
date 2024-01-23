@@ -153,17 +153,6 @@ if SHOULD_TRAIN:
                 oxide,
             )
 
-            logger.info(
-                f"Filtering {oxide} for {compositional_range} compositional range..."
-            )
-            train_data_filtered = filter_data_by_compositional_range(
-                train_processed, compositional_range, oxide, oxide_ranges
-            )
-
-            test_data_filtered = filter_data_by_compositional_range(
-                test_processed, compositional_range, oxide, oxide_ranges
-            )
-
             # We don't do this anymore because we already have the split in train_test_split.csv
             # Separate 20% of the data for testing
             # train, test = custom_train_test_split(
@@ -173,11 +162,11 @@ if SHOULD_TRAIN:
             #     random_state=random_state,
             # )
 
-            train_cols = train_data_filtered.columns
-            test_cols = test_data_filtered.columns
+            train_cols = train_processed.columns
+            test_cols = test_processed.columns
 
             n_components = training_info[oxide][compositional_range]["n_components"]
-            norm = training_info[oxide][compositional_range]["normalization"]
+            norm = 1  # training_info[oxide][compositional_range]["normalization"]
             scaler = (
                 Norm1Scaler(reshaped=True)
                 if norm == 1
@@ -186,13 +175,24 @@ if SHOULD_TRAIN:
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
             logger.debug("Fitting and transforming training data.")
-            train = scaler.fit_transform(train_data_filtered)
+            train = scaler.fit_transform(train_processed.copy())
             logger.debug("Transforming test data.")
-            test = scaler.fit_transform(test_data_filtered)
+            test = scaler.fit_transform(test_processed.copy())
 
             # turn back into dataframe
             train = pd.DataFrame(train, columns=train_cols)
             test = pd.DataFrame(test, columns=test_cols)
+
+            logger.info(
+                f"Filtering {oxide} for {compositional_range} compositional range..."
+            )
+            train = filter_data_by_compositional_range(
+                train, compositional_range, oxide, oxide_ranges
+            )
+
+            test = filter_data_by_compositional_range(
+                test, compositional_range, oxide, oxide_ranges
+            )
 
             with mlflow.start_run(run_name=f"{oxide}_{compositional_range}"):
                 mlflow.log_metric(
@@ -342,12 +342,13 @@ if SHOULD_TRAIN:
                 X_test = test.drop(columns=drop_cols).to_numpy()
                 y_test = test[oxide].to_numpy()
 
-                X_train_NO = train_processed.drop(columns=drop_cols).to_numpy()
-                y_train_NO = train_processed[oxide].to_numpy()
+                X_train_NO = train_no_outliers.drop(columns=drop_cols).to_numpy()
+                y_train_NO = train_no_outliers[oxide].to_numpy()
 
                 pls_all = PLSRegression(n_components=n_components)
                 pls_all.fit(X_train_NO, y_train_NO)
                 y_pred = pls_all.predict(X_test)
+                # y_pred = best_CV_model.predict(X_test)
                 test_rmse = mean_squared_error(y_test, y_pred, squared=False)
                 mlflow.log_metric("RMSEP", float(test_rmse))
                 mlflow.sklearn.log_model(
@@ -396,7 +397,7 @@ if SHOULD_PREDICT:
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="691892636467835743")
+    models = get_models(experiment_id="988425307703323628")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
@@ -435,14 +436,16 @@ if SHOULD_PREDICT:
                 logger.info("Skipping oxide: %s", oxide)
                 continue
 
-            pred = np.array(predict_composition_with_blending(
-                oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
-            ))
+            pred = np.array(
+                predict_composition_with_blending(
+                    oxide, X_test_n1, X_test_n1, models, optimized_blending_ranges
+                )
+            )
 
             # remove nans in pred from both pred and test
-            nan_in_pred = np.isnan(pred)
-            pred = pred[~nan_in_pred]
-            Y = Y[~nan_in_pred]
+            # nan_in_pred = np.isnan(pred)
+            # pred = pred[~nan_in_pred]
+            # Y = Y[~nan_in_pred]
 
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
