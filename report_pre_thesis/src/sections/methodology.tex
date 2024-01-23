@@ -30,11 +30,10 @@ The preprocessing of the data is illustrated in Figure~\ref{fig:pls_data_preproc
 We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
 As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to remove these regions.
-The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
 The dataframe is then transformed through a transpose operation, swapping the rows and columns.
 This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
 All negative values are then transformed into zeros since negative values are not physically possible.
-Given the pre-defined compositional ranges for each oxide in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out wavelengths outside of these ranges.
+Given the compositional ranges for each submodel defined in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out the samples whose compositional values are outside of these ranges.
 The range is defined by an upper and a lower bound, and any wavelength outside of this range is removed.
 Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
 This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
@@ -68,7 +67,7 @@ Given some new data sample, the full model gives an initial compositional predic
 Based on this prediction, the data is then "binned" into one of five concentration ranges -- the three submodel ranges and two blending ranges.
 For each of these five concentration ranges, there is one or two corresponding \textit{submodel(s)}.
 These submodels are used to make predictions in the corresponding concentration range after the full model has made its initial predictions.
-The submodels are specialized in either low, low-mid, mid, mid-high, high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
+The submodels are specialized in either low, mid, or high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
 If the full model predicts a concentration that falls within a blending range, the approach described in Section~\ref{sec:pls_submodels} is used to combine the predictions from the corresponding submodels.
 
 \begin{figure}
@@ -124,7 +123,7 @@ Specifically, the author pointed out that weighing by the inverse of the discard
 If the same instrument were used for all analyses, one could argue that the IRF (apart from the inverse square law correction) part is irrelevant, but that is not the case here; there are two different instruments --- one in Los Alamos and one on Mars.
 Based on these considerations, we have decided to not weigh by the inverse of the IRF.
 
-In addition, because \citet{cleggRecalibrationMarsScience2017} does not mention how each of the five location datasets are used for each sample, we have decided to only use one for each sample.
+In addition, because \citet{cleggRecalibrationMarsScience2017} does not specify how each of the five location datasets are used for each sample, we have decided to only use one for each sample.
 This likely does not produce as accurate results as using all five location datasets would, since we do not get a full representation of the sample that was shot at by the laser, instead only getting a partial representation from a single location.
 Nevertheless, to avoid deviating significantly from \citet{cleggRecalibrationMarsScience2017}'s methodology or making unfounded assumptions about their data processing, we have opted for this more conservative approach.
 Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
@@ -144,6 +143,7 @@ This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE)
 This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
 By taking the product of the mixing matrix and the normalized data, we get the estimated sources.
 This new matrix is an $M \times P$ matrix, where $M$ is the number of independent components, and $P$ is the number of wavelengths.
+Our replica of the pipeline uses $M = 8$ independent components, which is the same as \citet{cleggRecalibrationMarsScience2017}.
 
 After performing ICA, we post-process by computing the correlation between the independent components and the wavelengths.
 Using this, we can identify which wavelengths are associated with which independent components by computing the maximum correlation for each wavelength.
@@ -163,33 +163,9 @@ For each oxide, they used the type of regression and normalization that produced
 We use Linear Regression for all oxides and instead transform the data to fit the model similar to \citet{kuo_detecting_2018}.
 Initially, it might appear limiting, but by applying transformations to the features --— for example by taking logs, square roots, etc. --- it's possible to achieve an almost linear relationship with the target variable.
 
-% TODO: Move this table to the results section and embed our own results in it as well to show the baseline results compared to the original results.
-% This can be seen in table \ref{tab:regression_types}, which is taken from \citet{cleggRecalibrationMarsScience2017}.
-
-% \begin{table}[h]
-% \centering
-% \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccc}
-% \toprule
-
-% Element & Norm & Law type    & RMS \\ \midrule
-% Si      & 1    & Logsqaure   & 6.7 \\
-% Ti      & 3    & Geometric   & 0.6 \\
-% Al      & 3    & Geometric   & 4.4 \\
-% Fe      & 1    & Geometric   & 2.2 \\
-% Mg      & 1    & Exponential & 3.0 \\
-% Ca      & 1    & Parabolic   & 1.0 \\
-% Na      & 3    & Parabolic   & 0.6 \\
-% K       & 3    & Geometric   & 0.4 \\
-% \bottomrule
-% \end{tabular*}
-% \caption{The summary of each ICA model characteristics from \citet{cleggRecalibrationMarsScience2017}.}
-% \label{tab:regression_types}
-% \end{table}
-
 \subsection{MOC}\label{sec:methodology_moc}
 As described in section \ref{sec:moc_derivation}, the result of the PLS1-SM and ICA are combined to produce the final MOC model, which weights the results of the two techniques in favor of the one that performs best for each oxide.
 The specific weights used for each oxide can be seen in table \ref{tab:weighted_sum_oxide}.
-Note that the weights for Ti, Mg and Ca have been set to 50/50 since \citet{cleggRecalibrationMarsScience2017} does not mention the weights they used for these elements.
 
 \begin{table}[h]
 \centering
@@ -201,12 +177,12 @@ Fe       & 75           & 25      \\
 Si       & 50           & 50      \\
 Na       & 40           & 60      \\
 K2       & 25           & 75      \\
-Ti*      & 50           & 50      \\
-Mg*      & 50           & 50      \\
-Ca*      & 50           & 50      \\
+Ti       & 50           & 50      \\
+Mg       & 50           & 50      \\
+Ca       & 50           & 50      \\
 \bottomrule
 \end{tabular*}
-\caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citet{cleggRecalibrationMarsScience2017}}
+\caption{Weighted Sum of Oxide Percentages.}
 \label{tab:weighted_sum_oxide}
 \end{table}
 
