@@ -41,16 +41,8 @@ def identify_outliers(leverage, Q):
         0.95, df=2
     )  # df=2 because we have two dimensions (leverage and Q)
 
-    # Identify outliers based on Mahalanobis distance
-    mahalanobis_outliers = distances > threshold
-
-    # Additionally, identify high residual outliers
-    # Define a threshold for what you consider a high residual, e.g., 2 standard deviations above the mean
-    residual_threshold = np.mean(Q) + 2 * np.std(Q)
-    residual_outliers = Q > residual_threshold
-
-    # Combine the two outlier criteria
-    outliers = np.logical_or(mahalanobis_outliers, residual_outliers)
+    # Identify outliers
+    outliers = distances > threshold
 
     # Now you can remove these outliers from your dataset and retrain your model
     return outliers
