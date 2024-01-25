@@ -189,9 +189,10 @@ class WavelengthMaskTransformer(BaseEstimator, TransformerMixin):
         """
         if not isinstance(X, pd.DataFrame):
             raise ValueError("Input should be a pandas DataFrame.")
-
+        
         for mask in self.masks:
-            X = X.loc[~((X["wave"] >= mask[0]) & (X["wave"] <= mask[1]))]
+            mask_condition = (X["wave"] >= mask[0]) & (X["wave"] <= mask[1])
+            X.loc[mask_condition, 'shot_avg'] = 0
 
         return X
 
