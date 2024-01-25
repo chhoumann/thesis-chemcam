@@ -127,13 +127,13 @@ else:
 SHOULD_TRAIN = False
 SHOULD_PREDICT = True
 
-DO_OUTLIER_REMOVAL = False
+DO_OUTLIER_REMOVAL = True
 
 if SHOULD_TRAIN:
     k_folds = 4
     random_state = 42
     influence_plot_dir = Path("plots/")
-    experiment_name = f"PLS_Models_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_Models_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}_ConfInterval0.95_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
     # experiment_name = "PLS_Models_Train_Test_Split"
 
     mlflow.set_experiment(experiment_name)
@@ -390,12 +390,12 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    experiment_name = f"PLS_TEST_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_TEST_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}_ConfInterval0.95_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
 
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="669193739052390121")
+    models = get_models(experiment_id="918789175669963118")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
