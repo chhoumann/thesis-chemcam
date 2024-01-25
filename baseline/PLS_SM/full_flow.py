@@ -127,7 +127,7 @@ else:
 SHOULD_TRAIN = False
 SHOULD_PREDICT = True
 
-DO_OUTLIER_REMOVAL = True
+DO_OUTLIER_REMOVAL = False
 
 if SHOULD_TRAIN:
     k_folds = 4
@@ -395,7 +395,7 @@ if SHOULD_PREDICT:
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="276299400723967585")
+    models = get_models(experiment_id="669193739052390121")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
