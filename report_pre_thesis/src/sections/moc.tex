@@ -1,16 +1,21 @@
 \subsection{The Multivariate Oxide Composition Model}\label{sec:moc}
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/pipeline.png}
-    \caption{Flowchart illustrating MOC derivation via the ChemCam team's MOC model: data processing and calibration steps given LIBS data.}
+    \includegraphics[width=0.225\textwidth]{images/pipeline.png}
+    \caption{High level overview of the pipeline for deriving the Multivariate Oxide Composition (MOC) from raw LIBS data.}
     \label{fig:libs_data_processing}
 \end{figure}
 
-In Figure \ref{fig:libs_data_processing} we illustrate the data processing and calibration steps for LIBS data leading to the derivation of Multivariate Oxide Composition (MOC). The MOC model is described in details by \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}, but we provide a brief overview here, which will serve as a foundation for the subsequent discussion of our work.
+In Figure~\ref{fig:libs_data_processing} we illustrate the inference steps for deriving the Multivariate Oxide Composition (MOC) from LIBS data.
+In Section~\ref{sec:methodology}, we detail the training process of the models.
+A comprehensive description of the MOC model is presented in \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}.
+Here, we offer a concise summary of the MOC model, laying the groundwork for further exploration of our contributions to the subject.
 
 \subsubsection{Data Preprocessing}\label{sec:data_preprocessing}
-As shown in Figure~\ref{fig:libs_data_processing}, the raw LIBS data goes through a series of initial preprocessing steps to produce a clean calibrated spectrum (CCS) for each shot, which is used as the input for the system.
+Before the MOC model can be applied to the data, the raw LIBS data must be preprocessed to produce a clean calibrated spectrum (CCS).
 We do not go into further details about this process here, however a full description can be found in \citet{wiensPreFlight3}.
+We only concern ourselves with the CCS data in this work.
+
 The CCS data format is a table of intensity values for each wavelength, with each row representing the intensities for a given shot, which is a single laser pulse on the sample.
 We give a more detailed description of the CCS data format in Section \ref{sec:data_overview} where we also describe the ChemCam calibration dataset as a whole.
 
