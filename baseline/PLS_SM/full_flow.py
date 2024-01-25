@@ -390,7 +390,7 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    experiment_name = f"PLS_TEST_NO-OUT-OF-RANGE_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_TEST_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
 
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
