@@ -27,7 +27,6 @@ from lib.reproduction import (
     optimized_blending_ranges,
     oxide_ranges,
     paper_individual_sm_rmses,
-    spectrometer_wavelength_ranges,
     training_info,
 )
 from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
@@ -91,8 +90,8 @@ if (
     train_processed.to_csv(train_path, index=False)
     test_processed.to_csv(test_path, index=False)
 
-    # n1_scaler = Norm1Scaler(reshaped=True)
-    # n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+    # n1_scaler = Norm1Scaler()
+    # n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges)
 
     # train_cols = train_processed.columns
     # test_cols = test_processed.columns
@@ -125,8 +124,8 @@ else:
     # test_processed_n1 = pd.read_csv(test_n1_path)
     # test_processed_n3 = pd.read_csv(test_n3_path)
 
-SHOULD_TRAIN = True
-SHOULD_PREDICT = False
+SHOULD_TRAIN = False
+SHOULD_PREDICT = True
 
 DO_OUTLIER_REMOVAL = True
 
@@ -178,13 +177,8 @@ if SHOULD_TRAIN:
             test = filter_data_by_compositional_range(
                 test_processed, compositional_range, oxide, oxide_ranges
             )
-            print(train.shape)
 
-            scaler = (
-                Norm1Scaler(reshaped=True)
-                if norm == 1
-                else Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
-            )
+            scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
             logger.debug("Fitting and transforming training data.")
@@ -193,27 +187,10 @@ if SHOULD_TRAIN:
             test = scaler.fit_transform(test.copy())
 
             drop_cols = major_oxides + ["Sample Name", "ID"]
-            print(train_processed.shape)
-
-            # if norm 3, take scaler.scaler.out_of_range_columns and remove them from train_cols and test_cols - except those in drop_cols
-            if norm == 3:
-                # get out of range columns
-                out_of_range_cols = scaler.scaler.out_of_range_columns # type: ignore
-
-                # remove out of range columns from train_cols and test_cols
-                train_cols = [col for col in train_cols if col not in out_of_range_cols] # type: ignore
-                test_cols = [col for col in test_cols if col not in out_of_range_cols] # type: ignore
 
             # turn back into dataframe
             train = pd.DataFrame(train, columns=train_cols)
             test = pd.DataFrame(test, columns=test_cols)
-            print(train.shape)
-
-            if norm == 3:
-                print(f"Train: {train.drop(columns=drop_cols).sum().sum()}")
-
-            print(train.head(30))
-            print("----------------------")
 
             with mlflow.start_run(run_name=f"{oxide}_{compositional_range}"):
                 mlflow.log_metric(
@@ -418,7 +395,7 @@ if SHOULD_PREDICT:
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="102665837291682565")
+    models = get_models(experiment_id="276299400723967585")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
@@ -439,8 +416,8 @@ if SHOULD_PREDICT:
 
     target_predictions = pd.DataFrame(test_processed[["Sample Name", "ID"]])
 
-    n1_scaler = Norm1Scaler(reshaped=True)
-    n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+    n1_scaler = Norm1Scaler()
+    n3_scaler = Norm3Scaler()
 
     X_test_n1 = n1_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
     X_test_n3 = n3_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))

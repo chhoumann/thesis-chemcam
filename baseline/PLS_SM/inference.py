@@ -20,13 +20,13 @@ def norm_data(x, oxide: str, model: str):
     norm = training_info[oxide][model]["normalization"]
 
     if norm == 1:
-        scaler = Norm1Scaler(reshaped=True)
+        scaler = Norm1Scaler()
         print(f"Using Norm1Scaler for {oxide} {model}")
         scaled_df = scaler.fit_transform(x.copy(deep=True))
         assert np.isclose(scaled_df.sum(axis=1), 1).all()
         return scaled_df
     elif norm == 3:
-        scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+        scaler = Norm3Scaler(spectrometer_wavelength_ranges)
         print(f"Using Norm3Scaler for {oxide} {model}")
 
         scaled_df = scaler.fit_transform(x.copy(deep=True))

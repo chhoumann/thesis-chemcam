@@ -80,12 +80,13 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
                 else compositions_df_n3[oxide]
             )
 
-            if model_name == "Log-square":
-                X_train = np.log(X_train**2)
-                X_test = np.log(X_test**2)
-            elif model_name == "Exponential":
+            if model_name == "Exponential" or model_name == "Log-square":
                 X_train = np.log(X_train)
                 X_test = np.log(X_test)
+
+                # turn -inf to 0
+                X_train[X_train == -np.inf] = 0
+                X_test[X_test == -np.inf] = 0
             elif model_name == "Geometric":
                 X_train = np.sqrt(X_train)
                 X_test = np.sqrt(X_test)
@@ -120,7 +121,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
 def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     models = {}
-    experiment_id = "346015952702592840"
+    experiment_id = "641832419024282634"
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
     for _, run in runs.iterrows():
@@ -160,10 +161,11 @@ def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
                 else compositions_df_n3[oxide]
             )
 
-            if model_name == "Log-square":
-                X_test = np.log(X_test**2)
-            elif model_name == "Exponential":
+            if model_name == "Exponential" or model_name == "Log-square":
                 X_test = np.log(X_test)
+
+                # turn -inf to 0
+                X_test[X_test == -np.inf] = 0
             elif model_name == "Geometric":
                 X_test = np.sqrt(X_test)
             elif model_name == "Parabolic":
@@ -294,6 +296,8 @@ def create_processed_data(
             continue
 
         processor.preprocess(calib_data_path, norm)
+
+        processor.df.to_csv("bad_data.csv")
 
         # Run ICA and get the estimated sources
         ica_estimated_sources = run_ica(
