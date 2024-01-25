@@ -125,8 +125,8 @@ else:
     # test_processed_n1 = pd.read_csv(test_n1_path)
     # test_processed_n3 = pd.read_csv(test_n3_path)
 
-SHOULD_TRAIN = False
-SHOULD_PREDICT = True
+SHOULD_TRAIN = True
+SHOULD_PREDICT = False
 
 DO_OUTLIER_REMOVAL = True
 
@@ -166,7 +166,20 @@ if SHOULD_TRAIN:
             test_cols = test_processed.columns
 
             n_components = training_info[oxide][compositional_range]["n_components"]
-            norm = 1  # training_info[oxide][compositional_range]["normalization"]
+            norm = training_info[oxide][compositional_range]["normalization"]
+
+            logger.info(
+                f"Filtering {oxide} for {compositional_range} compositional range..."
+            )
+            train = filter_data_by_compositional_range(
+                train_processed, compositional_range, oxide, oxide_ranges
+            )
+
+            test = filter_data_by_compositional_range(
+                test_processed, compositional_range, oxide, oxide_ranges
+            )
+            print(train.shape)
+
             scaler = (
                 Norm1Scaler(reshaped=True)
                 if norm == 1
@@ -175,24 +188,32 @@ if SHOULD_TRAIN:
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
             logger.debug("Fitting and transforming training data.")
-            train = scaler.fit_transform(train_processed.copy())
+            train = scaler.fit_transform(train.copy())
             logger.debug("Transforming test data.")
-            test = scaler.fit_transform(test_processed.copy())
+            test = scaler.fit_transform(test.copy())
+
+            drop_cols = major_oxides + ["Sample Name", "ID"]
+            print(train_processed.shape)
+
+            # if norm 3, take scaler.scaler.out_of_range_columns and remove them from train_cols and test_cols - except those in drop_cols
+            if norm == 3:
+                # get out of range columns
+                out_of_range_cols = scaler.scaler.out_of_range_columns # type: ignore
+
+                # remove out of range columns from train_cols and test_cols
+                train_cols = [col for col in train_cols if col not in out_of_range_cols] # type: ignore
+                test_cols = [col for col in test_cols if col not in out_of_range_cols] # type: ignore
 
             # turn back into dataframe
             train = pd.DataFrame(train, columns=train_cols)
             test = pd.DataFrame(test, columns=test_cols)
+            print(train.shape)
 
-            logger.info(
-                f"Filtering {oxide} for {compositional_range} compositional range..."
-            )
-            train = filter_data_by_compositional_range(
-                train, compositional_range, oxide, oxide_ranges
-            )
+            if norm == 3:
+                print(f"Train: {train.drop(columns=drop_cols).sum().sum()}")
 
-            test = filter_data_by_compositional_range(
-                test, compositional_range, oxide, oxide_ranges
-            )
+            print(train.head(30))
+            print("----------------------")
 
             with mlflow.start_run(run_name=f"{oxide}_{compositional_range}"):
                 mlflow.log_metric(
@@ -207,10 +228,10 @@ if SHOULD_TRAIN:
                         "oxide": oxide,
                         "n_spectra": len(train),
                         "outlier_removal": DO_OUTLIER_REMOVAL,
+                        "norm": norm,
                     }
                 )
 
-                drop_cols = major_oxides + ["Sample Name", "ID"]
                 # region OUTLIER REMOVAL
                 outlier_removal_iterations = 0
                 pls_OR = PLSRegression(n_components=n_components)

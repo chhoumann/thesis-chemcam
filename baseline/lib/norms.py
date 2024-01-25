@@ -1,6 +1,8 @@
 import enum
 from typing import Dict, Tuple
 
+import pandas as pd
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -152,25 +154,40 @@ class Norm3ScalerReshapedData(BaseEstimator, TransformerMixin):
     def __init__(self, wavelength_ranges: Dict[str, Tuple[float, float]]):
         self.wavelength_ranges = wavelength_ranges
         self.totals = None
+        self.out_of_range_columns = None
 
     def fit(self, df):
         """
         Compute the total intensity for each spectrometer range.
         """
         self.totals = {}
+
+        # Convert column names to floats. If conversion fails, assign NaN
+        float_cols = pd.to_numeric(df.columns, errors="coerce")
+
+        # Initialize an empty set to keep track of all selected columns
+        selected_columns_set = set()
+
         for key, (start, end) in self.wavelength_ranges.items():
-            # Select columns in the specified range and ignore non-float columns
-            selected_columns = []
-            for col in df.columns:
-                try:
-                    if start <= float(col) <= end:
-                        selected_columns.append(col)
-                except ValueError:
-                    # Ignore columns that cannot be converted to float
-                    continue
+            # Use boolean indexing to select columns in the specified range
+            selected_columns = df.columns[(float_cols >= start) & (float_cols <= end)]
+            selected_columns_set.update(selected_columns)
 
             # Compute the sum of intensities in these columns
             self.totals[key] = df[selected_columns].sum().sum()
+
+        # Identify columns that are not in any range
+        all_columns_set = set(df.columns)
+        self.out_of_range_columns = all_columns_set - selected_columns_set
+        
+        # only keep out of range columns that are floats
+        self.out_of_range_columns = pd.to_numeric(list(self.out_of_range_columns), errors="coerce")
+        # remove nans
+        self.out_of_range_columns = self.out_of_range_columns[~np.isnan(self.out_of_range_columns)]
+        # convert back to string
+        self.out_of_range_columns = self.out_of_range_columns.astype(str)
+
+        assert len(self.totals) == 3, "Expected 3 spectrometer ranges"
         return self
 
     def transform(self, df):
@@ -193,4 +210,7 @@ class Norm3ScalerReshapedData(BaseEstimator, TransformerMixin):
 
             # Normalize intensities in these columns
             df[selected_columns] = df[selected_columns].div(self.totals[key], axis=0)
+
+        # drop columns that are not in any range
+        df.drop(columns=self.out_of_range_columns, inplace=True)
         return df
