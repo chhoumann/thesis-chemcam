@@ -89,40 +89,10 @@ if (
 
     train_processed.to_csv(train_path, index=False)
     test_processed.to_csv(test_path, index=False)
-
-    # n1_scaler = Norm1Scaler()
-    # n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges)
-
-    # train_cols = train_processed.columns
-    # test_cols = test_processed.columns
-
-    # train_processed_n1 = n1_scaler.fit_transform(train_processed)
-    # train_processed_n3 = n3_scaler.fit_transform(train_processed)
-    # test_processed_n1 = n1_scaler.fit_transform(test_processed)
-    # test_processed_n3 = n3_scaler.fit_transform(test_processed)
-
-    # # turn back into dataframe
-    # train_processed_n1 = pd.DataFrame(train_processed_n1, columns=train_cols)
-    # train_processed_n3 = pd.DataFrame(train_processed_n3, columns=train_cols)
-    # test_processed_n1 = pd.DataFrame(test_processed_n1, columns=test_cols)
-    # test_processed_n3 = pd.DataFrame(test_processed_n3, columns=test_cols)
-
-    # train_processed_n1.to_csv(preformatted_data_path / "train_n1.csv", index=False)
-    # train_processed_n3.to_csv(preformatted_data_path / "train_n3.csv", index=False)
-
-    # test_processed_n1.to_csv(preformatted_data_path / "test_n1.csv", index=False)
-    # test_processed_n3.to_csv(preformatted_data_path / "test_n3.csv", index=False)
-
-    logger.info("Preformatted data saved to %s", preformatted_data_path)
 else:
     logger.info("Loading preformatted data from location: %s", preformatted_data_path)
     train_processed = pd.read_csv(train_path)
     test_processed = pd.read_csv(test_path)
-
-    # train_processed_n1 = pd.read_csv(train_n1_path)
-    # train_processed_n3 = pd.read_csv(train_n3_path)
-    # test_processed_n1 = pd.read_csv(test_n1_path)
-    # test_processed_n3 = pd.read_csv(test_n3_path)
 
 SHOULD_TRAIN = False
 SHOULD_PREDICT = True
