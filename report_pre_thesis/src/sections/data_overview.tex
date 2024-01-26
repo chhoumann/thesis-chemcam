@@ -61,7 +61,7 @@ They contain the following columns:
 
 \begin{table*}[!b]
 \centering
-\begin{tabular}{rrrrrrrr}
+\begin{tabular}{llllllll}
 \toprule
      wave &         shot1 &         shot2 &  $\cdots$ &        shot49 &       shot50  & median        & mean          \\
 \midrule
@@ -82,7 +82,7 @@ While $N=50$ for each sample in the calibration data, the number of shots taken 
 
 Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{cadillac} sample.
 As can be seen in the table, the second final row of the \texttt{cadillac} sample contains negative values, which is not physically possible.
-These negative values represent noise and are a result of the processing step that is applied to the EDR data to remove the background noise during transformation to RDR data, which is illustrated in Figure~\ref{fig:libs_data_processing}.
+These negative values represent noise and are a result of the initial preprocessing steps applied to the raw LIBS data.
 
 Figure \ref{fig:masked_regions} shows a spectral plot of the CCS data for the \texttt{cadillac} sample.
 Note how it comprises of three different spectral regions - ultra-violet (UV), violet (VIO), and visible and near infrared (VNIR).
@@ -98,6 +98,36 @@ Specifically, the masked ranges are defined in \citet{cleggRecalibrationMarsScie
 	\label{fig:masked_regions}
 \end{figure}
 
+\subsection{Composition Data}\label{subsec:composition_data}
 In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
 There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
 For each of these oxides, the data specifies their respective concentrations in each sample, expressed as a weight percentage (wt. \%) of the total composition.
+An excerpt of this dataset is shown in Table~\ref{tab:composotion_data_example}.
+
+\begin{table*}[!b]
+\centering
+\begin{tabular}{lllllllllllll}
+\toprule
+     Target & Spectrum Name & Sample Name & \ce{SiO2} & \ce{TiO2} & \ce{Al2O3} & \ce{FeOT} & \ce{MnO} & \ce{MgO} & \ce{CaO} & \ce{Na2O} & \ce{K2O} & \ce{MOC total} \\
+\midrule
+AGV2 & AGV2 & AGV2 & 59.3 & 1.05 & 16.91 & 6.02 & 0.099 & 1.79 & 5.2 & 4.19 & 2.88 & 97.44 \\
+BCR-2 & BCR2 & BCR2 & 54.1 & 2.26 & 13.5 & 12.42 & 0.2 & 3.59 & 7.12 & 3.16 & 1.79 & 98.14 \\
+$\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
+TB & --- & --- & 60.23 & 0.93 & 20.64 & 11.6387 & 0.052 & 1.93 & 0.000031 & 1.32 & 3.87 & 100.610731 \\
+    TB2 & --- & --- & 60.4 & 0.93 & 20.5 & 11.6536 & 0.047 & 1.86 & 0.2 & 1.29 & 3.86 & 100.7406 \\
+\bottomrule
+\end{tabular}
+\caption{Exert from the composition dataset.}
+\label{tab:composotion_data_example}
+\end{table*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/composition_box_plot.png}
+	\caption{Box plot of the composition data. The orange line represents the median, the black boxes represent the interquartile range for each oxide, and the whiskers represent the range of the data. The black circles represent outliers.}
+	\label{fig:composition_box_plot}
+\end{figure*}
+
+Figure \ref{fig:composition_box_plot} shows a box plot of the composition data.
+The presence of outliers, notably in the \ce{SiO2} and \ce{FeOT} data, indicates significant variability, which may be attributed to the diverse geological origins of the samples.
+These outliers are retained in the analysis to preserve the integrity of the dataset and reflect the full spectrum of geochemical diversity.
