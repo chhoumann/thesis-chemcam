@@ -2,3 +2,4 @@ baseline/.vscode
 baseline/venv
 baseline/chemcam_baseline.egg-info
 baseline/.env
+baseline/build/*

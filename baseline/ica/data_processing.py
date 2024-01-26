@@ -9,7 +9,7 @@ from lib.data_handling import (
     get_preprocessed_sample_data,
 )
 from lib.norms import Norm, Norm1Scaler, Norm3Scaler
-from lib.reproduction import masks, spectrometer_wavelength_ranges
+from lib.reproduction import masks
 
 
 class ICASampleProcessor:
@@ -58,18 +58,13 @@ class ICASampleProcessor:
         df.set_index("wave", inplace=True)
 
         # Normalize the data
-        scaler = (
-            Norm1Scaler()
-            if norm.value == 1
-            else Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
-        )
+        scaler = Norm1Scaler() if norm.value == 1 else Norm3Scaler()
         df = pd.DataFrame(scaler.fit_transform(df))
 
         self.df = df.transpose()
 
     def postprocess(self, ica_estimated_sources: np.ndarray) -> None:
         columns = self.df.columns
-
 
         corrcols = [f"IC{i+1}" for i in range(self.num_components)]
         df_ics = pd.DataFrame(
@@ -106,6 +101,9 @@ class ICASampleProcessor:
         corrdf = (
             self.df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
         )
+        # set all corrdf nans to 0 - they were set to 0 during masking, and
+        # .corr() sets values that don't vary to NaN
+        corrdf = corrdf.fillna(0)
         ids = []
 
         for ic_label in icacols:
