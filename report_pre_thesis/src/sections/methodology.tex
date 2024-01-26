@@ -1,4 +1,4 @@
-\section{Methodology}\label{sec:methodology}
+\section{MOC Pipeline Replica}\label{sec:methodology}
 As part of our goal to evaluate the performance of each of the components in the pipeline, the first step was to create a replica of the original pipeline described by \citet{cleggRecalibrationMarsScience2017}
 Since we did not have access to the original source code implementing the pipeline, we have replicated it at accurately as we could based on the available information.
 We have had to make some assumptions due to insufficient information regarding some components, which we detail in this section.
@@ -29,12 +29,11 @@ The preprocessing of the data is illustrated in Figure~\ref{fig:pls_data_preproc
 \noindent
 We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
-As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to remove these regions.
-The masked regions, which do not contain unique major element diagnostic peaks, are excluded to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
+As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data by zeroing out these regions.
 The dataframe is then transformed through a transpose operation, swapping the rows and columns.
 This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
 All negative values are then transformed into zeros since negative values are not physically possible.
-Given the pre-defined compositional ranges for each oxide in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out wavelengths outside of these ranges.
+Given the compositional ranges for each submodel defined in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out the samples whose compositional values are outside of these ranges.
 The range is defined by an upper and a lower bound, and any wavelength outside of this range is removed.
 Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
 This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
@@ -68,7 +67,7 @@ Given some new data sample, the full model gives an initial compositional predic
 Based on this prediction, the data is then "binned" into one of five concentration ranges -- the three submodel ranges and two blending ranges.
 For each of these five concentration ranges, there is one or two corresponding \textit{submodel(s)}.
 These submodels are used to make predictions in the corresponding concentration range after the full model has made its initial predictions.
-The submodels are specialized in either low, low-mid, mid, mid-high, high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
+The submodels are specialized in either low, mid, or high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
 If the full model predicts a concentration that falls within a blending range, the approach described in Section~\ref{sec:pls_submodels} is used to combine the predictions from the corresponding submodels.
 
 \begin{figure}
@@ -112,7 +111,7 @@ In this section, we delve into the differences between our pipeline and the orig
 
 \subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
 For ICA, the first five shots are removed from the data.
-We then apply masking to the data to remove the same regions as in the PLS1-SM phase.
+We then apply masking to the data by zeroing out the same regions as in the PLS1-SM phase.
 Afterwards, we transform all negative values into zeros.
 Then we normalize the data using Norm1 and Norm3.
 
@@ -124,7 +123,7 @@ Specifically, the author pointed out that weighing by the inverse of the discard
 If the same instrument were used for all analyses, one could argue that the IRF (apart from the inverse square law correction) part is irrelevant, but that is not the case here; there are two different instruments --- one in Los Alamos and one on Mars.
 Based on these considerations, we have decided to not weigh by the inverse of the IRF.
 
-In addition, because \citet{cleggRecalibrationMarsScience2017} does not mention how each of the five location datasets are used for each sample, we have decided to only use one for each sample.
+In addition, because \citet{cleggRecalibrationMarsScience2017} does not specify how each of the five location datasets are used for each sample, we have decided to only use one for each sample.
 This likely does not produce as accurate results as using all five location datasets would, since we do not get a full representation of the sample that was shot at by the laser, instead only getting a partial representation from a single location.
 Nevertheless, to avoid deviating significantly from \citet{cleggRecalibrationMarsScience2017}'s methodology or making unfounded assumptions about their data processing, we have opted for this more conservative approach.
 Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
@@ -144,6 +143,7 @@ This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE)
 This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
 By taking the product of the mixing matrix and the normalized data, we get the estimated sources.
 This new matrix is an $M \times P$ matrix, where $M$ is the number of independent components, and $P$ is the number of wavelengths.
+Our replica of the pipeline uses $M = 8$ independent components, which is the same as \citet{cleggRecalibrationMarsScience2017}.
 
 After performing ICA, we post-process by computing the correlation between the independent components and the wavelengths.
 Using this, we can identify which wavelengths are associated with which independent components by computing the maximum correlation for each wavelength.
@@ -163,37 +163,13 @@ For each oxide, they used the type of regression and normalization that produced
 We use Linear Regression for all oxides and instead transform the data to fit the model similar to \citet{kuo_detecting_2018}.
 Initially, it might appear limiting, but by applying transformations to the features --— for example by taking logs, square roots, etc. --- it's possible to achieve an almost linear relationship with the target variable.
 
-% TODO: Move this table to the results section and embed our own results in it as well to show the baseline results compared to the original results.
-% This can be seen in table \ref{tab:regression_types}, which is taken from \citet{cleggRecalibrationMarsScience2017}.
-
-% \begin{table}[h]
-% \centering
-% \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccc}
-% \toprule
-
-% Element & Norm & Law type    & RMS \\ \midrule
-% Si      & 1    & Logsqaure   & 6.7 \\
-% Ti      & 3    & Geometric   & 0.6 \\
-% Al      & 3    & Geometric   & 4.4 \\
-% Fe      & 1    & Geometric   & 2.2 \\
-% Mg      & 1    & Exponential & 3.0 \\
-% Ca      & 1    & Parabolic   & 1.0 \\
-% Na      & 3    & Parabolic   & 0.6 \\
-% K       & 3    & Geometric   & 0.4 \\
-% \bottomrule
-% \end{tabular*}
-% \caption{The summary of each ICA model characteristics from \citet{cleggRecalibrationMarsScience2017}.}
-% \label{tab:regression_types}
-% \end{table}
-
 \subsection{MOC}\label{sec:methodology_moc}
 As described in section \ref{sec:moc_derivation}, the result of the PLS1-SM and ICA are combined to produce the final MOC model, which weights the results of the two techniques in favor of the one that performs best for each oxide.
 The specific weights used for each oxide can be seen in table \ref{tab:weighted_sum_oxide}.
-Note that the weights for Ti, Mg and Ca have been set to 50/50 since \citet{cleggRecalibrationMarsScience2017} does not mention the weights they used for these elements.
 
 \begin{table}[h]
 \centering
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lll}
 \toprule
 Element  & PLS1-SM (\%) & ICA (\%) \\ \midrule
 Al       & 75           & 25      \\
@@ -201,71 +177,11 @@ Fe       & 75           & 25      \\
 Si       & 50           & 50      \\
 Na       & 40           & 60      \\
 K2       & 25           & 75      \\
-Ti*      & 50           & 50      \\
-Mg*      & 50           & 50      \\
-Ca*      & 50           & 50      \\
+Ti       & 50           & 50      \\
+Mg       & 50           & 50      \\
+Ca       & 50           & 50      \\
 \bottomrule
 \end{tabular*}
-\caption{Weighted Sum of Oxide Percentages. Elements marked with an asterisk (*) have been set to 50/50 as they are unspecified in \citet{cleggRecalibrationMarsScience2017}}
+\caption{Weighted Sum of Oxide Percentages.}
 \label{tab:weighted_sum_oxide}
 \end{table}
-
-\subsection{Experiments}\label{sec:methodology_experiments}
-To evaluate the performance of each of the components in the pipeline, we focus our experiments on three main aspects:
-
-\begin{itemize}
-	\item \textbf{Outlier removal} to assess the impact of leaving outliers in the dataset or using a different outlier removal method.
-	\item \textbf{Hyperparameter tuning} to assess the impact of different hyperparameter configurations.
-	\item \textbf{Other models} to compare the performance of the PLS1-SM and ICA models to other models.
-\end{itemize}
-
-\noindent
-Given that the original authors did not perform experiments using alternative methods to demonstrate the efficacy of their chosen approach, this omission results in a lack of comprehensive understanding regarding the full potential of the pipeline's performance.
-While they did perform hyperparameter tuning, they did not conduct experiments using different outlier removal methods or alternative models.
-This raises questions about the optimality of the chosen methodology, as a comparative analysis with different methodologies could reveal superior approaches.
-Experimenting with alternative methods means that we can uncover which components contribute the most to the overall error and therefore would benefit the most from further research and development.
-Should a substitution of a component within the pipeline with an alternative method yield improved outcomes, it would indicate that the currently employed method represents a limitation in the overall pipeline, thus highlighting an area that necessitates enhancement.
-
-\subsubsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
-The original PLS1-SM identified outliers manually by inspecting the leverage and spectral residuals plots.
-We have instead chosen to automate this based on the reasons described in Section~\ref{sec:methodology_outlier_removal}.
-It would therefore be intriguing to examine the impact on the pipeline's performance when this process is adjusted.
-Firstly, examining the performance implications of completely omitting outlier removal would be worthwhile.
-This experiment is justified given the substantial efforts dedicated to developing the ChemCam calibration dataset as mentioned in Section~\ref{sec:ica_data_preprocessing}, which implies a minimal presence of significant outliers.
-Furthermore, experimenting with various significance levels for the chi-squared test could reveal whether a more or less conservative approach is advantageous.
-
-In the ICA phase, the original authors employed the Median Absolute Deviation (MAD) for outlier removal, yet the detailed methodology of their approach was not fully delineated.
-Consequently, in our version of the pipeline, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
-This decision allows us to evaluate the intrinsic effectiveness of the ICA phase without the influence of outlier removal.
-Introducing outlier removal using MAD in our replication of the pipeline presents an opportunity to assess its impact on the pipeline's efficacy.
-By comparing the results with and without MAD, we can quantitatively measure the utility of this step.
-Such an experiment is crucial for understanding whether MAD significantly contributes to reducing noise and improving data quality, thereby enhancing the overall performance of the machine learning pipeline.
-This experiment would also offer insights into the robustness of the ICA phase against outliers, providing a more comprehensive understanding of the pipeline's capabilities and limitations.
-
-\subsubsection{Experiment: Hyperparameter Tuning}\label{sec:experiment_hyperparameter_tuning}
-\citet{cleggRecalibrationMarsScience2017} use qualitative judgement to identify hyperparameters for their PLS1-SM model.
-This approach carries a risk of inaccuracies without sufficient domain expertise, given the challenges in guaranteeing the optimality of chosen hyperparameters.
-Lacking such expertise, we opted for a more systematic and automated methodology to determine hyperparameters for our PLS1-SM model.
-
-Similarly, the authors use eight independent components for their ICA algorithm, but do not provide any experimental results justifying that this is the optimal number of components.
-As such, it is possible that the performance of the ICA phase could be improved by experimenting with a variety of components.
-
-For the PLS1-SM model we decided to use the common grid search algorithm for testing different hyperparameters for the PLS models.
-% Explain set up...
-
-Since each independent component does not necessarily correlate one-to-one with the number of elements that one wishes to identify in a spectra, we decided to experiment with a number of components ranging between 4 and 25.
-This range is within the vicinity of the original selection of components whilst providing us with a set of reasonable extremes.
-
-% Probably show the setup in some way
-
-\subsubsection{Experiment: Other Models}\label{sec:experiment_other_models}
-\citet{cleggRecalibrationMarsScience2017} have only compared their new approach with the original method presented by \citet{wiensPreFlight3}, and have not conducted experiments using alternative methods to establish the superiority of their chosen approach.
-Therefore, we decided to compare the performance of the PLS1-SM and ICA models to other models.
-The objective is to evaluate two distinct scenarios. In the first scenario, we aim to conduct a direct comparison between the MOC model and an alternative model. The second scenario revolves around substituting either PLS or ICA with a different model and then calculating a weighted average.
-We have decided to conduct the experiments using the following models:
-
-\begin{itemize}
-	\item \textbf{XGBoost}, a gradient boosting algorithm, \cite{chen_xgboost_2016}.
-	\item \textbf{ANN}, a neural network model, \cite{scikit-learn}.
-	% More? Random Forest, SVM, etc.
-\end{itemize}

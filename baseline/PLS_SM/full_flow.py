@@ -2,16 +2,20 @@ import logging
 from pathlib import Path
 from typing import Dict
 
+# import warnings filter
+from warnings import simplefilter
+
 import mlflow
 import numpy as np
 import pandas as pd
-from dotenv import dotenv_values
+import typer
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 
+from lib import full_flow_dataloader
+
 # from config import logger
-from lib.data_handling import CustomSpectralPipeline, load_split_data  # type: ignore
 from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.outlier_removal import (
     calculate_leverage_residuals,
@@ -24,78 +28,41 @@ from lib.reproduction import (
     optimized_blending_ranges,
     oxide_ranges,
     paper_individual_sm_rmses,
-    spectrometer_wavelength_ranges,
     training_info,
 )
 from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
 from PLS_SM.inference import predict_composition_with_blending
 
-env = dotenv_values()
-comp_data_loc = env.get("COMPOSITION_DATA_PATH")
-dataset_loc = env.get("DATA_PATH")
-
-if not comp_data_loc:
-    print("Please set COMPOSITION_DATA_PATH in .env file")
-    exit(1)
-
-if not dataset_loc:
-    print("Please set DATA_PATH in .env file")
-    exit(1)
+# ignore all future warnings
+simplefilter(action="ignore", category=FutureWarning)
 
 logger = logging.getLogger("train")
-
 mlflow.set_tracking_uri("http://localhost:5000")
 
-preformatted_data_path = Path("./data/_preformatted_sm/")
-train_path = preformatted_data_path / "train.csv"
-test_path = preformatted_data_path / "test.csv"
 
-if (
-    not preformatted_data_path.exists()
-    or not train_path.exists()
-    or not test_path.exists()
-):
-    take_samples = None
+app = typer.Typer()
 
-    logger.info("Loading data from location: %s", dataset_loc)
-    # data = load_data(str(dataset_loc))
-    train_data, test_data = load_split_data(
-        str(dataset_loc), split_loc="./train_test_split.csv", average_shots=True
-    )
-    logger.info("Data loaded successfully.")
 
-    logger.info("Initializing CustomSpectralPipeline.")
-    pipeline = CustomSpectralPipeline(
-        masks=masks,
-        composition_data_loc=comp_data_loc,
-        major_oxides=major_oxides,
-    )
-    logger.info("Pipeline initialized. Fitting and transforming data.")
-    train_processed = pipeline.fit_transform(train_data)
-    test_processed = pipeline.fit_transform(test_data)
-    logger.info("Data processing complete.")
+@app.command(name="train", help="Train the PLS-SM models.")
+def train(do_outlier_removal=True, additional_info="", outlier_removal_constraint_iteration=-1):
+    outlier_removal_constraint_iteration = int(outlier_removal_constraint_iteration)
+    do_outlier_removal = bool(do_outlier_removal)
 
-    preformatted_data_path.mkdir(parents=True, exist_ok=True)
-
-    train_processed.to_csv(train_path, index=False)
-    test_processed.to_csv(test_path, index=False)
-else:
-    logger.info("Loading preformatted data from location: %s", preformatted_data_path)
-    train_processed = pd.read_csv(train_path)
-    test_processed = pd.read_csv(test_path)
-
-SHOULD_TRAIN = False
-SHOULD_PREDICT = True
-
-if SHOULD_TRAIN:
+    train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
     influence_plot_dir = Path("plots/")
-    experiment_name = f"PLS_Models_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
-    # experiment_name = "PLS_Models_Train_Test_Split"
+    timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
+    no_or = "" if do_outlier_removal else "NO-OR_"
+    add_info = "" if additional_info == "" else f"_{additional_info}"
 
-    mlflow.set_experiment(experiment_name)
-    mlflow.autolog()
+    if outlier_removal_constraint_iteration > 0:
+        add_info += f"_OR{outlier_removal_constraint_iteration}C"
+
+    experiment_name = f"PLS_Models{no_or}{add_info}_{timestamp}"
+
+    experiment = mlflow.set_experiment(experiment_name)
+    mlflow.autolog(log_datasets=False, silent=True)
 
     for oxide in tqdm(major_oxides, desc="Processing oxides"):
         _oxide_ranges = oxide_ranges.get(oxide, None)
@@ -110,51 +77,34 @@ if SHOULD_TRAIN:
                 oxide,
             )
 
-            logger.info("Filtering data by compositional range.")
-            train_data_filtered = filter_data_by_compositional_range(
-                train_processed, compositional_range, oxide, oxide_ranges
-            )
-
-            test_data_filtered = filter_data_by_compositional_range(
-                train_processed, compositional_range, oxide, oxide_ranges
-            )
-
-            # We don't do this anymore because we already have the split in train_test_split.csv
-            # Separate 20% of the data for testing
-            # train, test = custom_train_test_split(
-            #     data_filtered,
-            #     group_by="Sample Name",
-            #     test_size=0.2,
-            #     random_state=random_state,
-            # )
-
-            train_cols = train_data_filtered.columns
-            test_cols = test_data_filtered.columns
+            train_cols = train_processed.columns
+            test_cols = test_processed.columns
 
             n_components = training_info[oxide][compositional_range]["n_components"]
             norm = training_info[oxide][compositional_range]["normalization"]
-            scaler = (
-                Norm1Scaler(reshaped=True)
-                if norm == 1
-                else Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
-            )
+
+            logger.info(f"Filtering {oxide} for {compositional_range} compositional range...")
+            train = filter_data_by_compositional_range(train_processed, compositional_range, oxide, oxide_ranges)
+
+            test = filter_data_by_compositional_range(test_processed, compositional_range, oxide, oxide_ranges)
+
+            scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
             logger.debug("Fitting and transforming training data.")
-            train = scaler.fit_transform(train_data_filtered)
+            train = scaler.fit_transform(train.copy())
             logger.debug("Transforming test data.")
-            test = scaler.fit_transform(test_data_filtered)
+            test = scaler.fit_transform(test.copy())
+
+            drop_cols = major_oxides + ["Sample Name", "ID"]
 
             # turn back into dataframe
             train = pd.DataFrame(train, columns=train_cols)
             test = pd.DataFrame(test, columns=test_cols)
 
             with mlflow.start_run(run_name=f"{oxide}_{compositional_range}"):
-                mlflow.log_metric(
-                    "paper_rmse", paper_individual_sm_rmses[compositional_range][oxide]
-                )
+                mlflow.log_metric("paper_rmse", paper_individual_sm_rmses[compositional_range][oxide])
 
-                # region OUTLIER REMOVAL
                 mlflow.log_params(
                     {
                         "masks": masks,
@@ -162,20 +112,20 @@ if SHOULD_TRAIN:
                         "compositional_range": compositional_range,
                         "oxide": oxide,
                         "n_spectra": len(train),
+                        "outlier_removal": do_outlier_removal,
+                        "norm": norm,
                     }
                 )
 
+                # region OUTLIER REMOVAL
                 outlier_removal_iterations = 0
                 pls_OR = PLSRegression(n_components=n_components)
-                drop_cols = major_oxides + ["Sample Name", "ID"]
                 X_train_OR = train.drop(columns=drop_cols).to_numpy()
                 y_train_OR = train[oxide].to_numpy()
 
                 pls_OR.fit(X_train_OR, y_train_OR)
 
-                current_performance = mean_squared_error(
-                    y_train_OR, pls_OR.predict(X_train_OR), squared=False
-                )
+                current_performance = mean_squared_error(y_train_OR, pls_OR.predict(X_train_OR), squared=False)
 
                 mlflow.log_metric(
                     "RMSEOR",
@@ -187,9 +137,19 @@ if SHOULD_TRAIN:
 
                 train_no_outliers = train.copy()
 
-                while True:
+                leverage, Q = None, None
+
+                while True and do_outlier_removal:
                     outlier_removal_iterations += 1
-                    leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
+
+                    should_calculate_constraints = (
+                        outlier_removal_constraint_iteration >= 0
+                        and outlier_removal_iterations <= outlier_removal_constraint_iteration
+                    ) or outlier_removal_constraint_iteration < 0
+
+                    if should_calculate_constraints:
+                        leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
+
                     outliers = identify_outliers(leverage, Q)
 
                     if len(outliers) == 0:
@@ -203,8 +163,7 @@ if SHOULD_TRAIN:
                         / f"{experiment_name}"
                         / f"{oxide}_{compositional_range}_{outlier_removal_iterations}.png"
                     )
-                    if not plot_path.parent.exists():
-                        plot_path.parent.mkdir(parents=True)
+                    plot_path.parent.mkdir(parents=True, exist_ok=True)
 
                     plot_leverage_residuals(leverage, Q, outliers, str(plot_path))
                     mlflow.log_artifact(str(plot_path))
@@ -212,12 +171,11 @@ if SHOULD_TRAIN:
                     X_train_OR = np.delete(X_train_OR, outliers_indices, axis=0)
                     y_train_OR = np.delete(y_train_OR, outliers_indices, axis=0)
 
-                    pls_OR = PLSRegression(n_components=n_components)
-                    pls_OR.fit(X_train_OR, y_train_OR)
+                    if should_calculate_constraints:
+                        pls_OR = PLSRegression(n_components=n_components)
+                        pls_OR.fit(X_train_OR, y_train_OR)
 
-                    new_performance = mean_squared_error(
-                        y_train_OR, pls_OR.predict(X_train_OR), squared=False
-                    )
+                    new_performance = mean_squared_error(y_train_OR, pls_OR.predict(X_train_OR), squared=False)
 
                     mlflow.log_metric(
                         "RMSEOR",
@@ -225,9 +183,7 @@ if SHOULD_TRAIN:
                         step=outlier_removal_iterations,
                     )
 
-                    number_of_outliers = np.sum(
-                        outliers
-                    )  # Counting the number of True values
+                    number_of_outliers = np.sum(outliers)  # Counting the number of True values
                     mlflow.log_metric(
                         "outliers_removed",
                         float(number_of_outliers),
@@ -235,7 +191,7 @@ if SHOULD_TRAIN:
                     )
 
                     # Check if error has increased: early stop if so
-                    if new_performance >= current_performance:
+                    if float(new_performance) >= float(current_performance):
                         break
 
                     # Update to only have best set
@@ -244,12 +200,8 @@ if SHOULD_TRAIN:
                     current_performance = new_performance
                     best_or_model = pls_OR
 
-                mlflow.log_metric(
-                    "outlier_removal_iterations", outlier_removal_iterations
-                )
-                mlflow.sklearn.log_model(
-                    best_or_model, f"PLS_OR_{oxide}_{compositional_range}"
-                )
+                mlflow.log_metric("outlier_removal_iterations", outlier_removal_iterations)
+                mlflow.sklearn.log_model(best_or_model, f"PLS_OR_{oxide}_{compositional_range}")
 
                 # endregion
                 # region Cross-Validation
@@ -280,16 +232,14 @@ if SHOULD_TRAIN:
 
                     mlflow.log_metric(f"fold_{i}_RMSE", float(fold_rmse))
 
-                    if fold_rmse < best_CV_rmse:
+                    if float(fold_rmse) < float(best_CV_rmse):
                         best_CV_rmse = fold_rmse
                         best_CV_model = pls_CV
 
                 avg_rmse = np.mean(fold_rmses)
                 mlflow.log_metric("RMSECV", float(avg_rmse))
                 mlflow.log_metric("RMSECV_MIN", float(np.min(fold_rmses)))
-                mlflow.sklearn.log_model(
-                    best_CV_model, f"PLS_CV_{oxide}_{compositional_range}"
-                )
+                mlflow.sklearn.log_model(best_CV_model, f"PLS_CV_{oxide}_{compositional_range}")
                 # endregion
 
                 # region Train model on all data (outliers removed) & get RMSEP
@@ -302,13 +252,14 @@ if SHOULD_TRAIN:
                 pls_all = PLSRegression(n_components=n_components)
                 pls_all.fit(X_train_NO, y_train_NO)
                 y_pred = pls_all.predict(X_test)
+                # y_pred = best_CV_model.predict(X_test)
                 test_rmse = mean_squared_error(y_test, y_pred, squared=False)
                 mlflow.log_metric("RMSEP", float(test_rmse))
-                mlflow.sklearn.log_model(
-                    pls_all, f"PLS_ALL_{oxide}_{compositional_range}"
-                )
+                mlflow.sklearn.log_model(pls_all, f"PLS_ALL_{oxide}_{compositional_range}")
                 # endregion
             mlflow.end_run()
+
+    return experiment
 
 
 # region Use models to predict on test data - Full PLS-SM
@@ -344,18 +295,20 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
     return models
 
 
-if SHOULD_PREDICT:
-    experiment_name = f"PLS_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+@app.command(name="test", help="Test the PLS-SM models.")
+def test(experiment_id: str, do_outlier_removal=True, additional_info=""):
+    do_outlier_removal = bool(do_outlier_removal)
+    train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
+    timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
+    no_or = "" if do_outlier_removal else "_NO-OR_"
+    add_info = "" if additional_info == "" else f"_{additional_info}"
+    experiment_name = f"PLS_TEST{no_or}{add_info}_{timestamp}"
 
     mlflow.set_experiment(experiment_name)
-    mlflow.autolog(log_models=False, log_datasets=False)
+    mlflow.autolog(log_models=False, log_datasets=False, silent=True)
 
-    models = get_models(experiment_id="288133286244787831")
+    models = get_models(experiment_id)
 
-    # save na to csv
-    test_processed[test_processed.isna().any(axis=1)].to_csv(
-        "data/data/PLS_SM/na.csv", index=False
-    )
     count_pre_drop = len(test_processed)
     test_processed.dropna(inplace=True, axis="index")
     count_post_drop = len(test_processed)
@@ -371,26 +324,27 @@ if SHOULD_PREDICT:
 
     target_predictions = pd.DataFrame(test_processed[["Sample Name", "ID"]])
 
-    n1_scaler = Norm1Scaler(reshaped=True)
-    n3_scaler = Norm3Scaler(spectrometer_wavelength_ranges, reshaped=True)
+    n1_scaler = Norm1Scaler()
+    n3_scaler = Norm3Scaler()
 
     X_test_n1 = n1_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
     X_test_n3 = n3_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
 
     save_path = Path("data/data/PLS_SM/")
     predictions_save_path = save_path / "predictions"
+    tar_pred_path = predictions_save_path / "tar_pred.csv"
 
     predictions_save_path.mkdir(parents=True, exist_ok=True)
 
-    for oxide in tqdm(major_oxides, desc="Predicting oxides"):
-        with mlflow.start_run(run_name=f"PLS_TEST_{oxide}"):
+    with mlflow.start_run(run_name="PLS-SM Test"):
+        for oxide in tqdm(major_oxides, desc="Predicting oxides"):
             _oxide_ranges = oxide_ranges.get(oxide, None)
             if _oxide_ranges is None:
                 logger.info("Skipping oxide: %s", oxide)
                 continue
 
-            pred = predict_composition_with_blending(
-                oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
+            pred = np.array(
+                predict_composition_with_blending(oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges)
             )
 
             # save
@@ -411,14 +365,24 @@ if SHOULD_PREDICT:
 
             # calculate RMSEP
             rmsep = mean_squared_error(Y[oxide], pred_df, squared=False)
-            mlflow.log_metric("RMSEP", float(rmsep))
-            # save
-            with open(save_path / "rmsep.txt", "a") as f:
-                f.write(f"{oxide}: {rmsep}\n")
+            mlflow.log_metric(f"RMSEP_{oxide}", float(rmsep))
 
             target_predictions[oxide] = pred
 
-    target_predictions.to_csv(save_path / "tar_pred.csv")
+        target_predictions.to_csv(tar_pred_path)
+        mlflow.log_artifact(str(tar_pred_path))
+        mlflow.log_table(target_predictions, "target_predictions")
 
 
-# endregion
+@app.command(name="full_run", help="Run the full PLS-SM pipeline.")
+def full_run(do_outlier_removal=True, additional_info="", outlier_removal_constraint_iteration=-1):
+    experiment = train(
+        do_outlier_removal=do_outlier_removal,
+        additional_info=additional_info,
+        outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
+    )
+    test(experiment.experiment_id, do_outlier_removal=do_outlier_removal, additional_info=additional_info)
+
+
+if __name__ == "__main__":
+    app()
