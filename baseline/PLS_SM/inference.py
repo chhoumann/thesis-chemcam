@@ -1,7 +1,7 @@
 import numpy as np
 
 from lib.norms import Norm1Scaler, Norm3Scaler
-from lib.reproduction import spectrometer_wavelength_ranges, training_info
+from lib.reproduction import training_info
 
 
 def get_weights(y_full, blend_range_min, blend_range_max):
@@ -26,7 +26,7 @@ def norm_data(x, oxide: str, model: str):
         assert np.isclose(scaled_df.sum(axis=1), 1).all()
         return scaled_df
     elif norm == 3:
-        scaler = Norm3Scaler(spectrometer_wavelength_ranges)
+        scaler = Norm3Scaler()
         print(f"Using Norm3Scaler for {oxide} {model}")
 
         scaled_df = scaler.fit_transform(x.copy(deep=True))
