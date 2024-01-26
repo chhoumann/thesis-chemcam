@@ -6,18 +6,11 @@ masks = [
     (849, 905.574),
 ]
 
-
-spectrometer_wavelength_ranges = {
-    "UV": (240.1, 342.2),
-    "VIO": (382.1, 469.3),
-    "VNIR": (474.0, 906.5),
+spectral_ranges = {
+    "UV": (240.811, 340.797),
+    "VIO": (382.138, 469.089),
+    "VNIR": (473.1842, 906.573),
 }
-
-# spectrometer_wavelength_ranges = {
-#     "UV": (223.4, 325.97),
-#     "VIO": (381.86, 471.03),
-#     "VNIR": (494.93, 927.06),
-# }
 
 oxide_ranges = {
     "SiO2": {
