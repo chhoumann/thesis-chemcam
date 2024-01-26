@@ -29,7 +29,7 @@ The preprocessing of the data is illustrated in Figure~\ref{fig:pls_data_preproc
 \noindent
 We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
-As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to remove these regions.
+As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data to zero out these regions.
 The dataframe is then transformed through a transpose operation, swapping the rows and columns.
 This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
 All negative values are then transformed into zeros since negative values are not physically possible.
@@ -111,7 +111,7 @@ In this section, we delve into the differences between our pipeline and the orig
 
 \subsubsection{Data Preprocessing}\label{sec:ica_data_preprocessing}
 For ICA, the first five shots are removed from the data.
-We then apply masking to the data to remove the same regions as in the PLS1-SM phase.
+We then apply masking to the data to zero out the same regions as in the PLS1-SM phase.
 Afterwards, we transform all negative values into zeros.
 Then we normalize the data using Norm1 and Norm3.
 
