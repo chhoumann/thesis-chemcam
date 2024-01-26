@@ -97,4 +97,10 @@ def filter_data_by_compositional_range(data, compositional_range, oxide, oxide_r
     # Filter the dataset based on the oxide concentration within the specified range
     filtered_data = data[(data[oxide] >= lower_bound) & (data[oxide] <= upper_bound)]
 
+    # Check if empty now
+    if filtered_data.empty:
+        print(
+            f"WARNING: No data found for {compositional_range} {oxide} ({lower_bound}-{upper_bound})"
+        )
+
     return filtered_data

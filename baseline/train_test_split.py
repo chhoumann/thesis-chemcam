@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 import pandas as pd
 from dotenv import dotenv_values
@@ -38,16 +39,11 @@ def get_composition_for_sample(cd, sample_name):
 if __name__ == "__main__":
     save_path = Path("train_test_split.csv")
 
-    if save_path.exists():
-        print("train_test_split.csv already exists. Skipping...")
-        exit()
-
-    # quick and easy way to get the list of samples we have
-    data = load_data(dataset_loc)
+    samples = os.listdir(dataset_loc)
 
     # get list of samples we have that were used for 2015 calibration
     samples_used_2015 = []
-    for sample in data.keys():
+    for sample in samples:
         sample_name = folder_to_composition_sample_name.get(sample, sample)
         composition = get_composition_for_sample(cd.composition_data, sample_name)
 
@@ -59,8 +55,8 @@ if __name__ == "__main__":
             continue
 
         used_2015 = composition["Used for 2015 calibration"].values[0]
-        if used_2015 == 1:
-            samples_used_2015.append(sample)
+        # if used_2015 == 1:
+        samples_used_2015.append(sample)
 
     train, test = train_test_split(samples_used_2015, test_size=0.2, random_state=42)
 
