@@ -1,4 +1,68 @@
 \section{Experiments}\label{sec:experiments}
+We describe our replica of the MOC pipeline, compare it to the original, and describe the experiments we have conducted.
+The performance of our replica serves as baseline for comparison with the original MOC pipeline and as a basis for assessing experimental results.
+
+\subsection{Replication of the MOC Pipeline}\label{sec:replica_moc}
+We present the baseline RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models in Table~\ref{tab:results_rmses}.
+The results show that the RMSEs of our replicas of the PLS1-SM, ICA and MOC models are similar to the original models.
+However, the are some notable differences --- in some cases, our replicas outperform the original models, while in other cases, the original models outperform our replicas.
+These differences can be attributed to a number of factors.
+
+Firstly, the original pipeline was trained on two datasets, one acquired at a 1600mm standoff distance and one acquired at a 3000mm standoff distance.
+We have only used the 1600mm dataset for our replicas since we do not have access to the 3000mm dataset.
+As mentioned in Section~\ref{sec:outlier_removal}, we also chose chose to automate the outlier removal process for the PLS1-SM phase, whereas the original authors performed this manually.
+Moreover, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
+As we also mentioned in Section~\ref{sec:ica_data_preprocessing}, we only used one of the five location datasets for each sample, whereas the original authors used all five due to missing information about how these datasets were used.
+For training the PLS models, \citet{andersonImprovedAccuracyQuantitative2017} methodically organized their training and test sets by sorting samples based on the major oxide, sequentially assigning them to folds, removing outliers, and deliberately including extreme compositions in the training folds to enhance the model's ability to handle a broad range of elemental variations.
+Since we lack the domain expertise to replicate this process, we instead randomly split the dataset into training and test sets without any further curation using a 80/20 split.
+Additionally, without going into speculations, it is possible that some of the differences are due to implementation details, such as the use of different programming languages and libraries.
+Lastly, it is worth noting that RMSE is simply a statistical measure of the differences between the original and predicted values, and does not necessarily reflect the true accuracy of the models on unseen data from Mars, and so the results should be interpreted with this in mind.
+
+\begin{table*}
+\centering
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllllll}
+\hline
+Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (replica) & MOC (original) & MOC (replica) \\
+\hline
+\ce{SiO2}  & 4.33               & 5.81              & 8.31           & 10.68         & 5.30           & 7.29 \\
+\ce{TiO2}  & 0.94               & 0.47              & 1.44           & 0.63          & 1.03           & 0.49 \\
+\ce{Al2O3} & 2.85               & 1.94              & 4.77           & 5.55          & 3.47           & 2.39 \\
+\ce{FeO_T} & 2.01               & 4.35              & 5.17           & 8.30          & 2.31           & 5.21 \\
+\ce{MgO}   & 1.06               & 1.17              & 4.08           & 2.90          & 2.21           & 1.67 \\
+\ce{CaO}   & 2.65               & 1.43              & 3.07           & 3.52          & 2.72           & 1.81 \\
+\ce{Na2O}  & 0.62               & 0.66              & 2.29           & 1.72          & 0.62           & 1.10 \\
+\ce{K2O}   & 0.72               & 0.72              & 0.98           & 1.37          & 0.82           & 1.09 \\
+\hline
+\end{tabular*}
+\caption{RMSE of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
+\label{tab:results_rmses}
+\end{table*}
+
+To evaluate the statistical significance of the differences between the original and our replicated models (PLS1-SM, ICA, and MOC), we applied three statistical tests: Student's t-test, Welch's t-test, and the Wilcoxon signed-rank test.
+Our null hypothesis (H$_0$) posits that there is no significant difference in the performance of the original and replicated models.
+The alternative hypothesis (H$_1$) contends that a significant difference does exist.
+We set our significance level $\alpha$ at 0.05, meaning we would require a p-value less than 0.05 to reject the null hypothesis in favor of the alternative.
+The p-values obtained from our tests are presented in Table~\ref{tab:results_ttests}. With all p-values exceeding the $\alpha$ level of 0.05, there is insufficient statistical evidence to reject the null hypothesis.
+Therefore, we retain the null hypothesis, suggesting that the differences between the original and replicated models are not statistically significant.
+The p-values across all tests and models imply that the performances of the original and replicated models are statistically indistinguishable from each other.
+This congruence suggests that our replicated models are comparable to the original ones in terms of their statistical characteristics.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{llll}
+\hline
+p-value    & Student's & Welch's & Wilcoxon \\
+\hline
+PLS1-SM    & 67.71\% & 84.04\% & 73.53\% \\
+ICA        & 32.38\% & 71.38\% & 64.06\% \\
+MOC        & 54.69\% & 75.45\% & 100.00\% \\
+\hline
+\end{tabular}
+\caption{p-values of the Student's t-test, Welch's t-test, and Wilcoxon signed-rank test for the RMSEs between the original and our replicas of the PLS1-SM, ICA, and MOC models, respectively.}
+\label{tab:results_ttests}
+\end{table}
+
+\subsection{Chosen Experiments}\label{sec:chosen_experiments}
 To evaluate the performance of each of the components in the pipeline, we focus our experiments on three main aspects:
 
 \begin{itemize}
