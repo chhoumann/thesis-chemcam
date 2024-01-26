@@ -4,6 +4,7 @@ The performance of our replica serves as baseline for comparison with the origin
 
 \subsection{Replication of the MOC Pipeline}\label{sec:replica_moc}
 We present the baseline RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models in Table~\ref{tab:results_rmses}.
+Figure~\ref{fig:rmse_histograms} illustrates the distribution of the RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models as a grouped histogram.
 The results show that the RMSEs of our replicas of the PLS1-SM, ICA and MOC models are similar to the original models.
 However, the are some notable differences --- in some cases, our replicas outperform the original models, while in other cases, the original models outperform our replicas.
 These differences can be attributed to a number of factors.
@@ -18,7 +19,7 @@ Since we lack the domain expertise to replicate this process, we instead randoml
 Additionally, without going into speculations, it is possible that some of the differences are due to implementation details, such as the use of different programming languages and libraries.
 Lastly, it is worth noting that RMSE is simply a statistical measure of the differences between the original and predicted values, and does not necessarily reflect the true accuracy of the models on unseen data from Mars, and so the results should be interpreted with this in mind.
 
-\begin{table*}
+\begin{table*}[h]
 \centering
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllllll}
 \hline
@@ -38,6 +39,13 @@ Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (repl
 \label{tab:results_rmses}
 \end{table*}
 
+\begin{figure*}[b]
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/rmse_historgram.png}
+	\caption{Grouped histogram of the RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
+	\label{fig:rmse_histograms}
+\end{figure*}
+
 To evaluate the statistical significance of the differences between the original and our replicated models (PLS1-SM, ICA, and MOC), we applied three statistical tests: Student's t-test, Welch's t-test, and the Wilcoxon signed-rank test.
 Our null hypothesis (H$_0$) posits that there is no significant difference in the performance of the original and replicated models.
 The alternative hypothesis (H$_1$) contends that a significant difference does exist.
@@ -47,7 +55,7 @@ Therefore, we retain the null hypothesis, suggesting that the differences betwee
 The p-values across all tests and models imply that the performances of the original and replicated models are statistically indistinguishable from each other.
 This congruence suggests that our replicated models are comparable to the original ones in terms of their statistical characteristics.
 
-\begin{table}[t]
+\begin{table}[h]
 \centering
 \begin{tabular}{llll}
 \hline
