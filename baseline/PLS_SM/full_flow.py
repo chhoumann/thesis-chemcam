@@ -133,7 +133,7 @@ if SHOULD_TRAIN:
     k_folds = 4
     random_state = 42
     influence_plot_dir = Path("plots/")
-    experiment_name = f"PLS_Models_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}_ConfInterval0.80_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_Models_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}_ConfInterval0.975-2ndRoundConstraint_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
     # experiment_name = "PLS_Models_Train_Test_Split"
 
     mlflow.set_experiment(experiment_name)
@@ -231,9 +231,12 @@ if SHOULD_TRAIN:
 
                 train_no_outliers = train.copy()
 
+                leverage, Q = None, None
+
                 while True and DO_OUTLIER_REMOVAL:
                     outlier_removal_iterations += 1
-                    leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
+                    if outlier_removal_iterations <= 2:
+                        leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
                     outliers = identify_outliers(leverage, Q)
 
                     if len(outliers) == 0:
@@ -256,8 +259,9 @@ if SHOULD_TRAIN:
                     X_train_OR = np.delete(X_train_OR, outliers_indices, axis=0)
                     y_train_OR = np.delete(y_train_OR, outliers_indices, axis=0)
 
-                    pls_OR = PLSRegression(n_components=n_components)
-                    pls_OR.fit(X_train_OR, y_train_OR)
+                    if outlier_removal_iterations <= 2:
+                        pls_OR = PLSRegression(n_components=n_components)
+                        pls_OR.fit(X_train_OR, y_train_OR)
 
                     new_performance = mean_squared_error(
                         y_train_OR, pls_OR.predict(X_train_OR), squared=False
@@ -390,12 +394,12 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 if SHOULD_PREDICT:
-    experiment_name = f"PLS_TEST_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}_ConfInterval0.80_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    experiment_name = f"PLS_TEST_{'' if DO_OUTLIER_REMOVAL else 'NO-OR_'}_ConfInterval0.975-2ndRoundConstraint_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
 
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False)
 
-    models = get_models(experiment_id="944746487735791439")
+    models = get_models(experiment_id="363272354674335993")
 
     # save na to csv
     test_processed[test_processed.isna().any(axis=1)].to_csv(
