@@ -4,6 +4,10 @@ import scipy.stats as stats
 from sklearn.cross_decomposition import PLSRegression
 
 
+import matplotlib
+matplotlib.use('agg')
+
+
 def calculate_mahalanobis(x, mean, cov):
     x_minus_mu = x - mean
     return np.sqrt(np.dot(np.dot(x_minus_mu, np.linalg.inv(cov)), x_minus_mu.T))
@@ -69,4 +73,4 @@ def plot_leverage_residuals(leverage, Q, outliers, plot_file_path=None) -> None:
     if plot_file_path:
         fig.savefig(plot_file_path)
 
-    # plt.close()
+    plt.close(fig)

@@ -8,7 +8,7 @@ import seaborn as sns
 import typer
 
 from lib.data_handling import WavelengthMaskTransformer, get_preprocessed_sample_data
-from lib.reproduction import masks, spectrometer_wavelength_ranges
+from lib.reproduction import masks, spectral_ranges
 
 app = typer.Typer()
 
@@ -26,27 +26,21 @@ def plot_spectra(
     assert _data_path.exists(), f"Data path {data_path} does not exist."
 
     # Get the preprocessed sample data
-    sample_data = get_preprocessed_sample_data(
-        sample_name, _data_path, average_shots=average_shots
-    )
+    sample_data = get_preprocessed_sample_data(sample_name, _data_path, average_shots=average_shots)
     first_location = list(sample_data.values())[0]
 
     # Transform the data using WavelengthMaskTransformer
     wmt = WavelengthMaskTransformer(masks)
     transformed = wmt.fit_transform(first_location)
 
-    df = pd.DataFrame(
-        {"wave": transformed["wave"], "shot_avg": transformed["shot_avg"]}
-    )
+    df = pd.DataFrame({"wave": transformed["wave"], "shot_avg": transformed["shot_avg"]})
 
     # Debug: Print the DataFrame structure
     print("DataFrame columns:", df.columns)
 
     # Check if 'wave' and 'shot_avg' are in the DataFrame
     if "wave" not in df.columns or "shot_avg" not in df.columns:
-        raise ValueError(
-            "Expected columns 'wave' and 'shot_avg' not found in the DataFrame."
-        )
+        raise ValueError("Expected columns 'wave' and 'shot_avg' not found in the DataFrame.")
 
     # Extract wavelength and intensity data
     wave, intensity = df["wave"], df["shot_avg"]
@@ -57,13 +51,9 @@ def plot_spectra(
     start_idx = 0
     for i in range(1, len(wave)):
         if wave.iloc[i] - wave.iloc[i - 1] > float(max_gap_threshold):
-            sns.lineplot(
-                x=wave.iloc[start_idx:i], y=intensity.iloc[start_idx:i], color="blue"
-            )
+            sns.lineplot(x=wave.iloc[start_idx:i], y=intensity.iloc[start_idx:i], color="blue")
             start_idx = i
-    sns.lineplot(
-        x=wave.iloc[start_idx:], y=intensity.iloc[start_idx:], color="blue"
-    )  # plot the last segment
+    sns.lineplot(x=wave.iloc[start_idx:], y=intensity.iloc[start_idx:], color="blue")  # plot the last segment
 
     # Colors for the spectral ranges
     spectral_colors = {
@@ -73,15 +63,11 @@ def plot_spectra(
     }
 
     # Overlaying spectral ranges
-    for range_name, (start, end) in spectrometer_wavelength_ranges.items():
-        plt.axvspan(
-            start, end, alpha=0.3, color=spectral_colors[range_name], label=range_name
-        )
+    for range_name, (start, end) in spectral_ranges.items():
+        plt.axvspan(start, end, alpha=0.3, color=spectral_colors[range_name], label=range_name)
 
     for i, (start, end) in enumerate(masks):
-        plt.axvspan(
-            start, end, alpha=0.25, color="#0099ff", label="Mask" if i == 0 else None
-        )
+        plt.axvspan(start, end, alpha=0.25, color="#0099ff", label="Mask" if i == 0 else None)
 
     # Labeling and title
     plt.title("Spectral Analysis of Sample: " + sample_name)
@@ -104,12 +90,8 @@ def plot_outliers_for_run(mlflow_run_id: str, figure_name=""):
     local_dir.mkdir(parents=True, exist_ok=True)
 
     artifact_info = client.list_artifacts(mlflow_run_id)
-    image_files = [
-        artifact.path for artifact in artifact_info if artifact.path.endswith(".png")
-    ]
-    image_files_sorted = sorted(
-        image_files, key=lambda x: int(x.split("_")[-1].split(".")[0])
-    )
+    image_files = [artifact.path for artifact in artifact_info if artifact.path.endswith(".png")]
+    image_files_sorted = sorted(image_files, key=lambda x: int(x.split("_")[-1].split(".")[0]))
 
     for image_file in image_files_sorted:
         client.download_artifacts(mlflow_run_id, image_file, str(local_dir))
@@ -139,6 +121,7 @@ def plot_outliers_for_run(mlflow_run_id: str, figure_name=""):
         plt.savefig(save_file_path, bbox_inches="tight")
 
     # plt.show()
+
 
 if __name__ == "__main__":
     app()
