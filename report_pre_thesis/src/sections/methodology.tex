@@ -98,6 +98,10 @@ The process is as follows:
 It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
 
+Figure~\ref{fig:FeOT_oxide_removal} illustrates running the outlier removal process on the FeOT full model.
+As can be seen, the number of outliers decreases with each iteration, and the model improves as measured by the RMSE.
+Here, the process terminates after four iterations, as the RMSE no longer improves with further iterations.
+
 \begin{figure*}[]
 \centering
 
@@ -105,13 +109,13 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{images/FeOT_Full_1.png}
-    \caption{Iteration 1}
+    \caption{Iteration 1 (RMSE = 2.03)}
     \label{fig:iteration1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{images/FeOT_Full_2.png}
-    \caption{Iteration 2}
+    \caption{Iteration 2 (RMSE = 1.99)}
     \label{fig:iteration2}
 \end{subfigure}
 
@@ -119,13 +123,13 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{images/FeOT_Full_3.png}
-    \caption{Iteration 3}
+    \caption{Iteration 3 (RMSE = 1.92)}
     \label{fig:iteration3}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{images/FeOT_Full_4.png}
-    \caption{Iteration 4}
+    \caption{Iteration 4 (RMSE = 1.90)}
     \label{fig:iteration4}
 \end{subfigure}
 
@@ -137,8 +141,8 @@ This means that we are willing to accept a 2.5\% chance of falsely removing a sa
 %     \label{fig:iteration5}
 % \end{subfigure}
 
-\caption{FeOT Full Iterations}
-\label{fig:FeOT_full_iterations}
+\caption{The results of the outlier removal process for the FeOT submodel. The red dots represent the outliers that were removed in each iteration.}
+\label{fig:FeOT_oxide_removal}
 \end{figure*}
 
 
