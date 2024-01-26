@@ -44,7 +44,7 @@ app = typer.Typer()
 
 
 @app.command(name="train", help="Train the PLS-SM models.")
-def train(do_outlier_removal=True, additional_info=""):
+def train(do_outlier_removal=True, additional_info="", experiment_outlier_round2_constraint=False):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
@@ -52,6 +52,10 @@ def train(do_outlier_removal=True, additional_info=""):
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
     no_or = "" if do_outlier_removal else "NO-OR_"
     add_info = "" if additional_info == "" else f"_{additional_info}"
+
+    if experiment_outlier_round2_constraint:
+        add_info += "_OR2C"
+
     experiment_name = f"PLS_Models{no_or}{add_info}_{timestamp}"
 
     experiment = mlflow.set_experiment(experiment_name)
@@ -134,8 +138,14 @@ def train(do_outlier_removal=True, additional_info=""):
 
                 while True and do_outlier_removal:
                     outlier_removal_iterations += 1
-                    if outlier_removal_iterations <= 2:
+
+                    if experiment_outlier_round2_constraint:
+                        # Only calculate leverage and residuals for the first two iterations
+                        if outlier_removal_iterations <= 2:
+                            leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
+                    else:
                         leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
+
                     outliers = identify_outliers(leverage, Q)
 
                     if len(outliers) == 0:
@@ -157,7 +167,13 @@ def train(do_outlier_removal=True, additional_info=""):
                     X_train_OR = np.delete(X_train_OR, outliers_indices, axis=0)
                     y_train_OR = np.delete(y_train_OR, outliers_indices, axis=0)
 
-                    if outlier_removal_iterations <= 2:
+                    if experiment_outlier_round2_constraint:
+                        # Only train a new model if we're in the first two iterations.
+                        # This is just a hack to speed up the process.
+                        if outlier_removal_iterations <= 2:
+                            pls_OR = PLSRegression(n_components=n_components)
+                            pls_OR.fit(X_train_OR, y_train_OR)
+                    else:
                         pls_OR = PLSRegression(n_components=n_components)
                         pls_OR.fit(X_train_OR, y_train_OR)
 
