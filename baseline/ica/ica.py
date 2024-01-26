@@ -67,18 +67,10 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
             print(f"Training model {model_name} for {oxide}...")
 
             X_train = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_train = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
+            y_train = compositions_df_n1[oxide] if norm == Norm.NORM_1 else compositions_df_n3[oxide]
 
             X_test = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_test = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
+            y_test = compositions_df_n1[oxide] if norm == Norm.NORM_1 else compositions_df_n3[oxide]
 
             if model_name == "Exponential" or model_name == "Log-square":
                 if model_name == "Log-square":
@@ -125,7 +117,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
 def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     models = {}
-    experiment_id = "641832419024282634"
+    experiment_id = "383396068120538342"
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
     for _, run in runs.iterrows():
@@ -159,11 +151,7 @@ def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
             print(f"Testing model {model_name} for {oxide}...")
 
             X_test = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_test = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
+            y_test = compositions_df_n1[oxide] if norm == Norm.NORM_1 else compositions_df_n3[oxide]
 
             if model_name == "Exponential" or model_name == "Log-square":
                 if model_name == "Log-square":
@@ -216,13 +204,9 @@ def main():
     temp_df = temp_df.abs()
     ica_df_n3_abs = pd.concat([ica_df_n3[exclude_columns_abs], temp_df], axis=1)
 
-    assert len(ica_df_n1_abs) == len(
-        ica_df_n3_abs
-    ), "The number of rows in the two DataFrames must be equal."
+    assert len(ica_df_n1_abs) == len(ica_df_n3_abs), "The number of rows in the two DataFrames must be equal."
 
-    assert (
-        ica_df_n1_abs["id"] == ica_df_n1_abs["id"]
-    ).all(), "The IDs of the two DataFrames must be aligned."
+    assert (ica_df_n1_abs["id"] == ica_df_n1_abs["id"]).all(), "The IDs of the two DataFrames must be aligned."
 
     if TEST:
         test(ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3)
@@ -244,14 +228,10 @@ def get_data(num_components: int, norm: Norm) -> (pd.DataFrame, pd.DataFrame):
     else:
         print("No preprocessed data found. Creating and saving preprocessed data...")
         output_dir.mkdir(parents=True, exist_ok=True)
-        ica_df, compositions_df = create_processed_data(
-            calib_data_path, num_components=num_components, norm=norm
-        )
+        ica_df, compositions_df = create_processed_data(calib_data_path, num_components=num_components, norm=norm)
         ica_df.to_csv(ica_df_csv_loc)
         compositions_df.to_csv(compositions_csv_loc)
-        print(
-            f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
-        )
+        print(f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n")
 
     return ica_df, compositions_df
 
@@ -274,9 +254,7 @@ def create_processed_data(
 
     desired_dataset = "test" if TEST else "train"
     for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
-        split_info_sample_row = test_train_split_idx[
-            test_train_split_idx["sample_name"] == sample_name
-        ]["train_test"]
+        split_info_sample_row = test_train_split_idx[test_train_split_idx["sample_name"] == sample_name]["train_test"]
 
         if split_info_sample_row.empty:
             print(
@@ -295,9 +273,7 @@ def create_processed_data(
 
         processor = ICASampleProcessor(sample_name, num_components)
 
-        if not processor.try_load_composition_df(
-            composition_data_loc=composition_data_loc
-        ):
+        if not processor.try_load_composition_df(composition_data_loc=composition_data_loc):
             print(f"No composition data found for {sample_name}. Skipping.")
             missing.append(sample_name)
             continue
@@ -305,9 +281,7 @@ def create_processed_data(
         processor.preprocess(calib_data_path, norm)
 
         # Run ICA and get the estimated sources
-        ica_estimated_sources = run_ica(
-            processor.df, model=ica_model, num_components=num_components
-        )
+        ica_estimated_sources = run_ica(processor.df, model=ica_model, num_components=num_components)
 
         # Postprocess the data
         processor.postprocess(ica_estimated_sources)
@@ -328,16 +302,12 @@ def create_processed_data(
     print(f"#{len(not_in_set)} | Samples not in {desired_dataset} set: {not_in_set}")
     print(f"#{len(missing)} | Samples missing composition data: {missing}")
     print(f"#{len(ica_df)} | Samples with ICA data: {ica_df.index.unique()}")
-    print(
-        f"#{len(compositions_df)} | Samples with composition data: {compositions_df.index.unique()}"
-    )
+    print(f"#{len(compositions_df)} | Samples with composition data: {compositions_df.index.unique()}")
 
     return ica_df, compositions_df
 
 
-def run_ica(
-    df: pd.DataFrame, model: str = "jade", num_components: int = 8
-) -> np.ndarray:
+def run_ica(df: pd.DataFrame, model: str = "jade", num_components: int = 8) -> np.ndarray:
     """
     Performs Independent Component Analysis (ICA) on a given dataset using JADE or FastICA algorithms.
 
@@ -374,9 +344,7 @@ def run_ica(
         mixing_matrix = jade_model.fit(X=df)
         estimated_sources = jade_model.transform(df)
     elif model == "fastica":
-        fastica_model = FastICA(
-            n_components=num_components, whiten="unit-variance", max_iter=5000
-        )
+        fastica_model = FastICA(n_components=num_components, whiten="unit-variance", max_iter=5000)
         estimated_sources = fastica_model.fit_transform(df)
     else:
         raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
