@@ -98,6 +98,50 @@ The process is as follows:
 It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
 
+\begin{figure*}[]
+\centering
+
+% First Row
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/FeOT_Full_1.png}
+    \caption{Iteration 1}
+    \label{fig:iteration1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/FeOT_Full_2.png}
+    \caption{Iteration 2}
+    \label{fig:iteration2}
+\end{subfigure}
+
+% Second Row
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/FeOT_Full_3.png}
+    \caption{Iteration 3}
+    \label{fig:iteration3}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/FeOT_Full_4.png}
+    \caption{Iteration 4}
+    \label{fig:iteration4}
+\end{subfigure}
+
+% Third Row
+% \begin{subfigure}{\textwidth}
+%     \centering
+%     \includegraphics[width=0.45\textwidth]{images/FeOT_Full_5.png}
+%     \caption{Iteration 5}
+%     \label{fig:iteration5}
+% \end{subfigure}
+
+\caption{FeOT Full Iterations}
+\label{fig:FeOT_full_iterations}
+\end{figure*}
+
+
 \subsection{ICA}\label{sec:methodology_ica}
 The ICA phase in our pipeline can be seen in figure \ref{fig:ica_phase}.
 In this section, we delve into the differences between our pipeline and the original, and we discuss the rationale behind our choices.
