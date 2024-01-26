@@ -45,6 +45,9 @@ app = typer.Typer()
 
 @app.command(name="train", help="Train the PLS-SM models.")
 def train(do_outlier_removal=True, additional_info="", outlier_removal_constraint_iteration=-1):
+    outlier_removal_constraint_iteration = int(outlier_removal_constraint_iteration)
+    do_outlier_removal = bool(do_outlier_removal)
+
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
@@ -294,6 +297,7 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 @app.command(name="test", help="Test the PLS-SM models.")
 def test(experiment_id: str, do_outlier_removal=True, additional_info=""):
+    do_outlier_removal = bool(do_outlier_removal)
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
     no_or = "" if do_outlier_removal else "_NO-OR_"
@@ -371,8 +375,12 @@ def test(experiment_id: str, do_outlier_removal=True, additional_info=""):
 
 
 @app.command(name="full_run", help="Run the full PLS-SM pipeline.")
-def full_run(do_outlier_removal=True, additional_info=""):
-    experiment = train(do_outlier_removal=do_outlier_removal, additional_info=additional_info)
+def full_run(do_outlier_removal=True, additional_info="", outlier_removal_constraint_iteration=-1):
+    experiment = train(
+        do_outlier_removal=do_outlier_removal,
+        additional_info=additional_info,
+        outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
+    )
     test(experiment.experiment_id, do_outlier_removal=do_outlier_removal, additional_info=additional_info)
 
 
