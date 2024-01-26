@@ -71,20 +71,33 @@ MOC        & 54.69\% & 75.45\% & 100.00\% \\
 \end{table}
 
 \subsection{Chosen Experiments}\label{sec:chosen_experiments}
-To evaluate the performance of each of the components in the pipeline, we focus our experiments on three main aspects:
+To evaluate the performance of each of the components in the pipeline, we have conducted the following series of experiments.
 
-\begin{itemize}
-	\item \textbf{Outlier removal} to assess the impact of leaving outliers in the dataset or using a different outlier removal method.
-	\item \textbf{Hyperparameter tuning} to assess the impact of different hyperparameter configurations.
-	\item \textbf{Other models} to compare the performance of the PLS1-SM and ICA models to other models.
-\end{itemize}
+\begin{enumerate}
+	\item\label{enum:experiment1} No outlier removal for PLS1-SM to evaluate the significance of our automated outlier removal process and whether outlier removal is necessary.
+	\item\label{enum:experiment2} Maintain the threshold values from the second iteration of the outlier removal in the PLS1-SM training process to see if a more or less conservative approach is advantageous.
+	\item\label{enum:experiment3} MAD for ICA to evaluate the significance of the outlier removal step in the ICA phase.
+	\item\label{enum:experiment4} Evaluating the impact on ICA model performance when using all five location datasets versus just one.
+	\item\label{enum:experiment5} Other models to compare the performance of the PLS1-SM and ICA models to other models.
+	% \item PLS outlier removal on ICA (?) instead of MAD.
+\end{enumerate}
 
 \noindent
-Given that the original authors did not perform experiments using alternative methods to demonstrate the efficacy of their chosen approach, this omission results in a lack of comprehensive understanding regarding the full potential of the pipeline's performance.
-While they did perform hyperparameter tuning, they did not conduct experiments using different outlier removal methods or alternative models.
-This raises questions about the optimality of the chosen methodology, as a comparative analysis with different methodologies could reveal superior approaches.
-Experimenting with alternative methods means that we can uncover which components contribute the most to the overall error and therefore would benefit the most from further research and development.
-Should a substitution of a component within the pipeline with an alternative method yield improved outcomes, it would indicate that the currently employed method represents a limitation in the overall pipeline, thus highlighting an area that necessitates enhancement.
+We have chosen these experiments based on the following reasons.
+For Experiment~\ref{enum:experiment1}, we are interested in evaluating the significance of our automated outlier removal process due to its differences from the original manual process.
+Additionally, we are interested in examining whether outlier removal is necessary for the PLS1-SM phase by comparing the results with and without outlier removal.
+
+For Experiment~\ref{enum:experiment2}, we want to evaluate the significance of the threshold values used in the outlier removal process by maintaining the threshold values from the second iteration of the outlier removal in the PLS1-SM training process.
+This is a more conservative than always updating the threshold values after each iteration.
+
+For Experiment~\ref{enum:experiment3}, we implement our best guess of the original authors' outlier removal process for the ICA phase, which is based on the Median Absolute Deviation (MAD).
+Then, we compare the results with and without MAD to evaluate the significance of the outlier removal step in the ICA phase.
+
+For Experiment~\ref{enum:experiment4}, we perform ICA using all five location datasets by averaging the results from location into a single dataset.
+By doing this, we will either obtain a more representative dataset for the sample, or we will end up losing information by averaging the results.
+
+For Experiment~\ref{enum:experiment5}, we want to compare the performance of the MOC model with other models.
+Specifically, we train an XGBoost model and an ANN model for comparison.
 
 \subsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
 The original PLS1-SM identified outliers manually by inspecting the leverage and spectral residuals plots.
@@ -102,22 +115,6 @@ By comparing the results with and without MAD, we can quantitatively measure the
 Such an experiment is crucial for understanding whether MAD significantly contributes to reducing noise and improving data quality, thereby enhancing the overall performance of the machine learning pipeline.
 This experiment would also offer insights into the robustness of the ICA phase against outliers, providing a more comprehensive understanding of the pipeline's capabilities and limitations.
 
-\subsection{Experiment: Hyperparameter Tuning}\label{sec:experiment_hyperparameter_tuning}
-\citet{cleggRecalibrationMarsScience2017} use qualitative judgement to identify hyperparameters for their PLS1-SM model.
-This approach carries a risk of inaccuracies without sufficient domain expertise, given the challenges in guaranteeing the optimality of chosen hyperparameters.
-Lacking such expertise, we opted for a more systematic and automated methodology to determine hyperparameters for our PLS1-SM model.
-
-Similarly, the authors use eight independent components for their ICA algorithm, but do not provide any experimental results justifying that this is the optimal number of components.
-As such, it is possible that the performance of the ICA phase could be improved by experimenting with a variety of components.
-
-For the PLS1-SM model we decided to use the common grid search algorithm for testing different hyperparameters for the PLS models.
-% Explain set up...
-
-Since each independent component does not necessarily correlate one-to-one with the number of elements that one wishes to identify in a spectra, we decided to experiment with a number of components ranging between 4 and 25.
-This range is within the vicinity of the original selection of components whilst providing us with a set of reasonable extremes.
-
-% Probably show the setup in some way
-
 \subsection{Experiment: Other Models}\label{sec:experiment_other_models}
 \citet{cleggRecalibrationMarsScience2017} have only compared their new approach with the original method presented by \citet{wiensPreFlight3}, and have not conducted experiments using alternative methods to establish the superiority of their chosen approach.
 Therefore, we decided to compare the performance of the PLS1-SM and ICA models to other models.
@@ -127,5 +124,4 @@ We have decided to conduct the experiments using the following models:
 \begin{itemize}
 	\item \textbf{XGBoost}, a gradient boosting algorithm, \cite{chen_xgboost_2016}.
 	\item \textbf{ANN}, a neural network model, \cite{scikit-learn}.
-	% More? Random Forest, SVM, etc.
 \end{itemize}
