@@ -44,22 +44,20 @@ app = typer.Typer()
 
 
 @app.command(name="train", help="Train the PLS-SM models.")
-def train(do_outlier_removal=True, additional_info="", outlier_removal_constraint_iteration=-1):
-    outlier_removal_constraint_iteration = int(outlier_removal_constraint_iteration)
-    do_outlier_removal = bool(do_outlier_removal)
-
+def train(outlier_removal: bool = True, additional_info: str = "", outlier_removal_constraint_iteration: int = -1):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
     influence_plot_dir = Path("plots/")
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
-    no_or = "" if do_outlier_removal else "NO-OR_"
-    add_info = "" if additional_info == "" else f"_{additional_info}"
+    no_or = "" if outlier_removal else "NO-OR"
+    add_info = "" if additional_info == "" else f"{additional_info}"
 
     if outlier_removal_constraint_iteration > 0:
-        add_info += f"_OR{outlier_removal_constraint_iteration}C"
+        add_info += f"OR{outlier_removal_constraint_iteration}C"
 
-    experiment_name = f"PLS_Models{no_or}{add_info}_{timestamp}"
+    name_tags = ["PLS_Train", no_or, add_info, timestamp]
+    experiment_name = "_".join(name_tags)
 
     experiment = mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_datasets=False, silent=True)
@@ -112,7 +110,7 @@ def train(do_outlier_removal=True, additional_info="", outlier_removal_constrain
                         "compositional_range": compositional_range,
                         "oxide": oxide,
                         "n_spectra": len(train),
-                        "outlier_removal": do_outlier_removal,
+                        "outlier_removal": outlier_removal,
                         "norm": norm,
                     }
                 )
@@ -139,7 +137,7 @@ def train(do_outlier_removal=True, additional_info="", outlier_removal_constrain
 
                 leverage, Q = None, None
 
-                while True and do_outlier_removal:
+                while True and outlier_removal:
                     outlier_removal_iterations += 1
 
                     should_calculate_constraints = (
@@ -296,13 +294,14 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 @app.command(name="test", help="Test the PLS-SM models.")
-def test(experiment_id: str, do_outlier_removal=True, additional_info=""):
-    do_outlier_removal = bool(do_outlier_removal)
+def test(experiment_id: str, outlier_removal: bool = True, additional_info: str = ""):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
-    no_or = "" if do_outlier_removal else "_NO-OR_"
-    add_info = "" if additional_info == "" else f"_{additional_info}"
-    experiment_name = f"PLS_TEST{no_or}{add_info}_{timestamp}"
+    no_or = "" if outlier_removal else "NO-OR"
+    add_info = "" if additional_info == "" else f"{additional_info}"
+    name_tags = ["PLS_TEST", no_or, add_info, timestamp]
+
+    experiment_name = "_".join(name_tags)
 
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False, silent=True)
@@ -375,13 +374,13 @@ def test(experiment_id: str, do_outlier_removal=True, additional_info=""):
 
 
 @app.command(name="full_run", help="Run the full PLS-SM pipeline.")
-def full_run(do_outlier_removal=True, additional_info="", outlier_removal_constraint_iteration=-1):
+def full_run(outlier_removal: bool = True, additional_info: str = "", outlier_removal_constraint_iteration: int = -1):
     experiment = train(
-        do_outlier_removal=do_outlier_removal,
+        outlier_removal=outlier_removal,
         additional_info=additional_info,
         outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
     )
-    test(experiment.experiment_id, do_outlier_removal=do_outlier_removal, additional_info=additional_info)
+    test(experiment.experiment_id, outlier_removal=outlier_removal, additional_info=additional_info)
 
 
 if __name__ == "__main__":
