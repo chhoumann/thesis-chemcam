@@ -1,5 +1,6 @@
 \section{Definition}\label{sec:definition}
 This section introduces the LIBS dataset and the hypothesis function for predicting the composition of major oxides, establishing the foundation for model evaluation and optimization in our study.
+A summary of domain specific abbreviations used in this paper is provided in Table \ref{tab:abbreviations}
 
 \begin{definition}\label{def:dataset}
     Let $D$ be the LIBS data set, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities.
@@ -37,3 +38,25 @@ The goal is to measure how each experiment affects the model's performance by lo
 This leads us to the following challenge:
 
 \textbf{Problem}: Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error $E(M)$.
+
+\begin{table}
+\centering
+\begin{tabularx}{\columnwidth}{lX} % l for left, X for the cell that should be wrapped
+\toprule
+Abbreviation & Meaning \\
+\midrule
+LIBS & Laser-Induced Breakdown Spectroscopy \\
+CCS & Clean, calibrated spectra \\
+IRF & Instrument Response Function \\
+UV & Ultraviolet spectrum \\
+VIO & Violet spectrum \\
+VNIR & Visible and Near-Infrared spectrum \\
+PLS1-SM & Partial Least Squares 1 - sub-model \\
+ICA & Independent Component Analysis \\
+JADE & Joint Approximate Diagonalization of Eigenmatrices \\
+MOC & Multivariate Oxide Composition \\
+\bottomrule
+\end{tabularx}
+\caption{Summary of domain specific abbreviations used in this paper.}
+\label{tab:abbreviations}
+\end{table}
