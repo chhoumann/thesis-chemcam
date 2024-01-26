@@ -50,13 +50,14 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
     random_state = 42
     influence_plot_dir = Path("plots/")
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
-    no_or = "" if outlier_removal else "NO-OR_"
-    add_info = "" if additional_info == "" else f"_{additional_info}"
+    no_or = "" if outlier_removal else "NO-OR"
+    add_info = "" if additional_info == "" else f"{additional_info}"
 
     if outlier_removal_constraint_iteration > 0:
-        add_info += f"_OR{outlier_removal_constraint_iteration}C"
+        add_info += f"OR{outlier_removal_constraint_iteration}C"
 
-    experiment_name = f"PLS_Models{no_or}{add_info}_{timestamp}"
+    name_tags = ["PLS_Train", no_or, add_info, timestamp]
+    experiment_name = "_".join(name_tags)
 
     experiment = mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_datasets=False, silent=True)
@@ -296,9 +297,11 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 def test(experiment_id: str, outlier_removal: bool = True, additional_info: str = ""):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
-    no_or = "" if outlier_removal else "_NO-OR_"
-    add_info = "" if additional_info == "" else f"_{additional_info}"
-    experiment_name = f"PLS_TEST{no_or}{add_info}_{timestamp}"
+    no_or = "" if outlier_removal else "NO-OR"
+    add_info = "" if additional_info == "" else f"{additional_info}"
+    name_tags = ["PLS_TEST", no_or, add_info, timestamp]
+
+    experiment_name = "_".join(name_tags)
 
     mlflow.set_experiment(experiment_name)
     mlflow.autolog(log_models=False, log_datasets=False, silent=True)
