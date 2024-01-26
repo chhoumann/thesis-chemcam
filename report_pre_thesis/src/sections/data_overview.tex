@@ -131,3 +131,18 @@ TB & --- & --- & 60.23 & 0.93 & 20.64 & 11.6387 & 0.052 & 1.93 & 0.000031 & 1.32
 Figure \ref{fig:composition_box_plot} shows a box plot of the composition data.
 The presence of outliers, notably in the \ce{SiO2} and \ce{FeOT} data, indicates significant variability, which may be attributed to the diverse geological origins of the samples.
 These outliers are retained in the analysis to preserve the integrity of the dataset and reflect the full spectrum of geochemical diversity.
+However, the high presence of outliers for some oxides does make it more difficult to accurately predict the composition of a sample.
+For example, \ce{SiO2} was notoriously difficult to predict in the original MOC model\cite{cleggRecalibrationMarsScience2017}, which could be attributed to the high variability in the \ce{SiO2} data.
+
+A correlation matrix of the composition data is shown in Figure~\ref{fig:composition_corr}, calculated using the Pearson correlation coefficient.
+The matrix is illustrated as a heatmap, where the color of each cell represents the correlation between the oxides.
+A coefficient close to 1 implies a strong positive correlation, indicating that as the concentration of one oxide increases, so does that of the other.
+Conversely, a coefficient near -1 suggests a strong negative correlation, where the increase in one oxide concentration accompanies a decrease in the other.
+The matrix illustrates that there is a notable degree of correlation between some oxides, for example between \ce{SiO2} and \ce{CaO} and between \ce{CaO} and \ce{K2O}.
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/oxide_corr.png}
+	\caption{}
+	\label{fig:oxide_corr}
+\end{figure*}
