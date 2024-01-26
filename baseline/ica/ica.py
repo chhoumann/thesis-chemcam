@@ -297,8 +297,6 @@ def create_processed_data(
 
         processor.preprocess(calib_data_path, norm)
 
-        processor.df.to_csv("bad_data.csv")
-
         # Run ICA and get the estimated sources
         ica_estimated_sources = run_ica(
             processor.df, model=ica_model, num_components=num_components
