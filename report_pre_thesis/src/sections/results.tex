@@ -10,7 +10,7 @@ Table \ref{tab:results_rmses} shows the RMSEs of the original and our replicas o
 
 \begin{table*}[t]
 \centering
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllllll}
 \hline
 Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (replica) & MOC (original) & MOC (replica) \\
 \hline
@@ -27,6 +27,21 @@ Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (repl
 \caption{RMSE of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
 \label{tab:results_rmses}
 \end{table*}
+
+\begin{table}[t]
+\centering
+\begin{tabular}{llll}
+\hline
+p-value    & Student's & Welch's & Wilcoxon \\
+\hline
+PLS1-SM    & 67.71\% & 84.04\% & 73.53\% \\
+ICA        & 32.38\% & 71.38\% & 64.06\% \\
+MOC        & 54.69\% & 75.45\% & 100.00\% \\
+\hline
+\end{tabular}
+\caption{p-values of the Student's t-test, Welch's t-test, and Wilcoxon signed-rank test for the RMSEs between the original and our replicas of the PLS1-SM, ICA, and MOC models, respectively.}
+\label{tab:results_ttests}
+\end{table}
 
 As can be seen in Table~\ref{tab:results_rmses} we have presented a pairwise comparison between the errors obtained by the original models and our own.
 From the table it is clear that the errors obtained from our ICA and MOC replication are similar to the originals, while the errors obtained from our PLS1-SM replication are quite different.
