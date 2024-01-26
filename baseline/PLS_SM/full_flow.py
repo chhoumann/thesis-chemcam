@@ -414,11 +414,6 @@ if SHOULD_PREDICT:
                 )
             )
 
-            # remove nans in pred from both pred and test
-            # nan_in_pred = np.isnan(pred)
-            # pred = pred[~nan_in_pred]
-            # Y = Y[~nan_in_pred]
-
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
             pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
