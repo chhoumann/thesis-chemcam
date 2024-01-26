@@ -44,7 +44,7 @@ app = typer.Typer()
 
 
 @app.command(name="train", help="Train the PLS-SM models.")
-def train(do_outlier_removal=True, additional_info="", experiment_outlier_round2_constraint=False):
+def train(do_outlier_removal=True, additional_info="", outlier_removal_constraint_iteration=-1):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
@@ -53,8 +53,8 @@ def train(do_outlier_removal=True, additional_info="", experiment_outlier_round2
     no_or = "" if do_outlier_removal else "NO-OR_"
     add_info = "" if additional_info == "" else f"_{additional_info}"
 
-    if experiment_outlier_round2_constraint:
-        add_info += "_OR2C"
+    if outlier_removal_constraint_iteration > 0:
+        add_info += f"_OR{outlier_removal_constraint_iteration}C"
 
     experiment_name = f"PLS_Models{no_or}{add_info}_{timestamp}"
 
@@ -139,11 +139,12 @@ def train(do_outlier_removal=True, additional_info="", experiment_outlier_round2
                 while True and do_outlier_removal:
                     outlier_removal_iterations += 1
 
-                    if experiment_outlier_round2_constraint:
-                        # Only calculate leverage and residuals for the first two iterations
-                        if outlier_removal_iterations <= 2:
-                            leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
-                    else:
+                    should_calculate_constraints = (
+                        outlier_removal_constraint_iteration >= 0
+                        and outlier_removal_iterations <= outlier_removal_constraint_iteration
+                    ) or outlier_removal_constraint_iteration < 0
+
+                    if should_calculate_constraints:
                         leverage, Q = calculate_leverage_residuals(pls_OR, X_train_OR)
 
                     outliers = identify_outliers(leverage, Q)
@@ -167,13 +168,7 @@ def train(do_outlier_removal=True, additional_info="", experiment_outlier_round2
                     X_train_OR = np.delete(X_train_OR, outliers_indices, axis=0)
                     y_train_OR = np.delete(y_train_OR, outliers_indices, axis=0)
 
-                    if experiment_outlier_round2_constraint:
-                        # Only train a new model if we're in the first two iterations.
-                        # This is just a hack to speed up the process.
-                        if outlier_removal_iterations <= 2:
-                            pls_OR = PLSRegression(n_components=n_components)
-                            pls_OR.fit(X_train_OR, y_train_OR)
-                    else:
+                    if should_calculate_constraints:
                         pls_OR = PLSRegression(n_components=n_components)
                         pls_OR.fit(X_train_OR, y_train_OR)
 
