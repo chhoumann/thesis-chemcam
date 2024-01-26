@@ -4,8 +4,15 @@ This data is stored in a directory structure as shown in Figure~\ref{fig:directo
 For each sample, the data is split into five datasets, one for each location on the sample that was shot at by the laser.
 Each dataset contains CCS data stored in a \texttt{.csv} file.
 
+\begin{figure*}[b]
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/oxide_corr.png}
+	\caption{Correlation matrix of the composition data calculated using the Pearson correlation coefficient, illustrated as a heatmap.}
+	\label{fig:oxide_corr}
+\end{figure*}
+
 \begin{figure}[ht]
-    \scalebox{0.8}{
+    \scalebox{0.9}{
     \begin{forest}
         for tree={
             font=\ttfamily,
@@ -48,7 +55,6 @@ Each dataset contains CCS data stored in a \texttt{.csv} file.
 \label{fig:directory_structure}
 \end{figure}
 
-
 Each \texttt{.csv} file represents a location on the sample that was shot at by the laser.
 They contain the following columns:
 
@@ -76,34 +82,6 @@ $\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$
 \label{tab:ccs_data_example}
 \end{table*}
 
-The rows in the location dataset represent which wavelength the intensity measurements were taken at.
-There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample.
-While $N=50$ for each sample in the calibration data, the number of shots taken on Mars for each sample can vary but is typically between $30$ and $50$\cite{maurice_chemcam_2016}.
-
-Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{cadillac} sample.
-As can be seen in the table, the second final row of the \texttt{cadillac} sample contains negative values, which is not physically possible.
-These negative values represent noise and are a result of the initial preprocessing steps applied to the raw LIBS data.
-
-Figure \ref{fig:masked_regions} shows a spectral plot of the CCS data for the \texttt{cadillac} sample.
-Note how it comprises of three different spectral regions - ultra-violet (UV), violet (VIO), and visible and near infrared (VNIR).
-Separate instruments were used for each of these regions.
-Consequently, the edges of the spectral regions are noisy because pixels at the edges of the CCD\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy\cite{radionuclide_imaging}.} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
-These regions, which also contain no unique major element diagnostic peaks, are masked out to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
-Specifically, the masked ranges are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm and are highlighted in blue in Figure~\ref{fig:masked_regions}.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/masked_regions.png}
-	\caption{Spectral plot of the CCS data for the \texttt{cadillac} sample. The blue regions represent the noisy edges of the spectral regions.}
-	\label{fig:masked_regions}
-\end{figure}
-
-\subsection{Composition Data}\label{subsec:composition_data}
-In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
-There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
-For each of these oxides, the data specifies their respective concentrations in each sample, expressed as a weight percentage (wt. \%) of the total composition.
-An excerpt of this dataset is shown in Table~\ref{tab:composotion_data_example}.
-
 \begin{table*}[!b]
 \centering
 \begin{tabular}{lllllllllllll}
@@ -117,17 +95,57 @@ TB & --- & --- & 60.23 & 0.93 & 20.64 & 11.6387 & 0.052 & 1.93 & 0.000031 & 1.32
     TB2 & --- & --- & 60.4 & 0.93 & 20.5 & 11.6536 & 0.047 & 1.86 & 0.2 & 1.29 & 3.86 & 100.7406 \\
 \bottomrule
 \end{tabular}
-\caption{Exert from the composition dataset.}
+\caption{Excerpt from the composition dataset.}
 \label{tab:composotion_data_example}
 \end{table*}
 
-\begin{figure*}
+The rows in the location dataset represent which wavelength the intensity measurements were taken at.
+There are $6144$ rows and $N$ columns, where $N$ is the number of shots taken for a given sample.
+While $N=50$ for each sample in the calibration data, the number of shots taken on Mars for each sample can vary but is typically between $30$ and $50$\cite{maurice_chemcam_2016}.
+
+Table \ref{tab:ccs_data_example} shows an example of the CCS data for the first location for the \texttt{cadillac} sample.
+As can be seen in the table, the second final row of the \texttt{cadillac} sample contains negative values, which is not physically possible.
+These negative values represent noise and are a result of the initial preprocessing steps applied to the raw LIBS data.
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/masked_regions.png}
+	\caption{Spectral plot of the CCS data for the \texttt{cadillac} sample. The blue regions represent the noisy edges of the spectral regions.}
+	\label{fig:masked_regions}
+\end{figure}
+
+Figure \ref{fig:masked_regions} shows a spectral plot of the CCS data for the \texttt{cadillac} sample.
+Note how it comprises of three different spectral regions - ultra-violet (UV), violet (VIO), and visible and near infrared (VNIR).
+Separate instruments were used for each of these regions.
+Consequently, the edges of the spectral regions are noisy because pixels at the edges of the CCD\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy\cite{radionuclide_imaging}.} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
+These regions, which also contain no unique major element diagnostic peaks, are masked out to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
+Specifically, the masked ranges are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm and are highlighted in blue in Figure~\ref{fig:masked_regions}.
+
+\subsection{Composition Data}\label{subsec:composition_data}
+\begin{figure*}[t]
 	\centering
 	\includegraphics[width=0.85\textwidth]{images/composition_box_plot.png}
 	\caption{Box plot of the composition data. The orange line represents the median, the black boxes represent the interquartile range for each oxide, and the whiskers represent the range of the data. The black circles represent outliers.}
 	\label{fig:composition_box_plot}
 \end{figure*}
 
+In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
+There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
+For each of these oxides, the data specifies their respective concentrations in each sample, expressed as a weight percentage (wt. \%) of the total composition.
+An excerpt of this dataset is shown in Table~\ref{tab:composotion_data_example}.
+
+
 Figure \ref{fig:composition_box_plot} shows a box plot of the composition data.
-The presence of outliers, notably in the \ce{SiO2} and \ce{FeOT} data, indicates significant variability, which may be attributed to the diverse geological origins of the samples.
-These outliers are retained in the analysis to preserve the integrity of the dataset and reflect the full spectrum of geochemical diversity.
+In the context of this box plot, data points are statistically categorized as "outliers" based on their deviation from the interquartile range.
+The presence of such outliers, notably in the \ce{SiO2} and \ce{FeOT} data, indicates significant variability, which may be attributed to the diverse geological origins of the samples.
+It is crucial to note that these "outliers" are not anomalous or erroneous measurements but are reflective of substantial natural variability, likely due to the heterogeneous geological origins of the samples.
+composition composition
+In our methodology, we deliberately choose to retain these composition data points to honor the natural variability and complexity of the geochemical systems we are studying.
+Rather than discarding them based on a statistical rule, we acknowledge that what appears as an outlier in a box plot does not necessarily equate to being an outlier in geochemical terms.
+Indeed, the significant range in \ce{SiO2} concentrations —-- although challenging for predictive models as described by \citet{cleggRecalibrationMarsScience2017} --- is representative of the geochemical diversity we intend to capture and analyze.
+
+A correlation matrix of the composition data is shown in Figure~\ref{fig:oxide_corr}, calculated using the Pearson correlation coefficient.
+The matrix is illustrated as a heatmap, where the color of each cell represents the correlation between the oxides.
+A coefficient close to 1 implies a strong positive correlation, indicating that as the concentration of one oxide increases, so does that of the other.
+Conversely, a coefficient near -1 suggests a strong negative correlation, where the increase in one oxide concentration accompanies a decrease in the other.
+The matrix illustrates that there is a notable degree of correlation between some oxides, for example between \ce{SiO2} and \ce{CaO} and between \ce{CaO} and \ce{K2O}.
