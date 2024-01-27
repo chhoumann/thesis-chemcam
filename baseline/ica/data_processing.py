@@ -41,14 +41,8 @@ class ICASampleProcessor:
 
         return True
 
-    def preprocess(self, calib_data_path: Path, norm: Norm = Norm.NORM_1) -> None:
-        sample_data = get_preprocessed_sample_data(
-            self.sample_name, calib_data_path, average_shots=False
-        )
-
-        # For now, we just use the first of the datasets
-        sample_location, df = list(sample_data.items())[0]
-        self.sample_id = f"{self.sample_name}_{sample_location}"
+    def preprocess(self, location_name: str, df: pd.DataFrame, norm: Norm = Norm.NORM_1) -> None:
+        self.sample_id = f"{self.sample_name}_{location_name}"
 
         # Apply masking
         wmt = WavelengthMaskTransformer(masks)

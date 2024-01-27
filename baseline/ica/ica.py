@@ -14,8 +14,9 @@ from sklearn.metrics import mean_squared_error
 from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
 from lib.norms import Norm
+from lib.data_handling import get_preprocessed_sample_data
 
-TEST = True
+TEST = False
 mlflow.set_tracking_uri("http://localhost:5000")
 experiment_name = f"""ICA_{
     'TEST' if TEST else 'TRAIN'
@@ -253,6 +254,7 @@ def create_processed_data(
     missing = []
 
     desired_dataset = "test" if TEST else "train"
+
     for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
         split_info_sample_row = test_train_split_idx[test_train_split_idx["sample_name"] == sample_name]["train_test"]
 
@@ -271,30 +273,59 @@ def create_processed_data(
             not_in_set.append(sample_name)
             continue
 
-        processor = ICASampleProcessor(sample_name, num_components)
+        sample_data = get_preprocessed_sample_data(
+            sample_name, calib_data_path, average_shots=False
+        )
 
-        if not processor.try_load_composition_df(composition_data_loc=composition_data_loc):
-            print(f"No composition data found for {sample_name}. Skipping.")
+        sample_dfs = []
+
+        for location_name, df in sample_data.items():
+            processor = ICASampleProcessor(sample_name, num_components)
+
+            if not processor.try_load_composition_df(composition_data_loc=composition_data_loc):
+                print(f"No composition data found for {sample_name}. Skipping.")
+                missing.append(sample_name)
+                continue
+
+            processor.preprocess(location_name, df, norm)
+
+            # Run ICA and get the estimated sources
+            ica_estimated_sources = run_ica(processor.df, model=ica_model, num_components=num_components)
+
+            # Postprocess the data
+            processor.postprocess(ica_estimated_sources)
+
+            # Aggregate the ICA results and composition data to their respective DataFrames
+            compositions_df = pd.concat([compositions_df, processor.composition_df])
+
+            # Add the sample ID to the ICA DataFrame
+            processor.ic_wavelengths["id"] = processor.sample_id
+            sample_dfs.append(processor.ic_wavelengths)
+
+
+        if len(sample_dfs) != 0:
+            # append the average of the 5 samples to the ica_df
+            concatenated_dfs = pd.concat(sample_dfs)
+
+            # Separate the numerical data and 'id'
+            numerical_data = concatenated_dfs[concatenated_dfs.columns.difference(['id'])]
+
+            # Calculate the mean of the numerical data
+            average_scores = numerical_data.mean().to_frame().T
+
+            # Add the sample ID to the average scores
+            average_scores.index = [sample_name]
+            average_scores["id"] = sample_name
+
+            # Add the average scores to the ica_df (assuming ica_df structure is appropriate for this)
+            ica_df = pd.concat([ica_df, average_scores])  # Transpose to match the original df structure
+        else:
+            print(f"No data found for {sample_name}. Skipping lmao...")
             missing.append(sample_name)
-            continue
-
-        processor.preprocess(calib_data_path, norm)
-
-        # Run ICA and get the estimated sources
-        ica_estimated_sources = run_ica(processor.df, model=ica_model, num_components=num_components)
-
-        # Postprocess the data
-        processor.postprocess(ica_estimated_sources)
-
-        # Aggregate the ICA results and composition data to their respective DataFrames
-        compositions_df = pd.concat([compositions_df, processor.composition_df])
-        # Add the sample ID to the ICA DataFrame
-        processor.ic_wavelengths["id"] = processor.sample_id
-        ica_df = pd.concat([ica_df, processor.ic_wavelengths])
 
     # Set the index and column names for the DataFrames
     ica_df.index.name = "target"
-    ica_df.columns.name = "wavelegths"
+    ica_df.columns.name = "wavelengths"
 
     compositions_df.index.name = "target"
     compositions_df.columns.name = "oxide"
