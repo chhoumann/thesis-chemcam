@@ -9,7 +9,7 @@ The results show that the RMSEs of our replicas of the PLS1-SM, ICA and MOC mode
 However, the are some notable differences --- in some cases, our replicas outperform the original models, while in other cases, the original models outperform our replicas.
 These differences can be attributed to a number of factors.
 
-Firstly, the original pipeline was trained on two datasets, one acquired at a 1600mm standoff distance and one acquired at a 3000mm standoff distance.
+Firstly, the original models were trained on two datasets, one acquired at a 1600mm standoff distance and one acquired at a 3000mm standoff distance.
 We have only used the 1600mm dataset for our replicas since we do not have access to the 3000mm dataset.
 As mentioned in Section~\ref{sec:outlier_removal}, we also chose chose to automate the outlier removal process for the PLS1-SM phase, whereas the original authors performed this manually.
 Moreover, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
