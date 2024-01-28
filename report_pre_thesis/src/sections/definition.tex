@@ -20,10 +20,10 @@ The samples may contain other elements that are not considered major oxides, whi
 If the sum of the predicted weight percentages is greater than 100\%, the model is overestimating the weight percentages, and represents a physical impossibility.
 
 There are various methods to evaluate the performance of a model.
-We use the average RMSE of the predictions for each oxide $\mathbf{\hat{y}}$ and actual values $\mathbf{y}$, denoted $E$, as the error metric for the model:
+We use the RMSE of the predictions for each oxide $\mathbf{\hat{y}}$ and actual values $\mathbf{y}$, denoted $E$, as the error metric for the model:
 
 \begin{equation}\label{eq:avg_rmse_metric}
-    E(M) = \frac{1}{k} \sum_{i=1}^{k} \sqrt{\frac{1}{m} \sum_{j=1}^{m} (\hat{y}_{ij} - y_{ij})^2}
+    E(M) = \sqrt{\frac{1}{m} \sum_{j=1}^{m} (\hat{y}_{ij} - y_{ij})^2}
 \end{equation}
 
 Where \( \hat{y}_{ij} \) is the \( i^{th} \) component of the output vector \( \hat{y} \) for the \( j^{th} \) sample in the dataset \( D \), as produced by the hypothesis function \( f \) of model \( M \). Similarly, \( y_{ij} \) is the actual weight percentage of the \( i^{th} \) major oxide \( o_i \in O \) for the \( j^{th} \) sample.
