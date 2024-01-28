@@ -24,3 +24,11 @@ Element    & Baseline      & Aggregated datasets \\
 \caption{RMSEs for the ICA phase's regression models using aggregated datasets.}
 \label{tab:ica_aggregated_rmses}
 \end{table}
+
+The results, as depicted in Table~\ref{tab:ica_aggregated_rmses}, indicate a significant increase in the Root Mean Square Error (RMSE) across all elements when aggregated datasets were used compared to the baseline.
+Specifically, the RMSE values for \ce{SiO2}, \ce{Al2O3}, \ce{FeO_T}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O} all saw substantial increases.
+This suggests that the aggregation process, contrary to potentially enhancing model accuracy by noise reduction, actually led to a considerable loss of critical information necessary for accurate predictions.
+
+Such an outcome implies that the variability between the different location datasets contains valuable information that is pertinent to the predictive modeling of oxide compositions.
+Averaging these datasets seems to dilute these nuances, leading to a generalized representation of the samples that does not capture the specificities required for precise predictions.
+This is particularly evident in the case of \ce{SiO2} and \ce{Al2O3}, where the RMSE more than doubled when using aggregated datasets, highlighting a significant degradation in model performance.
