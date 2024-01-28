@@ -17,7 +17,7 @@ In light of \citeauthor{takahashi_quantitative_2017}'s findings on the limitatio
 This approach was motivated by ANNs' capacity to discern complex, non-linear relationships within LIBS spectra.
 
 The ANN comprises of a sequence of fully connected (dense) layers and dropout layers, aimed at reducing overfitting through regularization.
-The architecture begins with an input layer of 6144 units, reflecting the high-dimensional nature of the input data.
+The architecture begins with an input layer of 6144 units, corresponding to the number of wavelengths in the LIBS spectra, as explained in our examination of the data in Section~\ref{sec:data_overview}.
 This is immediately followed by a series of linear transformations and non-linear activations (ReLU), reducing the dimensionality in a stepwise fashion to 1024, 512, 256, and finally 128 units across four layers.
 Each of these reductions is aimed at distilling the essential features required for accurate regression outcomes.
 The inclusion of dropout layers with a dropout rate of 0.3 after the first and second dense layers further aids in mitigating the risk of overfitting by randomly omitting a subset of features during the training phase.
