@@ -1,0 +1,14 @@
+\subsection{Summarizing the experiments}\label{sec:experiments_summary}
+In this chapter, we have conducted a series of experiments to evaluate the MOC pipeline, each revealing important insights into its various components.
+
+In Section~\ref{sec:experiment_pls_automated_outlier_removal} we investigated the efficacy of our automated outlier removal. 
+We demonstrated that our approach did not yield any significant benefits when compared to no outlier removal.
+
+Additionally, in Section~\ref{sec:experiment_pls_fixed_thresholds} we experimented with fixed threshold values for outlier removal.
+This experiment further validated that our outlier removal process did not improve model performance despite using a more conservative approach.
+
+%Needs to reflect our actual results: Our application of the MAD method for outlier removal in the ICA phase offered a comparative perspective against traditional approaches, setting a benchmark for future enhancements. The evaluation of ICA’s performance with aggregated datasets illuminated the trade-offs between data representativeness and information loss, emphasizing the importance of diverse datasets.
+%The comparative analysis with alternative models provided a broader understanding of the MOC pipeline's performance, identifying areas for future improvement.
+
+Finally, in Section~\ref{sec:experiment_other_models} we tested the performance of two different types of models, namely XGBoost and an ANN. 
+Here we demonstrated that both approaches are promising alternatives, both yielding comparable or better predictions in almost all cases.
