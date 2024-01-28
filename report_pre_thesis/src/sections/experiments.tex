@@ -90,6 +90,14 @@ f = \frac{\left(S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2\right)^2}{\frac{S^4_{\
 $$
 which accounts for the variances in RMSE values and the respective sample sizes ($n_A$ and $n_B$) of the models being compared.
 Finally, the p-value is derived from the t-distribution's cumulative distribution function:
+% Note to selves:
+% This can be calculated using the cumulative distribution function of the t-distribution.
+% https://stackoverflow.com/questions/17559897/python-p-value-from-t-statistic
+% https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.t.html
+% We've used: p_value = stats.t.sf(np.abs(t_value), degrees_of_freedom) * 2
+% where t_value is the t-statistic and degrees_of_freedom is the degrees of freedom.
+% But you could use: p_value = 2 * ( 1 - stats.t.cdf(abs(t_value), degrees_of_freedom))
+% Just as well.
 $$p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)$$
 where $F_{\text{T}}$ is the cumulative distribution function of the t-distribution with $f$ degrees of freedom. 
 Higher p-values indicate greater compatibility with the null hypothesis.
