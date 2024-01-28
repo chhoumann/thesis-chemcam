@@ -99,7 +99,7 @@ Finally, the p-value is derived from the t-distribution's cumulative distributio
 % But you could use: p_value = 2 * ( 1 - stats.t.cdf(abs(t_value), degrees_of_freedom))
 % Just as well.
 $$p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)$$
-where $F_{\text{T}}$ is the cumulative distribution function of the t-distribution with $f$ degrees of freedom. 
+where $F_{\text{T}}$ is the cumulative distribution function of the t-distribution with $f$ degrees of freedom.
 Higher p-values indicate greater compatibility with the null hypothesis.
 
 We present the results of our t-tests in Table~\ref{table:results_ttests}.
@@ -141,40 +141,10 @@ However, the lower p-values associated with $FeO_T$ for both PLS1-SM and MOC, in
 Given our dataset's inherent variability in the compositions of these specific elements, as substantiated in Section~\ref{sec:data_overview}, these findings are interpretable and not wholly unexpected.
 
 In conclusion, our t-tests demonstrate that our replicated models are statistically similar to the original models, thereby achieving our goal of demonstrating equivalence rather than disparity.
-As such, they serve their purpose as a baseline for identifying which aspects of the pipeline contribute the most to the overall error. 
+As such, they serve their purpose as a baseline for identifying which aspects of the pipeline contribute the most to the overall error.
 
-
-\subsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
-% TODO: Add results and discussion.
-
-The original PLS1-SM identified outliers manually by inspecting the leverage and spectral residuals plots.
-We have instead chosen to automate this based on the reasons described in Section~\ref{sec:methodology_outlier_removal}.
-It would therefore be intriguing to examine the impact on the pipeline's performance when this process is adjusted.
-Firstly, examining the performance implications of completely omitting outlier removal would be worthwhile.
-This experiment is justified given the substantial efforts dedicated to developing the ChemCam calibration dataset as mentioned in Section~\ref{sec:ica_data_preprocessing}, which implies a minimal presence of significant outliers.
-Secondly, maintaining the threshold values from the second iteration of the outlier removal in the PLS1-SM training process would lead to a more conservative outlier removal process where fewer samples are removed.
-The reason for doing so is that we do not know the basis for the original author's manual outlier removal process, and it is possible that they were more conservative than our automated process.
-Consequently, a more conservative approach could potentially align our replica of the pipeline more closely with the original.
-
-In the ICA phase, the original authors employed the Median Absolute Deviation (MAD) for outlier removal, yet the detailed methodology of their approach was not fully delineated.
-Consequently, in our version of the pipeline, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
-This decision allows us to evaluate the intrinsic effectiveness of the ICA phase without the influence of outlier removal.
-Introducing outlier removal using MAD in our replication of the pipeline presents an opportunity to assess its impact on the pipeline's efficacy.
-By comparing the results with and without MAD, we can quantitatively measure the utility of this step.
-Such an experiment is crucial for understanding whether MAD significantly contributes to reducing noise and improving data quality, thereby enhancing the overall performance of the machine learning pipeline.
-This experiment would also offer insights into the robustness of the ICA phase against outliers, providing a more comprehensive understanding of the pipeline's capabilities and limitations.
-
-\subsection{Experiment: Other Models}\label{sec:experiment_other_models}
-\citet{cleggRecalibrationMarsScience2017} have only compared their new approach with the original method presented by \citet{wiensPreFlight3}, and have not conducted experiments using alternative methods to establish the superiority of their chosen approach.
-Therefore, we decided to compare the performance of the PLS1-SM and ICA models to other models.
-The objective is to evaluate two distinct scenarios.
-In the first scenario, we aim to conduct a direct comparison between the MOC model and an alternative model. The second scenario revolves around substituting either PLS or ICA with a different model and then calculating a weighted average.
-We have decided to conduct the experiments using the following models:
-
-\begin{itemize}
-	\item \textbf{XGBoost}, a gradient boosting algorithm, \cite{chen_xgboost_2016}.
-	\item \textbf{ANN}, a neural network model, \cite{scikit-learn}.
-\end{itemize}
-
-% TODO: Argue why we chose these models (ref SuperCam paper).
-% TODO: Add results and discussion.
+\input{sections/experiments/pls_outlier.tex}
+\input{sections/experiments/pls_thresholds.tex}
+\input{sections/experiments/ica_outlier.tex}
+\input{sections/experiments/ica_aggregated.tex}
+\input{sections/experiments/other_models.tex}

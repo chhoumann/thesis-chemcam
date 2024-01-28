@@ -1,0 +1,8 @@
+\subsection{Experiment: ICA MAD Outlier Removal}\label{sec:experiment_ica_mad_outlier_removal}
+In the ICA phase, the original authors employed the Median Absolute Deviation (MAD) for outlier removal, yet the detailed methodology of their approach was not fully delineated.
+Consequently, in our version of the pipeline, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
+This decision allows us to evaluate the intrinsic effectiveness of the ICA phase without the influence of outlier removal.
+Introducing outlier removal using MAD in our replication of the pipeline presents an opportunity to assess its impact on the pipeline's efficacy.
+By comparing the results with and without MAD, we can quantitatively measure the utility of this step.
+Such an experiment is crucial for understanding whether MAD significantly contributes to reducing noise and improving data quality, thereby enhancing the overall performance of the machine learning pipeline.
+This experiment would also offer insights into the robustness of the ICA phase against outliers, providing a more comprehensive understanding of the pipeline's capabilities and limitations.
