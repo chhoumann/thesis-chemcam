@@ -14,8 +14,8 @@ from lib.reproduction import masks
 
 def average_each_shot_across_locations(data):
     # Concatenate all DataFrames along the 'wave' column to calculate the mean for each shot across locations
-    all_shots = pd.concat([df.set_index('wave') for df in data.values()], axis=0, keys=range(1, 6))
-    all_shots_mean = all_shots.groupby('wave').mean()
+    all_shots = pd.concat([df.set_index("wave") for df in data.values()], axis=0, keys=range(1, 6))
+    all_shots_mean = all_shots.groupby("wave").mean()
 
     # Reset index to include 'wave' as a column in the final DataFrame
     final_avg_shots_df = all_shots_mean.reset_index()
@@ -43,23 +43,21 @@ class ICASampleProcessor:
 
         # Check if the composition data contains NaN values
         if composition_df.isnull().values.any():
-            print(
-                f"NaN values found in composition data for {self.sample_name}. Skipping..."
-            )
+            print(f"NaN values found in composition data for {self.sample_name}. Skipping...")
             return False
 
         self.composition_df = composition_df
 
         return True
 
-    def preprocess(self, calib_data_path: Path, norm: Norm = Norm.NORM_1) -> None:
-        sample_data = get_preprocessed_sample_data(
-            self.sample_name, calib_data_path, average_shots=False
-        )
+    def preprocess(self, calib_data_path: Path, average_locations=False, norm: Norm = Norm.NORM_1) -> None:
+        sample_data = get_preprocessed_sample_data(self.sample_name, calib_data_path, average_shots=False)
         self.sample_id = f"{self.sample_name}"
 
         # Average all of the five location datasets into one single dataset
-        final_avg_shots_df = average_each_shot_across_locations(sample_data)
+        final_avg_shots_df = (
+            average_each_shot_across_locations(sample_data) if average_locations else list(sample_data.values())[0]
+        )
 
         # Apply masking
         wmt = WavelengthMaskTransformer(masks)
@@ -106,12 +104,8 @@ class ICASampleProcessor:
 
     # This is a function that finds the correlation between loadings and a set of columns
     # The idea is to somewhat automate identifying which element the loading corresponds to.
-    def __correlate_loadings__(
-        self, corrcols: list, icacols: list
-    ) -> (pd.DataFrame, list):
-        corrdf = (
-            self.df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
-        )
+    def __correlate_loadings__(self, corrcols: list, icacols: list) -> (pd.DataFrame, list):
+        corrdf = self.df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
         # set all corrdf nans to 0 - they were set to 0 during masking, and
         # .corr() sets values that don't vary to NaN
         corrdf = corrdf.fillna(0)

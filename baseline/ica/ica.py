@@ -16,6 +16,7 @@ from ica.jade import JADE
 from lib.norms import Norm
 
 TEST = True
+AVERAGE_LOCATION_DATASETS = False
 mlflow.set_tracking_uri("http://localhost:5000")
 experiment_name = f"""ICA_{
     'TEST' if TEST else 'TRAIN'
@@ -278,7 +279,7 @@ def create_processed_data(
             missing.append(sample_name)
             continue
 
-        processor.preprocess(calib_data_path, norm)
+        processor.preprocess(calib_data_path, AVERAGE_LOCATION_DATASETS, norm)
 
         # Run ICA and get the estimated sources
         ica_estimated_sources = run_ica(processor.df, model=ica_model, num_components=num_components)
