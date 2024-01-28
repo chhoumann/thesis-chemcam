@@ -12,6 +12,17 @@ from lib.norms import Norm, Norm1Scaler, Norm3Scaler
 from lib.reproduction import masks
 
 
+def average_each_shot_across_locations(data):
+    # Concatenate all DataFrames along the 'wave' column to calculate the mean for each shot across locations
+    all_shots = pd.concat([df.set_index('wave') for df in data.values()], axis=0, keys=range(1, 6))
+    all_shots_mean = all_shots.groupby('wave').mean()
+
+    # Reset index to include 'wave' as a column in the final DataFrame
+    final_avg_shots_df = all_shots_mean.reset_index()
+
+    return final_avg_shots_df
+
+
 class ICASampleProcessor:
     def __init__(self, sample_name: str, num_components: int):
         self.sample_name = sample_name
@@ -45,23 +56,23 @@ class ICASampleProcessor:
         sample_data = get_preprocessed_sample_data(
             self.sample_name, calib_data_path, average_shots=False
         )
+        self.sample_id = f"{self.sample_name}"
 
-        # For now, we just use the first of the datasets
-        sample_location, df = list(sample_data.items())[0]
-        self.sample_id = f"{self.sample_name}_{sample_location}"
+        # Average all of the five location datasets into one single dataset
+        final_avg_shots_df = average_each_shot_across_locations(sample_data)
 
         # Apply masking
         wmt = WavelengthMaskTransformer(masks)
-        df = wmt.fit_transform(df)
+        df = wmt.fit_transform(final_avg_shots_df)
 
         # set the wave column as the index
-        df.set_index("wave", inplace=True)
+        final_avg_shots_df.set_index("wave", inplace=True)
 
         # Normalize the data
         scaler = Norm1Scaler() if norm.value == 1 else Norm3Scaler()
-        df = pd.DataFrame(scaler.fit_transform(df))
+        final_avg_shots_df = pd.DataFrame(scaler.fit_transform(df))
 
-        self.df = df.transpose()
+        self.df = final_avg_shots_df.transpose()
 
     def postprocess(self, ica_estimated_sources: np.ndarray) -> None:
         columns = self.df.columns
