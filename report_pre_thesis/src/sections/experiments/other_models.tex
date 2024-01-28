@@ -1,23 +1,26 @@
 \subsection{Experiment: Other Models}\label{sec:experiment_other_models}
 \citet{cleggRecalibrationMarsScience2017} have only compared their new approach with the original method presented by \citet{wiensPreFlight3}, and have not conducted experiments using alternative methods to establish the superiority of their chosen approach.
 Therefore, we decided to compare the performance of the PLS1-SM and ICA models to other models.
-The objective is to evaluate two distinct scenarios.
-In the first scenario, we aim to conduct a direct comparison between the MOC model and an alternative model. The second scenario revolves around substituting either PLS or ICA with a different model and then calculating a weighted average.
-We have decided to conduct the experiments using the following models:
+The objective was to evaluate two distinct scenarios.
+In the first scenario, we aimed to conduct a direct comparison between the MOC model and an alternative model. The second scenario revolves around substituting either PLS or ICA with a different model and then calculating a weighted average.
+We conducted the experiments using the following models:
 
 \begin{itemize}
 	\item \textbf{XGBoost}, a gradient boosting algorithm \cite{chen_xgboost_2016}
 	\item \textbf{ANN}, a neural network model
 \end{itemize}
 
-Building on the findings of \citet{andersonPostlandingMajorElement2022}, who demonstrated Gradient Boosting Regression (GBR) models' superior predictive accuracy in analyzing major oxide compositions in geological samples, we adopt XGBoost for its refined GBR implementation.
-This decision is informed by XGBoost's documented success in enhancing model precision, as detailed in Section~\ref{sec:related_works}.
+Building on the findings of \citet{andersonPostlandingMajorElement2022}, who demonstrated Gradient Boosting Regression (GBR) models' superior predictive accuracy in analyzing major oxide compositions in geological samples, we adopted XGBoost for its refined GBR implementation.
+This decision was informed by XGBoost's documented success in enhancing model precision, as detailed in Section~\ref{sec:related_works}.
+
+We present our XGBoost parameters in Section~\ref{sec:XGBoost_parameters}.
+We found that these parameters provided better results than the default parameters, but did not conduct a thorough hyperparameter search.
 
 In light of \citeauthor{takahashi_quantitative_2017}'s findings on the limitations of traditional LIBS calibration methods and the potential of ANNs to address non-linearities in solid sample analysis, described in Section~\ref{sec:related_works}, we also decided to include ANNs in our experiments.
-This approach is motivated by ANNs' capacity to discern complex, non-linear relationships within LIBS spectra.
+This approach was motivated by ANNs' capacity to discern complex, non-linear relationships within LIBS spectra.
 
 The ANN comprises of a sequence of fully connected (dense) layers and dropout layers, aimed at reducing overfitting through regularization.
-The architecture begins with an input layer of 6144 units, reflecting the high-dimensional nature of the input data.
+The architecture begins with an input layer of 6144 units, corresponding to the number of wavelengths in the LIBS spectra, as explained in our examination of the data in Section~\ref{sec:data_overview}.
 This is immediately followed by a series of linear transformations and non-linear activations (ReLU), reducing the dimensionality in a stepwise fashion to 1024, 512, 256, and finally 128 units across four layers.
 Each of these reductions is aimed at distilling the essential features required for accurate regression outcomes.
 The inclusion of dropout layers with a dropout rate of 0.3 after the first and second dense layers further aids in mitigating the risk of overfitting by randomly omitting a subset of features during the training phase.

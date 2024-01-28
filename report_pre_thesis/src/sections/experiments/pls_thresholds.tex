@@ -1,6 +1,6 @@
 \subsection{Experiment: PLS Fixed Thresholds}\label{sec:experiment_pls_fixed_thresholds}
-We maintain the leverage and residuals from the second iteration of the outlier removal in the PLS1-SM training process, leading to a more conservative outlier removal process where fewer samples are removed.
-The reason for doing so is that we do not know the basis for the original author's manual outlier removal process, and it is possible that they were more conservative than our automated process.
+We maintained the leverage and residuals from the second iteration of the outlier removal in the PLS1-SM training process, leading to a more conservative outlier removal process where fewer samples are removed.
+The reason for doing so was that we did not know the basis for the original author's manual outlier removal process, and it is possible that they were more conservative than our automated process.
 Consequently, a more conservative approach could potentially align our replica of the pipeline more closely with the original.
 
 Table \ref{tab:pls1_sm_fixed_thresholds_rmses} shows the RMSEs for the PLS1-SM baseline model with fixed outlier removal thresholds.
