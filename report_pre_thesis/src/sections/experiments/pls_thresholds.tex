@@ -1,0 +1,27 @@
+\subsection{Experiment: PLS Fixed Thresholds}\label{sec:experiment_pls_fixed_thresholds}
+We maintained the leverage and residuals from the second iteration of the outlier removal in the PLS1-SM training process, leading to a more conservative outlier removal process where fewer samples are removed.
+The reason for doing so was that we did not know the basis for the original author's manual outlier removal process, and it is possible that they were more conservative than our automated process.
+Consequently, a more conservative approach could potentially align our replica of the pipeline more closely with the original.
+
+Table \ref{tab:pls1_sm_fixed_thresholds_rmses} shows the RMSEs for the PLS1-SM baseline model with fixed outlier removal thresholds.
+The RMSEs are almost identical, which further reinforces the conclusion from the previous experiment that the automated outlier removal does not have a significant impact on the model performance.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\hline
+Element    & Baseline      & Fixed thresholds \\
+\hline
+\ce{SiO2}  & 5.81          & 5.81  \\
+\ce{TiO2}  & 0.47          & 0.47  \\
+\ce{Al2O3} & 1.94          & 1.94  \\
+\ce{FeO_T} & 4.35          & 4.35  \\
+\ce{MgO}   & 1.17          & 1.18  \\
+\ce{CaO}   & 1.43          & 1.44  \\
+\ce{Na2O}  & 0.66          & 0.67  \\
+\ce{K2O}   & 0.72          & 0.72  \\
+\hline
+\end{tabular}
+\caption{RMSEs for the PLS1-SM model with fixed outlier removal thresholds.}
+\label{tab:pls1_sm_fixed_thresholds_rmses}
+\end{table}

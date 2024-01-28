@@ -1,0 +1,30 @@
+\appendix
+\onecolumn
+\section{Appendix}\label{sec:appendix}
+\subsection{XGBoost parameters}\label{sec:XGBoost_parameters}
+The XGBoost parameters used for the experiment in Section~\ref{sec:experiment_other_models} are listed in Table~\ref{tab:xgbparams}.
+
+\begin{table*}[ht]
+\centering
+\caption{XGBoost Parameter Configuration}
+\label{tab:xgbparams}
+\begin{tabular}{llp{10cm}}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Description} \\
+\midrule
+max\_depth & 4 & Slightly deeper trees since data is high-dimensional. \\
+min\_child\_weight & 5 & Higher to control over-fitting. \\
+gamma & 0.1 & Minimum loss reduction required to make further partition. \\
+subsample & 0.7 & Subsample ratio of the training instances. \\
+colsample\_bytree & 0.5 & Subsample ratio of columns when constructing each tree. \\
+colsample\_bylevel & 0.5 & Subsample ratio of columns for each level. \\
+colsample\_bynode & 0.5 & Subsample ratio of columns for each split. \\
+lambda & 1 & L2 regularization term on weights (lambda). \\
+alpha & 0.5 & L1 regularization term on weights (alpha). \\
+learning\_rate & 0.05 & Step size shrinkage used in update to prevent overfitting. \\
+n\_estimators & 100 & Number of boosting rounds. \\
+objective & "reg:squarederror" & Regression with squared loss. \\
+eval\_metric & "rmse" & Evaluation metric for validation data. \\
+\bottomrule
+\end{tabular}
+\end{table*}
