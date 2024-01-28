@@ -1,1 +1,34 @@
 \subsection{Experiment: ICA Aggregated Datasets}\label{sec:experiment_ica_aggregated_datasets}
+In Section~{sec:ica_data_preprocessing}, we described how we only use one of the five location datasets for each sample for the ICA training process.
+In this experiment, we use all five location datasets for each sample, and aggregate the results by taking the mean of the shots over the datasets.
+Since this results in an averaged dataset, we expect to either lose information by averaging out the differences between the datasets, or gain information by reducing the noise in the dataset.
+
+Table \ref{tab:ica_aggregated_rmses} shows the RMSEs for the ICA model with and without aggregated datasets.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\hline
+Element    & Baseline      & Aggregated datasets \\
+\hline
+\ce{SiO2}  & 5.81          & ? \\
+\ce{TiO2}  & 0.47          & ? \\
+\ce{Al2O3} & 1.94          & ? \\
+\ce{FeO_T} & 4.35          & ? \\
+\ce{MgO}   & 1.17          & ? \\
+\ce{CaO}   & 1.43          & ? \\
+\ce{Na2O}  & 0.66          & ? \\
+\ce{K2O}   & 0.72          & ? \\
+\hline
+\end{tabular}
+\caption{RMSEs for the PLS1-SM model with fixed outlier removal thresholds.}
+\label{tab:ica_aggregated_rmses}
+\end{table}
+
+
+
+
+% In addition, because \citet{cleggRecalibrationMarsScience2017} does not specify how each of the five location datasets are used for each sample, we have decided to only use one for each sample.
+% This likely does not produce as accurate results as using all five location datasets would, since we do not get a full representation of the sample that was shot at by the laser, instead only getting a partial representation from a single location.
+% Nevertheless, to avoid deviating significantly from \citet{cleggRecalibrationMarsScience2017}'s methodology or making unfounded assumptions about their data processing, we have opted for this more conservative approach.
+% Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.

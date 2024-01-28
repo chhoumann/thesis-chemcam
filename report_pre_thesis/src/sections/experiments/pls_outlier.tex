@@ -4,7 +4,7 @@ We have instead chosen to automate this based on the reasons described in Sectio
 Examining the performance implications of completely omitting outlier removal would be worthwhile.
 This experiment is justified given the substantial efforts dedicated to developing the ChemCam calibration dataset as mentioned in Section~\ref{sec:ica_data_preprocessing}, which implies a minimal presence of significant outliers.
 
-Table \ref{tab:pls1_sm_no_outlier_rmses} shows the RMSEs for the PLS1-SM model with and without automated outlier removal.
+Table \ref{tab:pls1_sm_no_outlier_rmses} shows the RMSEs for the PLS1-SM replica model with and without automated outlier removal.
 The RMSEs are very similar, which indicates that the automated outlier removal does not have a significant impact on the model performance.
 This is expected based on the aforementioned efforts that went into developing the ChemCam calibration dataset, as described in Section~\ref{sec:ica_data_preprocessing}.
 
@@ -12,16 +12,16 @@ This is expected based on the aforementioned efforts that went into developing t
 \centering
 \begin{tabular}{lll}
 \hline
-Element    & With & Without \\
+Element    & Baseline & Without outlier removal \\
 \hline
-\ce{SiO2}  & 5.81 & 5.81    \\
-\ce{TiO2}  & 0.47 & 0.47    \\
-\ce{Al2O3} & 1.94 & 1.91    \\
-\ce{FeO_T} & 4.35 & 4.35    \\
-\ce{MgO}   & 1.17 & 1.17    \\
-\ce{CaO}   & 1.43 & 1.44    \\
-\ce{Na2O}  & 0.66 & 0.67    \\
-\ce{K2O}   & 0.72 & 0.70    \\
+\ce{SiO2}  & 5.81     & 5.81                    \\
+\ce{TiO2}  & 0.47     & 0.47                    \\
+\ce{Al2O3} & 1.94     & 1.91                    \\
+\ce{FeO_T} & 4.35     & 4.35                    \\
+\ce{MgO}   & 1.17     & 1.17                    \\
+\ce{CaO}   & 1.43     & 1.44                    \\
+\ce{Na2O}  & 0.66     & 0.67                    \\
+\ce{K2O}   & 0.72     & 0.70                    \\
 \hline
 \end{tabular}
 \caption{RMSEs for the PLS1-SM model without automated outlier removal.}
