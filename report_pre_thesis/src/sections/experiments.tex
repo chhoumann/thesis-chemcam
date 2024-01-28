@@ -20,41 +20,7 @@ In the third experiment, we apply the MAD method for outlier removal in ICA, com
 The fourth experiment evaluates ICA's performance using aggregated datasets from multiple locations, aiming to understand the balance between representativeness and information loss.
 The final experiment extends the analysis to include comparisons with other models, providing a broader perspective on the MOC pipeline's performance.
 
-
 This experimental approach allows for assessment of the MOC pipeline's components, offering insights into their individual and collective impacts on the system's overall performance.
-
-
-Given our replication of the MOC pipeline, we are now in a position to conduct experiments to evaluate the performance of each of the components in the pipeline.
-We start by describing the baseline we have established, which serves as basis for comparison with the original MOC pipeline and for assessing experimental results.
-Then, we describe the experiments we have conducted to evaluate the performance of each of the components in the pipeline.
-
-To evaluate the performance of each of the components in the pipeline, we have conducted the following series of experiments.
-
-\begin{enumerate}
-	\item\label{enum:experiment1} No outlier removal for PLS1-SM to evaluate the significance of our automated outlier removal process and whether outlier removal is necessary.
-	\item\label{enum:experiment2} Maintain the threshold values from the second iteration of the outlier removal in the PLS1-SM training process to see if a more or less conservative approach is advantageous.
-	\item\label{enum:experiment3} MAD for ICA to evaluate the significance of the outlier removal step in the ICA phase.
-	\item\label{enum:experiment4} Evaluating the impact on ICA model performance when using all five location datasets versus just one.
-	\item\label{enum:experiment5} Other models to compare the performance of the PLS1-SM and ICA models to other models.
-	% \item PLS outlier removal on ICA (?) instead of MAD.
-\end{enumerate}
-
-\noindent
-We have chosen these experiments based on the following reasons.
-For Experiment~\ref{enum:experiment1}, we are interested in evaluating the significance of our automated outlier removal process due to its differences from the original manual process.
-Additionally, we are interested in examining whether outlier removal is necessary for the PLS1-SM phase by comparing the results with and without outlier removal.
-
-For Experiment~\ref{enum:experiment2}, we want to evaluate the significance of the threshold values used in the outlier removal process by maintaining the threshold values from the second iteration of the outlier removal in the PLS1-SM training process.
-This is a more conservative than always updating the threshold values after each iteration.
-
-For Experiment~\ref{enum:experiment3}, we implement our best guess of the original authors' outlier removal process for the ICA phase, which is based on the Median Absolute Deviation (MAD).
-Then, we compare the results with and without MAD to evaluate the significance of the outlier removal step in the ICA phase.
-
-For Experiment~\ref{enum:experiment4}, we perform ICA using all five location datasets by averaging the results from location into a single dataset.
-By doing this, we will either obtain a more representative dataset for the sample, or we will end up losing information by averaging the results.
-
-For Experiment~\ref{enum:experiment5}, we want to compare the performance of the MOC model with other models.
-Specifically, we train an XGBoost model and an ANN model for comparison.
 
 \subsection{Replication of the MOC Pipeline}\label{sec:replica_moc}
 We present the baseline RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models in Table~\ref{tab:results_rmses}.
