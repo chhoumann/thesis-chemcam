@@ -9,5 +9,26 @@ We have decided to conduct the experiments using the following models:
 	\item \textbf{XGBoost}, a gradient boosting algorithm, \cite{chen_xgboost_2016}.
 	\item \textbf{ANN}, a neural network model, \cite{scikit-learn}.
 \end{itemize}
+
 % TODO: Argue why we chose these models (ref SuperCam paper).
 % TODO: Add results and discussion.
+
+\begin{table*}[h]
+\centering
+\begin{tabular}{lllllll}
+\hline
+Element    & ANN (Norm1)   & ANN (Norm3) & XGBoost (Norm1) & XGBoost (Norm3) & MOC (original) & MOC (replica) \\
+\hline
+\ce{SiO2}  & 5.62          & 5.01        & 5.12            & \textbf{4.67}   & 5.30           & 7.29 \\
+\ce{TiO2}  & 0.58          & 0.62        & \textbf{0.44}   & 0.45            & 1.03           & 0.49 \\
+\ce{Al2O3} & 2.12          & 2.27        & \textbf{1.93}   & 1.97            & 3.47           & 2.39 \\
+\ce{FeO_T} & 4.05          & 4.00        & 4.40            & 5.02            & \textbf{2.31}  & 5.21 \\
+\ce{MgO}   & 1.61          & 1.49        & 0.99            & \textbf{0.96}   & 2.21           & 1.67 \\
+\ce{CaO}   & 1.33          & 1.26        & \textbf{1.23}   & 1.26            & 2.72           & 1.81 \\
+\ce{Na2O}  & 1.17          & 1.09        & \textbf{0.49}   & 0.51            & 0.62           & 1.10 \\
+\ce{K2O}   & 1.05          & 0.88        & \textbf{0.50}   & 0.51            & 0.82           & 1.09 \\
+\hline
+\end{tabular}
+\caption{RMSEs for the ANN and XGBoost models using Norm 1 and Norm 3. The RMSEs for the MOC models are included for comparison.}
+\label{tab:other_models_rmses}
+\end{table*}

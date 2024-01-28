@@ -1,5 +1,5 @@
 \subsection{Experiment: ICA Aggregated Datasets}\label{sec:experiment_ica_aggregated_datasets}
-In Section~{sec:ica_data_preprocessing}, we described how we only use one of the five location datasets for each sample for the ICA training process.
+In Section~\ref{sec:ica_data_preprocessing}, we described how we only use one of the five location datasets for each sample for the ICA training process.
 In this experiment, we use all five location datasets for each sample, and aggregate the results by taking the mean of the shots over the datasets.
 Since this results in an averaged dataset, we expect to either lose information by averaging out the differences between the datasets, or gain information by reducing the noise in the dataset.
 
@@ -21,14 +21,6 @@ Element    & Baseline      & Aggregated datasets \\
 \ce{K2O}   & 0.72          & ? \\
 \hline
 \end{tabular}
-\caption{RMSEs for the PLS1-SM model with fixed outlier removal thresholds.}
+\caption{RMSEs for the ICA phase's regression models using aggregated datasets.}
 \label{tab:ica_aggregated_rmses}
 \end{table}
-
-
-
-
-% In addition, because \citet{cleggRecalibrationMarsScience2017} does not specify how each of the five location datasets are used for each sample, we have decided to only use one for each sample.
-% This likely does not produce as accurate results as using all five location datasets would, since we do not get a full representation of the sample that was shot at by the laser, instead only getting a partial representation from a single location.
-% Nevertheless, to avoid deviating significantly from \citet{cleggRecalibrationMarsScience2017}'s methodology or making unfounded assumptions about their data processing, we have opted for this more conservative approach.
-% Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
