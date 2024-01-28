@@ -6,12 +6,24 @@ In the first scenario, we aim to conduct a direct comparison between the MOC mod
 We have decided to conduct the experiments using the following models:
 
 \begin{itemize}
-	\item \textbf{XGBoost}, a gradient boosting algorithm, \cite{chen_xgboost_2016}.
-	\item \textbf{ANN}, a neural network model, \cite{scikit-learn}.
+	\item \textbf{XGBoost}, a gradient boosting algorithm \cite{chen_xgboost_2016}
+	\item \textbf{ANN}, a neural network model
 \end{itemize}
 
-% TODO: Argue why we chose these models (ref SuperCam paper).
-% TODO: Add results and discussion.
+Building on the findings of \citet{andersonPostlandingMajorElement2022}, who demonstrated Gradient Boosting Regression (GBR) models' superior predictive accuracy in analyzing major oxide compositions in geological samples, we adopt XGBoost for its refined GBR implementation.
+This decision is informed by XGBoost's documented success in enhancing model precision, as detailed in Section~\ref{sec:related_works}.
+
+In light of \citeauthor{takahashi_quantitative_2017}'s findings on the limitations of traditional LIBS calibration methods and the potential of ANNs to address non-linearities in solid sample analysis, described in Section~\ref{sec:related_works}, we also decided to include ANNs in our experiments.
+This approach is motivated by ANNs' capacity to discern complex, non-linear relationships within LIBS spectra.
+
+The ANN comprises of a sequence of fully connected (dense) layers and dropout layers, aimed at reducing overfitting through regularization.
+The architecture begins with an input layer of 6144 units, reflecting the high-dimensional nature of the input data.
+This is immediately followed by a series of linear transformations and non-linear activations (ReLU), reducing the dimensionality in a stepwise fashion to 1024, 512, 256, and finally 128 units across four layers.
+Each of these reductions is aimed at distilling the essential features required for accurate regression outcomes.
+The inclusion of dropout layers with a dropout rate of 0.3 after the first and second dense layers further aids in mitigating the risk of overfitting by randomly omitting a subset of features during the training phase.
+The final layer of ANN outputs 8 variables, corresponding to the eight major oxides we are trying to predict the compositional values of.
+Notably, this layer does not employ an activation function, as it aims to produce linear outputs that directly correspond to the predicted values for each of the regression targets.
+
 
 \begin{table*}[h]
 \centering
@@ -32,3 +44,13 @@ Element    & ANN (Norm1)   & ANN (Norm3) & XGBoost (Norm1) & XGBoost (Norm3) & M
 \caption{RMSEs for the ANN and XGBoost models using Norm 1 and Norm 3. The RMSEs for the MOC models are included for comparison.}
 \label{tab:other_models_rmses}
 \end{table*}
+
+The results presented in Table~\ref{tab:other_models_rmses} provide a comparison of the RMSE metric performance between the artificial neural network (ANN), XGBoost models, and the MOC (Model of Calibration) under two normalization conditions (Norm 1 and Norm 3), across the eight major oxides.
+
+Overall, the results suggest that XGBoost, particularly under the Norm 1 condition, consistently provides superior predictive accuracy for most of the oxides analyzed, with the exception of \ce{FeO_T} where the original MOC model excels.
+This indicates the potential benefits of integrating advanced machine learning techniques, such as gradient boosting, into the analysis of LIBS data for geological samples.
+The superior performance of XGBoost could be attributed to its sophisticated handling of complex data structures and its ability to minimize overfitting, making it a robust choice for predictive modeling in this context.
+
+ANNs also show promising results, particularly in scenarios where traditional models might not capture complex non-linear relationships effectively.
+However, their performance is generally outperformed by XGBoost, suggesting that while ANNs have the capacity to model complex phenomena within LIBS spectra, the specific architecture and training procedures might need further optimization to fully leverage their potential.
+The relatively small training dataset might also be a contributing factor to the ANN's performance, as ANNs typically require a large amount of data to train effectively.
