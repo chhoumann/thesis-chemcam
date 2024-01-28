@@ -66,29 +66,73 @@ Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (repl
 	\label{fig:rmse_histograms}
 \end{figure*}
 
-To evaluate the statistical significance of the differences between the original and our replicated models (PLS1-SM, ICA, and MOC), we applied three statistical tests: Student's t-test, Welch's t-test, and the Wilcoxon signed-rank test.
-Our null hypothesis (H$_0$) posits that there is no significant difference in the performance of the original and replicated models.
-The alternative hypothesis (H$_1$) contends that a significant difference does exist.
-We set our significance level $\alpha$ at 0.05, meaning we would require a p-value less than 0.05 to reject the null hypothesis in favor of the alternative.
-The p-values obtained from our tests are presented in Table~\ref{tab:results_ttests}. With all p-values exceeding the $\alpha$ level of 0.05, there is insufficient statistical evidence to reject the null hypothesis.
-Therefore, we retain the null hypothesis, suggesting that the differences between the original and replicated models are not statistically significant.
-The p-values across all tests and models imply that the performances of the original and replicated models are statistically indistinguishable from each other.
-This congruence suggests that our replicated models are comparable to the original ones in terms of their statistical characteristics.
+\citet{andersonImprovedAccuracyQuantitative2017} used the Student's t-test to show their new model outperformed the old one. In our study, we apply the same test but with a different aim: to verify if our replicated models (PLS1-SM, ICA, and MOC) are statistically similar to the original MOC  models, presented in \citet{cleggRecalibrationMarsScience2017}. This approach allows us to assess whether our models demonstrate equivalence rather than improvement.
+In conducting our analysis with the Student's t-test, we define our hypotheses and choose a significance level to guide our interpretation of the results.
+Our null hypothesis (\(H_0\)) posits that there is no significant difference between the mean performance of our replicated models (PLS1-SM, ICA, and MOC) and that of the originals.
+Conversely, the alternative hypothesis (\(H_1\)) suggests that there is a significant difference between the two sets of models.
+We set a significance level (\(\alpha\)) of 5\%, which establishes the threshold for determining statistical significance.
+If the p-value obtained from our t-test is less than 5\% (\(p < 0.05\)), we will reject the null hypothesis, indicating significant evidence of a difference between our replicated models and those of the original pipeline.
+Conversely, if the p-value is greater than or equal to 5\% (\(p \geq 0.05\)), we fail to reject the null hypothesis, suggesting that our models and the original models are statistically similar, thereby achieving our goal of demonstrating equivalence rather than disparity.
 
-\begin{table}[h]
+Following the approach delineated in \citet{andersonImprovedAccuracyQuantitative2017}, we start by calculating the uncertainty of the RMSE values, $S_{RMSE}^2$:
+$$
+S_{\text{RMSE}}^2 = \left(\frac{\text{RMSE}^2}{n}\right) \left[n - 1 - \frac{2\Gamma^2\left(\frac{n}{2}\right)}{\Gamma^2\left(\frac{n - 1}{2}\right)}\right] \\
+$$
+where $n$ is the number of samples, and $\Gamma$ is the gamma function. This formulation captures the variance of the RMSE, reflecting the dispersion of error magnitudes.
+Subsequently, the t-statistic $t$ is calculated to evaluate the statistical significance of the difference between the RMSEs of the original and replicated models:
+$$
+t = \frac{\text{RMSE}_A - \text{RMSE}_B}{\sqrt{S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2}}
+$$
+where $\text{RMSE}_A$ and $\text{RMSE}_B$ correspond to the RMSE values of the original and replicated models, respectively.
+The degrees of freedom ($f$) associated with this comparison are determined by:
+$$
+f = \frac{\left(S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2\right)^2}{\frac{S^4_{\text{RMSE}_A}}{n_A - 1} + \frac{S^4_{\text{RMSE}_B}}{n_B - 1}}
+$$
+which accounts for the variances in RMSE values and the respective sample sizes ($n_A$ and $n_B$) of the models being compared.
+Finally, the p-value is derived from the t-distribution's cumulative distribution function:
+$$p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)$$
+where $F_{\text{T}}$ is the cumulative distribution function of the t-distribution with $f$ degrees of freedom, providing the probability that the observed difference in RMSEs could occur under the null hypothesis.
+
+We present the results of our t-tests in Table~\ref{table:results_ttests}.
+
+\begin{table}[ht]
 \centering
-\begin{tabular}{llll}
+\begin{tabular}{|c|c|c|c|}
 \hline
-p-value    & Student's & Welch's & Wilcoxon \\
+\textbf{Oxide} & \textbf{PLS1-SM} & \textbf{ICA} & \textbf{MOC} \\
 \hline
-PLS1-SM    & 67.71\% & 84.04\% & 73.53\% \\
-ICA        & 32.38\% & 71.38\% & 64.06\% \\
-MOC        & 54.69\% & 75.45\% & 100.00\% \\
+$SiO_2$ & 42.00\% & 48.75\% & 38.45\% \\
+$TiO_2$ & 9.73\% & 6.31\% & 8.23\% \\
+$Al_2O_3$ & 30.23\% & 67.06\% & 31.58\% \\
+$FeO_T$ & 7.48\% & 21.68\% & 6.57\% \\
+$MgO$ & 78.05\% & 35.44\% & 44.08\% \\
+$CaO$ & 12.73\% & 70.04\% & 27.79\% \\
+$Na_2O$ & 85.96\% & 43.16\% & 14.93\% \\
+$K_2O$ & 100.00\% & 36.27\% & 43.40\% \\
 \hline
 \end{tabular}
-\caption{p-values of the Student's t-test, Welch's t-test, and Wilcoxon signed-rank test for the RMSEs between the original and our replicas of the PLS1-SM, ICA, and MOC models, respectively.}
-\label{tab:results_ttests}
+\caption{Results of the PLS1-SM, ICA, and MOC t-tests}
+\label{table:results_ttests}
 \end{table}
+
+The results from our t-tests are summarized as follows:
+
+\begin{itemize}
+    \item \textbf{PLS1-SM:} The p-values observed across the spectrum, most notably the 100.00\% for $K_2O$, unequivocally suggest a strong statistical proximity to the original models for a majority of the parameters. This is particularly indicative of a successful replication effort. However, the relatively lower p-value for $FeO_T$ (7.48\%) underscores an area where the model's performance diverges from the original. Given the high variance noted in the Section~\ref{sec:data_overview} for $FeO_T$ compositions, this deviation could be ascribed to inherent data variability rather than model inaccuracy.
+    
+    \item \textbf{ICA:} This model demonstrates considerable alignment with the original models across several constituents, as evidenced by p-values like 67.06\% for $Al_2O_3$ and 70.04\% for $CaO$. These figures signify a commendable approximation to the original models’ performance. Conversely, the p-value for $TiO_2$ (6.31\%) marks an exception, indicating a region where the ICA model might benefit from refinement. The noted high variance in $TiO_2$ values within our dataset likely contributes to this outlier, pointing to data variability as a contributing factor.
+    
+    \item \textbf{MOC:} The replicated MOC model's p-values, especially the 43.40\% for $K_2O$, reiterate its consistency with the original model's outcomes. This aligns with our hypothesis of statistical equivalence. Yet, as with PLS1-SM, the $FeO_T$ component exhibits a lower p-value (6.57\%), highlighting an area of divergence potentially attributed to the previously discussed variance in $FeO_T$ compositions.
+\end{itemize}
+
+Our comparative analysis, enriched by an acknowledgment that higher p-values denote model fidelity, predominantly affirms the statistical equivalence of our replicated models to the original MOC models across most tested parameters.
+This alignment underscores the robustness of our replication efforts.
+
+However, the lower p-values associated with $FeO_T$ for both PLS1-SM and MOC, in addition to $TiO_2$ for ICA, flag these elements as focal points for potential refinement.
+Given our dataset's inherent variability in the compositions of these specific elements, as substantiated in Section~\ref{sec:data_overview}, these findings are interpretable and not wholly unexpected.
+
+In conclusion, our t-tests demonstrate that our replicated models are statistically similar to the original models, thereby achieving our goal of demonstrating equivalence rather than disparity.
+
 
 \subsection{Experiment: Outlier Removal}\label{sec:experiment_outlier_removal}
 % TODO: Add results and discussion.
