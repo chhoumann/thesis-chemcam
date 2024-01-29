@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from ica.mad import identify_outliers_with_mad_iterative_multidim
 
 from lib.data_handling import (
     CompositionData,
@@ -58,6 +59,24 @@ class ICASampleProcessor:
         final_avg_shots_df = (
             average_each_shot_across_locations(sample_data) if average_locations else list(sample_data.values())[0]
         )
+
+        # Assuming `identify_outliers_with_mad_iterative_multidim` returns indices of non-outliers.
+        non_outlier_indices, iterations = identify_outliers_with_mad_iterative_multidim(final_avg_shots_df.drop("wave", axis=1))
+
+        # Create a full boolean array with False values
+        outlier_mask = np.zeros(len(final_avg_shots_df), dtype=bool)
+
+        # Set True for non-outliers
+        outlier_mask[non_outlier_indices] = True
+
+        # Invert the mask to get outliers
+        outlier_mask = ~outlier_mask
+
+        # Create a mask for columns to apply zeroing to (all columns except 'wave').
+        columns_to_zero = final_avg_shots_df.columns != 'wave'
+
+        # Set the outliers to 0
+        final_avg_shots_df.loc[outlier_mask, columns_to_zero] = 0
 
         # Apply masking
         wmt = WavelengthMaskTransformer(masks)
