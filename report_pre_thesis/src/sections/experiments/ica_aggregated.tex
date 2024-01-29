@@ -5,25 +5,27 @@ Since this results in an averaged dataset, we expect to either lose information 
 
 Table \ref{tab:ica_aggregated_rmses} shows the RMSEs for the ICA baseline models, the ICA baseline model with MAD-based outlier removal, the ICA models using aggregated datasets, and the ICA models using aggregated datasets with MAD-based outlier removal.
 
-\begin{table}[h]
+\begin{table*}[h]
 \centering
-\begin{tabular}{lll}
+\begin{tabular*}{\textwidth}{l @{\extracolsep{\fill}} lllll}
 \hline
-Element    & ICA baseline & ICA baseline (MAD) & Aggregated datasets & Aggregated datasets (MAD) \\
-\hline                    
-\ce{SiO2}  & 10.68        & 8.64               & 12.01             & \textbf{9.47} \\
-\ce{TiO2}  & 0.63         & 0.53               & 0.60              & \textbf{0.48} \\
-\ce{Al2O3} & 5.55         & 3.69               & 4.81              & \textbf{2.66} \\
-\ce{FeO_T} & 8.30         & 7.07               & 8.56              & \textbf{7.05} \\
-\ce{MgO}   & 2.90         & 2.10               & \textbf{2.51}     & 2.83 \\
-\ce{CaO}   & 3.52         & 4.00               & 3.71              & \textbf{1.90} \\
-\ce{Na2O}  & 1.72         & 1.45               & \textbf{1.41}     & 1.60 \\
-\ce{K2O}   & 1.37         & 1.15               & 1.51              & \textbf{1.08} \\
+\multicolumn{1}{l}{Element} & \multicolumn{1}{l}{Original} & \multicolumn{2}{c}{Replica} & \multicolumn{2}{c}{Replica (MAD)} \\
+\cline{1-6} 
+& & 1 location & Aggregated & 1 location & Aggregated \\
+\hline 
+\ce{SiO2}  & \textbf{8.31}  & 10.68    & 12.01         & 8.64               & 9.47 \\
+\ce{TiO2}  & 1.44           & 0.63     & 0.60          & 0.53               & \textbf{0.48} \\
+\ce{Al2O3} & 4.77           & 5.55     & 4.81          & 3.69               & \textbf{2.66} \\
+\ce{FeO_T} & \textbf{5.17}  & 8.30     & 8.56          & 7.07               & 7.05 \\
+\ce{MgO}   & 4.08           & 2.90     & 2.51          & \textbf{2.10}      & 2.83 \\
+\ce{CaO}   & 3.07           & 3.52     & 3.71          & 4.00               & \textbf{1.90} \\
+\ce{Na2O}  & 2.29           & 1.72     & \textbf{1.41} & 1.45               & 1.60 \\
+\ce{K2O}   & \textbf{0.98}  & 1.37     & 1.51          & 1.15               & 1.08 \\
 \hline
-\end{tabular}
-\caption{RMSEs for the ICA phase's regression models using aggregated datasets.}
+\end{tabular*}
+\caption{Comparing RMSEs for the ICA phase's regression models using aggregated datasets versus baseline and original.}
 \label{tab:ica_aggregated_rmses}
-\end{table}
+\end{table*}
 
 The results, as depicted in Table~\ref{tab:ica_aggregated_rmses}, indicate little difference in the RMSE across all elements when aggregated datasets were used compared to the baseline.
 For half of the oxides (\ce{TiO2}, \ce{Al2O3}, \ce{MgO}, \ce{Na2O}), the RMSE is lower when using aggregated datasets, while for the other half (\ce{SiO2}, \ce{FeO_T}, \ce{CaO}, \ce{K2O}), the RMSE is higher.
