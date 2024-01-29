@@ -53,11 +53,13 @@ class ICASampleProcessor:
 
     def preprocess(self, calib_data_path: Path, average_locations=False, norm: Norm = Norm.NORM_1) -> None:
         sample_data = get_preprocessed_sample_data(self.sample_name, calib_data_path, average_shots=False)
-        self.sample_id = f"{self.sample_name}"
+        location_name_ss, single_sample = list(sample_data.items())[0]
+
+        self.sample_id = self.sample_name if average_locations else f"{self.sample_name}_{location_name_ss}"
 
         # Average all of the five location datasets into one single dataset
         final_avg_shots_df = (
-            average_each_shot_across_locations(sample_data) if average_locations else list(sample_data.values())[0]
+            average_each_shot_across_locations(sample_data) if average_locations else single_sample
         )
 
         # Assuming `identify_outliers_with_mad_iterative_multidim` returns indices of non-outliers.
