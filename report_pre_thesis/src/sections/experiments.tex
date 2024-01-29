@@ -7,7 +7,7 @@ The experiments that follow are structured as follows:
 
 \begin{enumerate}
     \item Evaluating the necessity of automated outlier removal in the PLS1-SM component by comparing performance with and without this process.
-    \item Investigating the effect of fixed threshold values in the outlier removal process of PLS1-SM, maintaining these thresholds from the second iteration onwards.
+    \item Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM from the second iteration onwards.
     \item Assessing the impact of the Median Absolute Deviation (MAD) method for outlier removal in the Independent Component Analysis (ICA) phase.
     \item Determining the effect on ICA performance when utilizing datasets from five locations compared to a single dataset.
     \item Comparing the performance of PLS1-SM and ICA models against alternative models, such as XGBoost and Artificial Neural Networks (ANN).
@@ -208,3 +208,25 @@ K2O &&&&&& \\
 \input{sections/experiments/ica_outlier.tex}
 \input{sections/experiments/ica_aggregated.tex}
 \input{sections/experiments/other_models.tex}
+
+\subsection{summary}\label{sec:experiments_summary}
+The experiments conducted in this section provide an assessment of the MOC pipeline's components, offering insights into their individual and collective impacts on the system's overall performance.
+
+Our findings indicate that outlier removal does not have a major impact on neither the PLS1-SM nor the ICA models, which is expected considering we anticipate a low number of outliers in the dataset, as mentioned in Section~\ref{ica_data_preprocessing}.
+Following this, we also found that maintaining the leverage and residuals from the second iteration of the outlier removal barely affects the PLS1-SM model's performance.
+
+We also found that the MAD method for outlier removal in the ICA phase improves the performance of the ICA models across all oxides except for \ce{CaO}.
+When using all five datasets for training the ICA models through aggregation, we found that the RMSEs vary across the oxides, with oxides that have a higher variance in their compositions having higher RMSEs and vice versa.
+
+Finally, we found that the XGBoost model performs exceptionally well, only being outperformed by the original MOC model on \ce{FeO_T}.
+The ANN model also shows promising results, often outperforming the original MOC model, and we expect that it could perform even better with a larger training dataset.
+
+We can draw several key conclusions from the experiments conducted in this section regarding the limitations of the MOC pipeline components:
+
+% TODO: Key conclusion here - what is the key limitations of the MOC pipeline components?
+% Note that PLS was more robust to outliers than ICA! The RMSEs for ICA were much higher than PLS when we did not do outlier removal.
+
+Finally, an aspect that is out of scope for this study is the inherent limitations stemming from the calibration dataset itself.
+The fact that it was acquired on Earth and not on Mars, and that it was acquired using a different LIBS instrument than the one used on Mars, causes a misalignment between the calibration dataset and the unseen data gathered by Mars rovers.
+In fact, NASA acknowledges this limitation, and is currently working on a mission to bring samples from Mars back to Earth, where they can be analyzed in laboratories around the world \cite{mars_sample_return}.
+This would allow for the creation of a calibration dataset that is more representative of the unseen data, which would allow for more accurate predictions.
