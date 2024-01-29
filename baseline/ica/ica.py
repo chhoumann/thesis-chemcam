@@ -18,7 +18,7 @@ from lib.norms import Norm
 TEST = True
 AVERAGE_LOCATION_DATASETS = False
 mlflow.set_tracking_uri("http://localhost:5000")
-experiment_name = f"""ICA_{
+experiment_name = f"""ICA_MAD_{
     'TEST' if TEST else 'TRAIN'
     }_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"""
 # experiment_name = "ICA_Train_Test_Split"
@@ -91,6 +91,9 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
                 X_train = X_train**2
                 X_test = X_test**2
 
+            X_train.fillna(0, inplace=True)
+            X_test.fillna(0, inplace=True)
+
             model = LinearRegression()
             model.fit(X_train, y_train)
 
@@ -118,7 +121,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
 def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     models = {}
-    experiment_id = "216548553400626169"
+    experiment_id = "619103318265414997"
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
     for _, run in runs.iterrows():
