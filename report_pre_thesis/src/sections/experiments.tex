@@ -24,6 +24,7 @@ This experimental approach allows for assessment of the MOC pipeline's component
 
 \subsection{Replication of the MOC Pipeline}\label{sec:replica_moc}
 We present the baseline RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models in Table~\ref{tab:results_rmses}.
+Likewise, we show the results of the PLS1-SM replica submodels in Table~\ref{table:rmsecv_results}. This table presents the RMSE across different concentration ranges, the number of spectra used in the model, the total number of outliers removed, and the number of outlier removal iterations for each submodel (Low, Mid, High, Full). RMSECV is the average RMSE of the cross-validation folds, and RMSECV\_MIN is the minimum RMSE of the cross-validation folds. RMSEP is the RMSE of the test set.
 Figure~\ref{fig:rmse_histograms} illustrates the distribution of the RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models as a grouped histogram.
 The results show that the RMSEs of our replicas of the PLS1-SM, ICA and MOC models are similar to the original models.
 However, the are some notable differences --- in some cases, our replicas outperform the original models, while in other cases, the original models outperform our replicas.
@@ -142,6 +143,65 @@ Given our dataset's inherent variability in the compositions of these specific e
 
 In conclusion, our t-tests demonstrate that our replicated models are statistically similar to the original models, thereby achieving our goal of demonstrating equivalence rather than disparity.
 As such, they serve their purpose as a baseline for identifying which aspects of the pipeline contribute the most to the overall error.
+
+\begin{table*}[htbp] % Use htbp for more placement flexibility
+\centering
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} lllllll}
+\hline
+Model & RMSECV & RMSECV\_MIN & RMSEP & \# of spectra & \# Outliers removed & Outlier removal iterations  \\
+\hline
+SiO2 &&&&&& \\
+  Low & 8.55 & 6.14 & 6.57 & 439 & 0 & 2 \\
+  Mid & 4.71 & 3.64 & 4.20 & 1268 & 15 & 1 \\
+  High & 3.59 & 3.01 & 4.26 & 605 & 1 & 2 \\
+  Full & 5.98 & 4.75 & 7.18 & 1538 & 8 & 1 \\
+\\
+TiO2 &&&&&& \\
+  Low & 0.29 & 0.28 & 0.39 & 1359 & 8 & 1 \\
+  Mid & 0.62 & 0.57 & 0.44 & 418 & 6 & 4 \\
+  High & 0.74 & 0.11 & 0.09 & 40 & 0 & 2 \\
+  Full & 0.48 & 0.37 & 0.50 & 1538 & 16 & 4 \\
+\\
+Al2O3 &&&&&& \\
+  Low & 2.40 & 1.68 & 1.99 & 324 & 0 & 2 \\
+  Mid & 2.27 & 1.57 & 2.04 & 1198 & 12 & 2 \\
+  High & 3.97 & 1.99 & 2.03 & 240 & 0 & 2 \\
+  Full & 3.31 & 2.59 & 2.43 & 1538 & 9 & 1 \\
+\\
+FeOT &&&&&& \\
+  Low & 1.81 & 1.72 & 1.55 & 1438 & 1 & 3 \\
+  Mid & 2.64 & 2.15 & 1.69 & 978 & 28 & 9 \\
+  High & 4.00 & 1.52 & 11.89 & 105 & 0 & 2 \\
+  Full & 2.86 & 2.67 & 4.08 & 1538 & 23 & 5 \\
+\\
+MgO &&&&&& \\
+  Low & 0.49 & 0.45 & 0.63 & 1000 & 7 & 4 \\
+  Mid & 1.32 & 0.88 & 1.16 & 1488 & 10 & 1 \\
+  High & 4.42 & 1.99 & 3.14 & 135 & 0 & 1 \\
+  Full & 1.74 & 1.36 & 1.25 & 1538 & 41 & 6 \\
+\\
+CaO &&&&&& \\
+  Low & 0.79 & 0.57 & 0.78 & 1070 & 22 & 6 \\
+  Mid & 1.40 & 1.07 & 1.02 & 1428 & 20 & 4 \\
+  High & 1.89 & 0.72 & 1.85 & 35 & 0 & 2 \\
+  Full & 1.62 & 1.19 & 1.81 & 1538 & 41 & 8 \\
+\\
+Na2O &&&&&& \\
+  Low & 0.57 & 0.48 & 0.57 & 1278 & 8 & 3 \\
+  High & 1.27 & 0.65 & 0.60 & 375 & 0 & 1 \\
+  Full & 1.05 & 0.59 & 1.00 & 1538 & 37 & 7 \\
+\\
+K2O &&&&&& \\
+  Low & 0.39 & 0.28 & 0.34 & 773 & 5 & 3 \\
+  High & 0.98 & 0.58 & 0.71 & 920 & 13 & 2 \\
+  Full & 1.03 & 0.92 & 0.81 & 1538 & 48 & 8 \\
+\\
+
+\end{tabular*}
+\caption{Summary of PLS model performance for the major oxides. The table presents the RMSE across different concentration ranges, the number of spectra used in the model, the total number of outliers removed, and the number of outlier removal iterations for each submodel (Low, Mid, High, Full). RMSECV is the average RMSE of the cross-validation folds, and RMSECV\_MIN is the minimum RMSE of the cross-validation folds. RMSEP is the RMSE of the test set.}
+\label{table:rmsecv_results}
+\end{table*}
+
 
 \input{sections/experiments/pls_outlier.tex}
 \input{sections/experiments/pls_thresholds.tex}
