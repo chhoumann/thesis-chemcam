@@ -62,3 +62,6 @@ As shown in Table~\ref{tab:ica_mad_moc_ttest_results}, using MAD-based outlier r
 This indicates that MAD-based outlier removal is effective in improving the ICA phase's performance.
 It also suggests that the ICA phase is more susceptible to outliers than the PLS1-SM phase, as the PLS1-SM phase's performance was not significantly impacted by the omission of outlier removal.
 We will examine this further in the next experiment in Section~\ref{sec:experiment_ica_aggregated_datasets}.
+
+In Section~\ref{sec:ica_data_preprocessing}, we explained why we did not use the inverse of the IRF for weighting, based on critique from one of the original authors of \citet{cleggRecalibrationMarsScience2017}.
+Based on the fact that our ICA replica, which does not utilize the inverse of the IRF for weighting, yields results similar to the original ICA method, we concur with the original author's critique that weighting by the inverse of the IRF lacks justification.
