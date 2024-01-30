@@ -1,5 +1,25 @@
 \section{Recommendations for Future Work}\label{sec:recommendations_for_future_work}
-Suggestions for potential improvements or modifications in the methodology.
-Identification of any additional benchmarks that may be relevant for future studies.
+Building upon our key conclusions from Section~\ref{sec:experiments} regarding the MOC pipeline, we identify the following directions for future research.
+These recommendations aim to enhance the accuracy and robustness of Martian geochemical analysis, given the inherent complexities in interpreting LIBS spectra.
 
-% TODO: Mention the possibility of implementing MAD outlier detection in ICA (since the paper is unclear about how they did it, we could experiment with it and see if we could use it to improve the results)
+\subsection{Enhanced Model Selection}
+
+\textbf{Exploration of Ensemble and Advanced Machine Learning Models:} The promising performance of XGBoost highlights the potential of ensemble learning methods in improving prediction accuracy. 
+Future efforts should extend to other ensemble techniques such as Random Forests and Gradient Boosted Machines (GBM), assessing their efficacy in modeling Martian geochemical data.
+These models were also explored in \citet{andersonPostlandingMajorElement2022}, where they were found to be promising, thus warranting further research.
+Furthermore, the exploration of advanced neural network architectures, including Convolutional Neural Networks (CNNs), Recurrent Neural Networks (RNNs), or other model architectures.
+These become increasingly relevant as more data becomes available, and could offer significant advancements in capturing the complexities of spectral data.
+
+\subsection{Data Preprocessing Improvements}
+
+\textbf{Advanced Outlier Detection Methods:} Implementing sophisticated outlier detection algorithms that adapt to the unique characteristics of the dataset may enhance preprocessing outcomes.
+This includes the investigation of machine learning-based outlier detection methods, which could offer a more nuanced approach to identifying and removing anomalies the data.
+While we showed that our outlier detection method did not significantly impact the performance of the PLS1-SM phase, it is possible that alternative outlier detection methods may yield different results for different models --- as was the case for ICA.
+
+\textbf{Dimensionality Reduction:} Dimensionality reduction techniques such as Principal Component Analysis (PCA) and Autoencoders could be explored to reduce the dimensionality of the data.
+This would be especially relevant when exploring models which do not do this inherently, as part of their training process.
+
+
+
+These strategic directions embody our vision for the future development of the MOC pipeline.
+By prioritizing model selection, refining data preprocessing techniques, enhancing the calibration dataset with Martian samples, optimizing models for real-time analysis, and fostering an open science approach, we aim to significantly advance the capabilities of the MOC pipeline for the exploration and understanding of Mars.
