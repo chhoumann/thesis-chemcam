@@ -1,17 +1,16 @@
 \section{MOC Pipeline Replica}\label{sec:methodology}
-As part of our goal to evaluate the performance of each of the components in the pipeline, the first step was to create a replica of the original pipeline described by \citet{cleggRecalibrationMarsScience2017}
-Since we did not have access to the original source code implementing the pipeline, we have replicated it at accurately as we could based on the available information.
+As part of our goal to evaluate the performance of each of the components in the pipeline, the first step was to create a replica of the original pipeline described by \citet{cleggRecalibrationMarsScience2017}.
+Since we did not have access to the original source code implementing the pipeline, we have replicated it as accurately as we could based on the available information.
 We have had to make some assumptions due to insufficient information regarding some components, which we detail in this section.
 In addition, some aspects of the pipeline rely on qualitative assessments made by the original authors --- something we cannot do because we are not domain experts.
 Consequently, our pipeline is not identical to the original, but we have strived to make it as close as possible while favoring conservative choices and omitting implementations where information about the original pipeline was unclear.
 This decision was driven by the aspiration to ensure that the baseline results remained minimally influenced by our methodological choices.
 
 This section is dedicated to describing the methodology of our pipeline, how it differs from the original, and which design choices we have made and why.
-Furthermore, we delve into the experiments we have conducted to evaluate the performance of our pipeline such that we can identify the components that contribute the most to the overall error.
 
-Section \ref{sec:methodology_pls1}, we focus on the specifics of the PLS1-SM phase, detailing its associated data preprocessing procedures.
-In Section \ref{sec:methodology_ica} then details the ICA phase, including its unique data preprocessing steps.
-Lastly, Section \ref{sec:methodology_moc} presents a description of the MOC phase of the pipeline.
+Section~\ref{sec:methodology_pls1} focuses on the specifics of the PLS1-SM phase, detailing its associated data preprocessing procedures.
+Then, Section~\ref{sec:methodology_ica} details the ICA phase, including its unique data preprocessing steps.
+Lastly, Section~\ref{sec:methodology_moc} presents a description of the MOC phase of the pipeline.
 
 \subsection{PLS1-SM}\label{sec:methodology_pls1}
 The PLS1-SM phase in our pipeline largely follows the same approach as described in \citet{andersonImprovedAccuracyQuantitative2017} with a few exceptions.
@@ -30,18 +29,17 @@ The preprocessing of the data is illustrated in Figure~\ref{fig:pls_data_preproc
 We start by removing the first five shots from the data similarly to \citet{cleggRecalibrationMarsScience2017} since they are typically contaminated by dust that covers the target before being removed by the laser-produced shock waves.
 Then the remaining 45 shots from each location are averaged, resulting in a single spectrum per location with a total of five spectra per target.
 As mentioned in Section~\ref{sec:data_overview}, the edges of the spectral regions contain noise, so we apply masking to the data by zeroing out these regions.
-The dataframe is then transformed through a transpose operation, swapping the rows and columns.
-This gives us a dataframe with the average intensities per sample as rows, and the wavelengths as columns.
+The data matrix is then transformed through a transpose operation, swapping the rows and columns.
+This gives us a matrix with the average intensities per sample as rows, and the wavelengths as columns.
 All negative values are then transformed into zeros since negative values are not physically possible.
 Given the compositional ranges for each sub-model defined in \citet{andersonImprovedAccuracyQuantitative2017}, we filter out the samples whose compositional values are outside of these ranges.
-The range is defined by an upper and a lower bound, and any wavelength outside of this range is removed.
-Finally, we apply two different normalization techniques, Norm1 and Norm3, to the data.
+The range is defined by an upper and a lower bound, and any wavelengths outside of this range is removed.
+Finally, we apply two different normalization techniques, Norm 1 and Norm 3, to the data.
 This results in two separate datasets, each normalized in a distinct manner but derived from the same original dataset.
-ICA and PLS-SM are then performed on each of these datasets separately.
-The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm1, while others are better modeled with data normalized using Norm3.
+The reason for this is that, as \citet{cleggRecalibrationMarsScience2017} found, some of the oxides are better modeled with data normalized using Norm 1, while others are better modeled with data normalized using Norm 3.
 
 \subsubsection{PLS1-SM Regression}\label{sec:methodology_pls1-sm_regression}
-The PLS phase of the pipeline follows a sub-model approach to make wt. \% predictions for each oxide, as previously mentioned in Section~\ref{sec:introduction}.
+The PLS phase of the pipeline follows a sub-model approach to make wt. \% predictions for each oxide, as previously mentioned in Section~\ref{sec:background}.
 
 The training of the models follows the same approach as described in \citet{andersonImprovedAccuracyQuantitative2017} and is illustrated in Figure~\ref{fig:pls_training}.
 However, assumptions have been made regarding the k-fold cross-validation process, as the authors are ambiguous in their description of the number of folds used.
@@ -56,17 +54,17 @@ Finally, similar hyperparameters have been used for the PLS models as described 
 	\label{fig:pls_training}
 \end{figure}
 
-Obtaining predictions for each of the eight oxides, for a single spectrum, requires a separate predictions for each oxide. While PLS regression is capable of multivariate regression, each oxide calls for different hyperparameter configurations and normalization procedures.
-The sub-models for an oxide generally include a full model, a low, mid, and high model. They are named after the compositional range in the data they are trained on. Here, compositional range refers to the known compositional values for a sample, which we use to filter the sample data to include samples data within that range.
+Obtaining predictions for each of the eight oxides, for a single spectrum, requires a separate prediction for each oxide. While PLS regression is capable of multivariate regression, each oxide calls for different hyperparameter configurations and normalization procedures.
+The sub-models for an oxide generally include a full model, a low, mid, and high model. They are named after the compositional range in the data they are trained on. Here, compositional range refers to the known compositional values for a sample, which we use to filter the sample data to include samples within that range.
 These compositional ranges overlap, which creates a blending range.
-Some oxides have only two compositional ranges, which means the model may have low-high as a blending range.
+Some oxides have only two compositional ranges, excluding the full range, which means the model may have low-high as a blending range.
 
 As mentioned, the PLS sub-models approach is repeated for each oxide and is illustrated in Figure~\ref{fig:pls_inference}.
 Given some new data sample, the full model gives an initial compositional prediction for its oxide.
-Based on this prediction, the data is then "binned" into one of five concentration ranges -- the three sub-model ranges and two blending ranges.
-For each of these five concentration ranges, there is one or two corresponding \textit{sub-model(s)}.
-These sub-models are used to make predictions in the corresponding concentration range after the full model has made its initial predictions.
-The sub-models are specialized in either low, mid, or high concentration ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
+Based on this prediction, the data is then "binned" into one of five composition ranges -- the three sub-model ranges and two blending ranges.
+For each of these five composition ranges, there is one or two corresponding sub-model(s).
+These sub-models are used to make predictions in the corresponding composition range after the full model has made its initial predictions.
+The sub-models are specialized in either low, mid, or high composition ranges, which are defined in Table 2 in \citet{andersonImprovedAccuracyQuantitative2017}.
 If the full model predicts a concentration that falls within a blending range, the approach described in Section~\ref{sec:pls_sub-models} is used to combine the predictions from the corresponding sub-models.
 
 \begin{figure}
@@ -97,7 +95,7 @@ The process is as follows:
 It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
 This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
 
-Figure~\ref{fig:FeOT_oxide_removal} illustrates running the outlier removal process on the FeOT full model.
+Figure~\ref{fig:FeOT_oxide_removal} illustrates running the outlier removal process on the \ce{FeO_T} full model.
 As can be seen, the number of outliers decreases with each iteration, and the model improves as measured by the RMSE.
 Here, the process terminates after four iterations, as the RMSE no longer improves with further iterations.
 
@@ -140,7 +138,7 @@ Here, the process terminates after four iterations, as the RMSE no longer improv
 %     \label{fig:iteration5}
 % \end{subfigure}
 
-\caption{The results of the outlier removal process for the FeOT sub-model. The red dots represent the outliers that were removed in each iteration.}
+\caption{The results of the outlier removal process for the \ce{FeO_T} sub-model. The red dots represent the outliers that were removed in each iteration.}
 \label{fig:FeOT_oxide_removal}
 \end{figure*}
 
@@ -182,7 +180,9 @@ Further supporting this decision is input from one of the original authors invol
 This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low presence of significant outliers.
 While it would be ideal to include outlier detection in the ICA phase to ensure alignment with the original pipeline, implementing it based on substantial assumptions would be counterproductive, potentially compromising the integrity of our analysis.
 
-After examining the results in section \ref{sec:results}, we will discuss the implications of these design choices in section \ref{sec:discussion}.
+After examining the results in Section~\ref{sec:results}, we discuss the implications of these design choices in Section~\ref{sec:discussion}.
+
+%%% FIX THIS
 
 \subsubsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
 After preprocessing the data, we are ready to perform ICA.
