@@ -3,30 +3,33 @@ In Section~\ref{sec:ica_data_preprocessing}, we described how we only use one of
 In this experiment, we used all five location datasets for each sample, and aggregated the results by taking the mean of the shots over the datasets.
 Since this results in an averaged dataset, we expect to either lose information by averaging out the differences between the datasets, or gain information by reducing the noise in the dataset.
 
-Table \ref{tab:ica_aggregated_rmses} shows the RMSEs for the ICA model with and without aggregated datasets.
+Table \ref{tab:ica_aggregated_rmses} shows the RMSEs for the ICA baseline models, the ICA baseline model with MAD-based outlier removal, the ICA models using aggregated datasets, and the ICA models using aggregated datasets with MAD-based outlier removal.
 
-\begin{table}[h]
+\begin{table*}[h]
 \centering
-\begin{tabular}{lll}
+\begin{tabular*}{\textwidth}{l @{\extracolsep{\fill}} lllll}
 \hline
-Element    & ICA baseline   & Aggregated datasets \\
+\multicolumn{1}{l}{Element} & \multicolumn{1}{l}{Original} & \multicolumn{2}{c}{Replica} & \multicolumn{2}{c}{Replica (MAD)} \\
+\cline{1-6} 
+& & 1 location & Aggregated & 1 location & Aggregated \\
+\hline 
+\ce{SiO2}  & \textbf{8.31}  & 10.68    & 12.01         & 8.64               & 9.47 \\
+\ce{TiO2}  & 1.44           & 0.63     & 0.60          & 0.53               & \textbf{0.48} \\
+\ce{Al2O3} & 4.77           & 5.55     & 4.81          & 3.69               & \textbf{2.66} \\
+\ce{FeO_T} & \textbf{5.17}  & 8.30     & 8.56          & 7.07               & 7.05 \\
+\ce{MgO}   & 4.08           & 2.90     & 2.51          & \textbf{2.10}      & 2.83 \\
+\ce{CaO}   & 3.07           & 3.52     & 3.71          & 4.00               & \textbf{1.90} \\
+\ce{Na2O}  & 2.29           & 1.72     & \textbf{1.41} & 1.45               & 1.60 \\
+\ce{K2O}   & \textbf{0.98}  & 1.37     & 1.51          & 1.15               & 1.08 \\
 \hline
-\ce{SiO2}  & \textbf{10.68} & 12.01 \\
-\ce{TiO2}  & 0.63           & \textbf{0.60} \\
-\ce{Al2O3} & 5.55           & \textbf{4.81} \\
-\ce{FeO_T} & \textbf{8.30}  & 8.56 \\
-\ce{MgO}   & 2.90           & \textbf{2.51} \\
-\ce{CaO}   & \textbf{3.52}  & 3.71 \\
-\ce{Na2O}  & 1.72           & \textbf{1.41} \\
-\ce{K2O}   & \textbf{1.37}  & 1.51 \\
-\hline
-\end{tabular}
-\caption{RMSEs for the ICA phase's regression models using aggregated datasets.}
+\end{tabular*}
+\caption{Comparing RMSEs for the ICA phase's regression models using aggregated datasets versus baseline, with and without MAD outlier removal, and the original ICA model RMSEs.}
 \label{tab:ica_aggregated_rmses}
-\end{table}
+\end{table*}
 
 The results, as depicted in Table~\ref{tab:ica_aggregated_rmses}, indicate little difference in the RMSE across all elements when aggregated datasets were used compared to the baseline.
 For half of the oxides (\ce{TiO2}, \ce{Al2O3}, \ce{MgO}, \ce{Na2O}), the RMSE is lower when using aggregated datasets, while for the other half (\ce{SiO2}, \ce{FeO_T}, \ce{CaO}, \ce{K2O}), the RMSE is higher.
 This suggests that in some cases, the aggregation process may have reduced noise, while in other cases, it may have led to a loss of information necessary for accurate predictions.
-In addition, because we do not perform outlier detection for ICA, the aggregated datasets may have been more susceptible to outliers across locations, which could increase the RMSE for samples with high variability.
-As evident from the table, the oxides mentioned in \ref{sec:data_overview} whose concentrations are highly variable across samples (like \ce{SiO2} and \ce{FeO_T}) have higher RMSEs when using aggregated datasets, which supports this notion.
+In addition, because we do not perform outlier detection for our baseline Replica ICA, the aggregated datasets may have been more susceptible to outliers across locations, as the aggregation process may have included outliers from the other location datasets.
+This notion is supported by the fact that applying MAD-based outlier removal to the aggregated datasets shows an improvement particularly on an oxide like \ce{CaO}, which have a higher RMSE when using aggregated datasets compared to the baseline, but a lower RMSE when using aggregated datasets with MAD-based outlier removal compared to the baseline.
+Furthermore, the results also show that applying MAD-based outlier removal to the aggregated datasets shows either the lowest or close to lowest RMSEs for all elements except \ce{SiO2} and \ce{FeOT}, suggesting that the aggregation process may have reduced noise, but also introduced outliers that can be removed by MAD-based outlier removal.

@@ -128,17 +128,17 @@ Oxide & PLS1-SM & ICA & MOC \\
 The results from our t-tests are summarized as follows:
 
 \begin{itemize}
-    \item \textbf{PLS1-SM:} The p-values observed across the spectrum, most notably the 100.00\% for $K_2O$, unequivocally suggest a strong statistical proximity to the original models for a majority of the parameters. This is particularly indicative of a successful replication effort. However, the relatively lower p-value for $FeO_T$ (7.48\%) underscores an area where the model's performance diverges from the original. Given the high variance noted in the Section~\ref{sec:data_overview} for $FeO_T$ compositions, this deviation could be ascribed to inherent data variability rather than model inaccuracy.
+    \item \textbf{PLS1-SM:} The p-values observed across the spectrum, most notably the 100.00\% for \ce{K2O}, unequivocally suggest a strong statistical proximity to the original models for a majority of the parameters. This is particularly indicative of a successful replication effort. However, the relatively lower p-value for \ce{FeO_T} (7.48\%) underscores an area where the model's performance diverges from the original. Given the high variance noted in the Section~\ref{sec:data_overview} for \ce{FeO_T} compositions, this deviation could be ascribed to inherent data variability rather than model inaccuracy.
 
-    \item \textbf{ICA:} This model demonstrates considerable alignment with the original models across several constituents, as evidenced by p-values like 67.06\% for $Al_2O_3$ and 70.04\% for $CaO$. These figures indicate a noteworthy approximation to the original models' performance. Conversely, the p-value for $TiO_2$ (6.31\%) marks an exception, indicating a region where the ICA model might benefit from refinement. The noted high variance in $TiO_2$ values within our dataset likely contributes to this outlier, pointing to data variability as a contributing factor.
+    \item \textbf{ICA:} This model demonstrates considerable alignment with the original models across several constituents, as evidenced by p-values like 67.06\% for \ce{Al2O3} and 70.04\% for \ce{CaO}. These figures indicate a noteworthy approximation to the original models' performance. Conversely, the p-value for \ce{TiO2} (6.31\%) marks an exception, indicating a region where the ICA model might benefit from refinement. The noted high variance in \ce{TiO2} values within our dataset likely contributes to this outlier, pointing to data variability as a contributing factor.
 
-    \item \textbf{MOC:} The replicated MOC model's p-values, especially the 43.40\% for $K_2O$, reiterate its consistency with the original model's outcomes. This aligns with our hypothesis of statistical equivalence. Yet, as with PLS1-SM, the $FeO_T$ component exhibits a lower p-value (6.57\%), highlighting an area of divergence potentially attributed to the previously discussed variance in $FeO_T$ compositions.
+    \item \textbf{MOC:} The replicated MOC model's p-values, especially the 43.40\% for \ce{K2O}, reiterate its consistency with the original model's outcomes. This aligns with our hypothesis of statistical equivalence. Yet, as with PLS1-SM, the \ce{FeO_T} component exhibits a lower p-value (6.57\%), highlighting an area of divergence potentially attributed to the previously discussed variance in \ce{FeO_T} compositions.
 \end{itemize}
 
 This comparative analysis affirms a satisfying statistical equivalence between our replicated models and the original MOC models across most tested parameters.
 This alignment underscores the robustness of our replication efforts.
 
-However, the lower p-values associated with $FeO_T$ for both PLS1-SM and MOC, in addition to $TiO_2$ for ICA, flag these elements as focal points for potential refinement.
+However, the lower p-values associated with \ce{FeO_T} for both PLS1-SM and MOC, in addition to \ce{TiO_2} for ICA, flag these elements as focal points for potential refinement.
 Given our dataset's inherent variability in the compositions of these specific elements, as substantiated in Section~\ref{sec:data_overview}, these findings are interpretable and not wholly unexpected.
 
 In conclusion, our t-tests demonstrate that our replicated models are statistically similar to the original models, thereby achieving our goal of demonstrating equivalence rather than disparity.
@@ -148,50 +148,50 @@ As such, they serve their purpose as a baseline for identifying which aspects of
 \centering
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} lllllll}
 \hline
-Model & RMSECV (avg) & RMSECV (min) & RMSEP & \# of spectra & \# Outliers removed & Outlier removal iterations  \\
+Model & RMSECV (avg) & RMSECV (min) & RMSEP & \# of spectra & \# outliers removed & Outlier removal iterations  \\
 \hline
-SiO2 &&&&&& \\
+\ce{SiO2} &&&&&& \\
   Low & 8.55 & 6.14 & 6.57 & 439 & 0 & 2 \\
   Mid & 4.71 & 3.64 & 4.20 & 1268 & 15 & 1 \\
   High & 3.59 & 3.01 & 4.26 & 605 & 1 & 2 \\
   Full & 5.98 & 4.75 & 7.18 & 1538 & 8 & 1 \\
 \\
-TiO2 &&&&&& \\
+\ce{TiO2} &&&&&& \\
   Low & 0.29 & 0.28 & 0.39 & 1359 & 8 & 1 \\
   Mid & 0.62 & 0.57 & 0.44 & 418 & 6 & 4 \\
   High & 0.74 & 0.11 & 0.09 & 40 & 0 & 2 \\
   Full & 0.48 & 0.37 & 0.50 & 1538 & 16 & 4 \\
 \\
-Al2O3 &&&&&& \\
+\ce{Al2O3} &&&&&& \\
   Low & 2.40 & 1.68 & 1.99 & 324 & 0 & 2 \\
   Mid & 2.27 & 1.57 & 2.04 & 1198 & 12 & 2 \\
   High & 3.97 & 1.99 & 2.03 & 240 & 0 & 2 \\
   Full & 3.31 & 2.59 & 2.43 & 1538 & 9 & 1 \\
 \\
-FeOT &&&&&& \\
+\ce{FeO_T} &&&&&& \\
   Low & 1.81 & 1.72 & 1.55 & 1438 & 1 & 3 \\
   Mid & 2.64 & 2.15 & 1.69 & 978 & 28 & 9 \\
   High & 4.00 & 1.52 & 11.89 & 105 & 0 & 2 \\
   Full & 2.86 & 2.67 & 4.08 & 1538 & 23 & 5 \\
 \\
-MgO &&&&&& \\
+\ce{MgO} &&&&&& \\
   Low & 0.49 & 0.45 & 0.63 & 1000 & 7 & 4 \\
   Mid & 1.32 & 0.88 & 1.16 & 1488 & 10 & 1 \\
   High & 4.42 & 1.99 & 3.14 & 135 & 0 & 1 \\
   Full & 1.74 & 1.36 & 1.25 & 1538 & 41 & 6 \\
 \\
-CaO &&&&&& \\
+\ce{CaO} &&&&&& \\
   Low & 0.79 & 0.57 & 0.78 & 1070 & 22 & 6 \\
   Mid & 1.40 & 1.07 & 1.02 & 1428 & 20 & 4 \\
   High & 1.89 & 0.72 & 1.85 & 35 & 0 & 2 \\
   Full & 1.62 & 1.19 & 1.81 & 1538 & 41 & 8 \\
 \\
-Na2O &&&&&& \\
+\ce{Na2O} &&&&&& \\
   Low & 0.57 & 0.48 & 0.57 & 1278 & 8 & 3 \\
   High & 1.27 & 0.65 & 0.60 & 375 & 0 & 1 \\
   Full & 1.05 & 0.59 & 1.00 & 1538 & 37 & 7 \\
 \\
-K2O &&&&&& \\
+\ce{K2O} &&&&&& \\
   Low & 0.39 & 0.28 & 0.34 & 773 & 5 & 3 \\
   High & 0.98 & 0.58 & 0.71 & 920 & 13 & 2 \\
   Full & 1.03 & 0.92 & 0.81 & 1538 & 48 & 8 \\
@@ -209,24 +209,46 @@ K2O &&&&&& \\
 \input{sections/experiments/ica_aggregated.tex}
 \input{sections/experiments/other_models.tex}
 
-\subsection{summary}\label{sec:experiments_summary}
+\subsection{Summary}\label{sec:experiments_summary}
 The experiments conducted in this section provide an assessment of the MOC pipeline's components, offering insights into their individual and collective impacts on the system's overall performance.
 
-Our findings indicate that outlier removal does not have a major impact on neither the PLS1-SM nor the ICA models, which is expected considering we anticipate a low number of outliers in the dataset, as mentioned in Section~\ref{ica_data_preprocessing}.
-Following this, we also found that maintaining the leverage and residuals from the second iteration of the outlier removal barely affects the PLS1-SM model's performance.
+% ----- summary of the experiments
+Firstly, our experiments demonstrated that the Median Absolute Deviation (MAD) method significantly improves the Independent Component Analysis (ICA) models' accuracy for most oxides, underscoring the critical role of outlier removal in enhancing predictive performance.
+This finding contrasts with the Partial Least Squares Regression (PLS1-SM) model, which exhibited robustness to outliers, indicating that the impact of outlier removal varies across different modeling approaches within the MOC pipeline.
 
-We also found that the MAD method for outlier removal in the ICA phase improves the performance of the ICA models across all oxides except for \ce{CaO}.
-When using all five datasets for training the ICA models through aggregation, we found that the RMSEs vary across the oxides, with oxides that have a higher variance in their compositions having higher RMSEs and vice versa.
+Secondly, the study highlighted the double-edged nature of data aggregation for ICA.
+While aggregation can reduce noise for certain oxides, leading to improved predictive accuracy, it can also obscure information or introduce noise for others, resulting in decreased performance.
+This emphasizes considering the specific characteristics and variability of each oxide and location, highlighting the importance of tailored data preprocessing methods to achieve optimal model performance.
 
-Finally, we found that the XGBoost model performs exceptionally well, only being outperformed by the original MOC model on \ce{FeO_T}.
+Furthermore, we found that the XGBoost model performs exceptionally well, only being outperformed by the original MOC model on \ce{FeO_T}.
+This suggests that gradient boosting methods, with their ability to handle complex data well, offer substantial benefits over traditional models.
 The ANN model also shows promising results, often outperforming the original MOC model, and we expect that it could perform even better with a larger training dataset.
 
+% --- key conclusions
 We can draw several key conclusions from the experiments conducted in this section regarding the limitations of the MOC pipeline components:
 
-% TODO: Key conclusion here - what is the key limitations of the MOC pipeline components?
-% Note that PLS was more robust to outliers than ICA! The RMSEs for ICA were much higher than PLS when we did not do outlier removal.
+\vspace{2mm}\noindent\textit{The choice of model and the volume of training data are paramount in influencing the pipeline's accuracy and reliability.}
+
+\noindent
+Specifically, our findings underscore the superior robustness of PLS1-SM to outliers compared to ICA, making it a more favorable choice.
+However, the efficacy of PLS1-SM is eclipsed by ensemble models such as XGBoost, which consistently outperform PLS1-SM across a variety of oxides.
+This delineates the significance of ensemble models in enhancing predictive accuracy.
+Additionally, while Artificial Neural Networks (ANNs) demonstrate potential, their performance is dependent on the availability of substantial training data. 
+Despite the high efforts of NASA to collect high quality data, it is a time consuming effort, and as such, the currently available data is comparatively small. 
+Therefore, our ability to fully assess the ANN's capabilities is, in part, limited by this factor.
+
+\vspace{2mm}\noindent\textit{The ICA component of the MOC pipeline is a candidate for replacement in future iterations, given its high RMSEs and poorer performance compared to other models.}
+
+\noindent
+Both the insufficiency of ICA, as well as the promising performance of gradient boosting, is further reinforced by \citet{andersonPostlandingMajorElement2022}. In their model selection for the SuperCam instrument, they did not choose to go forward with the existing MOC pipeline, favoring alternative modeling approaches instead.
+
+\vspace{2mm}\noindent\textit{Our investigation reveals that preprocessing steps, particularly automated outlier removal, do not critically impact model performance.} 
+
+\noindent
+This indicates that the key to advancing the MOC pipeline lies not within preprocessing but in judicious model selection and the enhancement of the training data corpus.
+Moving forward, prioritizing the exploration of efficient ensemble models and the expansion of the training dataset emerges as a crucial strategy for overcoming the most significant barriers to reducing prediction error within the MOC pipeline.
 
 Finally, an aspect that is out of scope for this study is the inherent limitations stemming from the calibration dataset itself.
 The fact that it was acquired on Earth and not on Mars, and that it was acquired using a different LIBS instrument than the one used on Mars, causes a misalignment between the calibration dataset and the unseen data gathered by Mars rovers.
-In fact, NASA acknowledges this limitation, and is currently working on a mission to bring samples from Mars back to Earth, where they can be analyzed in laboratories around the world \cite{mars_sample_return}.
+In fact, NASA acknowledges this limitation, and is currently working on a mission to bring samples from Mars back to Earth, where they can be analyzed in laboratories around the world \cite{mars-sample-return}.
 This would allow for the creation of a calibration dataset that is more representative of the unseen data, which would allow for more accurate predictions.
