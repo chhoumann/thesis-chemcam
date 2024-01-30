@@ -23,24 +23,23 @@ Initially designed as a scout instrument for the rover, ChemCam has significantl
 Notably, ChemCam was found to be useful not just for qualitative analysis as originally intended, but also for quantitative analysis by acting as a tool for determining the elemental composition of geological samples.
 The precision and depth of ChemCam's data help provide a comprehensive understanding of Mars' chemical landscape --- invaluable in the ongoing exploration and study of the planet's potential to support life.\cite{chemcamNasaWebsite}
 
-ChemCam is a remote-sensing laser instrument developed by NASA in collaboration with the French national space agency (CNES).
-The instrument is used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars.
+ChemCam is a remote-sensing laser instrument used to gather Laser-Induced Breakdown Spectroscopy (LIBS) data from geological samples on Mars.
 The laser pulses to ablate and remove any surface contaminants, such as dust and weathering layers, to expose the underlying material.
 The laser generates a plasma plume from the now-exposed sample material.
 This plasma plume emits light, and the data collected from this process consists of a series of spectral readings.
 Captured over a range of wavelengths, each spectrum is composed of various emission lines.
 Each emission line is associated with a specific element, and its intensity reflects the concentration of that element in the sample.
 Consequently, the collection of spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological formations.
-This data is then used to determine the elemental composition of these samples.\cite{cleggRecalibrationMarsScience2017}
+This data is used to determine the elemental composition of these samples.\cite{cleggRecalibrationMarsScience2017}
 
 Due to its capability for remote analysis, LIBS enables processesing of materials without needing sample preparation. This enables rapid analysis because of the immediate spectrum collection from the subsequent plasma. It does this while maintaining high spatial resolution due to its small observation footprints. This high resolution is essential for pinpointing and investigating small features.\cite{wiensChemcam2012}
 
-LIBS is a versatile analytical tool with broad applicability across various other fields. In environmental monitoring, its spectral data are effectively used with machine learning and statistical methods like partial least squares and neural networks for detecting and quantifying soil pollutants. In industrial contexts, it is also utilized for quality control processes involving metals and alloys\cite{huang_progress_2023}.
+LIBS is a versatile analytical tool with broad applicability across various other fields. In environmental monitoring, its spectral data are effectively used with machine learning and statistical methods like Partial Least Squares (PLS) and Artificial Neural Networks (ANNs) for detecting and quantifying soil pollutants. In industrial contexts, it is also utilized for quality control processes involving metals and alloys\cite{huang_progress_2023}.
 
 The ChemCam team uses an analytical system called the \textit{Multivariate Oxide Composition} (MOC) model to predict the composition of major oxides based on LIBS data from geological samples.
-The system is comprised of various components, each responsible for a specific task in predicting the composition of major oxides in geological samples.
-In this context, a 'component' refers to a distinct, isolatable process or model affecting the system's overall predictive function.
-The system utilizes a series of submodels to predict individual oxide concentrations, which are then combined with regression models that are based on ICA scores.
+The system is comprised of various components, each responsible for a specific task in predicting the composition of major oxides in these samples.
+In this context, a 'component' refers to a distinct, isolatable process or model affecting the system's overall predictive function
+The system utilizes a series of PLS sub-models to predict individual oxide concentrations, which are then combined with predictions from regression models based on Independent Component Analysis (ICA) scores.
 As part of their preprocessing, they use various techniques to remove noise and outliers from the data.\cite{cleggRecalibrationMarsScience2017}
 The model is trained on a calibration dataset consisting of LIBS data from 408 terrestrial rock samples, simulated to mimic Martian conditions\cite{cleggRecalibrationMarsScience2017}.
 
