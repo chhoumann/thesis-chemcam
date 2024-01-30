@@ -33,7 +33,7 @@ Each emission line is associated with a specific element, and its intensity refl
 Consequently, the collection of spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological formations.
 This data is then used to determine the elemental composition of these samples.\cite{cleggRecalibrationMarsScience2017}
 
-Due to its capability for remote analysis, LIBS enables processesing of materials without needing sample preparation. This enables rapid analysis because of the immediate spectrum collection from the subsequent plasma. It does this while maintaining high spatial resolution due to its small observation footprints. This high resolution is essential for pinpointing and investigating small features. \cite{wiensChemcam2012}
+Due to its capability for remote analysis, LIBS enables processesing of materials without needing sample preparation. This enables rapid analysis because of the immediate spectrum collection from the subsequent plasma. It does this while maintaining high spatial resolution due to its small observation footprints. This high resolution is essential for pinpointing and investigating small features.\cite{wiensChemcam2012}
 
 LIBS is a versatile analytical tool with broad applicability across various other fields. In environmental monitoring, its spectral data are effectively used with machine learning and statistical methods like partial least squares and neural networks for detecting and quantifying soil pollutants. In industrial contexts, it is also utilized for quality control processes involving metals and alloys\cite{huang_progress_2023}.
 
@@ -43,6 +43,12 @@ In this context, a 'component' refers to a distinct, isolatable process or model
 The system utilizes a series of submodels to predict individual oxide concentrations, which are then combined with regression models that are based on ICA scores.
 As part of their preprocessing, they use various techniques to remove noise and outliers from the data.\cite{cleggRecalibrationMarsScience2017}
 The model is trained on a calibration dataset consisting of LIBS data from 408 terrestrial rock samples, simulated to mimic Martian conditions\cite{cleggRecalibrationMarsScience2017}.
+
+The mission to explore Mars continues with the Perseverance rover, which landed on Mars in February 2021.
+This rover is equipped with a new ChemCam instrument, called SuperCam, which is an upgraded version of the ChemCam instrument on Curiosity.
+The SuperCam instrument is capable of collecting more data than its predecessor, and it is also capable of collecting data from a greater distance.
+This allows the rover to collect data from a wider variety of geological samples using LIBS, which will help scientists better understand the Martian landscape and its potential to support life.\cite{mars-2020-perseverance}
+To support this instrument, the SuperCam team has developed a new suite of models for predicting the composition of major oxides in geological samples using LIBS data\cite{andersonPostlandingMajorElement2022}.
 
 The interpretation of LIBS data poses significant computational challenges.
 First, a high degree of multicollinearity exists within the spectral data, rendering traditional linear analysis methods less effective.
