@@ -11,6 +11,13 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{afterpage}
+\usepackage[pagewise]{lineno}
+
+% ACM cleanup
+\settopmatter{printacmref=false} % Removes citation information below abstract
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{plain} % removes running headers
+
 
 \definecolor{folderbg}{RGB}{124,166,198}
 \definecolor{folderborder}{RGB}{110,144,169}
@@ -24,34 +31,6 @@
           (-1.15*\Size,-\Size) rectangle (1.15*\Size,\Size);
       }
     }
-
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{codenavy}{rgb}{0, 0, 0.9}
-
-\lstdefinestyle{mystyle}{
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{codenavy}\bfseries,
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,
-    breaklines=true,
-    captionpos=b,
-    keepspaces=true,
-    numbers=left,
-    numbersep=5pt,
-    showspaces=false,
-    showstringspaces=false,
-    showtabs=false,
-    tabsize=2,
-	frame=tlbr
-}
-
-\lstset{style=mystyle}
-\usepackage{lineno}
-\linenumbers
 
 \title{Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples}
 \author{Christian Bager Bach Houmann}
