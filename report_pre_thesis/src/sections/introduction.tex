@@ -27,7 +27,7 @@ ChemCam is a remote-sensing laser instrument used to gather Laser-Induced Breakd
 The laser pulses to ablate and remove any surface contaminants, such as dust and weathering layers, to expose the underlying material.
 The laser generates a plasma plume from the now-exposed sample material.
 This plasma plume emits light, and the data collected from this process consists of a series of spectral readings.
-Captured over a range of wavelengths, each spectrum is composed of various emission lines.
+Captured over a range of wavelengths captured through three distinct spectrometers, each spectrum is composed of various emission lines.
 Each emission line is associated with a specific element, and its intensity reflects the concentration of that element in the sample.
 Consequently, the collection of spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological formations.
 This data is used to determine the elemental composition of these samples.\cite{cleggRecalibrationMarsScience2017}
@@ -44,27 +44,27 @@ As part of their preprocessing, they use various techniques to remove noise and 
 The calibration dataset used to train the model includes LIBS data from 408 terrestrial rock samples. These samples were collected on Earth and then prepared in a laboratory, where they were exposed to LIBS under conditions simulated to resemble those on Mars\cite{cleggRecalibrationMarsScience2017}.
 
 The mission to explore Mars continues with the Perseverance rover, which landed on Mars in February 2021.
-This rover is equipped with a new ChemCam instrument, called SuperCam, which is an upgraded version of the ChemCam instrument on Curiosity.
+This rover is equipped with a new instrument called SuperCam, which is an upgraded version of the ChemCam instrument on Curiosity.
 The SuperCam instrument is capable of collecting more data than its predecessor, and it is also capable of collecting data from a greater distance.
-This allows the rover to collect data from a wider variety of geological samples using LIBS, which will help scientists better understand the Martian landscape and its potential to support life.\cite{mars-2020-perseverance}
+This allows the rover to gather data from a wider variety of geological samples using LIBS, which will help scientists better understand the Martian landscape.\cite{mars-2020-perseverance}
 To support this instrument, the SuperCam team has developed a new suite of models for predicting the composition of major oxides in geological samples using LIBS data\cite{andersonPostlandingMajorElement2022}.
 
 The interpretation of LIBS data poses significant computational challenges.
 First, a high degree of multicollinearity exists within the spectral data, rendering traditional linear analysis methods less effective.
 The multicollinearity arises due to the correlation among different spectral channels, influenced both by the multi-line emission characteristics of individual elements and by geochemical correlations between elements.
-Secondly, the complexity of LIBS spectra is increased by multiple interacting physical processes because of \textit{matrix effects}. 'Matrix effects' refer to any effect that can cause the intensity of emission lines from an element to vary, independent of that element's concentration. Such variability complicates the direct interpretation of the spectra and poses challenges for computational models aiming for accurate elemental quantification.
+Secondly, the complexity of LIBS spectra is increased by multiple interacting physical processes because of \textit{matrix effects}. Matrix effects refer to any effect that can cause the intensity of emission lines from an element to vary, independent of that element's concentration. Such variability complicates the direct interpretation of the spectra and poses challenges for computational models aiming for accurate elemental quantification.
 It is possible to partially account for these effects by using multivariate algorithms that make use of the information contained in the entire spectrum, rather than individual lines.\cite{andersonImprovedAccuracyQuantitative2017}
 
-The Mars Science Laboratory has made notable progress in planetary exploration, largely relying on models like the Multivariate Oxide Composition (MOC) model to interpret Laser-Induced Breakdown Spectroscopy (LIBS) data from Martian geological samples.
-Despite its utility, a domain expert from the ChemCam team has observed that the existing MOC model exhibits limitations in both predictive accuracy and robustness.
-Enhancing the predictive accuracy and robustness of the MOC model is crucial for achieving more reliable composition predictions, thereby furthering the scientific objectives of the Mars Science Laboratory in understanding Martian geology and potential habitability.
+The MSL team has made notable progress in planetary exploration, largely relying on models like the MOC model to interpret LIBS data from Martian geological samples.
+Despite its utility, a domain expert from the ChemCam team has noted that the existing MOC model exhibits limitations in both predictive accuracy and robustness.
+Enhancing the predictive accuracy and robustness of the MOC model is crucial for achieving more reliable composition predictions, thereby furthering the scientific objectives of the MSL mission in understanding Martian geology and potential habitability.
 Accuracy, in this context, is measured as Root Mean Squared Error (RMSE).
 Robustness refers to the model's ability to handle the variations in the data.
 
-The challenges posed by the inherent complexities in interpreting LIBS spectra underscore the need for refinement of models like the MOC.
+The challenges posed by the inherent complexities in interpreting LIBS data underscore the need for refinement of models like the MOC.
 Despite its current capabilities, the domain expert from the ChemCam team, emphasizes room for improvement in how the model handles data variability and predicts elemental compositions.
 
-\textit{In this work, we aim to solve the problem of identifying issues within the components of the current Multivariate Oxide Composition (MOC) model that limit its predictive accuracy and robustness, particularly in relation to matrix effects. Following this, we will propose improvements to the model's components that addresses these issues, thereby enhancing its overall accuracy and robustness.}
+\textit{In this work, we aim to solve the problem of identifying issues within the components of the current Multivariate Oxide Composition (MOC) model that limit its predictive accuracy and robustness. Following this, we will propose improvements to the model's components that addresses these issues, thereby enhancing its overall accuracy and robustness.}
 
 The remainder of this paper is organized as follows:
 Section~\ref{sec:background} sets the context, while Section~\ref{sec:related_works} reviews existing literature.
