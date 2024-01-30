@@ -59,7 +59,7 @@ Each \texttt{.csv} file represents a location on the sample that was shot at by 
 They contain the following columns:
 
 \begin{itemize}
-    \item \texttt{wave}: The wavelength of the spectral data measured in nanometers (nm).
+    \item \texttt{wave}: The wavelengths of the spectral data measured in nanometers (nm).
     \item \texttt{shot1}, \texttt{shot2}, ..., \texttt{shot50}: The intensity measurement for each wavelength at the corresponding shot measured in photons/pulse/mm²/sr/nm.
     \item \texttt{median}: The median of the intensity measurements for each wavelength.
     \item \texttt{mean}: The mean of the intensity measurements for each wavelength.
@@ -116,7 +116,7 @@ These negative values represent noise and are a result of the initial preprocess
 
 Figure \ref{fig:masked_regions} shows a spectral plot of the CCS data for the \texttt{cadillac} sample.
 Note how it comprises of three different spectral regions - ultra-violet (UV), violet (VIO), and visible and near infrared (VNIR).
-Separate instruments were used for each of these regions.
+Separate spectrometers were used for each of these regions.
 Consequently, the edges of the spectral regions are noisy because pixels at the edges of the CCD\footnote{A charge-coupled device (CCD) is a light-sensitive electronic detector that converts incoming photons into an electronic signal, commonly used in digital imaging and astronomy\cite{radionuclide_imaging}.} usually exhibit lower sensitivity compared to those at the center, and the optics vary in their reflective and absorptive properties at different wavelengths.
 These regions, which also contain no unique major element diagnostic peaks, are masked out to enhance the accuracy and reliability of the quantitative analysis\cite{cleggRecalibrationMarsScience2017}.
 Specifically, the masked ranges are defined in \citet{cleggRecalibrationMarsScience2017} as 240.811 --- 246.635, 338.457 --- 340.797, 382.138 --- 387.859, 473.184 --- 492.427, and 849 --- 905.574 nm and are highlighted in blue in Figure~\ref{fig:masked_regions}.
@@ -130,18 +130,18 @@ Specifically, the masked ranges are defined in \citet{cleggRecalibrationMarsScie
 \end{figure*}
 
 In addition to these datasets, there is also a \\ \texttt{ccam\_calibration\_compositions.csv} file that contains ground truth data for each major oxide in each sample.
-There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
+There are a total of eight major oxides: \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeO_T}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.
 For each of these oxides, the data specifies their respective concentrations in each sample, expressed as a weight percentage (wt. \%) of the total composition.
 An excerpt of this dataset is shown in Table~\ref{tab:composotion_data_example}.
 
 
 Figure \ref{fig:composition_box_plot} shows a box plot of the composition data.
 In the context of this box plot, data points are statistically categorized as "outliers" based on their deviation from the interquartile range.
-The presence of such outliers, notably in the \ce{SiO2} and \ce{FeOT} data, indicates significant variability, which may be attributed to the diverse geological origins of the samples.
+The presence of such outliers, notably in the \ce{SiO2} and \ce{FeO_T} data, indicates significant variability, which may be attributed to the diverse geological origins of the samples.
 It is crucial to note that these "outliers" are not anomalous or erroneous measurements but are reflective of substantial natural variability, likely due to the heterogeneous geological origins of the samples.
 In our methodology, we deliberately choose to retain these composition data points to honor the natural variability and complexity of the geochemical systems we are studying.
 Rather than discarding them based on a statistical rule, we acknowledge that what appears as an outlier in a box plot does not necessarily equate to being an outlier in geochemical terms.
-Indeed, the significant range in \ce{SiO2} concentrations —-- although challenging for predictive models as described by \citet{cleggRecalibrationMarsScience2017} --- is representative of the geochemical diversity we intend to capture and analyze.
+Indeed, the significant range in \ce{SiO2} concentrations --- although challenging for predictive models as described by \citet{cleggRecalibrationMarsScience2017} --- is representative of the geochemical diversity we intend to capture and analyze.
 
 A correlation matrix of the composition data is shown in Figure~\ref{fig:oxide_corr}, calculated using the Pearson correlation coefficient.
 The matrix is illustrated as a heatmap, where the color of each cell represents the correlation between the oxides.
