@@ -1,6 +1,13 @@
 \section{Experiments}\label{sec:experiments}
 In this section, we detail the experiments conducted to evaluate the performance of each component within the MOC pipeline by using our replica as a baseline for comparison and assessment of experimental results.
 
+\begin{figure*}[ht]
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/rmse_historgram.png}
+	\caption{Grouped histogram of the RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
+	\label{fig:rmse_histograms}
+\end{figure*}
+
 The experiments are structured as follows:
 
 \begin{enumerate}
@@ -10,6 +17,28 @@ The experiments are structured as follows:
     \item Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset.
     \item Comparing the performance of PLS1-SM and ICA models against alternative models, such as XGBoost and ANN.
 \end{enumerate}
+
+
+\begin{table*}[hb]
+\centering
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllllll}
+\hline
+Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (replica) & MOC (original) & MOC (replica) \\
+\hline
+\ce{SiO2}  & 4.33               & 5.81              & 8.31           & 10.68         & 5.30           & 7.29 \\
+\ce{TiO2}  & 0.94               & 0.47              & 1.44           & 0.63          & 1.03           & 0.49 \\
+\ce{Al2O3} & 2.85               & 1.94              & 4.77           & 5.55          & 3.47           & 2.39 \\
+\ce{FeO_T} & 2.01               & 4.35              & 5.17           & 8.30          & 2.31           & 5.21 \\
+\ce{MgO}   & 1.06               & 1.17              & 4.08           & 2.90          & 2.21           & 1.67 \\
+\ce{CaO}   & 2.65               & 1.43              & 3.07           & 3.52          & 2.72           & 1.81 \\
+\ce{Na2O}  & 0.62               & 0.66              & 2.29           & 1.72          & 0.62           & 1.10 \\
+\ce{K2O}   & 0.72               & 0.72              & 0.98           & 1.37          & 0.82           & 1.09 \\
+\hline
+\end{tabular*}
+\caption{RMSE of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
+\label{tab:results_rmses}
+\end{table*}
+
 
 These experiments were selected to explore the significance of each MOC component and the comparative effectiveness of different modeling approaches.
 The first experiment focuses on the automated outlier removal process in PLS1-SM, examining its necessity by comparing outcomes with and without this step.
@@ -37,33 +66,6 @@ Since we lack the domain expertize to replicate this process, we instead randoml
 Additionally, without going into speculations, it is possible that some of the differences are due to implementation details, such as the use of different programming languages and libraries.
 Lastly, it is worth noting that RMSE is simply a statistical measure of the differences between the actual and predicted values, and does not necessarily reflect the true accuracy of the models on unseen data from Mars, and so the results should be interpreted with this in mind.
 
-\begin{table*}[h]
-\centering
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllllll}
-\hline
-Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (replica) & MOC (original) & MOC (replica) \\
-\hline
-\ce{SiO2}  & 4.33               & 5.81              & 8.31           & 10.68         & 5.30           & 7.29 \\
-\ce{TiO2}  & 0.94               & 0.47              & 1.44           & 0.63          & 1.03           & 0.49 \\
-\ce{Al2O3} & 2.85               & 1.94              & 4.77           & 5.55          & 3.47           & 2.39 \\
-\ce{FeO_T} & 2.01               & 4.35              & 5.17           & 8.30          & 2.31           & 5.21 \\
-\ce{MgO}   & 1.06               & 1.17              & 4.08           & 2.90          & 2.21           & 1.67 \\
-\ce{CaO}   & 2.65               & 1.43              & 3.07           & 3.52          & 2.72           & 1.81 \\
-\ce{Na2O}  & 0.62               & 0.66              & 2.29           & 1.72          & 0.62           & 1.10 \\
-\ce{K2O}   & 0.72               & 0.72              & 0.98           & 1.37          & 0.82           & 1.09 \\
-\hline
-\end{tabular*}
-\caption{RMSE of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
-\label{tab:results_rmses}
-\end{table*}
-
-\begin{figure*}[b]
-	\centering
-	\includegraphics[width=0.85\textwidth]{images/rmse_historgram.png}
-	\caption{Grouped histogram of the RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models.}
-	\label{fig:rmse_histograms}
-\end{figure*}
-
 \citet{andersonImprovedAccuracyQuantitative2017} used the Student's $t$-test to show their new model outperformed the old one. In our study, we apply the same test but with a different aim: to verify if there is no statistically significant difference between our replicated models and the original models presented in \citet{cleggRecalibrationMarsScience2017}. This approach allows us to assess whether our models demonstrate equivalence rather than improvement.
 In conducting our analysis with the Student's $t$-test, we define our hypotheses and choose a significance level to guide our interpretation of the results.
 Our null hypothesis (\(H_0\)) posits that there is no significant difference between the mean performance of our replicated models and that of the originals.
@@ -73,20 +75,26 @@ If the p-values obtained from our $t$-tests are less than 5\% (\(p < 0.05\)), we
 Conversely, if the p-value is greater than or equal to 5\% (\(p \geq 0.05\)), we fail to reject the null hypothesis, suggesting that our models and the original models are statistically similar, thereby achieving our goal of demonstrating equivalence rather than disparity.
 
 Following the approach delineated in \citet{andersonImprovedAccuracyQuantitative2017}, we start by calculating the uncertainty of the RMSE values, $S_{RMSE}^2$:
+
 $$
 S_{\text{RMSE}}^2 = \left(\frac{\text{RMSE}^2}{n}\right) \left[n - 1 - \frac{2\Gamma^2\left(\frac{n}{2}\right)}{\Gamma^2\left(\frac{n - 1}{2}\right)}\right], \\
 $$
+
 where $n$ is the number of samples, and $\Gamma$ is the gamma function. 
 This formula captures the variance of the RMSE, reflecting the dispersion of error magnitudes.
 Subsequently, the t-statistic $t$ is calculated to evaluate the statistical significance of the difference between the RMSEs of the original and replicated models:
+
 $$
 t = \frac{\text{RMSE}_A - \text{RMSE}_B}{\sqrt{S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2}},
 $$
+
 where $\text{RMSE}_A$ and $\text{RMSE}_B$ correspond to the RMSE values of the original and replicated models, respectively.
 The degrees of freedom $f$ associated with this comparison are determined by:
+
 $$
 f = \frac{\left(S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2\right)^2}{\frac{S^4_{\text{RMSE}_A}}{n_A - 1} + \frac{S^4_{\text{RMSE}_B}}{n_B - 1}},
 $$
+
 which accounts for the variances in RMSE values and the respective sample sizes ($n_A$ and $n_B$) of the models being compared.
 Finally, the p-value is derived from the $t$-distribution's cumulative distribution function:
 % Note to selves:
@@ -97,7 +105,11 @@ Finally, the p-value is derived from the $t$-distribution's cumulative distribut
 % where t_value is the t-statistic and degrees_of_freedom is the degrees of freedom.
 % But you could use: p_value = 2 * ( 1 - stats.t.cdf(abs(t_value), degrees_of_freedom))
 % Just as well.
-$$p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)$$
+
+$$
+p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)
+$$
+
 where $F_{\text{T}}$ is the cumulative distribution function of the t-distribution with $f$ degrees of freedom.
 Higher p-values indicate greater compatibility with the null hypothesis.
 We present the results of our $t$-tests in Table~\ref{table:results_ttests}.

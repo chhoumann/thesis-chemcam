@@ -74,38 +74,7 @@ If the full model predicts a concentration that falls within a blending range, t
 	\label{fig:pls_inference}
 \end{figure}
 
-\subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}\label{sec:methodology_outlier_removal}
-As outlined in Section \ref{sec:outlier_removal}, the Mahalanobis distance is utilized for outlier detection by leveraging its relationship with the chi-squared distribution.
-This method does not rely on qualitative assessments but rather employs a statistical approach to automatically identify outliers.
-For each data point in our dataset, the Mahalanobis distance is computed relative to the overall distribution of the dataset.
-A data point is deemed an outlier if its Mahalanobis distance yields a chi-squared statistic exceeding a critical value, determined by the significance level $\alpha$ and the degrees of freedom $\nu$.
-Given our analysis involves two dimensions --- leverage and spectral residuals --- the degrees of freedom $\nu$ are set to 2.
-
-The iterative process of outlier removal is inspired by the phenomenon where the exclusion of outliers may lead to the emergence of new outliers, as discussed by \citet{cleggRecalibrationMarsScience2017}.
-The procedure is as follows:
-\begin{enumerate}
-\item Compute leverage and spectral residuals for each sample using scores and loadings from a PLS model trained on the dataset.
-\item Combine leverage and residuals into a two-dimensional dataset, and calculate the Mahalanobis distance for each sample.
-\item Determine the chi-squared critical value for a 97.5\% confidence level, assuming $\nu = 2$ degrees of freedom.
-\item Classify samples as outliers if their Mahalanobis distance exceeds this critical value.
-\item Exclude outliers from the dataset and retrain the model on the filtered dataset.
-\item Repeat the process until the model's performance, determined by RMSE, ceases to improve.
-\end{enumerate}
-
-Leverage is computed as the diagonal of the product of the model's score matrix, its inverse correlation matrix, and the transpose of the score matrix.
-Spectral residuals ($Q$) are calculated as the sum of squared differences between the observed and predicted values by the model, for each sample.
-
-These metrics are then utilized to form a two-dimensional array for each data point, combining leverage and spectral residuals.
-The Mahalanobis distance for each point is computed using the mean and covariance of this two-dimensional array.
-
-It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
-This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
-
-Figure~\ref{fig:FeOT_oxide_removal} illustrates running the outlier removal process on the \ce{FeO_T} full model.
-As can be seen, the number of outliers decreases with each iteration, and the model improves as measured by the RMSE.
-Here, the process terminates after four iterations, as the RMSE no longer improves with further iterations.
-
-\begin{figure*}[]
+\begin{figure*}[h]
 \centering
 
 % First Row
@@ -148,6 +117,37 @@ Here, the process terminates after four iterations, as the RMSE no longer improv
 \label{fig:FeOT_oxide_removal}
 \end{figure*}
 
+\subsubsection{Outlier Removal with Mahalanobis Distance and Chi-Squared Test}\label{sec:methodology_outlier_removal}
+
+As outlined in Section \ref{sec:outlier_removal}, the Mahalanobis distance is utilized for outlier detection by leveraging its relationship with the chi-squared distribution.
+This method does not rely on qualitative assessments but rather employs a statistical approach to automatically identify outliers.
+For each data point in our dataset, the Mahalanobis distance is computed relative to the overall distribution of the dataset.
+A data point is deemed an outlier if its Mahalanobis distance yields a chi-squared statistic exceeding a critical value, determined by the significance level $\alpha$ and the degrees of freedom $\nu$.
+Given our analysis involves two dimensions --- leverage and spectral residuals --- the degrees of freedom $\nu$ are set to 2.
+
+The iterative process of outlier removal is inspired by the phenomenon where the exclusion of outliers may lead to the emergence of new outliers, as discussed by \citet{cleggRecalibrationMarsScience2017}.
+The procedure is as follows:
+\begin{enumerate}
+\item Compute leverage and spectral residuals for each sample using scores and loadings from a PLS model trained on the dataset.
+\item Combine leverage and residuals into a two-dimensional dataset, and calculate the Mahalanobis distance for each sample.
+\item Determine the chi-squared critical value for a 97.5\% confidence level, assuming $\nu = 2$ degrees of freedom.
+\item Classify samples as outliers if their Mahalanobis distance exceeds this critical value.
+\item Exclude outliers from the dataset and retrain the model on the filtered dataset.
+\item Repeat the process until the model's performance, determined by RMSE, ceases to improve.
+\end{enumerate}
+
+Leverage is computed as the diagonal of the product of the model's score matrix, its inverse correlation matrix, and the transpose of the score matrix.
+Spectral residuals ($Q$) are calculated as the sum of squared differences between the observed and predicted values by the model, for each sample.
+
+These metrics are then utilized to form a two-dimensional array for each data point, combining leverage and spectral residuals.
+The Mahalanobis distance for each point is computed using the mean and covariance of this two-dimensional array.
+
+It should be noted that our outlier removal process is conservative to avoid removing too many samples and as such, we have set our significance level $\alpha$ to 0.975.
+This means that we are willing to accept a 2.5\% chance of falsely removing a sample that is not an outlier.
+
+Figure~\ref{fig:FeOT_oxide_removal} illustrates running the outlier removal process on the \ce{FeO_T} full model.
+As can be seen, the number of outliers decreases with each iteration, and the model improves as measured by the RMSE.
+Here, the process terminates after four iterations, as the RMSE no longer improves with further iterations.
 
 \subsection{ICA}\label{sec:methodology_ica}
 In this section, we delve into the differences between our pipeline and the original, and we discuss the rationale behind our choices.
