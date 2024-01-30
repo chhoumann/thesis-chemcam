@@ -209,16 +209,19 @@ Model & RMSECV (avg) & RMSECV (min) & RMSEP & \# of spectra & \# outliers remove
 The experiments conducted in this section provide an assessment of the MOC pipeline's components, offering insights into their individual and collective impacts on the system's overall performance.
 
 % ----- summary of the experiments
-Firstly, our experiments demonstrated that the Median Absolute Deviation (MAD) method significantly improves the Independent Component Analysis (ICA) models' accuracy for most oxides, underscoring the critical role of outlier removal in enhancing predictive performance.
-This finding contrasts with the Partial Least Squares Regression (PLS1-SM) model, which exhibited robustness to outliers, indicating that the impact of outlier removal varies across different modeling approaches within the MOC pipeline.
+Firstly, our experiments demonstrated that the MAD-based outlier removal method significantly improves the ICA models' accuracy for most oxides, underscoring the critical role of outlier removal in enhancing predictive performance of the ICA component.
+This finding contrasts with the PLS1-SM models, which exhibited robustness to outliers, indicating that the impact of outlier removal varies across different modeling approaches within the MOC pipeline.
 
 Secondly, the study highlighted the double-edged nature of data aggregation for ICA.
 While aggregation can reduce noise for certain oxides, leading to improved predictive accuracy, it can also obscure information or introduce noise for others, resulting in decreased performance.
 This emphasizes considering the specific characteristics and variability of each oxide and location, highlighting the importance of tailored data preprocessing methods to achieve optimal model performance.
 
-Furthermore, we found that the XGBoost model performs exceptionally well, only being outperformed by the original MOC model on \ce{FeO_T}.
+Furthermore, we found that the XGBoost model performed exceptionally well, only being outperformed by the original MOC model on \ce{FeO_T}.
 This suggests that gradient boosting methods, with their ability to handle complex data well, offer substantial benefits over traditional models.
-The ANN model also shows promising results, often outperforming the original MOC model, and we expect that it could perform even better with a larger training dataset.
+The ANN model also showed promising results, often outperforming the original MOC model, and we expect that it could perform even better with a larger training dataset.
+
+Our replica models underperform in predicting \ce{FeO_T} compared to the original MOC model, a discrepancy likely due to the high variance in \ce{FeO_T} compositions identified in our calibration samples, as described in Section~\ref{sec:data_overview}.
+The randomized split of training and testing sets in our approach likely failed to encompass the comprehensive range of \ce{FeO_T} compositions, explaining our models' predictive shortcomings --- an issue not encountered by the original study's methodical sample division.
 
 % --- key conclusions
 We can draw several key conclusions from the experiments conducted in this section regarding the limitations of the MOC pipeline components:
@@ -227,23 +230,23 @@ We can draw several key conclusions from the experiments conducted in this secti
 
 \noindent
 Specifically, our findings underscore the superior robustness of PLS1-SM to outliers compared to ICA, making it a more favorable choice.
-However, the efficacy of PLS1-SM is eclipsed by ensemble models such as XGBoost, which consistently outperform PLS1-SM across a variety of oxides.
+However, the efficacy of PLS1-SM is surpassed by ensemble models such as XGBoost across a variety of oxides.
 This delineates the significance of ensemble models in enhancing predictive accuracy.
-Additionally, while Artificial Neural Networks (ANNs) demonstrate potential, their performance is dependent on the availability of substantial training data. 
-Despite the high efforts of NASA to collect high quality data, it is a time consuming effort, and as such, the currently available data is comparatively small. 
+Additionally, while ANNs demonstrate potential, their performance is dependent on the availability of substantial training data. 
+Despite the efforts of NASA to collect high quality data, it is a time consuming effort, and as such, the currently available data is comparatively small.
+This is supported by the claims made by \citet{lepore_quantitative_2022}, discussed in Section~\ref{sec:related_works}, that more data leads to more accurate geochemical analysis.
 Therefore, our ability to fully assess the ANN's capabilities is, in part, limited by this factor.
+
+Furthermore, we showed that choosing a model that is robust against outliers exhibits superior performance, as demonstrated by the major improvement in the ICA models' performances when MAD-based outlier removal was introduced.
+This indicates that the key to advancing the MOC pipeline lies not within outlier removal methods but in judicious model selection and the enhancement of the training data corpus.
+Moving forward, prioritizing the exploration of efficient ensemble models and the expansion of the training dataset emerges as a crucial strategy for overcoming the most significant barriers to reducing prediction error within the MOC pipeline.
 
 \vspace{2mm}\noindent\textit{The ICA component of the MOC pipeline is a candidate for replacement in future iterations, given its high RMSEs and poorer performance compared to other models.}
 
 \noindent
-Both the insufficiency of ICA, as well as the promising performance of gradient boosting, is further reinforced by \citet{andersonPostlandingMajorElement2022}. In their model selection for the SuperCam instrument, they did not choose to go forward with the existing MOC pipeline, favoring alternative modeling approaches instead.
+Both the insufficiency of ICA, as well as the promising performance of gradient boosting, is further reinforced by \citet{andersonPostlandingMajorElement2022}. In their model selection for the SuperCam instrument, they chose not to go forward with the existing MOC pipeline, favoring alternative modeling approaches instead.
 
-\vspace{2mm}\noindent\textit{Our investigation reveals that preprocessing steps, particularly automated outlier removal, do not critically impact model performance.} 
-
-\noindent
-This indicates that the key to advancing the MOC pipeline lies not within preprocessing but in judicious model selection and the enhancement of the training data corpus.
-Moving forward, prioritizing the exploration of efficient ensemble models and the expansion of the training dataset emerges as a crucial strategy for overcoming the most significant barriers to reducing prediction error within the MOC pipeline.
-
+\vspace{2mm}\noindent
 Finally, an aspect that is out of scope for this study is the inherent limitations stemming from the calibration dataset itself.
 The fact that it was acquired on Earth and not on Mars, and that it was acquired using a different LIBS instrument than the one used on Mars, causes a misalignment between the calibration dataset and the unseen data gathered by Mars rovers.
 In fact, NASA acknowledges this limitation, and is currently working on a mission to bring samples from Mars back to Earth, where they can be analyzed in laboratories around the world \cite{mars-sample-return}.
