@@ -1,44 +1,41 @@
 \section{Experiments}\label{sec:experiments}
-In this section, we detail the experiments conducted to evaluate the performance of each component within the MOC pipeline.
-Our initial step was to establish a baseline using the replica of the MOC pipeline described in Section~\ref{sec:methodology}.
-This baseline serves as a reference point for comparison and assessment of experimental results.
+In this section, we detail the experiments conducted to evaluate the performance of each component within the MOC pipeline by using our replica as a baseline for comparison and assessment of experimental results.
 
-The experiments that follow are structured as follows:
+The experiments are structured as follows:
 
 \begin{enumerate}
     \item Evaluating the necessity of automated outlier removal in the PLS1-SM component by comparing performance with and without this process.
     \item Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM from the second iteration onwards.
-    \item Assessing the impact of the Median Absolute Deviation (MAD) method for outlier removal in the Independent Component Analysis (ICA) phase.
-    \item Determining the effect on ICA performance when utilizing datasets from five locations compared to a single dataset.
-    \item Comparing the performance of PLS1-SM and ICA models against alternative models, such as XGBoost and Artificial Neural Networks (ANN).
+    \item Assessing the impact of the MAD-based method for outlier removal in the ICA phase.
+    \item Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset.
+    \item Comparing the performance of PLS1-SM and ICA models against alternative models, such as XGBoost and ANN.
 \end{enumerate}
 
-These experiments were selected to explore the significance of the outlier removal process, the optimization of threshold values, and the comparative effectiveness of different modeling approaches within the MOC pipeline.
+These experiments were selected to explore the significance of each MOC component and the comparative effectiveness of different modeling approaches.
 The first experiment focuses on the automated outlier removal process in PLS1-SM, examining its necessity by comparing outcomes with and without this step.
 The second experiment looks at the implications of using fixed threshold values for outlier removal in PLS1-SM, opting for a conservative approach by not updating these values after each iteration.
-In the third experiment, we apply the MAD method for outlier removal in ICA, comparing its effectiveness against the baseline.
+In the third experiment, we apply MAD-based outlier removal in ICA, comparing its effectiveness against the baseline.
 The fourth experiment evaluates ICA's performance using aggregated datasets from multiple locations, aiming to understand the balance between representativeness and information loss.
 The final experiment extends the analysis to include comparisons with other models, providing a broader perspective on the MOC pipeline's performance.
 
-This experimental approach allows for assessment of the MOC pipeline's components, offering insights into their individual and collective impacts on the system's overall performance.
-
 \subsection{Replication of the MOC Pipeline}\label{sec:replica_moc}
-We present the baseline RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models in Table~\ref{tab:results_rmses}.
-Additionally, we show the results of the PLS1-SM replica sub-models in Table~\ref{table:rmsecv_results}. This table presents the RMSE across different concentration ranges, the number of spectra used in the model, the total number of outliers removed, and the number of outlier removal iterations for each sub-model (Low, Mid, High, Full). We show both the average and minimum RMSE of the cross-validation folds. RMSEP is the RMSE of the test set.
+We present the baseline RMSEs of the original models and our replicas in Table~\ref{tab:results_rmses}.
+Additionally, we show the results of the PLS1-SM replica sub-models in Table~\ref{table:rmsecv_results}. This table presents the RMSE across different composition ranges, the number of spectra used in the model, the total number of outliers removed, and the number of outlier removal iterations for each sub-model (low, mid, high, full). We show both the average and minimum RMSE of the cross-validation folds. RMSEP is the RMSE of the test set.
 Figure~\ref{fig:rmse_histograms} illustrates the distribution of the RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models as a grouped histogram.
-The results show that the RMSEs of our replicas of the PLS1-SM, ICA and MOC models are similar to the original models.
-However, the are some notable differences --- in some cases, our replicas outperform the original models, while in other cases, the original models outperform our replicas.
+The results show that the RMSEs of our replicas are similar to the original models.
+However, there are some notable differences --- in some cases, our replicas outperform the original models, while in other cases, the original models outperform our replicas.
+
 These differences can be attributed to a number of factors.
 
 Firstly, the original models were trained on two datasets, one acquired at a 1600mm standoff distance and one acquired at a 3000mm standoff distance.
 We have only used the 1600mm dataset for our replicas since we do not have access to the 3000mm dataset.
-As mentioned in Section~\ref{sec:outlier_removal}, we also chose chose to automate the outlier removal process for the PLS1-SM phase, whereas the original authors performed this manually.
-Moreover, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
-In Section~\ref{sec:ica_data_preprocessing}, we clarified that unlike the original authors who utilized all five location datasets, our analysis was limited to a single dataset per sample due to the absence of details on their integration.
+As mentioned in Section~\ref{sec:outlier_removal}, we also chose to automate the outlier removal process for the PLS1-SM phase, whereas the original authors performed this manually.
+Moreover, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}, and our analysis was also limited to a single dataset per sample due to the absence of details on their integration.
+
 For training the PLS models, \citet{andersonImprovedAccuracyQuantitative2017} methodically organized their training and test sets by sorting samples based on the major oxide, sequentially assigning them to folds, removing outliers, and deliberately including extreme compositions in the training folds to enhance the model's ability to handle a broad range of elemental variations.
-Since we lack the domain expertise to replicate this process, we instead randomly split the dataset into training and test sets without any further curation using a 80/20 split.
+Since we lack the domain expertize to replicate this process, we instead randomly split the dataset into training and test sets without any further curation using an 80/20 split.
 Additionally, without going into speculations, it is possible that some of the differences are due to implementation details, such as the use of different programming languages and libraries.
-Lastly, it is worth noting that RMSE is simply a statistical measure of the differences between the original and predicted values, and does not necessarily reflect the true accuracy of the models on unseen data from Mars, and so the results should be interpreted with this in mind.
+Lastly, it is worth noting that RMSE is simply a statistical measure of the differences between the actual and predicted values, and does not necessarily reflect the true accuracy of the models on unseen data from Mars, and so the results should be interpreted with this in mind.
 
 \begin{table*}[h]
 \centering
@@ -67,30 +64,31 @@ Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (repl
 	\label{fig:rmse_histograms}
 \end{figure*}
 
-\citet{andersonImprovedAccuracyQuantitative2017} used the Student's t-test to show their new model outperformed the old one. In our study, we apply the same test but with a different aim: to verify if there is no statistical significant difference between our replicated models (PLS1-SM, ICA, and MOC) and the original models presented in \citet{cleggRecalibrationMarsScience2017}. This approach allows us to assess whether our models demonstrate equivalence rather than improvement.
-In conducting our analysis with the Student's t-test, we define our hypotheses and choose a significance level to guide our interpretation of the results.
-Our null hypothesis (\(H_0\)) posits that there is no significant difference between the mean performance of our replicated models (PLS1-SM, ICA, and MOC) and that of the originals.
+\citet{andersonImprovedAccuracyQuantitative2017} used the Student's $t$-test to show their new model outperformed the old one. In our study, we apply the same test but with a different aim: to verify if there is no statistically significant difference between our replicated models and the original models presented in \citet{cleggRecalibrationMarsScience2017}. This approach allows us to assess whether our models demonstrate equivalence rather than improvement.
+In conducting our analysis with the Student's $t$-test, we define our hypotheses and choose a significance level to guide our interpretation of the results.
+Our null hypothesis (\(H_0\)) posits that there is no significant difference between the mean performance of our replicated models and that of the originals.
 Conversely, the alternative hypothesis (\(H_1\)) suggests that there is a significant difference between the two sets of models.
 We set a significance level (\(\alpha\)) of 5\%, which establishes the threshold for determining statistical significance.
-If the p-value obtained from our t-test is less than 5\% (\(p < 0.05\)), we will reject the null hypothesis, indicating significant evidence of a difference between our replicated models and those of the original pipeline.
+If the p-values obtained from our $t$-tests are less than 5\% (\(p < 0.05\)), we will reject the null hypothesis, indicating that there is a significant difference between our replicated models and those of the original pipeline.
 Conversely, if the p-value is greater than or equal to 5\% (\(p \geq 0.05\)), we fail to reject the null hypothesis, suggesting that our models and the original models are statistically similar, thereby achieving our goal of demonstrating equivalence rather than disparity.
 
 Following the approach delineated in \citet{andersonImprovedAccuracyQuantitative2017}, we start by calculating the uncertainty of the RMSE values, $S_{RMSE}^2$:
 $$
-S_{\text{RMSE}}^2 = \left(\frac{\text{RMSE}^2}{n}\right) \left[n - 1 - \frac{2\Gamma^2\left(\frac{n}{2}\right)}{\Gamma^2\left(\frac{n - 1}{2}\right)}\right] \\
+S_{\text{RMSE}}^2 = \left(\frac{\text{RMSE}^2}{n}\right) \left[n - 1 - \frac{2\Gamma^2\left(\frac{n}{2}\right)}{\Gamma^2\left(\frac{n - 1}{2}\right)}\right], \\
 $$
-where $n$ is the number of samples, and $\Gamma$ is the gamma function. This formulation captures the variance of the RMSE, reflecting the dispersion of error magnitudes.
+where $n$ is the number of samples, and $\Gamma$ is the gamma function. 
+This formula captures the variance of the RMSE, reflecting the dispersion of error magnitudes.
 Subsequently, the t-statistic $t$ is calculated to evaluate the statistical significance of the difference between the RMSEs of the original and replicated models:
 $$
-t = \frac{\text{RMSE}_A - \text{RMSE}_B}{\sqrt{S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2}}
+t = \frac{\text{RMSE}_A - \text{RMSE}_B}{\sqrt{S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2}},
 $$
 where $\text{RMSE}_A$ and $\text{RMSE}_B$ correspond to the RMSE values of the original and replicated models, respectively.
-The degrees of freedom ($f$) associated with this comparison are determined by:
+The degrees of freedom $f$ associated with this comparison are determined by:
 $$
-f = \frac{\left(S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2\right)^2}{\frac{S^4_{\text{RMSE}_A}}{n_A - 1} + \frac{S^4_{\text{RMSE}_B}}{n_B - 1}}
+f = \frac{\left(S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2\right)^2}{\frac{S^4_{\text{RMSE}_A}}{n_A - 1} + \frac{S^4_{\text{RMSE}_B}}{n_B - 1}},
 $$
 which accounts for the variances in RMSE values and the respective sample sizes ($n_A$ and $n_B$) of the models being compared.
-Finally, the p-value is derived from the t-distribution's cumulative distribution function:
+Finally, the p-value is derived from the $t$-distribution's cumulative distribution function:
 % Note to selves:
 % This can be calculated using the cumulative distribution function of the t-distribution.
 % https://stackoverflow.com/questions/17559897/python-p-value-from-t-statistic
@@ -102,8 +100,7 @@ Finally, the p-value is derived from the t-distribution's cumulative distributio
 $$p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)$$
 where $F_{\text{T}}$ is the cumulative distribution function of the t-distribution with $f$ degrees of freedom.
 Higher p-values indicate greater compatibility with the null hypothesis.
-
-We present the results of our t-tests in Table~\ref{table:results_ttests}.
+We present the results of our $t$-tests in Table~\ref{table:results_ttests}.
 
 \begin{table}[h]
 \centering
@@ -121,27 +118,26 @@ Oxide & PLS1-SM & ICA & MOC \\
 \ce{K2O} & 100.00\% & 36.27\% & 43.40\% \\
 \hline
 \end{tabular}
-\caption{Results of the PLS1-SM, ICA, and MOC t-tests}
+\caption{Results of the PLS1-SM, ICA, and MOC $t$-tests.}
 \label{table:results_ttests}
 \end{table}
 
-The results from our t-tests are summarized as follows:
+The results from our $t$-tests are summarized as follows:
 
 \begin{itemize}
-    \item \textbf{PLS1-SM:} The p-values observed across the spectrum, most notably the 100.00\% for \ce{K2O}, unequivocally suggest a strong statistical proximity to the original models for a majority of the parameters. This is particularly indicative of a successful replication effort. However, the relatively lower p-value for \ce{FeO_T} (7.48\%) underscores an area where the model's performance diverges from the original. Given the high variance noted in the Section~\ref{sec:data_overview} for \ce{FeO_T} compositions, this deviation could be ascribed to inherent data variability rather than model inaccuracy.
+    \item \textbf{PLS1-SM:} The p-values observed across the spectrum, most notably the 100.00\% for \ce{K2O}, unequivocally suggest a strong statistical proximity to the original models for a majority of the parameters. This is particularly indicative of a successful replication effort. However, the relatively lower p-value for \ce{FeO_T} (7.48\%) underscores an area where the model's performance diverges from the original. Given the high variance noted in Section~\ref{sec:data_overview} for \ce{FeO_T} compositions, this deviation could be ascribed to inherent data variability rather than model inaccuracy.
 
     \item \textbf{ICA:} This model demonstrates considerable alignment with the original models across several constituents, as evidenced by p-values like 67.06\% for \ce{Al2O3} and 70.04\% for \ce{CaO}. These figures indicate a noteworthy approximation to the original models' performance. Conversely, the p-value for \ce{TiO2} (6.31\%) marks an exception, indicating a region where the ICA model might benefit from refinement. The noted high variance in \ce{TiO2} values within our dataset likely contributes to this outlier, pointing to data variability as a contributing factor.
 
-    \item \textbf{MOC:} The replicated MOC model's p-values, especially the 43.40\% for \ce{K2O}, reiterate its consistency with the original model's outcomes. This aligns with our hypothesis of statistical equivalence. Yet, as with PLS1-SM, the \ce{FeO_T} component exhibits a lower p-value (6.57\%), highlighting an area of divergence potentially attributed to the previously discussed variance in \ce{FeO_T} compositions.
+    \item \textbf{MOC:} The replicated MOC model's p-values, especially the 43.40\% for \ce{K2O}, reiterate its consistency with the original model. This aligns with our hypothesis of statistical equivalence. Yet, as with PLS1-SM, the \ce{FeO_T} component exhibits a lower p-value (6.57\%), highlighting an area of divergence potentially attributed to the previously discussed variance in \ce{FeO_T} compositions.
 \end{itemize}
 
-This comparative analysis affirms a satisfying statistical equivalence between our replicated models and the original MOC models across most tested parameters.
-This alignment underscores the robustness of our replication efforts.
+This comparative analysis affirms a satisfying statistical equivalence between our replicated models and the original.
 
 However, the lower p-values associated with \ce{FeO_T} for both PLS1-SM and MOC, in addition to \ce{TiO_2} for ICA, flag these elements as focal points for potential refinement.
 Given our dataset's inherent variability in the compositions of these specific elements, as substantiated in Section~\ref{sec:data_overview}, these findings are interpretable and not wholly unexpected.
 
-In conclusion, our t-tests demonstrate that our replicated models are statistically similar to the original models, thereby achieving our goal of demonstrating equivalence rather than disparity.
+In conclusion, our $t$-tests demonstrate that our replicated models are statistically similar to the original models, thereby achieving our goal of demonstrating equivalence rather than disparity.
 As such, they serve their purpose as a baseline for identifying which aspects of the pipeline contribute the most to the overall error.
 
 \begin{table*}[htbp] % Use htbp for more placement flexibility
