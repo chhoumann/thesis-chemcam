@@ -41,7 +41,7 @@ The system is comprised of various components, each responsible for a specific t
 In this context, a 'component' refers to a distinct, isolatable process or model affecting the system's overall predictive function
 The system utilizes a series of PLS sub-models to predict individual oxide concentrations, which are then combined with predictions from regression models based on Independent Component Analysis (ICA) scores.
 As part of their preprocessing, they use various techniques to remove noise and outliers from the data.\cite{cleggRecalibrationMarsScience2017}
-The model is trained on a calibration dataset consisting of LIBS data from 408 terrestrial rock samples, simulated to mimic Martian conditions\cite{cleggRecalibrationMarsScience2017}.
+The calibration dataset used to train the model includes LIBS data from 408 terrestrial rock samples. These samples were collected on Earth and then prepared in a laboratory, where they were exposed to LIBS under conditions simulated to resemble those on Mars\cite{cleggRecalibrationMarsScience2017}.
 
 The mission to explore Mars continues with the Perseverance rover, which landed on Mars in February 2021.
 This rover is equipped with a new ChemCam instrument, called SuperCam, which is an upgraded version of the ChemCam instrument on Curiosity.
