@@ -3,11 +3,11 @@
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.225\textwidth]{images/pipeline.png}
-    \caption{High level overview of the pipeline for deriving the Multivariate Oxide Composition (MOC) from raw LIBS data.}
+    \caption{High level overview of the pipeline for deriving the MOC from raw LIBS data.}
     \label{fig:libs_data_processing}
 \end{figure}
 
-In Figure~\ref{fig:libs_data_processing} we illustrate the inference steps for deriving the Multivariate Oxide Composition (MOC) from LIBS data.
+In Figure~\ref{fig:libs_data_processing} we illustrate the inference steps for deriving the MOC from LIBS data.
 In Section~\ref{sec:methodology}, we detail the training process of the models.
 A comprehensive description of the MOC model is presented in \citet{cleggRecalibrationMarsScience2017} and \citet{andersonImprovedAccuracyQuantitative2017}.
 Here, we offer a concise summary of the MOC model, laying the groundwork for further exploration of our contributions to the subject.
@@ -21,10 +21,10 @@ The CCS data format is a table of intensity values for each wavelength, with eac
 We give a more detailed description of the CCS data format in Section \ref{sec:data_overview} where we also describe the ChemCam calibration dataset as a whole.
 
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
-The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Sub-models (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
+The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Sub-models (PLS1-SM) and ICA to calculate the MOC.
 The outcomes of these two techniques are merged using a weighted average for each oxide, with the weighting skewed in favor of the technique that demonstrates superior performance for the specific oxide.
-The PLS-SM approach utilizes tailored sub-models that specialize in targeting distinct composition ranges, along with a comprehensive full model used for initial composition estimation.
-Independent Component Analysis assists in distinguishing elemental emission lines, contributing to a refined multivariate model.
+The PLS1-SM approach utilizes tailored sub-models that specialize in targeting distinct composition ranges, along with a comprehensive full model used for initial composition estimation.
+ICA assists in distinguishing elemental emission lines, contributing to a refined multivariate model.
 
 Two normalization methods are employed in the analysis: Norm 1 and Norm 3.
 Norm 1 standardizes the full spectrum across all three spectrometers such that the sum total is unity.
