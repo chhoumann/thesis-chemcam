@@ -1,13 +1,12 @@
 \subsection{Experiment: ICA MAD Outlier Removal}\label{sec:experiment_ica_mad_outlier_removal}
-In the ICA phase, the original authors employed the Median Absolute Deviation (MAD) for outlier removal, yet the detailed methodology of their approach was not fully delineated.
+In the ICA phase, the original authors employed MAD-based outlier removal, yet the detailed methodology of their approach was not fully delineated.
 Consequently, in our version of the pipeline, we chose to exclude the outlier removal step during the ICA phase to avoid introducing unsubstantiated assumptions, as described in Section~\ref{sec:ica_data_preprocessing}.
-This decision allowed us to evaluate the intrinsic effectiveness of the ICA phase without outlier removal and assesses the impact of introducing MAD (Median Absolute Deviation) for outlier removal in our pipeline replication.
-By comparing results with and without MAD, we aim to quantitatively determine its utility in reducing noise and improving data quality.
+This decision allowed us to evaluate the intrinsic effectiveness of the ICA phase without outlier removal and assess the impact of introducing MAD-based outlier removal in our pipeline replication.
+By comparing results with and without MAD-based outlier removal, we aim to quantitatively determine its utility in reducing noise and improving data quality.
 This will also provide insights into the robustness of the ICA phase against outliers, offering a comprehensive understanding of the pipeline's capabilities and limitations.
 
-As mentioned in Section~\ref{sec:ica_data_preprocessing}, \citet{cleggRecalibrationMarsScience2017} did not specify the exact methodology of their outlier removal process.
-Therefore, we experimented with applying it at different stages of the ICA phase.
-The results presented in Table~\ref{tab:ica_mad_rmses} are the best results we obtained from these experiments, which were achieved by applying MAD before masking and normalization in the preprocessing phase.
+We experimented with applying MAD-based outlier removal at different stages of the ICA phase.
+The results presented in Table~\ref{tab:ica_mad_rmses} are the best results we obtained from these experiments, which were achieved by applying MAD-based outlier removal before masking and normalization in the preprocessing phase.
 
 \begin{table}[h]
 \centering
@@ -29,13 +28,13 @@ Element    & ICA baseline   & ICA with MAD \\
 \label{tab:ica_mad_rmses}
 \end{table}
 
-As evident from Table~\ref{tab:ica_mad_rmses}, the ICA phase's performance is improved across all elements when MAD is applied except for $\ce{CaO}$.
+As evident from Table~\ref{tab:ica_mad_rmses}, the ICA phase's performance is improved across all elements when MAD-based outlier removal is applied except for $\ce{CaO}$.
 We hypothesize that this could be because the nature of the $\ce{CaO}$ data might differ from other elements, where outliers removed according to the MAD-based approach might be removing critical information, resulting in a less accurate model.
 
 It is also notable that the ICA regression models show an overall significant improvement when outlier removal is applied, while the experiment presented in Section~\ref{sec:experiment_pls_automated_outlier_removal} shows that omitting outlier removal in the PLS1-SM phase does not have a significant impact on the models' performance.
 This indicates that PLS is more robust to outliers than ICA.
 
-Given these results, we decided to recalculate the MOC $t$-test results given the RMSEs from the ICA phase with MAD-based outlier removal.
+Given these results, we decided to recalculate the MOC $t$-test results given the improved RMSEs from the ICA phase with MAD-based outlier removal.
 The results, along with the previous $t$-test values for comparison, are presented in Table~\ref{tab:ica_mad_moc_ttest_results}.
 \begin{table}[h]
 \centering
@@ -58,10 +57,10 @@ Element & \multicolumn{2}{c}{ICA} & \multicolumn{2}{c}{MOC} \\
 \label{tab:ica_mad_moc_ttest_results}
 \end{table}
 
-As shown in Table~\ref{tab:ica_mad_moc_ttest_results}, using MAD-based outlier removal in the ICA phase results in a significant improvement in the MOC $t$-test results for all elements except \ce{SiO2}, \ce{TiO2}, and \ce{CaO}. 
+As evident in the table, using MAD-based outlier removal in the ICA phase results in a significant improvement in the MOC $t$-test results for all elements except \ce{SiO2}, \ce{TiO2}, and \ce{CaO}. 
 This indicates that MAD-based outlier removal is effective in improving the ICA phase's performance.
-It also suggests that the ICA phase is more susceptible to outliers than the PLS1-SM phase, as the PLS1-SM phase's performance was not significantly impacted by the omission of outlier removal.
+This further reinforces that the ICA phase is more susceptible to outliers than the PLS1-SM phase.
 We will examine this further in the next experiment in Section~\ref{sec:experiment_ica_aggregated_datasets}.
 
-In Section~\ref{sec:ica_data_preprocessing}, we explained why we did not use the inverse of the IRF for weighting, based on critique from one of the original authors of \citet{cleggRecalibrationMarsScience2017}.
-Based on the fact that our ICA replica, which does not utilize the inverse of the IRF for weighting, yields results similar to the original ICA method, we concur with the original author's critique that weighting by the inverse of the IRF lacks justification.
+In Section~\ref{sec:ica_data_preprocessing}, we explained why we did not weigh by the inverse of the IRF grounded in critique from one of the original authors of \citet{cleggRecalibrationMarsScience2017}.
+Based on the fact that our ICA replica, which does not utilize the inverse of the IRF for weighing, yields results similar to the original ICA method, we concur with the original author's critique that weighting by the inverse of the IRF lacks justification.
