@@ -212,6 +212,7 @@ Model & RMSECV (avg) & RMSECV (min) & RMSEP & \# of spectra & \# outliers remove
 \subsection{Summary}\label{sec:experiments_summary}
 The experiments conducted in this section provide an assessment of the MOC pipeline's components, offering insights into their individual and collective impacts on the system's overall performance.
 
+% ----- summary of the experiments
 Firstly, our experiments demonstrated that the Median Absolute Deviation (MAD) method significantly improves the Independent Component Analysis (ICA) models' accuracy for most oxides, underscoring the critical role of outlier removal in enhancing predictive performance.
 This finding contrasts with the Partial Least Squares Regression (PLS1-SM) model, which exhibited robustness to outliers, indicating that the impact of outlier removal varies across different modeling approaches within the MOC pipeline.
 
@@ -223,34 +224,29 @@ Furthermore, we found that the XGBoost model performs exceptionally well, only b
 This suggests that gradient boosting methods, with their ability to handle complex data well, offer substantial benefits over traditional models.
 The ANN model also shows promising results, often outperforming the original MOC model, and we expect that it could perform even better with a larger training dataset.
 
+% --- key conclusions
 We can draw several key conclusions from the experiments conducted in this section regarding the limitations of the MOC pipeline components:
 
-% - Outlier detection is a less-limiting factor for PLS1-SM than for ICA, as PLS1-SM is (seemingly) more robust to outliers than ICA.
-% - Using ICA seems to less beneficial than using PLS1-SM.
-% - But PLS1-SM is analogous to ensemble models. However, the XGBoost model is also an ensemble model, and it performs better than PLS1-SM on most oxides.
-% - The ANN model performs well, but it requires a large amount of training data to perform well. We don't have enough training data to train a good ANN model, so we can't draw any conclusions about its fully realized performance.
-% - In the future, using ICA is likely not necessary (high RMSEs on both originals and replications, etc.). Perhaps using some form of dimensionality reduction could be beneficial, but ICA is not the right choice. This is evident from the fact that all other models outperform the ICA model on most oxides. Another good clue is that the SuperCam model evaluation (seen in paper "andersonPostlandingMajorElement2022") didn't even consider ICA. The point about Dimensionality reduction is also supported by PLS having it's own 'inbuilt' dimensionality reduction.
-% - The automated outlier removal process in PLS1-SM is not necessary, as it does not have a significant impact on the model's performance - given that the data is preprocessed correctly. We found that it can become necessary when location data is aggregated, but that's only for ICA. We are unclear about whether manual outlier removal would improve results.
-% - It's likely that the preprocessing steps are the least limiting factors in the MOC pipeline. The most limiting factors are likely the choice of model and the amount of training data available.
+\vspace{2mm}\noindent\textit{The choice of model and the volume of training data are paramount in influencing the pipeline's accuracy and reliability.}
 
-% Outlier removal - ingen effekt.
-% Preprocessing - stor effekt.
-% Model - stor effekt.
-
-% -> Data er veludformet. Derfor er preprocessing af high-dim, LIBS data vigtigt. Derudover skal du have en model som kan fange kompleksiteten i dataen.
-
-% - However, we did not have access to any data pre-RDR, so we can't draw any conclusions about the impact of the prior data processing steps. We found that RDR data is not sufficient to train a good model, so it's likely that the prior data processing steps are necessary. Masking and normalization seems to be the most important preprocessing steps.
-
-The choice of model and the volume of training data are paramount in influencing the pipeline's accuracy and reliability.
+\noindent
 Specifically, our findings underscore the superior robustness of PLS1-SM to outliers compared to ICA, making it a more favorable choice.
 However, the efficacy of PLS1-SM is eclipsed by ensemble models such as XGBoost, which consistently outperform PLS1-SM across a variety of oxides.
 This delineates the significance of ensemble models in enhancing predictive accuracy.
-Additionally, while Artificial Neural Networks (ANNs) demonstrate potential, their performance is critically dependent on the availability of substantial training data --- a resource presently insufficient for our purposes, thereby limiting our ability to fully assess ANNs' capabilities.
-The anticipated utility of ICA is reconsidered in light of its high Root Mean Square Errors (RMSEs) and its underperformance relative to other models, suggesting a pivot away from ICA in future iterations of the pipeline. % todo: rephrase
-Moreover, our investigation reveals that preprocessing steps, particularly automated outlier removal, do not critically impact model performance, indicating that the key to advancing the MOC pipeline lies not within preprocessing but in judicious model selection and the enhancement of the training data corpus.
-Moving forward, prioritizing the exploration of efficient ensemble models and the expansion of the training dataset emerges as a crucial strategy for overcoming the most significant barriers to reducing prediction error within the MOC pipeline.
-This is further reinforced by \cite{andersonPostlandingMajorElement2022} also did model selection for the SuperCam instrument, opting not to use the MOC pipeline.
+Additionally, while Artificial Neural Networks (ANNs) demonstrate potential, their performance is dependent on the availability of substantial training data. 
+Despite the high efforts of NASA to collect high quality data, it is a time consuming effort, and as such, the currently available data is comparatively small. 
+Therefore, our ability to fully assess the ANN's capabilities is, in part, limited by this factor.
 
+\vspace{2mm}\noindent\textit{The ICA component of the MOC pipeline is a candidate for replacement in future iterations, given its high RMSEs and poorer performance compared to other models.}
+
+\noindent
+Both the insufficiency of ICA, as well as the promising performance of gradient boosting, is further reinforced by \citet{andersonPostlandingMajorElement2022}. In their model selection for the SuperCam instrument, they did not choose to go forward with the existing MOC pipeline, favoring alternative modeling approaches instead.
+
+\vspace{2mm}\noindent\textit{Our investigation reveals that preprocessing steps, particularly automated outlier removal, do not critically impact model performance.} 
+
+\noindent
+This indicates that the key to advancing the MOC pipeline lies not within preprocessing but in judicious model selection and the enhancement of the training data corpus.
+Moving forward, prioritizing the exploration of efficient ensemble models and the expansion of the training dataset emerges as a crucial strategy for overcoming the most significant barriers to reducing prediction error within the MOC pipeline.
 
 Finally, an aspect that is out of scope for this study is the inherent limitations stemming from the calibration dataset itself.
 The fact that it was acquired on Earth and not on Mars, and that it was acquired using a different LIBS instrument than the one used on Mars, causes a misalignment between the calibration dataset and the unseen data gathered by Mars rovers.
