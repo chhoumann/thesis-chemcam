@@ -22,7 +22,7 @@ The preprocessing of the data is illustrated in Figure~\ref{fig:pls_data_preproc
 \begin{figure}
 	\centering
 	\includegraphics[width=0.175\textwidth]{images/pls_preprocessing.png}
-	\caption{The PLS1-SM data preprocessing phase in our recreation of the pipeline. The filtering and normalization steps are done independently for each oxide.}
+	\caption{The PLS1-SM data preprocessing phase in our replica of the pipeline. The filtering and normalization steps are done independently for each oxide.}
 	\label{fig:pls_data_preprocessing}
 \end{figure}
 \noindent
@@ -50,7 +50,7 @@ Finally, similar hyperparameters have been used for the PLS models as described 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.175\textwidth]{images/pls_training.png}
-	\caption{The PLS1-SM training phase in our recreation of the pipeline. This phase is repeated for each oxide's compositional range.}
+	\caption{The PLS1-SM training phase in our replica of the pipeline. This phase is repeated for each oxide's compositional range.}
 	\label{fig:pls_training}
 \end{figure}
 
@@ -70,7 +70,7 @@ If the full model predicts a concentration that falls within a blending range, t
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth]{images/pls_inference.png}
-	\caption{The PLS1-SM inference phase in our recreation of the pipeline.}
+	\caption{The PLS1-SM inference phase in our replica of the pipeline.}
 	\label{fig:pls_inference}
 \end{figure}
 
@@ -150,13 +150,13 @@ Here, the process terminates after four iterations, as the RMSE no longer improv
 
 
 \subsection{ICA}\label{sec:methodology_ica}
-The ICA phase in our pipeline can be seen in figure \ref{fig:ica_phase}.
 In this section, we delve into the differences between our pipeline and the original, and we discuss the rationale behind our choices.
+The ICA phase in our pipeline can be seen in figure \ref{fig:ica_phase}.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.2675\textwidth]{images/ica_phase.png}
-	\caption{The ICA phase in our recreation of the pipeline.}
+	\caption{The ICA phase in our replica of the pipeline.}
 	\label{fig:ica_phase}
 \end{figure}
 
@@ -164,13 +164,13 @@ In this section, we delve into the differences between our pipeline and the orig
 For ICA, the first five shots are removed from the data.
 We then apply masking to the data by zeroing out the same regions as in the PLS1-SM phase.
 Afterwards, we transform all negative values into zeros.
-Then we normalize the data using Norm1 and Norm3.
+Then we normalize the data using Norm 1 and Norm 3.
 
 In contrast to \citet{cleggRecalibrationMarsScience2017} however, we do not weigh by the inverse of the instrument response function (IRF) before normalizing.
 The purpose of the IRF is to calibrate the measured signal to physical units since different pixels have different sensitivities\cite{wiensChemcam2012}.
 One argument for inverting the IRF is that it introduces more noise in areas of interest on the spectrum by multiplying with a high value as part of the conversion to physical units.
 However, during a conversation with one of the original authors of \citet{cleggRecalibrationMarsScience2017}, criticism was raised against this.
-Specifically, the author pointed out that weighing by the inverse of the discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
+Specifically, the author pointed out that weighing by the inverse of the IRF discards the alignment between the spectral data collected by the instrument in Los Alamos and the spectral data collected by the instrument on Mars.
 If the same instrument were used for all analyses, one could argue that the IRF (apart from the inverse square law correction) part is irrelevant, but that is not the case here; there are two different instruments --- one in Los Alamos and one on Mars.
 Based on these considerations, we have decided to not weigh by the inverse of the IRF.
 
@@ -180,17 +180,13 @@ Nevertheless, to avoid deviating significantly from \citet{cleggRecalibrationMar
 Our goal is to test each of the components of the pipeline individually rather than trying to reproduce the results to absolute perfection.
 
 Similarly, in our replica of the pipeline, we have not incorporated outlier detection in the ICA part of the pipeline primarily because \citet{cleggRecalibrationMarsScience2017} does not describe their implementation sufficiently enough for replication without unsubstantiated assumptions.
-They mention the use of Median Absolute Deviation for this purpose, but the specifics of their approach remain unclear.
+They mention the use of Median Absolute Deviation (MAD) for this purpose, but the specifics of their approach remain unclear.
 Our decision to omit outlier detection in the ICA phase of our pipeline is also influenced by a preference for retaining a more comprehensive dataset, despite the potential inclusion of outliers.
 Further supporting this decision is input from one of the original authors involved in the ChemCam project.
 This author highlighted the extensive efforts invested in developing the ChemCam calibration dataset, suggesting a low presence of significant outliers.
 While it would be ideal to include outlier detection in the ICA phase to ensure alignment with the original pipeline, implementing it based on substantial assumptions would be counterproductive, potentially compromising the integrity of our analysis.
 
-After examining the results in Section~\ref{sec:results}, we discuss the implications of these design choices in Section~\ref{sec:discussion}.
-
-%%% FIX THIS
-
-\subsubsection{Joint Approximate Diagonalization of Eigenmatrices (JADE) and Regression}
+\subsubsection{Joint Approximate Diagonalization of Eigenmatrices and Regression}
 After preprocessing the data, we are ready to perform ICA.
 This is done using the Joint Approximate Diagonalization of Eigenmatrices (JADE) algorithm, which is used to calculate the mixing matrix.
 This mixing matrix is an $N \times M$ matrix, where $N$ is the number of samples and $M$ is the number of independent components.
@@ -205,20 +201,20 @@ This gives us a matrix of ICA scores that we then use for regression.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth]{images/ica_regression.png}
-	\caption{Regression in the ICA phase of our recreation of the pipeline.}
+	\caption{Regression in the ICA phase of our replica of the pipeline.}
 	\label{fig:ica_regression}
 \end{figure}
 
-The regression process is illustrated in figure \ref{fig:ica_regression}.
-\citet{cleggRecalibrationMarsScience2017} perform four more types of regression in addition to linear regression, namely parabolic, exponential, geometric and logsquare.
+The regression process is illustrated in Figure~\ref{fig:ica_regression}.
+\citet{cleggRecalibrationMarsScience2017} perform five types of regression: linear, parabolic, exponential, geometric, and logsquare.
 For each oxide, they used the type of regression and normalization that produced the best results.
 
-We use Linear Regression for all oxides and instead transform the data to fit the model similar to \citet{kuo_detecting_2018}.
+We use linear regression for all oxides and instead transform the data to fit the model similar to \citet{kuo_detecting_2018}.
 Initially, it might appear limiting, but by applying transformations to the features --— for example by taking logs, square roots, etc. --- it's possible to achieve an almost linear relationship with the target variable.
 
 \subsection{MOC}\label{sec:methodology_moc}
-As described in section \ref{sec:moc_derivation}, the result of the PLS1-SM and ICA are combined to produce the final MOC model, which weights the results of the two techniques in favor of the one that performs best for each oxide.
-The specific weights used for each oxide can be seen in table \ref{tab:weighted_sum_oxide}.
+As described in Section~\ref{sec:moc_derivation}, the result of the PLS1-SM and ICA are combined to produce the final MOC model, which weights the results of the two techniques in favor of the one that performs best for each oxide.
+The specific weights used for each oxide can be seen in Table~\ref{tab:weighted_sum_oxide}.
 
 \begin{table}[h]
 \centering
