@@ -8,7 +8,7 @@ This will also provide insights into the robustness of the ICA phase against out
 We experimented with applying MAD-based outlier removal at different stages of the ICA phase.
 The results presented in Table~\ref{tab:ica_mad_rmses} are the best results we obtained from these experiments, which were achieved by applying MAD-based outlier removal before masking and normalization in the preprocessing phase.
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \begin{tabular}{lll}
 \hline
@@ -36,7 +36,7 @@ This indicates that PLS is more robust to outliers than ICA.
 
 Given these results, we decided to recalculate the MOC $t$-test results given the improved RMSEs from the ICA phase with MAD-based outlier removal.
 The results, along with the previous $t$-test values for comparison, are presented in Table~\ref{tab:ica_mad_moc_ttest_results}.
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \begin{tabular}{lllll}
 \hline
