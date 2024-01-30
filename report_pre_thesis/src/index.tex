@@ -1,14 +1,21 @@
 \begin{abstract}
+\linenumbers
 The Mars Science Laboratory's Curiosity rover has been instrumental in studying Mars' geology and potential habitability through its ChemCam instrument, which uses Laser-Induced Breakdown Spectroscopy (LIBS) for elemental quantification.
 However, the computational interpretation of LIBS data faces challenges such as multicollinearity and matrix effects, complicating the accurate prediction of elemental compositions.
 This study aims to scrutinize the limitations of the existing Multivariate Oxide Composition (MOC) model, used for predicting major oxides in Martian geological samples based on Earth-based calibration data.
-We propose ...
 Enhancing the MOC model's predictive accuracy could significantly advance the scientific objectives of the Mars Science Laboratory mission by providing more precise insights into Martian geology and habitability.
+We develop a replica of the MOC model to facilitate experimental evaluation of the model's components.
+Through a series of experiments, we identify limitations in the model's ability to handle data variability and predict elemental compositions.
+We show that other models based Neural Networks and Gradient Tree Boosting can significantly outperform the MOC model.
+Lastly, we propose recommendations for future work, including exploration of alternative model architectures and advanced preprocessing techniques.
 \end{abstract}
 
 \maketitle
-% Acknowledgments
-% - Acknowledge any contributions, support, or guidance from individuals, organizations, or institutions.
+\begin{linenumbers}
+
+\subsubsection*{Acknowledgements:} We would like to thank our supervisors Daniele Dell'Aglio and Matteo Lissandrini for their guidance and support throughout this project.
+We also thank our co-supervisor Jens Frydenvang for his guidance as a domain expert from the ChemCam team, as well as volunteering his time to provide feedback on our work.
+
 
 \input{sections/introduction.tex}
 \input{sections/background.tex}
