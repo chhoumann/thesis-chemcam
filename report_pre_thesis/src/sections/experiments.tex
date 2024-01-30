@@ -75,20 +75,26 @@ If the p-values obtained from our $t$-tests are less than 5\% (\(p < 0.05\)), we
 Conversely, if the p-value is greater than or equal to 5\% (\(p \geq 0.05\)), we fail to reject the null hypothesis, suggesting that our models and the original models are statistically similar, thereby achieving our goal of demonstrating equivalence rather than disparity.
 
 Following the approach delineated in \citet{andersonImprovedAccuracyQuantitative2017}, we start by calculating the uncertainty of the RMSE values, $S_{RMSE}^2$:
+
 $$
 S_{\text{RMSE}}^2 = \left(\frac{\text{RMSE}^2}{n}\right) \left[n - 1 - \frac{2\Gamma^2\left(\frac{n}{2}\right)}{\Gamma^2\left(\frac{n - 1}{2}\right)}\right], \\
 $$
+
 where $n$ is the number of samples, and $\Gamma$ is the gamma function. 
 This formula captures the variance of the RMSE, reflecting the dispersion of error magnitudes.
 Subsequently, the t-statistic $t$ is calculated to evaluate the statistical significance of the difference between the RMSEs of the original and replicated models:
+
 $$
 t = \frac{\text{RMSE}_A - \text{RMSE}_B}{\sqrt{S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2}},
 $$
+
 where $\text{RMSE}_A$ and $\text{RMSE}_B$ correspond to the RMSE values of the original and replicated models, respectively.
 The degrees of freedom $f$ associated with this comparison are determined by:
+
 $$
 f = \frac{\left(S_{\text{RMSE}_A}^2 + S_{\text{RMSE}_B}^2\right)^2}{\frac{S^4_{\text{RMSE}_A}}{n_A - 1} + \frac{S^4_{\text{RMSE}_B}}{n_B - 1}},
 $$
+
 which accounts for the variances in RMSE values and the respective sample sizes ($n_A$ and $n_B$) of the models being compared.
 Finally, the p-value is derived from the $t$-distribution's cumulative distribution function:
 % Note to selves:
@@ -99,7 +105,11 @@ Finally, the p-value is derived from the $t$-distribution's cumulative distribut
 % where t_value is the t-statistic and degrees_of_freedom is the degrees of freedom.
 % But you could use: p_value = 2 * ( 1 - stats.t.cdf(abs(t_value), degrees_of_freedom))
 % Just as well.
-$$p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)$$
+
+$$
+p\text{-value} = 2 \times \left(1 - F_{\text{T}}(|t|)\right)
+$$
+
 where $F_{\text{T}}$ is the cumulative distribution function of the t-distribution with $f$ degrees of freedom.
 Higher p-values indicate greater compatibility with the null hypothesis.
 We present the results of our $t$-tests in Table~\ref{table:results_ttests}.
