@@ -21,7 +21,7 @@ The CCS data format is a table of intensity values for each wavelength, with eac
 We give a more detailed description of the CCS data format in Section \ref{sec:data_overview} where we also describe the ChemCam calibration dataset as a whole.
 
 \subsubsection{Multivariate Oxide Composition Derivation}\label{sec:moc_derivation}
-The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Submodels (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
+The multivariate analysis adopts a hybrid methodology, blending Partial Least Squares Regression with Sub-models (PLS-SM) and Independent Component Analysis (ICA) to calculate the Multivariate Oxide Composition (MOC).
 The outcomes of these two techniques are merged using a weighted average for each oxide, with the weighting skewed in favor of the technique that demonstrates superior performance for the specific oxide.
 The PLS-SM approach utilizes tailored sub-models that specialize in targeting distinct composition ranges, along with a comprehensive full model used for initial composition estimation.
 Independent Component Analysis assists in distinguishing elemental emission lines, contributing to a refined multivariate model.
@@ -67,7 +67,7 @@ The fit of model for the $i$th observation is then computed by taking the residu
 Outlier removal is performed iteratively; an initial PLS model is conceived with cross-validation to determine the optimum number of latent variables, followed by an inspection of the influence plot to pinpoint outliers. Identified outliers are removed, and the model is re-evaluated. This procedure is repeated as needed, ensuring that any removals do not degrade the model's general performance.
 
 
-\subsubsection{Partial Least Squares Sub-Models}\label{sec:pls_submodels}
+\subsubsection{Partial Least Squares Sub-Models}\label{sec:pls_sub-models}
 
 \citet{andersonImprovedAccuracyQuantitative2017} proposed an approach referred to as the Partial Least Squares Sub-Models (PLS1-SM).
 The inherent variability of LIBS spectral responses to different element concentrations necessitates a nuanced analysis.
