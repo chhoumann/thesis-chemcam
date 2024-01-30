@@ -1,35 +1,36 @@
 \section{Related work}\label{sec:related_works}
-In this section, we explore a broad spectrum of quantitative analysis methods, emphasizing their application and potential in LIBS spectra analysis. Our review spans a variety of papers, covering established statistical techniques, machine learning approaches, and methods like XGBoost. This selection of papers reflects the current state of the field and also points to novel directions for future research.
+In this section, we explore a broad spectrum of quantitative analysis methods, emphasizing their application and potential in LIBS spectra analysis. Our review spans a variety of papers, covering established statistical techniques, machine learning approaches and methods. This selection of papers reflects the current state of the field and also points to novel directions for future research.
 
 \citeauthor{takahashi_quantitative_2017} evaluated methods for correcting matrix effects and self-absorption in the quantitative analysis of solid compositions via LIBS.
 They found that while traditional calibration methods for LIBS face challenges with complex in-situ samples, Calibration-Free Laser-Induced Breakdown Spectroscopy (CF-LIBS), despite its advantage of not requiring calibration standards, is limited by the need for prior sample knowledge\cite{hu_review_2022}
-Multivariate analysis techniques like PCR and PLS handle matrix effects well but struggle with non-linearities like self-absorption.
-Despite limited research into the use of ANNs for quantitative analysis of solid samples, they found that ANN showed potential to overcome these issues because ANNs are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.
+Multivariate analysis techniques like Principal Component Regression (PCR) and PLS handle matrix effects well but struggle with non-linearities like self-absorption.
+Despite limited research into the use of ANNs for quantitative analysis of solid samples, they found that ANNs showed potential to overcome these issues because ANNs are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.
 However, ANNs are limited by the need for a large number of training samples.
-They conclude that simpler matrices favor theory-based methods, and more complex samples benefit from flexible statistical approaches, with computational advancements promising further improvements in LIBS analysis\cite{takahashi_quantitative_2017}.
-While this study applies ANNs to tackle LIBS data non-linearities, our research is oriented towards identifying which components in the MOC model most significantly influence the overall error. Although our methodologies differ, insights from the ANN approach could inform our series of experiments, potentially guiding us in identifying critical components in our model.
+They conclude that simpler matrices favor theory-based methods, and more complex samples benefit from flexible statistical approaches, with computational advancements promising further improvements in LIBS \\analysis\cite{takahashi_quantitative_2017}.
+While this study applies ANNs to tackle LIBS data non-linearities, our research is oriented towards identifying which components in the MOC model most significantly influence the overall error. Although our methodologies differ, insights from the ANN approach has informed our experiments, helping us identify opportunities for improved accuracy and robustness.
 
-\citeauthor{lepore_quantitative_2022} examine how dividing LIBS spectra into submodels, as presented in \citet{andersonImprovedAccuracyQuantitative2017}, impacts the prediction of major element compositions.
-Their findings suggest that while submodeling shows promise, using the entire spectrum often yields lower Root Mean Square Errors of Prediction (RMSE-P). 
+\citeauthor{lepore_quantitative_2022} examine how dividing LIBS spectra into sub-models, as presented by \citet{andersonImprovedAccuracyQuantitative2017}, impacts the prediction of major element compositions.
+Their findings suggest that while sub-modeling shows promise, using the entire spectrum often yields lower Root Mean Square Errors of Prediction (RMSEP). 
 This indicates that a more comprehensive dataset typically leads to more accurate geochemical analysis\cite{lepore_quantitative_2022}.
-The insights from this study are informative for our project, as they offer useful considerations and approaches for identifying the components of the MOC model that most significantly impact the overall error.
+The insights from this study are informative for our project, as they offer useful considerations and approaches for identifying the components of the MOC model that significantly impact the overall error.
 
-\citeauthor{bai_application_2023} explored elastic net regression for analyzing Mars-analog LIBS data - specifically, Earth-based samples crafted to simulate Martian geological conditions - and demonstrated that it efficiently balances feature selection with model stability.
+\citeauthor{bai_application_2023} explored elastic net regression for analyzing Mars-analog LIBS data --- specifically, Earth-based samples crafted to simulate Martian geological conditions --- and demonstrated that it efficiently balances feature selection with model stability.
 This technique was proficient in detecting relevant spectral lines, which is crucial for interpreting multivariate data.
-The elastic net model was trained with three normalization methods: Norm 1 and Norm 3, which are described in section \ref{sec:background}, and Standard Normal Variate. Their findings suggest Norm 3 as the optimal normalization technique for this context.
-The elastic net provided reliable SiO2 estimates in Martian soil analogs, often aligning closely with or surpassing traditional ChemCam team models.
+The elastic net model was trained with three normalization methods: Norm 1 and Norm 3, which are described in Section~\ref{sec:background}, as well as Standard Normal Variate. 
+Their findings suggest Norm 3 as the optimal normalization technique for this context.
+The elastic net provided reliable \ce{SiO2} estimates in Martian soil analogs, often aligning closely with or surpassing the original ChemCam models.
 Across a vast dataset of over 23,000 Mars spectra, the elastic net showed strong correlations with established models, though some challenges in iron oxide predictions were noted\cite{bai_application_2023}.
-The examination of elastic net regression for Mars-analog LIBS data offers valuable perspectives on feature selection and model stability, essential for interpreting multivariate Martian data. Their findings, particularly on optimal normalization techniques and model performance across a large dataset, provide a comparative framework for our experiments.
+The examination of elastic net regression for Mars-analog LIBS data offers valuable perspectives on feature selection and model stability, essential for interpreting multivariate Martian LIBS data. Their findings, particularly on optimal normalization techniques and model performance across a large dataset, provide a comparative framework for our experiments.
 
 \citeauthor{dyar_effect_2021} found that accuracy in geochemical quantification with LIBS improves as the training set size increases, specifically a minimum of 31\% improvement for 65 elements.
 They highlighted that a larger training set more significantly influences accuracy than spectral resolution or detector sensitivity.
-They concluded that Root Mean Square Error of Prediction (RMSE-P) is the most accurate measure for large datasets, while Root Mean Square Error of Cross Validation  (RMSE-CV) is better than Root Mean Square Error of Calibration (RMSE-C), especially for smaller datasets where holding out a test set is impractical.
+They concluded that RMSEP is the most accurate measure for large datasets, while Root Mean Square Error of Cross Validation (RMSECV) is better than Root Mean Square Error of Calibration (RMSEC), especially for smaller datasets where holding out a test set is impractical.
 The research suggests a balance between dataset size and practicality, indicating that while more data improves accuracy, the returns diminish against the costs of data acquisition\cite{dyar_effect_2021}.
-The research on the effect of training set size offers relevant considerations for our work. Their analysis of different error metrics for varying dataset sizes provides a good framework when analyzing the balance between data quantity and model structure in our efforts to minimize overall error
+The research on the effect of training set size offers relevant considerations for our work. Their analysis of different error metrics for varying dataset sizes provides a good framework when analyzing the balance between data quantity and model structure in our efforts to minimize overall error.
 
-\citeauthor{castorena_deep_2021} developed a deep spectral convolutional neural network (CNN) for processing and analyzing laser-induced breakdown spectroscopy (LIBS) signals.
+\citeauthor{castorena_deep_2021} developed a deep spectral Convolutional Neural Network (CNN) for processing and analyzing LIBS signals.
 Their CNN is designed to first remove uncertainties from sensor data and then assess the chemical content qualitatively and quantitatively from a sample's LIBS signal.
-Their experiments showed that their method surpasses existing ones used by the Mars Science Laboratory for pre-processing and calibration.
+Their experiments showed that their method surpasses existing ones used by MSL for preprocessing and calibration.
 Notably, their CNN operates in real-time and does not require additional information like dark current, system response, temperature, or range.
 For chemical content estimation, their CNN matches current techniques' performance and even exceeds them when utilizing an end-to-end learning approach, all the while reducing prior information requirements and being ready for immediate deployment\cite{castorena_deep_2021}.
 Their development of a deep spectral CNN for analyzing LIBS signals showcases an innovative method that excels in real-time operation and minimal data dependency. Their method's ability to operate in real-time and with reduced data dependency provides a compelling framework for future considerations in our work, especially when evaluating the balance between model complexity and operational efficiency in reducing overall error.
@@ -38,4 +39,6 @@ In their work, \citeauthor{chen_xgboost_2016} presented the development of XGBoo
 XGBoost is unique due to its algorithm, designed for sparse data handling, and its implementation of a weighted quantile sketch for approximate tree learning.
 XGBoost's robust performance, evidenced by its predominant use in winning solutions of various Kaggle challenges, highlights its effectiveness in creating accurate models.
 The authors' use of cache optimization, data compression, and sharding techniques further contributes to the system's enhanced scalability and resource efficiency\cite{chen_xgboost_2016}.
-XGBoost's efficacy in managing sparse data provides a useful insights for our work, particularly given the constraints of limited training data. Their approach could guide the design of our experiments, and potentially reveal new approaches that could be adopted in the current MOC model to enhance its' accuracy and robustness.
+Given that XGBoost allows for the use of various loss functions, including regression, classification, and ranking, it was a promising candidate for our experiments.
+During the SuperCam model evaluation, the SuperCam team evaluated Gradient Boosting Regression (GBR) as a potential suitable model, and found that it performed well in predicting major oxides\cite{andersonPostlandingMajorElement2022}.
+For this reason, we chose to include XGBoost in our experiments, as it is a popular and effective implementation of GBR.
