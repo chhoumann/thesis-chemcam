@@ -121,7 +121,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
 def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     models = {}
-    experiment_id = "619103318265414997"
+    experiment_id = "627022602655107420"
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
     for _, run in runs.iterrows():
@@ -192,7 +192,10 @@ def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     for oxide, pred in oxide_preds.items():
         target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
 
-    target_predictions.to_csv("./data/data/jade/ica/tar_pred.csv")
+    tar_pred_path = Path("./data/data/jade/ica/tar_pred.csv")
+    target_predictions.to_csv(tar_pred_path)
+    mlflow.log_artifact(str(tar_pred_path))
+    mlflow.log_table(target_predictions, "target_predictions")
 
 
 def main():
