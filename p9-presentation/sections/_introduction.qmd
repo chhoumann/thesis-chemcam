@@ -35,12 +35,12 @@ Presenter: Patrick Frostholm Østergaard.
 
 :::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
-![Viking Lander](static/introduction/viking-lander.jpg){width="60%" height="60%"}
+::: {.fragment .fade-up fragment-index=1 style="border-radius: 10px;"}
+![Viking Lander](static/introduction/viking-lander.jpg){width="60%" height="60%" .rounded-fig}
 :::
 
 ::: {.fragment .fade-up fragment-index=4}
-![Mars Science Laboratory Curiosity Rover](static/introduction/msl.jpg){width="75%" height="75%"}
+![Mars Science Laboratory Curiosity Rover](static/introduction/msl.jpg){width="75%" height="75%" .rounded-fig}
 :::
 
 ::::
