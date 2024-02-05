@@ -6,11 +6,15 @@ date: 2024-02-13
 date-format: "D MMM YYYY"
 slide-number: true
 bibliography: static/references.bib
-format: 
+format:
     revealjs:
-        theme: default
+        theme: serif
+        progress: true
         toc: true
         css: styles.css
+        transition: slide
+        transition-speed: fast
+        auto-animate-duration: 0.5
 ---
 
 # Introduction
