@@ -1,0 +1,9 @@
+project:
+    title: "P9 Presentation"
+    output-dir: publish
+    type: website
+    preview:
+        watch-inputs: true
+        browser: false
+        port: 6060
+        navigate: true
