@@ -109,19 +109,115 @@ Following this, we have decided to replicate and improve upon their work.
 
 ::: {.notes}
 The model currently used by the ChemCam team is the Multivariate Oxide Composition (MOC) model, illustrated in the figure on the right.
+
 The MOC model is trained on a calibration dataset of clean, calibrated spectra (CCS), which I will give an overview of in a moment.
 When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample.
 Christian will elaborate on how exactly the MOC model works later in the presentation.
 
 Our goal is to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$, as defined by the root mean squared error (RMSE).
 We do this through a series of experiments, which Ivik will explain in more detail later in the presentation.
-By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.
 
+By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.
 This is the focus of our pre-thesis project, and we will present our findings in this presentation and talk about our plans for the thesis project next semester.
 :::
 
 
 ## Related Work
 
-## Data Overview
+## Calibration Data {.smaller}
+
+::::: {.columns}
+
+::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+- 408 pressed powder samples
+- 5 locations per sample
+- 50 shots location
+:::
+
+::: {.fragment .fade-up fragment-index=2}
+- CCS: 3 spectrometers
+:::
+::: {.fragment .fade-up}
+- Masked regions:
+	- 240.811 — 246.635 nm
+	- 338.457 — 340.797 nm
+	- 382.138 — 387.859 nm
+	- 473.184 — 492.427 nm
+	- 849 — 905.574 nm
+:::
+
+:::
+
+::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+![](static/introduction/folder-structure.png){width="35%" height="35%" fig-align="center"}
+:::
+
+::: {.fragment .fade-up fragment-index=2}
+![](static/introduction/spectrum.png)
+:::
+
+:::
+
+::::
+
+::: {.notes}
+The calibration dataset consists of 408 pressed powder samples.
+Each sample was shot at 5 different locations, and 50 shots were taken at each location.
+
+The data is grouped into folders where each folder corresponds to a sample.
+Each folder contains a .csv file for each location, and each .csv file contains the spectra for the 3 spectrometers.
+This is what we refer to as the CCS data.
+
+An example of a spectrum is shown in the figure on the right.
+The x-axis represents the wavelength, and the y-axis represents the intensity of the light at each wavelength.
+
+As you can see, there are some regions of the spectrum that are masked out.
+These regions are at the edges of each of the spectrometers' ranges and are not used in the analysis because they are noisy and not very informative.
+We will talk more about the preprocessing of the CCS data later in the presentation.
+:::
+
+## Composition Data {.smaller}
 - 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, $\text{K}_2\text{O}$
+
+- For each sample, we know the composition weight percentage (wt. %)
+
+::: {.fragment .fade-up}
+- Composition data is used to train the MOC model
+
+::: {style="font-size: 0.5em;"}
+| Target | Spectrum Name | Sample Name | SiO2 | TiO2 | Al2O3 | FeOT | MnO | MgO | CaO | Na2O | K2O | MOC total |
+|--------|---------------|-------------|------|------|-------|------|-----|-----|-----|------|-----|-----------|
+| AGV2   | AGV2          | AGV2        | 59.3 | 1.05 | 16.91 | 6.02 | 0.099 | 1.79 | 5.2 | 4.19 | 2.88 | 97.44 |
+| BCR-2  | BCR2          | BCR2        | 54.1 | 2.26 | 13.5 | 12.42 | 0.2 | 3.59 | 7.12 | 3.16 | 1.79 | 98.14 |
+| ...    | ...           | ...         | ...  | ...  | ...   | ...  | ... | ... | ... | ...  | ... | ...     |
+| TB     | ---           | ---         | 60.23 | 0.93 | 20.64 | 11.6387 | 0.052 | 1.93 | 0.000031 | 1.32 | 3.87 | 100.610731 |
+| TB2    | ---           | ---         | 60.4 | 0.93 | 20.5 | 11.6536 | 0.047 | 1.86 | 0.2 | 1.29 | 3.86 | 100.7406 |
+:::
+:::
+
+::: {.fragment .fade-up}
+![](static/introduction/oxide_corr.png){width="60%" height="60%" fig-align="center"}
+:::
+
+::: {.notes}
+The composition data is our ground truth.
+It contains 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, and $\text{K}_2\text{O}$.
+For each sample, we know the composition weight percentage (wt. %) of each of these oxides.
+
+This data is used to train the MOC model.
+This table here shows an excerpt of the composition data for a few samples.
+You can see that for each sample, we have the target, the spectrum name, the sample name, and the weight percentage of each of the oxides.
+The last column is the total weight percentage of the oxides, which should in theory sum to 100%.
+However, as you can see, the sum is not always exactly 100%, which is due to the presence of other elements in the samples that are not considered major oxides.
+In the last row, you can see that the sum is actually greater than 100%, which is a physical impossibility.
+
+This figure here shows the correlation between the different oxides as a heatmap.
+The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.
+For example, $\text{SiO}_2$ and $\text{CaO}$ are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases.
+
+This is the data that we use to train our models, which Christian will talk about next.
+:::
