@@ -10,6 +10,7 @@ on:
 
 jobs:
     build-and-publish:
+        
         runs-on: ubuntu-latest
 
         steps:
@@ -34,9 +35,11 @@ jobs:
                   git reset --hard origin/main
 
             - name: Render with Quarto
+              working-directory: p9-presentation
               run: quarto render
 
             - name: Commit and push
+              working-directory: p9-presentation
               run: |
                   git add -f publish
                   git commit -m "Update Quarto render" || echo "No changes to commit"
