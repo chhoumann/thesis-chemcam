@@ -10,6 +10,7 @@
 figcaption {
     margin: auto;
     text-align: center;
+    font-style: italic;
 }
 
 .rounded-fig {
