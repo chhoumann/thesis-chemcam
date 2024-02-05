@@ -1,1 +1,61 @@
 Presenter: Patrick Frostholm Østergaard.
+
+## The Early Days of Mars Exploration {.smaller transition="slide-in fade-out"}
+
+
+::::: {.columns style="display: flex !important; height: 90%;"}
+
+:::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+- 1970s: Viking missions
+	- *"Is there life on Mars?"*
+:::
+
+::: {.fragment .fade-up}
+- Inconclusive results...
+:::
+
+::::
+
+:::: {.column width="50%" style="display: flex; justify-content: center; align-items: center;"}
+
+::: {.fragment .fade-up fragment-index=1}
+![Viking Lander](static/introduction/viking-lander.jpg)
+:::
+
+::::
+
+:::::
+
+::: {.notes}
+In the 1970s, the Viking missions were the first to land on Mars.
+Goal: Is there life on Mars?
+
+Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
+:::
+
+## The Early Days of Mars Exploration {.smaller transition="fade-in slide-out"}
+- 1990s: Philosophical shift
+	- *"Did Mars ever have the conditions to support life as we know it?"*
+
+::: {.fragment .fade-up}
+- August 2012: Mars Science Laboratory (MSL) mission
+	- Curiosity rover
+
+![](static/introduction/msl.jpg){height=50% width=50% fig-align="center"}
+:::
+
+
+::: {.notes}
+1990s: Philosophical shift in the scientific community.
+The focus shifted from "Is there life on Mars?" to "Did Mars ever have the conditions to support life as we know it?"
+
+August 2012: The Mars Science Laboratory (MSL) mission lands the Curiosity rover on Mars.
+:::
+
+## Problem Definition
+
+## Related Work
+
+## Data Overview
