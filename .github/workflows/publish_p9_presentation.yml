@@ -1,4 +1,4 @@
-name: Quarto Publish
+name: Quarto Publish P9 Presentation
 
 on:
     push:
