@@ -6,3 +6,8 @@
 .reveal-full-page {
     --r-background-color: #fefefe;
 }
+
+figcaption {
+    margin: auto;
+    text-align: center;
+}
