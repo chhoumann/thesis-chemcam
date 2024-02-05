@@ -3,7 +3,7 @@ Presenter: Patrick Frostholm Østergaard.
 ## The Early Days of Mars Exploration {.smaller transition="slide-in fade-out"}
 
 
-::::: {.columns style="display: flex !important; height: 90%;"}
+::::: {.columns}
 
 :::: {.column width="50%"}
 
@@ -12,16 +12,35 @@ Presenter: Patrick Frostholm Østergaard.
 	- *"Is there life on Mars?"*
 :::
 
-::: {.fragment .fade-up}
-- Inconclusive results...
+::: {.fragment .fade-up fragment-index=2}
+- Positive but inconclusive results...
 :::
+
+::: {.fragment .fade-up fragment-index=3}
+- 1990s: Philosophical shift
+	- *"Did Mars ever have the conditions to support life as we know it?"*
+:::
+
+::: {.fragment .fade-up fragment-index=4}
+- August 2012: Mars Science Laboratory (MSL) mission
+	- Curiosity rover
+:::
+
+::: {.fragment .fade-up fragment-index=5}
+- ChemCam: **L**aser-**i**nduced **b**reakdown **s**pectroscopy (*LIBS*) instrument
+:::
+
 
 ::::
 
-:::: {.column width="50%" style="display: flex; justify-content: center; align-items: center;"}
+:::: {.column width="50%"}
 
 ::: {.fragment .fade-up fragment-index=1}
-![Viking Lander](static/introduction/viking-lander.jpg)
+![Viking Lander](static/introduction/viking-lander.jpg){width="60%" height="60%"}
+:::
+
+::: {.fragment .fade-up fragment-index=4}
+![Mars Science Laboratory](static/introduction/msl.jpg){width="60%" height="60%"}
 :::
 
 ::::
@@ -33,26 +52,18 @@ In the 1970s, the Viking missions were the first to land on Mars.
 Goal: Is there life on Mars?
 
 Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
-:::
 
-## The Early Days of Mars Exploration {.smaller transition="fade-in slide-out"}
-- 1990s: Philosophical shift
-	- *"Did Mars ever have the conditions to support life as we know it?"*
-
-::: {.fragment .fade-up}
-- August 2012: Mars Science Laboratory (MSL) mission
-	- Curiosity rover
-
-![](static/introduction/msl.jpg){height=50% width=50% fig-align="center"}
-:::
-
-
-::: {.notes}
 1990s: Philosophical shift in the scientific community.
 The focus shifted from "Is there life on Mars?" to "Did Mars ever have the conditions to support life as we know it?"
 
 August 2012: The Mars Science Laboratory (MSL) mission lands the Curiosity rover on Mars.
+Rover is equipped with a suite of instruments to study the Martian climate and geology to search for organic material.
+
+One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.
+ChemCam is used to study the composition of the Martian surface and to search for organic material.
+This requires the development of machine learning algorithms to analyze the data, which is the focus of this thesis.
 :::
+
 
 ## Problem Definition
 
