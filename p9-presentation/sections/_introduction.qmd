@@ -40,7 +40,7 @@ Presenter: Patrick Frostholm Østergaard.
 :::
 
 ::: {.fragment .fade-up fragment-index=4}
-![Mars Science Laboratory](static/introduction/msl.jpg){width="60%" height="60%"}
+![Mars Science Laboratory Curiosity Rover](static/introduction/msl.jpg){width="75%" height="75%"}
 :::
 
 ::::
@@ -64,13 +64,64 @@ ChemCam is used to study the composition of the Martian surface and to search fo
 This requires the development of machine learning models to analyze the data, which is the focus of this presentation.
 
 NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.
-Our goal is to replicate and improve upon their work.
+We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the models are far from perfect and that there is room for improvement.
+Following this, we have decided to replicate and improve upon their work.
 :::
 
 
 ## Problem Definition {.smaller}
-*"In this work, we aim to solve the problem of identifying issues within the components of the current Multivariate Oxide Composition (MOC) model that limit its predictive accuracy and robustness. Following this, we will propose improvements to the model’s components that addresses these issues, thereby enhancing its overall accuracy and robustness."*
+
+::::: {.columns style='display: flex !important; height: 70%;'}
+
+::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+- Current model: **M**ultivariate **O**xide **C**omposition (*MOC*)
+:::
+
+::: {.fragment .fade-up}
+- Predicts composition from **C**lean, **c**alibrated **s**pectra (*CCS*)
+:::
+
+::: {.fragment .fade-up}
+- **Goal**: Identify components contributing most to error $E(M)$ as defined by RMSE
+:::
+
+::: {.fragment .fade-up}
+- **Method**: Replicate MOC model and perform experiments
+:::
+
+:::
+
+::: {.column width="50%" style='display: flex; justify-content: center; align-items: center;'}
+::: {.fragment .fade-up fragment-index=1}
+![](static/introduction/pipeline.png){width="65%" height="65%"}
+:::
+:::
+
+::::
+
+::: {.fragment .fade-up}
+::: {style="border: 2px solid black; padding: 0px 15px;"}
+**Problem**: Given a series of experiments and the resulting models, identify the components that acontribute the most to the overall error $E(M)$.
+:::
+:::
+
+::: {.notes}
+The model currently used by the ChemCam team is the Multivariate Oxide Composition (MOC) model, illustrated in the figure on the right.
+The MOC model is trained on a calibration dataset of clean, calibrated spectra (CCS), which I will give an overview of in a moment.
+When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample.
+Christian will elaborate on how exactly the MOC model works later in the presentation.
+
+Our goal is to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$, as defined by the root mean squared error (RMSE).
+We do this through a series of experiments, which Ivik will explain in more detail later in the presentation.
+By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.
+
+This is the focus of our pre-thesis project, and we will present our findings in this presentation and talk about our plans for the thesis project next semester.
+:::
+
 
 ## Related Work
 
 ## Data Overview
+- 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, $\text{K}_2\text{O}$
