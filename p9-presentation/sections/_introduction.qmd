@@ -103,7 +103,7 @@ Following this, we have decided to replicate and improve upon their work.
 
 ::: {.fragment .fade-up}
 ::: {style="border: 2px solid black; padding: 0px 15px;"}
-**Problem**: Given a series of experiments and the resulting models, identify the components that acontribute the most to the overall error $E(M)$.
+**Problem**: Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error $E(M)$.
 :::
 :::
 
