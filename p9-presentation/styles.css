@@ -6,3 +6,13 @@
 .reveal-full-page {
     --r-background-color: #fefefe;
 }
+
+figcaption {
+    margin: auto;
+    text-align: center;
+    font-style: italic;
+}
+
+.rounded-fig {
+    border-radius: 5px;
+}
