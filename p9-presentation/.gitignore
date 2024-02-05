@@ -1,0 +1,5 @@
+/.quarto/
+venv
+
+/env/
+publish

@@ -1,0 +1,23 @@
+---
+title: "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples"
+# subtitle: ""
+author: "Christian Bager Bach Houmann<br/>Patrick Frostholm Østergaard<br/>Ivik Lau Dalgas Hostrup<br/> @ AAU"
+date: 2024-02-13
+date-format: "D MMM YYYY"
+slide-number: true
+bibliography: static/references.bib
+format: 
+    revealjs:
+        theme: default
+        toc: true
+        css: styles.css
+---
+
+# Introduction
+{{< include sections/_introduction.qmd >}}
+
+# Methodology
+{{< include sections/_methodology.qmd >}}
+
+# Experiments
+{{< include sections/_experiments.qmd >}}
