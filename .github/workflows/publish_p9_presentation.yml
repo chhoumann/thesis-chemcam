@@ -3,7 +3,7 @@ name: Quarto Publish P9 Presentation
 on:
     push:
         branches:
-            - master
+            - main
         paths:
             - 'p9-presentation/**'
     workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
               run: |
                   git fetch origin publish:refs/remotes/origin/publish
                   git checkout -b publish --track origin/publish || git checkout publish
-                  git reset --hard origin/master
+                  git reset --hard origin/main
 
             - name: Render with Quarto
               run: quarto render
