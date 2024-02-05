@@ -13,16 +13,17 @@ Presenter: Patrick Frostholm Østergaard.
 :::
 
 ::: {.fragment .fade-up fragment-index=2}
-- Positive but inconclusive results...
-:::
-
-::: {.fragment .fade-up fragment-index=3}
 - 1990s: Philosophical shift
 	- *"Did Mars ever have the conditions to support life as we know it?"*
 :::
 
+::: {.fragment .fade-up fragment-index=3}
+- 2004: Mars Exploration Rover mission
+	- Discovered evidence of water
+:::
+
 ::: {.fragment .fade-up fragment-index=4}
-- August 2012: Mars Science Laboratory (MSL) mission
+- August 2012: Mars Science Laboratory
 	- Curiosity rover
 :::
 
@@ -53,17 +54,19 @@ Goal: Is there life on Mars?
 
 Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
 
-1990s: Philosophical shift in the scientific community.
-The focus shifted from "Is there life on Mars?" to "Did Mars ever have the conditions to support life as we know it?"
+1990s: Philosophical shift within NASA: "Is there life on Mars?" to "Did Mars ever have the conditions to support life as we know it?"
+In 2004, the Mars Exploration Rover mission landed the rovers Spirit and Opportunity on Mars, which quickly discovered evidence of water on Mars.
 
-August 2012: The Mars Science Laboratory (MSL) mission lands the Curiosity rover on Mars.
-Rover is equipped with a suite of instruments to study the Martian climate and geology to search for organic material.
+A few years later in 2012, the Mars Science Laboratory (MSL) mission landed the Curiosity rover on Mars.
+Rover is equipped with a suite of instruments to study the Martian climate and geology and to search for organic material.
 
 One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.
 ChemCam is used to study the composition of the Martian surface and to search for organic material.
-This requires the development of machine learning algorithms to analyze the data, which is the focus of this thesis.
-:::
+This requires the development of machine learning models to analyze the data, which is the focus of this presentation.
 
+NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.
+Our goal is to replicate and improve upon their work.
+:::
 
 ## Problem Definition
 
