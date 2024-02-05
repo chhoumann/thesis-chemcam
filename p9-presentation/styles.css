@@ -11,3 +11,7 @@ figcaption {
     margin: auto;
     text-align: center;
 }
+
+.rounded-fig {
+    border-radius: 5px;
+}
