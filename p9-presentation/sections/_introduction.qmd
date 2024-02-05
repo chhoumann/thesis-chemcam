@@ -1,7 +1,7 @@
 Presenter: Patrick Frostholm Østergaard.
 
-## The Early Days of Mars Exploration {.smaller transition="slide-in fade-out"}
 
+## A Brief History {.smaller}
 
 ::::: {.columns}
 
@@ -30,7 +30,6 @@ Presenter: Patrick Frostholm Østergaard.
 ::: {.fragment .fade-up fragment-index=5}
 - ChemCam: **L**aser-**i**nduced **b**reakdown **s**pectroscopy (*LIBS*) instrument
 :::
-
 
 ::::
 
@@ -68,7 +67,9 @@ NASA has made most of the ChemCam calibration data publicly available, and they 
 Our goal is to replicate and improve upon their work.
 :::
 
-## Problem Definition
+
+## Problem Definition {.smaller}
+*"In this work, we aim to solve the problem of identifying issues within the components of the current Multivariate Oxide Composition (MOC) model that limit its predictive accuracy and robustness. Following this, we will propose improvements to the model’s components that addresses these issues, thereby enhancing its overall accuracy and robustness."*
 
 ## Related Work
 
