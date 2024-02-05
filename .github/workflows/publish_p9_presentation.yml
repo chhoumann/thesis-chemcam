@@ -6,6 +6,7 @@ on:
             - master
         paths:
             - 'p9-presentation/**'
+    workflow_dispatch:
 
 jobs:
     build-and-publish:
