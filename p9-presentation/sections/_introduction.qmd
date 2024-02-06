@@ -1,1 +1,275 @@
 Presenter: Patrick Frostholm Østergaard.
+
+
+## A Brief History {.smaller}
+
+::::: {.columns}
+
+:::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+- 1970s: Viking missions
+	- *"Is there life on Mars?"*
+:::
+
+::: {.fragment .fade-up fragment-index=2}
+- 1990s: Philosophical shift
+	- *"Did Mars ever have the conditions to support life as we know it?"*
+:::
+
+::: {.fragment .fade-up fragment-index=3}
+- 2004: Mars Exploration Rover mission
+	- Discovered evidence of water
+:::
+
+::: {.fragment .fade-up fragment-index=4}
+- August 2012: Mars Science Laboratory
+	- Curiosity rover
+:::
+
+::: {.fragment .fade-up fragment-index=5}
+- ChemCam: **L**aser-**i**nduced **b**reakdown **s**pectroscopy (*LIBS*) instrument
+:::
+
+::::
+
+:::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1 style="border-radius: 10px;"}
+![Viking Lander](static/introduction/viking-lander.jpg){width="60%" height="60%" .rounded-fig}
+:::
+
+::: {.fragment .fade-up fragment-index=4}
+![Mars Science Laboratory Curiosity Rover](static/introduction/msl.jpg){width="75%" height="75%" .rounded-fig}
+:::
+
+::::
+
+:::::
+
+::: {.notes}
+In the 1970s, the Viking missions were the first to land on Mars.
+Goal: Is there life on Mars?
+Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
+
+1990s: Philosophical shift within NASA: "Is there life on Mars?" to "Did Mars ever have the conditions to support life as we know it?"
+
+In 2004, the Mars Exploration Rover mission landed the rovers Spirit and Opportunity on Mars, which quickly discovered evidence of water on Mars.
+
+A few years later in 2012, the Mars Science Laboratory (MSL) mission landed the Curiosity rover on Mars.
+Rover is equipped with a suite of instruments to study the Martian climate and geology and to search for organic material.
+
+One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.
+In very simple terms, the instrument shoots a laser at a rock, and the light emitted by the rock is then captured by spectrometers as a spectrum, which can be used to determine the composition of the rock.
+This requires the development of machine learning models to analyze the data, which is the focus of this presentation.
+Specifically, this type of problem is a supervised learning, multivariate regression problem.
+It is supervised because we have labeled data, and it is multivariate because we are predicting multiple outputs.
+NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.
+We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the models are far from perfect and that there is room for improvement.
+Following this, we have decided to replicate and attempt to improve upon their work.
+:::
+
+
+## Problem Definition {.smaller}
+
+::::: {.columns style='display: flex !important; height: 70%;'}
+
+::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+- Current model: **M**ultivariate **O**xide **C**omposition (*MOC*)
+:::
+
+::: {.fragment .fade-up}
+- Predicts composition from **C**lean, **c**alibrated **s**pectra (*CCS*)
+:::
+
+::: {.fragment .fade-up}
+- **Goal**: Identify components contributing most to error $E(M)$ as defined by RMSE
+:::
+
+::: {.fragment .fade-up}
+- **Method**: Replicate MOC model and perform experiments
+:::
+
+:::
+
+::: {.column width="50%" style='display: flex; justify-content: center; align-items: center;'}
+::: {.fragment .fade-up fragment-index=1}
+![](static/introduction/pipeline.png){width="65%" height="65%"}
+:::
+:::
+
+::::
+
+::: {.fragment .fade-up}
+::: {style="border: 2px solid black; padding: 0px 15px;"}
+**Problem**: Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error $E(M)$.
+:::
+:::
+
+::: {.notes}
+The model currently used by the ChemCam team is the Multivariate Oxide Composition (MOC) model, illustrated in the figure on the right.
+
+The MOC model is trained on a calibration dataset of clean, calibrated spectra (CCS), which I will give an overview of in a moment.
+When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample.
+Christian will elaborate on how exactly the MOC model works later in the presentation.
+
+Our goal was to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$, as defined by the root mean squared error (RMSE).
+
+We do this through a series of experiments, which Ivik will explain in more detail later in the presentation.
+
+By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.
+This is the focus of our pre-thesis project, and we will present our findings in this presentation and talk about our plans for the thesis project next semester.
+:::
+
+
+## Related Work {.smaller}
+:::: {.fragment .fade-up}
+- **@takahashi_quantitative_2017**: ANNs for LIBS data non-linearities.
+:::
+
+::: {.fragment .fade-up}
+- **@lepore_quantitative_2022**: Full spectrum instead of sub-models often reduces RMSEP, enhancing geochemical accuracy.
+:::
+
+::: {.fragment .fade-up}
+- **@bai_application_2023**: Elastic net regression for Mars LIBS data and Norm 3 optimal normalization technique.
+:::
+
+::: {.fragment .fade-up}
+- **@dyar_effect_2021**: Larger LIBS training sets improve geochemical quantification accuracy.
+:::
+
+::: {.fragment .fade-up}
+- **@castorena_deep_2021**: Developed a real-time, efficient deep spectral CNN for LIBS.
+:::
+
+::: {.fragment .fade-up}
+- **@chen_xgboost_2016** presented XGBoost, a gradient boosting system.
+- **@andersonPostlandingMajorElement2022** found GBR performed well for SuperCam calibration data.
+:::
+
+::: {.notes}
+I will briefly summarize the key aspects of our related work section from our report.
+
+First, @takahashi_quantitative_2017 applied artificial neural networks (ANNs) to LIBS data and found that ANNs showed potential since they are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.
+This has inspired one of our experiments, as we compared the performance the MOC model with an ANN model.
+
+@lepore_quantitative_2022 examined how dividing LIBS spectra into sub-models impacts the prediction of major element compositions.
+Their findings suggest that using the entire spectrum instead of sub-models often reduces the error and enhances geochemical accuracy.
+This is interesting considering that sub-models were introduced to the MOC model to improve its performance, which contradicts the findings of this paper.
+
+@bai_application_2023 explored elastic net regression for Mars LIBS data and found it quite efficient, however perhaps more interestingly, they found that the Norm 3 normalization technique was the optimal normalization technique for their context.
+This is one of the two normalization techniques used to preprocess the CCS data, and this find is something we considered when performing our experiments.
+
+@dyar_effect_2021 found that accuracy in geochemical quantification with LIBS improves as the training set size increases.
+This is expected and tells us that we should aim to use as much data as possible when training our models.
+
+@castorena_deep_2021 developed a real-time, efficient deep spectral CNN for LIBS.
+While we did not have time to experiment with CNNs this semester, this is something we might consider in the future.
+
+Finally, @chen_xgboost_2016 presented XGBoost, which is a gradient boosting system that has become popular among data scientists for its performance in diverse machine learning applications.
+Interestingly, @andersonPostlandingMajorElement2022 found that Gradient Boosting Regression (GBR) performed well in predicting major oxides for SuperCam, which is ChemCam's successor.
+This is why we chose to include XGBoost in our experiments, as it is a popular and effective implementation of GBR.
+:::
+
+
+## Calibration Data {.smaller}
+
+::::: {.columns}
+
+::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+- 408 pressed powder samples
+- 5 locations per sample
+- 50 shots location
+:::
+
+::: {.fragment .fade-up fragment-index=2}
+- Grouped into folders:
+	- Each folder corresponds to a sample
+:::
+::: {.fragment .fade-up}
+- Masked regions:
+	- 240.811 — 246.635 nm
+	- 338.457 — 340.797 nm
+	- 382.138 — 387.859 nm
+	- 473.184 — 492.427 nm
+	- 849.000 — 905.574 nm
+:::
+
+:::
+
+::: {.column width="50%"}
+
+::: {.fragment .fade-up fragment-index=1}
+![](static/introduction/folder-structure.png){width="35%" height="35%" fig-align="center"}
+:::
+
+::: {.fragment .fade-up fragment-index=2}
+![](static/introduction/spectrum.png)
+:::
+
+:::
+
+::::
+
+::: {.notes}
+Now we will take a closer look at data that we have worked with this semester.
+First, we have the calibration dataset, which consists of 408 pressed powder samples.
+Each sample was shot at 5 different locations, and 50 shots were taken at each location.
+
+The data is grouped into folders where each folder corresponds to a sample.
+Each folder contains a .csv file for each location, and each .csv file contains the spectra for the 3 spectrometers.
+This is what we refer to as the CCS data.
+
+An example of a spectrum is shown in the figure on the right.
+The x-axis represents the wavelength, and the y-axis represents the intensity of the light at each wavelength.
+As you can see, there are some regions of the spectrum that are masked out.
+These regions are at the edges of each of the spectrometers' ranges and are not used in the analysis because they are noisy and not very informative.
+This masking is part of the preprocessing of the CCS data, which is something we will talk more about later in the presentation.
+:::
+
+
+## Composition Data {.smaller}
+- 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, $\text{K}_2\text{O}$
+
+- For each sample, we know the composition weight percentage (wt. %)
+
+::: {.fragment .fade-up}
+- Composition data is used to train the MOC model
+
+::: {style="font-size: 0.5em;"}
+| Target | Spectrum Name | Sample Name | SiO2 | TiO2 | Al2O3 | FeOT | MnO | MgO | CaO | Na2O | K2O | MOC total |
+|--------|---------------|-------------|------|------|-------|------|-----|-----|-----|------|-----|-----------|
+| AGV2   | AGV2          | AGV2        | 59.3 | 1.05 | 16.91 | 6.02 | 0.099 | 1.79 | 5.2 | 4.19 | 2.88 | 97.44 |
+| BCR-2  | BCR2          | BCR2        | 54.1 | 2.26 | 13.5 | 12.42 | 0.2 | 3.59 | 7.12 | 3.16 | 1.79 | 98.14 |
+| ...    | ...           | ...         | ...  | ...  | ...   | ...  | ... | ... | ... | ...  | ... | ...     |
+| TB     | ---           | ---         | 60.23 | 0.93 | 20.64 | 11.6387 | 0.052 | 1.93 | 0.000031 | 1.32 | 3.87 | 100.610731 |
+| TB2    | ---           | ---         | 60.4 | 0.93 | 20.5 | 11.6536 | 0.047 | 1.86 | 0.2 | 1.29 | 3.86 | 100.7406 |
+:::
+:::
+
+::: {.fragment .fade-up}
+![](static/introduction/oxide_corr.png){width="60%" height="60%" fig-align="center"}
+:::
+
+::: {.notes}
+Next, we have the composition data, which is our ground truth.
+It contains 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, and $\text{K}_2\text{O}$.
+For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides.
+
+This data is used to train the MOC model.
+This table here shows an excerpt of the composition data for a few samples.
+You can see that we know the composition of each sample in terms of the weight percentage of each of the major oxides.
+The last column is the total weight percentage of the oxides, which should in theory sum to 100%.
+However, as you can see, the sum is not always exactly 100%, which is due to the presence of other elements in the samples that are not considered major oxides.
+In the last row, you can see that the sum is actually greater than 100%, which is a physical impossibility.
+
+This figure here shows the correlation between the different oxides as a heatmap.
+The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.
+For example, $\text{SiO}_2$ and $\text{CaO}$ are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases.
+This is the data that we use to train our models, which Christian will talk about next.
+:::
