@@ -62,6 +62,8 @@ Rover is equipped with a suite of instruments to study the Martian climate and g
 One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.
 In very simple terms, the instrument shoots a laser at a rock, and the light emitted by the rock is then captured by spectrometers as a spectrum, which can be used to determine the composition of the rock.
 This requires the development of machine learning models to analyze the data, which is the focus of this presentation.
+Specifically, this type of problem is a supervised learning, multivariate regression problem.
+It is supervised because we have labeled data, and it is multivariate because we are predicting multiple outputs.
 NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.
 We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the models are far from perfect and that there is room for improvement.
 Following this, we have decided to replicate and attempt to improve upon their work.
