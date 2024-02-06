@@ -50,10 +50,10 @@ Presenter: Patrick Frostholm Østergaard.
 ::: {.notes}
 In the 1970s, the Viking missions were the first to land on Mars.
 Goal: Is there life on Mars?
-
 Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
 
 1990s: Philosophical shift within NASA: "Is there life on Mars?" to "Did Mars ever have the conditions to support life as we know it?"
+
 In 2004, the Mars Exploration Rover mission landed the rovers Spirit and Opportunity on Mars, which quickly discovered evidence of water on Mars.
 
 A few years later in 2012, the Mars Science Laboratory (MSL) mission landed the Curiosity rover on Mars.
@@ -62,10 +62,9 @@ Rover is equipped with a suite of instruments to study the Martian climate and g
 One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.
 ChemCam is used to study the composition of the Martian surface and to search for organic material.
 This requires the development of machine learning models to analyze the data, which is the focus of this presentation.
-
 NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.
 We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the models are far from perfect and that there is room for improvement.
-Following this, we have decided to replicate and improve upon their work.
+Following this, we have decided to replicate and attempt to improve upon their work.
 :::
 
 
@@ -114,7 +113,8 @@ The MOC model is trained on a calibration dataset of clean, calibrated spectra (
 When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample.
 Christian will elaborate on how exactly the MOC model works later in the presentation.
 
-Our goal is to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$, as defined by the root mean squared error (RMSE).
+Our goal was to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$, as defined by the root mean squared error (RMSE).
+
 We do this through a series of experiments, which Ivik will explain in more detail later in the presentation.
 
 By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.
@@ -151,7 +151,7 @@ This is the focus of our pre-thesis project, and we will present our findings in
 ::: {.notes}
 I will briefly summarize the key aspects of our related work section from our report.
 
-First, @takahashi_quantitative_2017 applied artificial neural networks (ANNs) to LIBS data and found that ANNs showed potential to overcome these issues because ANNs are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.
+First, @takahashi_quantitative_2017 applied artificial neural networks (ANNs) to LIBS data and found that ANNs showed potential since they are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.
 This has inspired one of our experiments, as we compared the performance the MOC model with an ANN model.
 
 @lepore_quantitative_2022 examined how dividing LIBS spectra into sub-models impacts the prediction of major element compositions.
@@ -186,7 +186,8 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 :::
 
 ::: {.fragment .fade-up fragment-index=2}
-- CCS: 3 spectrometers
+- Grouped into folders:
+	- Each folder corresponds to a sample
 :::
 ::: {.fragment .fade-up}
 - Masked regions:
@@ -194,7 +195,7 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 	- 338.457 — 340.797 nm
 	- 382.138 — 387.859 nm
 	- 473.184 — 492.427 nm
-	- 849 — 905.574 nm
+	- 849.000 — 905.574 nm
 :::
 
 :::
@@ -214,7 +215,8 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 ::::
 
 ::: {.notes}
-The calibration dataset consists of 408 pressed powder samples.
+Now we will take a closer look at data that we have worked with this semester.
+First, we have the calibration dataset, which consists of 408 pressed powder samples.
 Each sample was shot at 5 different locations, and 50 shots were taken at each location.
 
 The data is grouped into folders where each folder corresponds to a sample.
@@ -223,10 +225,9 @@ This is what we refer to as the CCS data.
 
 An example of a spectrum is shown in the figure on the right.
 The x-axis represents the wavelength, and the y-axis represents the intensity of the light at each wavelength.
-
 As you can see, there are some regions of the spectrum that are masked out.
 These regions are at the edges of each of the spectrometers' ranges and are not used in the analysis because they are noisy and not very informative.
-We will talk more about the preprocessing of the CCS data later in the presentation.
+This masking is part of the preprocessing of the CCS data, which is something we will talk more about later in the presentation.
 :::
 
 
@@ -254,13 +255,13 @@ We will talk more about the preprocessing of the CCS data later in the presentat
 :::
 
 ::: {.notes}
-The composition data is our ground truth.
+Next, we have the composition data, which is our ground truth.
 It contains 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, and $\text{K}_2\text{O}$.
-For each sample, we know the composition weight percentage (wt. %) of each of these oxides.
+For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides.
 
 This data is used to train the MOC model.
 This table here shows an excerpt of the composition data for a few samples.
-You can see that for each sample, we have the target, the spectrum name, the sample name, and the weight percentage of each of the oxides.
+You can see that we know the composition of each sample in terms of the weight percentage of each of the major oxides.
 The last column is the total weight percentage of the oxides, which should in theory sum to 100%.
 However, as you can see, the sum is not always exactly 100%, which is due to the presence of other elements in the samples that are not considered major oxides.
 In the last row, you can see that the sum is actually greater than 100%, which is a physical impossibility.
@@ -268,6 +269,5 @@ In the last row, you can see that the sum is actually greater than 100%, which i
 This figure here shows the correlation between the different oxides as a heatmap.
 The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.
 For example, $\text{SiO}_2$ and $\text{CaO}$ are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases.
-
 This is the data that we use to train our models, which Christian will talk about next.
 :::
