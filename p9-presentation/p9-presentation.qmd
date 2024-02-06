@@ -23,5 +23,108 @@ format:
 # Methodology
 {{< include sections/_methodology.qmd >}}
 
+## PLS1-SM
+- Preprocessing
+- Submodels Approach
+
+## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+:::::: {.columns}
+::::: {.column width="50%"}
+- Remove 'dust' shots
+- Average shot intensities
+:::::
+
+::::: {.column width="50%"}
+![PLS Preprocessing](static/methodology/pls_preprocessing.png){top="-400px" style="position: relative;" data-id="x1"}
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+:::::
+::::::
+
+## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+:::: {.columns}
+::: {.column width="50%"}
+- Remove 'dust' shots
+- Average shot intensities
+- Mask noisy wavelenghts
+- Zero out negative values
+:::
+::: {.column width="50%"}
+![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top: -400px;" data-id="x1"}
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+:::
+::::
+
+## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+:::: {.columns}
+::: {.column width="50%"}
+- Remove 'dust' shots
+- Average shot intensities
+- Mask noisy wavelenghts
+- Zero out negative values
+- Tranpose
+- Submodels filter
+:::
+
+::: {.column width="50%"}
+![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top:-800px;" data-id="x1"}
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 57%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+:::
+::::
+
+## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+:::: {.columns}
+::: {.column width="50%"}
+- Remove 'dust' shots
+- Average shot intensities
+- Mask noisy wavelenghts
+- Zero out negative values
+- Tranpose
+- Submodels filter
+- Normalize
+:::
+
+::: {.column width="50%"}
+![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top:-1200px;" data-id="x1"}
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+:::
+::::
+
+## PLS1-SM Submodels {.unlisted}
+- Submodels
+    - Low
+    - Mid
+    - High
+    - Full
+- Each trained on subset of data
+- Cross validated
+
+## PLS1-SM Outlier Removal {.unlisted}
+- Iterative outlier removal
+- Based on influence plots of
+    - leverage
+    - spectral residuals
+
+## ICA
+- Similar preprocessing, except no averaging
+    - Uses only one location per sample
+- Uses JADE
+- Calculate correlation between ICs and wavelengths
+    - Finds relevant spectral lines for each component
+- Train regression models
+    - Data transformation
+    - Uses ICA scores
+
+## MOC
+- Weighted combination of the predictions
+    - Varying weight by oxide
+    - Depends on which model performs best
+
+## Differences
+- Omitted weighing by inverse IRF
+- No MAD outlier removal for ICA
+- Automated what they did manually (outlier removal PLS)
+- Our test fold was not carefully selected to be representative (just randomized)
+
+
 # Experiments
 {{< include sections/_experiments.qmd >}}
