@@ -48,24 +48,24 @@ Presenter: Patrick Frostholm Østergaard.
 :::::
 
 ::: {.notes}
-In the 1970s, the Viking missions were the first to land on Mars.
-Goal: Is there life on Mars?
+In the 1970s, the Viking missions were the first to land on Mars.<br>
+Goal: Is there life on Mars?<br>
 Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
 
 1990s: Philosophical shift within NASA: "Is there life on Mars?" to "Did Mars ever have the conditions to support life as we know it?"
 
 In 2004, the Mars Exploration Rover mission landed the rovers Spirit and Opportunity on Mars, which quickly discovered evidence of water on Mars.
 
-A few years later in 2012, the Mars Science Laboratory (MSL) mission landed the Curiosity rover on Mars.
+A few years later in 2012, the Mars Science Laboratory (MSL) mission landed the Curiosity rover on Mars.<br>
 Rover is equipped with a suite of instruments to study the Martian climate and geology and to search for organic material.
 
-One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.
-In very simple terms, the instrument shoots a laser at a rock, and the light emitted by the rock is then captured by spectrometers as a spectrum, which can be used to determine the composition of the rock.
-This requires the development of machine learning models to analyze the data, which is the focus of this presentation.
-Specifically, this type of problem is a supervised learning, multivariate regression problem.
-It is supervised because we have labeled data, and it is multivariate because we are predicting multiple outputs.
-NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.
-We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the models are far from perfect and that there is room for improvement.
+One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.<br>
+In very simple terms, the instrument shoots a laser at a rock, and the light emitted by the rock is then captured by spectrometers as a spectrum, which can be used to determine the composition of the rock.<br>
+This requires the development of machine learning models to analyze the data, which is the focus of this presentation.<br>
+Specifically, this type of problem is a supervised learning, multivariate regression problem.<br>
+It is supervised because we have labeled data, and it is multivariate because we are predicting multiple outputs.<br>
+NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.<br>
+We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the models are far from perfect and that there is room for improvement.<br>
 Following this, we have decided to replicate and attempt to improve upon their work.
 :::
 
@@ -111,15 +111,15 @@ Following this, we have decided to replicate and attempt to improve upon their w
 ::: {.notes}
 The model currently used by the ChemCam team is the Multivariate Oxide Composition (MOC) model, illustrated in the figure on the right.
 
-The MOC model is trained on a calibration dataset of clean, calibrated spectra (CCS), which I will give an overview of in a moment.
-When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample.
+The MOC model is trained on a calibration dataset of clean, calibrated spectra (CCS), which I will give an overview of in a moment.<br>
+When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample.<br>
 Christian will elaborate on how exactly the MOC model works later in the presentation.
 
 Our goal was to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$, as defined by the root mean squared error (RMSE).
 
 We do this through a series of experiments, which Ivik will explain in more detail later in the presentation.
 
-By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.
+By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.<br>
 This is the focus of our pre-thesis project, and we will present our findings in this presentation and talk about our plans for the thesis project next semester.
 :::
 
@@ -153,24 +153,24 @@ This is the focus of our pre-thesis project, and we will present our findings in
 ::: {.notes}
 I will briefly summarize the key aspects of our related work section from our report.
 
-First, @takahashi_quantitative_2017 applied artificial neural networks (ANNs) to LIBS data and found that ANNs showed potential since they are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.
+First, @takahashi_quantitative_2017 applied artificial neural networks (ANNs) to LIBS data and found that ANNs showed potential since they are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample.<br>
 This has inspired one of our experiments, as we compared the performance the MOC model with an ANN model.
 
-@lepore_quantitative_2022 examined how dividing LIBS spectra into sub-models impacts the prediction of major element compositions.
-Their findings suggest that using the entire spectrum instead of sub-models often reduces the error and enhances geochemical accuracy.
+@lepore_quantitative_2022 examined how dividing LIBS spectra into sub-models impacts the prediction of major element compositions.<br>
+Their findings suggest that using the entire spectrum instead of sub-models often reduces the error and enhances geochemical accuracy.<br>
 This is interesting considering that sub-models were introduced to the MOC model to improve its performance, which contradicts the findings of this paper.
 
-@bai_application_2023 explored elastic net regression for Mars LIBS data and found it quite efficient, however perhaps more interestingly, they found that the Norm 3 normalization technique was the optimal normalization technique for their context.
+@bai_application_2023 explored elastic net regression for Mars LIBS data and found it quite efficient, however perhaps more interestingly, they found that the Norm 3 normalization technique was the optimal normalization technique for their context.<br>
 This is one of the two normalization techniques used to preprocess the CCS data, and this find is something we considered when performing our experiments.
 
-@dyar_effect_2021 found that accuracy in geochemical quantification with LIBS improves as the training set size increases.
+@dyar_effect_2021 found that accuracy in geochemical quantification with LIBS improves as the training set size increases.<br>
 This is expected and tells us that we should aim to use as much data as possible when training our models.
 
-@castorena_deep_2021 developed a real-time, efficient deep spectral CNN for LIBS.
+@castorena_deep_2021 developed a real-time, efficient deep spectral CNN for LIBS.<br>
 While we did not have time to experiment with CNNs this semester, this is something we might consider in the future.
 
-Finally, @chen_xgboost_2016 presented XGBoost, which is a gradient boosting system that has become popular among data scientists for its performance in diverse machine learning applications.
-Interestingly, @andersonPostlandingMajorElement2022 found that Gradient Boosting Regression (GBR) performed well in predicting major oxides for SuperCam, which is ChemCam's successor.
+Finally, @chen_xgboost_2016 presented XGBoost, which is a gradient boosting system that has become popular among data scientists for its performance in diverse machine learning applications.<br>
+Interestingly, @andersonPostlandingMajorElement2022 found that Gradient Boosting Regression (GBR) performed well in predicting major oxides for SuperCam, which is ChemCam's successor.<br>
 This is why we chose to include XGBoost in our experiments, as it is a popular and effective implementation of GBR.
 :::
 
@@ -217,18 +217,18 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 ::::
 
 ::: {.notes}
-Now we will take a closer look at data that we have worked with this semester.
-First, we have the calibration dataset, which consists of 408 pressed powder samples.
+Now we will take a closer look at data that we have worked with this semester.<br>
+First, we have the calibration dataset, which consists of 408 pressed powder samples.<br>
 Each sample was shot at 5 different locations, and 50 shots were taken at each location.
 
-The data is grouped into folders where each folder corresponds to a sample.
-Each folder contains a .csv file for each location, and each .csv file contains the spectra for the 3 spectrometers.
+The data is grouped into folders where each folder corresponds to a sample.<br>
+Each folder contains a .csv file for each location, and each .csv file contains the spectra for the 3 spectrometers.<br>
 This is what we refer to as the CCS data.
 
-An example of a spectrum is shown in the figure on the right.
-The x-axis represents the wavelength, and the y-axis represents the intensity of the light at each wavelength.
-As you can see, there are some regions of the spectrum that are masked out.
-These regions are at the edges of each of the spectrometers' ranges and are not used in the analysis because they are noisy and not very informative.
+An example of a spectrum is shown in the figure on the right.<br>
+The x-axis represents the wavelength, and the y-axis represents the intensity of the light at each wavelength.<br>
+As you can see, there are some regions of the spectrum that are masked out.<br>
+These regions are at the edges of each of the spectrometers' ranges and are not used in the analysis because they are noisy and not very informative.<br>
 This masking is part of the preprocessing of the CCS data, which is something we will talk more about later in the presentation.
 :::
 
@@ -257,19 +257,19 @@ This masking is part of the preprocessing of the CCS data, which is something we
 :::
 
 ::: {.notes}
-Next, we have the composition data, which is our ground truth.
-It contains 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, and $\text{K}_2\text{O}$.
+Next, we have the composition data, which is our ground truth.<br>
+It contains 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, and $\text{K}_2\text{O}$.<br>
 For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides.
 
-This data is used to train the MOC model.
-This table here shows an excerpt of the composition data for a few samples.
-You can see that we know the composition of each sample in terms of the weight percentage of each of the major oxides.
-The last column is the total weight percentage of the oxides, which should in theory sum to 100%.
-However, as you can see, the sum is not always exactly 100%, which is due to the presence of other elements in the samples that are not considered major oxides.
+This data is used to train the MOC model.<br>
+This table here shows an excerpt of the composition data for a few samples.<br>
+You can see that we know the composition of each sample in terms of the weight percentage of each of the major oxides.<br>
+The last column is the total weight percentage of the oxides, which should in theory sum to 100%.<br>
+However, as you can see, the sum is not always exactly 100%, which is due to the presence of other elements in the samples that are not considered major oxides.<br>
 In the last row, you can see that the sum is actually greater than 100%, which is a physical impossibility.
 
-This figure here shows the correlation between the different oxides as a heatmap.
-The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.
-For example, $\text{SiO}_2$ and $\text{CaO}$ are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases.
+This figure here shows the correlation between the different oxides as a heatmap.<br>
+The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.<br>
+For example, $\text{SiO}_2$ and $\text{CaO}$ are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases.<br>
 This is the data that we use to train our models, which Christian will talk about next.
 :::
