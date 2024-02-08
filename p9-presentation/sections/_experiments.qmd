@@ -24,7 +24,6 @@ Presenter: Ivik Lau Dalgas Hostrup.
 </div>
 ::: 
 
-
 ::: notes
 **Experiments introduction**
 <br>
@@ -47,15 +46,15 @@ We had to ensure that the experiments were impactful enough to be able to determ
 ::: {.fragment .fade-up}
 ::: {style="font-size: 0.5em;"}
 | Element | Baseline | Without outlier removal | PLS1-SM (clegg) |
-|---------|---------:|------------------------:|-------------:|
-| SiO2    |     5.81 |                    5.81 |         4.33 |
-| TiO2    |     0.47 |                    0.47 |         0.94 |
-| Al2O3   |     1.94 |                    1.91 |         2.85 |
-| FeOT    |     4.35 |                    4.35 |         2.01 |
-| MgO     |     1.17 |                    1.17 |         1.06 |
-| CaO     |     1.43 |                    1.44 |         2.65 |
-| Na2O    |     0.66 |                    0.67 |         0.62 |
-| K2O     |     0.72 |                    0.70 |         0.72 |
+|---------|---------:|------------------------:|----------------:|
+| SiO2    |     5.81 |                    5.81 |            4.33 |
+| TiO2    |     0.47 |                    0.47 |            0.94 |
+| Al2O3   |     1.94 |                    1.91 |            2.85 |
+| FeOT    |     4.35 |                    4.35 |            2.01 |
+| MgO     |     1.17 |                    1.17 |            1.06 |
+| CaO     |     1.43 |                    1.44 |            2.65 |
+| Na2O    |     0.66 |                    0.67 |            0.62 |
+| K2O     |     0.72 |                    0.70 |            0.72 |
 
 
 :::
@@ -154,22 +153,151 @@ Couple that with the fact that ICA is worse across all oxides compared to PLS an
 :::
 
 ## Our Choice of Experiments
-::: {.fragment .fade-up}
+
 4. Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset
+
+
+::::: {.columns}
+
+:::: {.column width="33%"}
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.5em;"}
+|          | 1 location | Aggregated |
+|----------|-----------:|-----------:|
+| SiO2     |      10.68 |      12.01 |
+| TiO2     |       0.63 |       0.60 |
+| Al2O3    |       5.55 |       4.81 |
+| FeOT     |       8.30 |       8.56 |
+| MgO      |       2.90 |       2.51 |
+| CaO      |       3.52 |       3.71 |
+| Na2O     |       1.72 |       1.41 |
+| K2O      |       1.37 |       1.51 |
+
+: ICA replica **without** MAD
+
 :::
+:::
+
+::::
+
+:::: {.column width="33%"}
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.5em;"}
+|          | 1 location | Aggregated |
+|----------|-----------:|-----------:|
+| SiO2     |       8.64 |       9.47 |
+| TiO2     |       0.53 |       0.48 |
+| Al2O3    |       3.69 |       2.66 |
+| FeOT     |       7.07 |       7.05 |
+| MgO      |       2.10 |       2.83 |
+| CaO      |       4.00 |       1.90 |
+| Na2O     |       1.45 |       1.60 |
+| K2O      |       1.15 |       1.08 |
+
+: ICA replica with MAD
+
+:::
+:::
+
+::::
+
+:::: {.column width="33%"}
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.5em;"}
+| Element | Original |
+|---------|---------:|
+| SiO2    |     8.31 |
+| TiO2    |     1.44 |
+| Al2O3   |     4.77 |
+| FeOT    |     5.17 |
+| MgO     |     4.08 |
+| CaO     |     3.07 |
+| Na2O    |     2.29 |
+| K2O     |     0.98 |
+
+: ICA original from clegg et. al
+
+:::
+:::
+
+::::
+
+:::::
 
 ::: {.notes}
 **(4) ICA aggregated**
-Another thing that we mentioned being unsure about what how they utilized all 5 datasets for a sample in the ICA phase. In a similar spirit to the previous experiment, we wanted to see the effects of utilizing one of the two approaches one could think to do with the datasets.
+Another thing that we mentioned being unsure about is how they utilized all 5 datasets for a sample in the ICA phase. 
+In a similar spirit to the previous experiment, we wanted to see the effects of utilizing one of the two approaches one could think to do with the datasets.
 The first obviously being running ICA on each dataset and training the regression model on the results and the second being aggregating the 5 dataset into a single, average dataset. 
-We chose the second option for its simplicity and since we had already confirmed that ICA seemed susceptible to outliers, we thought that averaging could help stabilize the values and perhaps make it easir for ICA to identify the principal components. 
+We chose the second option for its simplicity and since we had already confirmed that ICA seemed susceptible to outliers, we thought that averaging could help stabilize the values and perhaps make it easier for ICA to identify the principal components. 
 
+**Table 4.1**
+As can be seen in the first table the results are fairly similar across all oxides, except for Silicium where the results are quite a bit worse. These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which suggests that it made it easier for ICA to separate out these signals. However, as can be seen it clearly also had the opposite effect for some other oxides as noise in some areas of the dataset were clearly magnified, making it harder to separate out signals for oxides such as silicium. Perhaps this is not too surprising, but good to have validated none the less.
 
+**Table 4.2**
+The previous results then led us to wonder how much of an effect outlier detection would have with this aggregated dataset. Since the noise in data was clearly being magnified, we reasoned that this would also make it easier to pick out any outliers. 
+And surprisingly, it did. 
+Looking at the results and comparing to the original from clegg, we see that for 5 out 8 oxides the results were significantly better. 
+This tells us two things. Firstly, we confirm once again that ICA is very dependent on a strategic outlier removal process, especially for LIBS data, as the results of some oxide predictions require more available data, while others need less. 
+Secondly, this dependency implies that ICA is much more dependent on calibration data that is tailored towards its strengths. 
+Since creating calibration data is a time consuming and expensive effort, opting to use ICA seems less beneficial.
 :::
 
 ---
 
-::: {.fragment .fade-up}
+## Our Choice of Experiments
+
 5. Comparing the performance of PLS1-SM and ICA models against XGBoost and ANN.
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.6em;"}
+| Element | ANN (Norm1) | ANN (Norm3) | XGBoost (Norm1) | XGBoost (Norm3) | MOC (original) | MOC (replica) |
+|---------|------------:|------------:|----------------:|----------------:|---------------:|--------------:|
+| SiO2    |        5.62 |        5.01 |            5.12 |            **4.67** |           5.30 |          7.29 |
+| TiO2    |        0.58 |        0.62 |            **0.44** |            0.45 |           1.03 |          0.49 |
+| Al2O3   |        2.12 |        2.27 |            **1.93** |            1.97 |           3.47 |          2.39 |
+| FeOT    |        4.05 |        4.00 |            4.40 |            5.02 |           **2.31** |          5.21 |
+| MgO     |        1.61 |        1.49 |            0.99 |            **0.96** |           2.21 |          1.67 |
+| CaO     |        1.33 |        1.26 |            **1.23** |            1.26 |           2.72 |          1.81 |
+| Na2O    |        1.17 |        1.09 |            **0.49** |            0.51 |           0.62 |          1.10 |
+| K2O     |        1.05 |        0.88 |            **0.50** |            0.51 |           0.82 |          1.09 |
+
+
+:::
 :::
 
+::: {.notes}
+The final experiments that we wanted to do was based on the desire to do some due diligence that we felt was lacking from clegg's paper. This was comparing the MOC pipeline to other methods that exist.
+For this we chose to work with XGBoost and ANN's.
+The decision to use these specifically was the fact they represented two fairly different approaches that both have the ability to learn complex patterns in data. 
+Given the time constraint that we had, we felt that this would be sufficient to demonstrate whether the current MOC model could potentially be updated to include other models or perhaps that entirely different approaches to oxide predictions in LIBS data should be persued.
+
+**Table 5**
+As you can see from the table XGBoost performed better in most cases and for some oxides even showed a significant improvement from the MOC model. 
+Additionally, the ANN model also showed to be better than the MOC model in many cases. 
+This conforms that potential improvements could be seen from either integrating such models in the pipeline or perhaps by focusing on new directions, where optimizing on these models could perhaps yield better results.
+:::
+
+## Conclusion {.smaller}
+
+<div class="experiments-spacing">
+<p class="experiments-header">So what did we learn?</p>
+</div>
+
+::: {.fragment .fade-up}
+1. Outlier removal is beneficial to some extend
+    - Specialty approaches needs to be developed for further improvements
+:::
+
+::: {.fragment .fade-up}
+2. Data preprocessing affects sections of the pipeline differently
+    - ICA is more sensitive
+:::
+
+::: {.fragment .fade-up}
+3. Rethinking the choice of models may be a better solution 
+    - Current pipeline has a lot of complexity and moving parts
+:::
