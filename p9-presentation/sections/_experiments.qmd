@@ -1,1 +1,62 @@
 Presenter: Ivik Lau Dalgas Hostrup.
+
+## Answering the Problem Definition {.smaller}
+<div class="experiments-spacing">
+<p class="experiments-header">The Problem Definition:</p>
+<div class="experiments-align-center">
+<p style="font-size: 30px">*Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error E(M)* 
+</p>
+</div>
+</div>
+
+::: {.fragment}
+<div class="experiments-spacing">
+<p class="experiments-header">The Challenges:</p>
+::: incremental
+- Determine what a component is
+- Figuring out which components to conduct experiments on
+- Time is a contraint - Which experiments are most meaningful?
+:::
+</div>
+::: 
+
+
+::: notes
+**Experiments introduction**
+<br>
+Once the replication process was done we had to decide on a set of experiments that would best answer our problem definition.
+<br>
+A tricky aspects of answering the problem definition is defining what constitutes a component and in turn, how to define an experiment that would allow us to determine its contribution to the over all error.
+<br>
+On top of this, was the looming time constraint for delivery on the project. This meant that we had to be selective on the type of experiments that we chose.
+We had to ensure that the experiments were impactful enough to be able to determine something about the pipeline.
+:::
+
+## Our Choice of Experiments
+<div class="experiments-spacing">
+<p class="experiments-header">Outlier based experiments:</p>
+</div>
+
+::: {.fragment .fade-up}
+1. Evaluating the necessity of automated outlier removal in the PLS1-SM
+:::
+::: {.fragment .fade-up}
+2. Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM
+:::
+::: {.fragment .fade-up}
+3. Assessing the impact of the MAD-based method for outlier removal in the ICA phase
+:::
+
+## Our Choice of Experiments
+::: {.fragment .fade-up}
+4. Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset
+:::
+::: {.fragment .fade-up}
+5. Comparing the performance of PLS1-SM and ICA models against XGBoost and ANN.
+:::
+
+::: {.notes}
+**The experiments that we chose**
+<br>
+The experiments that we decided on were 
+:::

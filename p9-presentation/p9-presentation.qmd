@@ -25,3 +25,6 @@ format:
 
 # Experiments
 {{< include sections/_experiments.qmd >}}
+
+# References
+{{< include sections/_references.qmd >}}

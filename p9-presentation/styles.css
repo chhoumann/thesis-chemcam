@@ -16,3 +16,16 @@ figcaption {
 .rounded-fig {
     border-radius: 5px;
 }
+
+.experiments-spacing {
+    margin-top: 50px;
+}
+
+.experiments-header {
+    font-size: 48px;
+    padding-bottom: 20px;
+}
+
+.experiments-align-center {
+    text-align: center;
+}
