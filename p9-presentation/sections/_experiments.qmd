@@ -9,12 +9,16 @@ Presenter: Ivik Lau Dalgas Hostrup.
 </div>
 </div>
 
-::: {.fragment}
+::: {.fragment .fade-up}
 <div class="experiments-spacing">
 <p class="experiments-header">The Challenges:</p>
-::: incremental
+::: {.fragment .fade-up}
 - Determine what a component is
+:::
+::: {.fragment .fade-up}
 - Figuring out which components to conduct experiments on
+:::
+::: {.fragment .fade-up}
 - Time is a contraint - Which experiments are most meaningful?
 :::
 </div>
@@ -41,22 +45,131 @@ We had to ensure that the experiments were impactful enough to be able to determ
 1. Evaluating the necessity of automated outlier removal in the PLS1-SM
 :::
 ::: {.fragment .fade-up}
-2. Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM
+::: {style="font-size: 0.5em;"}
+| Element | Baseline | Without outlier removal | PLS1-SM (clegg) |
+|---------|---------:|------------------------:|-------------:|
+| SiO2    |     5.81 |                    5.81 |         4.33 |
+| TiO2    |     0.47 |                    0.47 |         0.94 |
+| Al2O3   |     1.94 |                    1.91 |         2.85 |
+| FeOT    |     4.35 |                    4.35 |         2.01 |
+| MgO     |     1.17 |                    1.17 |         1.06 |
+| CaO     |     1.43 |                    1.44 |         2.65 |
+| Na2O    |     0.66 |                    0.67 |         0.62 |
+| K2O     |     0.72 |                    0.70 |         0.72 |
+
+
 :::
+:::
+
+::: {.notes}
+**The experiments that we chose**
+<br>
+We settled on conducting 5 sets of experiments. 
+The first set of experiments were centered around outlier removal.
+In the initial stages of our implementation we realized that we would not be able to do outlier detection in the same way that clegg et. al did it. 
+Both in terms of the PLS-SM side of the pipeline and also in the ICA side of the pipeline.
+Therefore we thought it would be interesting to conduct experiments that tested different aspects of our outlier removal process.
+
+**(1) Automated outlier removal**
+<br>
+The first experiment that we decided to conduct was to evaluate the effects of not doing outlier removal vs. our automated outlier removal for PLS-SM. 
+The outcome of this experiment would provide us answers to two things. The first being an evaluation of our automated outlier removal. 
+The second being an implicit evaluation of the PLS-SM model to handling of outliers. 
+The implicit evaluation of the PLS-SM is interesting since if we did not see a big deviation in RMSE from clegg et. al then that would call into question of doing outlier removal at all for PLS-SM.
+
+**Table 1**
+<br>
+As you can see from the table, our outlier removal had almost no efffect on the RMSE. This result was in many ways surprising to us. 
+We did not necessarily have any expectation that our outlier removal would perform better than clegg et. al's, however, we would have expected some difference.  
+The interesting result, though, is the fact that PLS performed just as well without our outlier removal and in fact very comparable to clegg's results, who manually picked out outliers.
+This, to us, shows that PLS is a very robust method, but it also poses the question whether it can even be improved any further.
+
+:::
+
+---
+
+2. Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM
+
 ::: {.fragment .fade-up}
+::: {style="font-size: 0.6em;"}
+| Element | Baseline | Fixed thresholds |
+|---------|---------:|-----------------:|
+| SiO2    |     5.81 |             5.81 |
+| TiO2    |     0.47 |             0.47 |
+| Al2O3   |     1.94 |             1.94 |
+| FeOT    |     4.35 |             4.35 |
+| MgO     |     1.17 |             1.18 |
+| CaO     |     1.43 |             1.44 |
+| Na2O    |     0.66 |              0.6 |
+| K2O     |     0.72 |             0.72 |
+
+:::
+:::
+
+::: {.notes}
+**(2) Maintaining leverage and residuals**
+<br>
+In order to further verify the results from the previous slide, we attempted a different approach where instead of recalculating the leverage and residuals for each iteration, we would instead maintain the ones from the second iteration.
+We did this to ensure that we were not being too aggressive in our outlier removal process, since this approach would result in fewer points overall being removed.
+
+**Table 2**
+<br>
+As can be seen in the table, the results are almost the same. This confirms that we are at least not being too aggressive in our approach, but given that our results are still worse to, some degree, than clegg's. 
+So perhaps we could attempt a more aggressive approach or perhaps a more specialized outlier approach since not all of the oxides necessarily have room for improvement.
+
+:::
+
+---
+
 3. Assessing the impact of the MAD-based method for outlier removal in the ICA phase
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.6em;"}
+| Element | ICA baseline | ICA with MAD | ICA (clegg)|
+|---------|-------------:|-------------:|-----------:|
+| SiO2    |        10.68 |         8.64 |        8.31|
+| TiO2    |         0.63 |         0.53 |        1.44|
+| Al2O3   |         5.55 |         3.69 |        4.77|
+| FeOT    |         8.30 |         7.07 |        5.17|
+| MgO     |         2.90 |         2.10 |        4.08|
+| CaO     |         3.52 |         4.00 |        3.07|
+| Na2O    |         1.72 |         1.45 |        2.29|
+| K2O     |         1.37 |         1.15 |        0.98|
+
+:::
+:::
+
+::: {.notes}
+**(3) MAD outlier ICA**
+<br>
+Moving on to our third outlier experiment, we wanted to actually implement MAD for ICA. 
+As we mentioned in the report we were unsure about how they had actually implemented it. 
+Therefore we chose to have it be an experiment to implement a version which we thought was most appropiate.
+Initially, one would think that this is not necessarily the most informative experiment. However, it allowed us to do a with/without outlier removal test, similar to the PLS, and as such test the robustness of the ICA model.
+
+**Table 3**
+<br>
+Looking at the results then, we see that using MAD did in fact have a pretty significant effect on the results of ICA. This told us that ICA seems quite susceptible to outliers.
+Couple that with the fact that ICA is worse across all oxides compared to PLS and you start to wonder what the benefit of using ICA is.
 :::
 
 ## Our Choice of Experiments
 ::: {.fragment .fade-up}
 4. Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset
 :::
+
+::: {.notes}
+**(4) ICA aggregated**
+Another thing that we mentioned being unsure about what how they utilized all 5 datasets for a sample in the ICA phase. In a similar spirit to the previous experiment, we wanted to see the effects of utilizing one of the two approaches one could think to do with the datasets.
+The first obviously being running ICA on each dataset and training the regression model on the results and the second being aggregating the 5 dataset into a single, average dataset. 
+We chose the second option for its simplicity and since we had already confirmed that ICA seemed susceptible to outliers, we thought that averaging could help stabilize the values and perhaps make it easir for ICA to identify the principal components. 
+
+
+:::
+
+---
+
 ::: {.fragment .fade-up}
 5. Comparing the performance of PLS1-SM and ICA models against XGBoost and ANN.
 :::
 
-::: {.notes}
-**The experiments that we chose**
-<br>
-The experiments that we decided on were 
-:::
