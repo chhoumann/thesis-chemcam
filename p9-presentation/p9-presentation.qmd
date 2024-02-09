@@ -27,7 +27,7 @@ format:
 - Preprocessing
 - Submodels Approach
 
-## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
 :::::: {.columns}
 ::::: {.column width="50%"}
 - Remove 'dust' shots
@@ -40,7 +40,7 @@ format:
 :::::
 ::::::
 
-## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
 - Remove 'dust' shots
@@ -54,7 +54,7 @@ format:
 :::
 ::::
 
-## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
 - Remove 'dust' shots
@@ -71,7 +71,7 @@ format:
 :::
 ::::
 
-## PLS1-SM Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
 - Remove 'dust' shots
@@ -89,7 +89,7 @@ format:
 :::
 ::::
 
-## PLS1-SM Submodels {.unlisted}
+## Submodels {.unlisted}
 - Submodels
     - Low
     - Mid
@@ -98,7 +98,18 @@ format:
 - Each trained on subset of data
 - Cross validated
 
-## PLS1-SM Outlier Removal {.unlisted}
+## PLS1-SM Inference
+Final output given by
+
+$$
+\begin{align*}
+w_{\text{mid}} &= \frac{y_{\text{full}}-y_{\text{blend range, min}}}{y_{\text{blend range, max}} - y_{\text{blend range, min}}} \\
+w_{\text{low}} &= 1 - w_{\text{mid}} \\
+y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}}
+\end{align*}
+$$
+
+## Outlier Removal {.unlisted}
 - Iterative outlier removal
 - Based on influence plots of
     - leverage
