@@ -20,12 +20,134 @@ format:
 # Introduction
 {{< include sections/_introduction.qmd >}}
 
-# Methodology
+# MOC Pipeline Replica
 {{< include sections/_methodology.qmd >}}
 
-## PLS1-SM
-- Preprocessing
-- Submodels Approach
+::: {.notes}
+My name is Christian, and I'll be presenting our replica of the MOC pipeline.
+This is what we used to establish baselines for our experiments.
+:::
+
+## MOC {auto-animate="true"}
+::: {style="width=100%;"}
+![](/static/methodology/pipeline.png){fig-align="center" width="auto"}
+:::
+::: {.fragment data-id="moc-box"}
+<div style="position: absolute; top: 35%; left: 28%; width: 20%; height: 45%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+:::
+
+::: {.fragment data-id="moc-box"}
+<div style="position: absolute; top: 35%; left: 51%; width: 20%; height: 45%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+:::
+
+::: {.notes}
+This is the entire MOC pipeline at inference-time.
+
+I start by walking through the PLS-SM side, and then the ICA side.
+
+It's important to keep in mind that this pipeline is for multivariate regression.
+That means we create predictions for each of 8 major oxides.
+However, most of the steps actually involve data being processed for each oxide individually.
+For both ICA and PLS, you can imagine that after some preprocessing steps, we branch out into 8 branches, each of which predict its own values for its associated oxide.
+And in the end, we put the outputs together to produce the MOC prediction.
+:::
+
+## PLS-SM
+- Recreating the MOC pipeline presented in @cleggRecalibrationMarsScience2017
+- Starting with the PLS-SM approach by @andersonImprovedAccuracyQuantitative2017
+    - Preprocessing
+    - Outlier removal
+    - Training
+    - Inference via submodels
+
+::: {.notes}
+Starting with the PLS-SM method, we have attempted to recreate the system presented by both Clegg and Anderson et al.
+:::
+
+## PLS-SM Motivation {.unlisted auto-animate="true"}
+- **PLS**
+    - Good for chemometrics
+    - Readily intrepretable
+
+
+
+::: {.notes}
+Let me start by explaining what motivated PLS-SM, because that will help us understand why it does what it does.
+
+First: they chose PLS because it can handle noisy data with many more variables than observations, and with significant correlation between variables.
+It's also readily intrepretable by plotting the regression coefficients as a function of the spectral channels. This shows which wavelength ranges show correlations with the prediction composition.
+:::
+
+## PLS-SM Motivation {.unlisted auto-animate="true"}
+- PLS
+- **PLS2 vs. PLS1**
+    - PLS2: Multivariate
+    - PLS1: Univariate
+    - Better results with separate PLS1 models
+
+::: {.notes}
+For the original ChemCam calibration, the team used PLS2. This case corresponds to the case where there are several dependent variables, meaning it can perform multivariate predictions.
+
+However, they found that they're seeing better results by using a separate PLS1 model for each of the major oxides.
+
+PLS1 is the case where there's only a single dependent variable --- so it's for univariate regression.
+:::
+
+## PLS-SM Motivation {.unlisted auto-animate="true"}
+- PLS
+- PLS2 vs. PLS1
+- **Solution: Submodels**
+    - More accurate when focusing on specific concentration ranges
+    - Single regression model: good general performance, worse on some individual samples
+    - So combine several models trained on subsets of the full compositional range
+
+::: {.notes}
+**OK. So why submodels?**
+
+Different parts of the LIBS spectrum react differently to varying amounts of elements in the sample.
+So, a spectrum from a sample with a medium amount of an element might show patterns that aren't there when there's a very high or low amount of that element.
+This can be because when there's too much of an element, it can overshadow its own signal, and the presence of other elements can also change the response.
+
+Using sub-models lets them focus on specific concentration ranges for more accurate readings.
+
+It's hard for a single regression model to account for these variations. It often makes a tradeoff where it has good general performance, but performance worse on some samples. And specialist models (trained on a restricted range) will do good for that range, but much worse outside the range than a model trained on the full set.
+
+So the solution was to combine several regression models trained on subsets of the full compositional range to improve overall performance across the full range, which overcomes the limitations of a single model, and then combine the results via blending.
+
+In this case, they created 3 overlapping submodels for most of the major oxides (low, mid, high), and a full model training on the full compositional range.
+:::
+
+
+
+## PLS-SM Inference {.unlisted}
+![](/static/methodology/pls_inference.png){fig-align="center" width="70%"}
+
+::: {.notes}
+I'm starting out by showing you how the model makes predictions.
+PLS-SM is an approach that uses PLS submodels to make predictions.
+It has a full model that makes some initial prediction, which it uses to determine which submodels should make the final prediction.
+They
+
+:::
+
+
+
+## Compositional Ranges {.unlisted}
+
+| Oxide | Full     | Low     | Mid      | High     |
+|-------|----------|---------|----------|----------|
+| SiO2  | (0, 100) | (0, 50) | (30, 70) | (60, 100)|
+| TiO2  | (0, 100) | (0, 2)  | (1, 5)   | (3, 100) |
+| Al2O3 | (0, 100) | (0, 12) | (10, 25) | (20, 100)|
+| FeOT  | (0, 100) | (0, 15) | (5, 25)  | (15, 100)|
+| MgO   | (0, 100) | (0, 3.5)| (0, 20)  | (8, 100) |
+| CaO   | (0, 42)  | (0, 7)  | (0, 15)  | (30, 100)|
+| Na2O  | (0, 100) | (0, 4)  | *N/A*    | (3.5, 100)|
+| K2O   | (0, 100) | (0, 2)  | *N/A*    | (1.5, 100)|
+
+::: {.footer}
+All submodel PLS configurations are taken directly from @cleggRecalibrationMarsScience2017.
+:::
 
 ## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
 :::::: {.columns}
@@ -40,19 +162,61 @@ format:
 :::::
 ::::::
 
+::: {.notes}
+The initial preprocessing step is to remove the first five shots.
+These shots usually serve to remove dust from samples, and are therefore often less informative than the remaining shots: the dust doesn't say much about what's in the sample.
+
+Then we proceed to averaging the shot intensity values for each wavelength.
+The final result is a single column representing an intensity value for each wavelength.
+:::
+
 ## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
-:::: {.columns}
-::: {.column width="50%"}
+::::: {.columns}
+:::: {.column width="50%"}
+- Remove 'dust' shots
+- Average shot intensities
+- Mask noisy wavelenghts
+::::
+
+:::: {.column width="50%"}
+![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top: -400px;" data-id="x1"}
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+::::
+:::::
+
+::: {.notes}
+The preprocessing continues by masking noisy wavelengths.
+The masking process itself simply involves setting the intensity values for the wavelengths in the masking ranges to zero.
+:::
+
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+![](/static/methodology/masked_regions.png){fig-align="center"}
+
+::: {.notes}
+As we see here, the mask regions are placed at the edges of the spectrometer ranges.
+This is because they were found to be untrustworthy & to generate outliers in the intensity values.
+:::
+
+
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+::::: {.columns}
+:::: {.column width="50%"}
 - Remove 'dust' shots
 - Average shot intensities
 - Mask noisy wavelenghts
 - Zero out negative values
-:::
-::: {.column width="50%"}
+::::
+
+:::: {.column width="50%"}
 ![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top: -400px;" data-id="x1"}
 <div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
-:::
 ::::
+:::::
+
+::: {.notes}
+After we've masked, we proceed to set negative values to zero.
+These negative values represent noise that stems from the pre-CCS preprocessing phase --- likely the continuum removal step.
+:::
 
 ## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
 :::: {.columns}
@@ -70,6 +234,21 @@ format:
 <div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 57%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
 :::
 ::::
+
+::: {.notes}
+We transpose the data, meaning the wavelengths are now the columns and the rows are the averaged sample location intensity values for the given wavelengths.
+Essentially, this means we have 5 locations per samples times 408 samples, giving us 2040 rows.
+Of course, in practice, we divide the data into five folds, where one represents the test set.
+
+From here on, the steps become easier to imagine if you 
+
+We now filter the data.
+At this point, as illustrated in the figure, we process the data for each oxide.
+So for each oxide, we filter it by the compositional range associated with a given submodel.
+
+<!--  TODO: Is there more? -->
+:::
+
 
 ## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
 :::: {.columns}
@@ -89,31 +268,47 @@ format:
 :::
 ::::
 
+::: {.notes}
+<!--  TODO: QUICK DRAFT BELOW  -->
+- **Norm 1** normalizes full spectrum by total across the total across all three spectrometers, so the resulting spectrum adds up to 1.
+- **Norm 3** normalizes on a per-spectrometer basis, resulting in a full normalized spectrum that sups to 3 (because there are 3 separate detectors...).
+:::
+
+
 ## Submodels {.unlisted}
+:::: {.columns}
+::: {.column width="50%"}
 - Submodels
+    - Full
     - Low
     - Mid
     - High
-    - Full
 - Each trained on subset of data
 - Cross validated
+:::
 
-## PLS1-SM Inference
-Final output given by
-
-$$
-\begin{align*}
-w_{\text{mid}} &= \frac{y_{\text{full}}-y_{\text{blend range, min}}}{y_{\text{blend range, max}} - y_{\text{blend range, min}}} \\
-w_{\text{low}} &= 1 - w_{\text{mid}} \\
-y_{\text{final}} &= w_{\text{low}}\cdot y_{\text{low}} + w_{\text{mid}}\cdot y_{\text{mid}}
-\end{align*}
-$$
+::: {.column width="50%"}
+![PLS Training](/static/methodology/pls_training.png){width="50%"}
+:::
+::::
 
 ## Outlier Removal {.unlisted}
-- Iterative outlier removal
+- Iterative, automated outlier removal
 - Based on influence plots of
     - leverage
     - spectral residuals
+
+## Outlier Removal {.unlisted}
+::: {.r-stack}
+![](/static/methodology/FeOT_Full_1.png)
+
+![](/static/methodology/FeOT_Full_2.png){.fragment fragment-index=1}
+
+![](/static/methodology/FeOT_Full_3.png){.fragment fragment-index=2}
+
+![](/static/methodology/FeOT_Full_4.png){.fragment fragment-index=3}
+:::
+
 
 ## ICA
 - Similar preprocessing, except no averaging
