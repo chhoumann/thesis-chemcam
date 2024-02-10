@@ -366,6 +366,16 @@ As you can see, those items with both a high error and leverage are classified a
 :::
 ::::
 
+::: {.notes}
+I won't go into much detail about the preprocessing stage in PLS.
+The process mostly follows the same steps as in PLS-SM, except we don't filter for any compositional ranges here.
+
+We also do not average the shots, and instead preserve the intensity values for each shot, except the first five.
+
+Finally, we don't use all five location datasets for each sample. That is left as an experiment, which Ivik will go into details about. We chose to do it this way because it was unclear whether the original authors used all location datasets or just one per sample.
+:::
+
+
 ## ICA {.unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
@@ -376,19 +386,46 @@ As you can see, those items with both a high error and leverage are classified a
 :::
 ::::
 
+::: {.notes}
+At this point, we use the Joint Approximate Diagonalization of Eigenmatrices algorithm to compute ICA scores.
+
+The JADE algorithm starts by computing a mixing matrix, consisting of independent component values for each sample.
+By taking the product of the mixing matrix and the normalized data, we get the estimated sources.
+
+We use this to train regression models later.
+:::
+
+
 ## ICA {.unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
 - Calculate correlation between ICs and wavelengths
-    - Finds relevant spectral lines for each component
-- Train regression models
-    - Data transformation
-    - Uses ICA scores
+
 :::
-::: {.column width="50%" height="100%" style="display: flex; align-content: center; height=100%"}
-![ICA Postprocessing](static/methodology/ica_postprocessing.png){width="75%"}
+::: {.column width="50%"}
+![ICA Postprocessing](static/methodology/ica_postprocessing.png){width="50%"}
 :::
 ::::
+
+::: {.notes}
+For the postprocessing phase, we start by calculating correlations between the independent components from JADE and the wavelenghts.
+Using this, we can identify which wavelengths are associated with which independent components by computing the maximum correlation for each wavelength.
+This gives us a matrix of ICA scores that we then use for regression.
+This finds the most relevant spectral lines for each component.
+
+We then create a wavelength matrix using the most correlated comopnent for each wavelength
+:::
+
+
+## ICA-Score based Regression Models {.unlisted .smaller}
+![a](static/methodology/ica_regression.png)
+
+::: {.notes}
+- Train regression models
+- Data transformation
+- Uses ICA scores
+:::
+
 
 ## MOC
 - Weighted combination of the predictions
@@ -396,11 +433,10 @@ As you can see, those items with both a high error and leverage are classified a
     - Depends on which model performs best
 
 ## Differences
-- Omitted weighing by inverse IRF
+- We do not weighing by inverse IRF
 - No MAD outlier removal for ICA
 - Automated what they did manually (outlier removal PLS)
 - Our test fold was not carefully selected to be representative (just randomized)
-
 
 # Experiments
 {{< include sections/_experiments.qmd >}}
