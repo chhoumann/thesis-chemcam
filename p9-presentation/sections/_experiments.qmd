@@ -65,7 +65,7 @@ We had to ensure that the experiments were impactful enough to be able to determ
 <br>
 We settled on conducting 5 sets of experiments. 
 The first set of experiments were centered around outlier removal.
-In the initial stages of our implementation we realized that we would not be able to do outlier detection in the same way that clegg et. al did it. 
+In the initial stages of our implementation we realized that we would not be able to do outlier detection in the same way that Clegg et. al did it. 
 Both in terms of the PLS-SM side of the pipeline and also in the ICA side of the pipeline.
 Therefore we thought it would be interesting to conduct experiments that tested different aspects of our outlier removal process.
 
