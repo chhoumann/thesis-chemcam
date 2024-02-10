@@ -240,7 +240,7 @@ Recall that in our baseline implementation we used 1 dataset per sample.
 We chose the second option for its simplicity and since we had already confirmed that ICA seemed susceptible to outliers, we thought that averaging could help stabilize the values and perhaps make it easier for ICA to identify the principal components. 
 
 **Table 4.1**
-As can be seen in the first table the results are fairly similar across all oxides, except for Silicium where the results are quite a bit worse. These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which suggests that it made it easier for ICA to separate out these signals. However, as can be seen it clearly also had the opposite effect for some other oxides as noise in some areas of the dataset were clearly magnified, making it harder to separate out signals for oxides such as silicium. 
+As can be seen in the first table the results are fairly similar across all oxides, except for Silicium where the results are quite a bit worse. These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which suggests that it made it easier for ICA to separate out these signals. However, as can be seen it also had the opposite effect for some other oxides as noise in some areas of the dataset were magnified, making it harder to separate out signals for oxides such as silicium. 
 This is likely do to the smoothing effect that averaging can have on the dataset and silicium may be found in regions that is close to other elements, making the distinction harder for ICA.  
 
 **Table 4.2**
