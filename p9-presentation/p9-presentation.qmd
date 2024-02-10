@@ -54,7 +54,7 @@ And in the end, we put the outputs together to produce the MOC prediction.<br>
 I start by walking through the PLS-SM side, and then the ICA side.
 :::
 
-## PLS-SM
+<!-- ## PLS-SM 
 - Recreating the PLS-SM method presented by @cleggRecalibrationMarsScience2017 and @andersonImprovedAccuracyQuantitative2017
     - Preprocessing
     - Outlier removal
@@ -63,7 +63,7 @@ I start by walking through the PLS-SM side, and then the ICA side.
 
 ::: {.notes}
 Starting with the PLS-SM method, we have attempted to recreate the system presented by both Clegg and Anderson et al.
-:::
+::: -->
 
 ## PLS-SM Motivation {.unlisted auto-animate="true"}
 - **PLS**
@@ -148,8 +148,8 @@ They would occur because the samples in each sub-model with the most "extreme" c
 ::: {.notes}
 Let me illustrate.<br>
 <br>
-I'm starting out by showing you how the model makes predictions, because that is the simplest view to start from.<br>
-<br>
+<!-- I'm starting out by showing you how the model makes predictions, because that is the simplest view to start from.<br>
+<br> -->
 It's important to understand that, in practice, this flow is executed for each oxide.<br>
 For simplicity's sake, we present it as being done wholly.<br>
 <br>
