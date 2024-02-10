@@ -24,7 +24,7 @@ format:
 {{< include sections/_methodology.qmd >}}
 
 ::: {.notes}
-My name is Christian, and I'll be presenting our replica of the MOC pipeline.
+My name is Christian, and I'll be presenting our replica of the MOC pipeline.<br>
 This is what we used to establish baselines for our experiments.
 :::
 
@@ -282,7 +282,7 @@ Now we normalize.
 
 **Norm 1** normalizes full spectrum by total across the total across all three spectrometers, so the resulting spectrum adds up to 1.
 
-**Norm 3** normalizes on a per-spectrometer basis, resulting in a full normalized spectrum that sups to 3 (because there are 3 separate detectors...).
+**Norm 3** normalizes on a per-spectrometer basis, resulting in a full normalized spectrum adds up to 3 (because there are 3 separate detectors...).
 :::
 
 
@@ -319,9 +319,9 @@ We decided to automate this process, whereas the original authors would manually
 The process itself follows the steps seen here.
 First we calculate the leverage and spectral residuals from the scores and loadings of a PLS model.
 
-Leverage is a measure of how far the independent variable values of an observation are from other observations. High-leverage points are outliers w.r.t the independent variables, as they have no neighboring points in space.
+<!-- Leverage is a measure of how far the independent variable values of an observation are from other observations. High-leverage points are outliers w.r.t the independent variables, as they have no neighboring points in space.
 
-Spectral residuals measure how well a given spectrum is explained by the model.
+Spectral residuals measure how well a given spectrum is explained by the model. -->
 
 Then we calculate the Mahalanobis distance for each point in a matrix of the combined leverage and spectral residuals.
 
