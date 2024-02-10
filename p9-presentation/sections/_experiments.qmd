@@ -243,7 +243,7 @@ We chose the second option for its simplicity and since we had already confirmed
 As can be seen in the first table the results are fairly similar across all oxides, except for Silicium where the results are quite a bit worse. These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which suggests that it made it easier for ICA to separate out these signals. However, as can be seen it clearly also had the opposite effect for some other oxides as noise in some areas of the dataset were clearly magnified, making it harder to separate out signals for oxides such as silicium. Perhaps this is not too surprising, but good to have validated none the less.
 
 **Table 4.2**
-The previous results then led us to wonder how much of an effect outlier detection would have with this aggregated dataset. Since the noise in data was clearly being magnified, we reasoned that this would also make it easier to pick out any outliers. 
+The previous results then led us to wonder how much of an effect outlier detection would have with this aggregated dataset. Since the signal in data was clearly being obscured, we reasoned that this would also make it easier to pick out any outliers. 
 And surprisingly, it did. 
 Looking at the results and comparing to the original from clegg, we see that for 5 out 8 oxides the results were significantly better. 
 This tells us two things. Firstly, we confirm once again that ICA is very dependent on a strategic outlier removal process, especially for LIBS data, as the results of some oxide predictions require more available data, while others need less. 
