@@ -19,7 +19,7 @@ Presenter: Ivik Lau Dalgas Hostrup.
 - Figuring out which components to conduct experiments on
 :::
 ::: {.fragment .fade-up}
-- Time is a contraint - Which experiments are most meaningful?
+- Time is a contraint - which experiments are most meaningful?
 :::
 </div>
 ::: 
