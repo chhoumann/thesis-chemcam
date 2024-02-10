@@ -255,8 +255,7 @@ From here on, the steps become easier to imagine if you
 We now filter the data.
 At this point, as illustrated in the figure, we process the data for each oxide.
 So for each oxide, we filter it by the compositional range associated with a given submodel.
-
-<!--  TODO: Is there more? -->
+This gives us the training data for this model's compositional range.
 :::
 
 
@@ -279,22 +278,21 @@ So for each oxide, we filter it by the compositional range associated with a giv
 ::::
 
 ::: {.notes}
-<!--  TODO: QUICK DRAFT BELOW  -->
-- **Norm 1** normalizes full spectrum by total across the total across all three spectrometers, so the resulting spectrum adds up to 1.
-- **Norm 3** normalizes on a per-spectrometer basis, resulting in a full normalized spectrum that sups to 3 (because there are 3 separate detectors...).
+Now we normalize.
+
+**Norm 1** normalizes full spectrum by total across the total across all three spectrometers, so the resulting spectrum adds up to 1.
+
+**Norm 3** normalizes on a per-spectrometer basis, resulting in a full normalized spectrum that sups to 3 (because there are 3 separate detectors...).
 :::
 
 
-## Submodels {.unlisted}
+## Training Phase {.unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
-- Submodels
-    - Full
-    - Low
-    - Mid
-    - High
-- Each trained on subset of data
+- Outlier removal
+- Each model trained on subset of data
 - Cross validated
+- Train on all training folds & evaluate
 :::
 
 ::: {.column width="50%"}
@@ -303,10 +301,38 @@ So for each oxide, we filter it by the compositional range associated with a giv
 ::::
 
 ## Outlier Removal {.unlisted}
-- Iterative, automated outlier removal
-- Based on influence plots of
-    - leverage
-    - spectral residuals
+Iterative, automated outlier removal process:
+
+1. Compute leverage & spectral residuals
+2. Calculate Mahalanobis distance $d$
+3. Get critical value $c$
+4. Classify sample as outlier if $d>c$
+5. Remove outliers & train new model
+6. Repeat until model performance ceases to improve
+
+::: {.notes}
+The outlier removal process is iterative and works using influence plots of leverage and spectral residuals.
+It is iterative because removing spectra that appear as outliers can reveal additional outliers.
+
+We decided to automate this process, whereas the original authors would manually select outliers based on expertise.
+
+The process itself follows the steps seen here.
+First we calculate the leverage and spectral residuals from the scores and loadings of a PLS model.
+
+Leverage is a measure of how far the independent variable values of an observation are from other observations. High-leverage points are outliers w.r.t the independent variables, as they have no neighboring points in space.
+
+Spectral residuals measure how well a given spectrum is explained by the model.
+
+Then we calculate the Mahalanobis distance for each point in a matrix of the combined leverage and spectral residuals.
+
+We obtain a critical value that is based on a chi-square distribution for a 97.5% confidence interval given 2 degrees of freedom.
+
+We compare the distances against this critical value, using it as a threshold, where distances above this threshold are classified as outliers.
+
+Then we remove outliers from the dataset, retrain a PLS model, and then repeat the process.
+:::
+
+
 
 ## Outlier Removal {.unlisted}
 ::: {.r-stack}
@@ -317,18 +343,52 @@ So for each oxide, we filter it by the compositional range associated with a giv
 ![](/static/methodology/FeOT_Full_3.png){.fragment fragment-index=2}
 
 ![](/static/methodology/FeOT_Full_4.png){.fragment fragment-index=3}
+
+![](/static/methodology/FeOT_Full_5.png){.fragment fragment-index=4}
 :::
 
+::: {.notes}
+The process itself is easily seen as we step through these influence plots.
+
+As you can see, those items with both a high error and leverage are classified as outliers and are promptly removed.
+:::
 
 ## ICA
-- Similar preprocessing, except no averaging
+:::: {.columns}
+::: {.column width="50%"}
+- Similar preprocessing to PLS-SM, except:
+    - No averaging
+    - No compositional range filtering
     - Uses only one location per sample
+:::
+::: {.column width="50%"}
+![ICA Preprocessing](static/methodology/ica_preprocessing.png){width="55%"}
+:::
+::::
+
+## ICA {.unlisted}
+:::: {.columns}
+::: {.column width="50%"}
 - Uses JADE
+:::
+::: {.column width="50%"}
+![JADE](static/methodology/ica_jade.png){width="55%"}
+:::
+::::
+
+## ICA {.unlisted}
+:::: {.columns}
+::: {.column width="50%"}
 - Calculate correlation between ICs and wavelengths
     - Finds relevant spectral lines for each component
 - Train regression models
     - Data transformation
     - Uses ICA scores
+:::
+::: {.column width="50%" height="100%" style="display: flex; align-content: center; height=100%"}
+![ICA Postprocessing](static/methodology/ica_postprocessing.png){width="75%"}
+:::
+::::
 
 ## MOC
 - Weighted combination of the predictions
