@@ -28,33 +28,34 @@ My name is Christian, and I'll be presenting our replica of the MOC pipeline.
 This is what we used to establish baselines for our experiments.
 :::
 
-## MOC {auto-animate="true"}
+## MOC Pipeline {auto-animate="true"}
 ::: {style="width=100%;"}
-![](/static/methodology/pipeline.png){fig-align="center" width="auto"}
+![](/static/methodology/pipeline.png){fig-align="center" width="35%"}
 :::
 ::: {.fragment data-id="moc-box"}
-<div style="position: absolute; top: 35%; left: 28%; width: 20%; height: 45%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 34.45%; left: 30.5%; width: 18%; height: 35.25%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
 :::
 
 ::: {.fragment data-id="moc-box"}
-<div style="position: absolute; top: 35%; left: 51%; width: 20%; height: 45%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 34.45%; left: 51.25%; width: 18%; height: 35.25%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
 :::
 
 ::: {.notes}
 This is the entire MOC pipeline at inference-time.
 
-I start by walking through the PLS-SM side, and then the ICA side.
+We have attempted to replicate this pipeline as faithfully as we could, but have had to make some design choices that differ from the original --- mostly due to a lack of information regarding some aspects of the original design.
 
 It's important to keep in mind that this pipeline is for multivariate regression.
 That means we create predictions for each of 8 major oxides.
 However, most of the steps actually involve data being processed for each oxide individually.
 For both ICA and PLS, you can imagine that after some preprocessing steps, we branch out into 8 branches, each of which predict its own values for its associated oxide.
 And in the end, we put the outputs together to produce the MOC prediction.
+
+I start by walking through the PLS-SM side, and then the ICA side.
 :::
 
 ## PLS-SM
-- Recreating the MOC pipeline presented in @cleggRecalibrationMarsScience2017
-- Starting with the PLS-SM approach by @andersonImprovedAccuracyQuantitative2017
+- Recreating the PLS-SM method presented by @cleggRecalibrationMarsScience2017 and @andersonImprovedAccuracyQuantitative2017
     - Preprocessing
     - Outlier removal
     - Training
@@ -68,8 +69,6 @@ Starting with the PLS-SM method, we have attempted to recreate the system presen
 - **PLS**
     - Good for chemometrics
     - Readily intrepretable
-
-
 
 ::: {.notes}
 Let me start by explaining what motivated PLS-SM, because that will help us understand why it does what it does.
@@ -117,21 +116,6 @@ So the solution was to combine several regression models trained on subsets of t
 In this case, they created 3 overlapping submodels for most of the major oxides (low, mid, high), and a full model training on the full compositional range.
 :::
 
-
-
-## PLS-SM Inference {.unlisted}
-![](/static/methodology/pls_inference.png){fig-align="center" width="70%"}
-
-::: {.notes}
-I'm starting out by showing you how the model makes predictions.
-PLS-SM is an approach that uses PLS submodels to make predictions.
-It has a full model that makes some initial prediction, which it uses to determine which submodels should make the final prediction.
-They
-
-:::
-
-
-
 ## Compositional Ranges {.unlisted}
 
 | Oxide | Full     | Low     | Mid      | High     |
@@ -146,7 +130,33 @@ They
 | K2O   | (0, 100) | (0, 2)  | *N/A*    | (1.5, 100)|
 
 ::: {.footer}
-All submodel PLS configurations are taken directly from @cleggRecalibrationMarsScience2017.
+All submodel PLS configurations are taken from @cleggRecalibrationMarsScience2017.
+:::
+
+::: {.notes}
+These are the compositional ranges that @cleggRecalibrationMarsScience2017 presented in their paper.
+
+As can be seen, the ranges overlap.
+This is to avoid discontinuities in the final combined results.
+They would occur because the samples in each sub-model with the most "extreme" compositions aren't necessarily weighted as strongly when the model is trained, so may be less accurately predicted.
+:::
+
+
+## PLS-SM Inference {.unlisted}
+![](/static/methodology/pls_inference.png){fig-align="center" width="70%"}
+
+::: {.notes}
+Let me illustrate.
+
+I'm starting out by showing you how the model makes predictions, because that is the simplest view to start from.
+
+It's important to understand that, in practice, this flow is executed for each oxide.
+For simplicity's sake, we present it as being done wholly.
+
+The full model is used to estimate the composition of an unknown target, and the appropriate sub-model(s) is then chosen based on this estimation for a more accurate prediction.
+
+If the initial estimate falls within the the range of only a single model, we use the full prediction from that model.
+Conversely, if the estimate falls within an overlapping range (blending range), we blend the predictions of the corresponding submodels such that the prediction is weighted favoring the submodel whose range the initial estimate is closest to.
 :::
 
 ## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
