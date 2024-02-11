@@ -366,7 +366,7 @@ As you can see, those items with both a high error and leverage are classified a
 ::::
 
 ::: {.notes}
-I won't go into much detail about the preprocessing stage in PLS.<br>
+I won't go into much detail about the preprocessing stage in the ICA phase.<br>
 The process mostly follows the same steps as in PLS-SM, except we don't filter for any compositional ranges here.<br>
 <br>
 We also do not average the shots, and instead preserve the intensity values for each shot, except the first five.<br>
@@ -375,10 +375,11 @@ Finally, we don't use all five location datasets for each sample. That is left a
 :::
 
 
-## ICA {.unlisted}
+## ICA Phase {.unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
-- Uses JADE
+- ICA
+- Using JADE
 :::
 ::: {.column width="50%"}
 ![JADE](static/methodology/ica_jade.png){width="55%"}
@@ -386,12 +387,11 @@ Finally, we don't use all five location datasets for each sample. That is left a
 ::::
 
 ::: {.notes}
-At this point, we use the Joint Approximate Diagonalization of Eigenmatrices algorithm to compute ICA scores.<br>
+To actually do Independent Component Analysis (ICA), we use the JADE algorithm, just as the original authors.<br>
+ICA is conceptually similar to PCA in that it decomposes data to a smaller number of variables.<br>
+However, it does not require the components to be perpendicular to each other; instead, it seeks components that are statistically independent.<br>
 <br>
-The JADE algorithm starts by computing a mixing matrix, consisting of independent component values for each sample.<br>
-By taking the product of the mixing matrix and the normalized data, we get the estimated sources.<br>
-<br>
-We use this to train regression models later.
+The result of running JADE 
 :::
 
 
