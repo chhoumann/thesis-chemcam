@@ -352,7 +352,7 @@ The process itself is easily seen as we step through these influence plots.<br>
 As you can see, those items with both a high error and leverage are classified as outliers and are promptly removed.
 :::
 
-## ICA
+## ICA Preprocessing
 :::: {.columns}
 ::: {.column width="50%"}
 - Similar preprocessing to PLS-SM, except:
@@ -375,11 +375,12 @@ Finally, we don't use all five location datasets for each sample. That is left a
 :::
 
 
-## ICA Phase {.unlisted}
+## ICA - JADE {.unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
 - ICA
 - Using JADE
+- Get estimated sources from the data
 :::
 ::: {.column width="50%"}
 ![JADE](static/methodology/ica_jade.png){width="55%"}
@@ -389,16 +390,24 @@ Finally, we don't use all five location datasets for each sample. That is left a
 ::: {.notes}
 To actually do Independent Component Analysis (ICA), we use the JADE algorithm, just as the original authors.<br>
 ICA is conceptually similar to PCA in that it decomposes data to a smaller number of variables.<br>
-However, it does not require the components to be perpendicular to each other; instead, it seeks components that are statistically independent.<br>
+The main idea to to take some original set of data, consisting of mixed signals. <br>
+
+Then reconstruct these via:
+- a mixing matrix, each column measuring how much each source contributes to the mixed signals, and
+- a matrix of independent components, called the estimated sources matrix
+
 <br>
-The result of running JADE 
+The result of running JADE is the estimated sources.<br>
+We'll use these in the next step, postprocessing.
 :::
 
 
-## ICA {.unlisted}
+## ICA Postprocessing {.unlisted}
 :::: {.columns}
 ::: {.column width="50%"}
 - Calculate correlation between ICs and wavelengths
+- Find most correlated
+- Get composition values for samples
 
 :::
 ::: {.column width="50%"}
@@ -407,12 +416,12 @@ The result of running JADE
 ::::
 
 ::: {.notes}
-For the postprocessing phase, we start by calculating correlations between the independent components from JADE and the wavelenghts.<br>
+For the postprocessing phase, we start by calculating correlations between the estimated sources from JADE and the wavelenghts.<br>
 Using this, we can identify which wavelengths are associated with which independent components by computing the maximum correlation for each wavelength.<br>
 This gives us a matrix of ICA scores that we then use for regression.<br>
 This finds the most relevant spectral lines for each component.<br>
 <br>
-We then create a wavelength matrix using the most correlated comopnent for each wavelength
+Finally, we curate the compositions for the samples we've processed, which will be used to train the regression models.
 :::
 
 
@@ -420,16 +429,24 @@ We then create a wavelength matrix using the most correlated comopnent for each 
 ![a](static/methodology/ica_regression.png)
 
 ::: {.notes}
-- Train regression models
-- Data transformation
-- Uses ICA scores
+- We train regression models on the ICA scores and composition data
+- First, the ICA scores go through data transformation to one of the regression laws seen here
+- The regression models are then trained with the scores as inputs and composition data as targets
 :::
 
 
-## MOC
-- Weighted combination of the predictions
-    - Varying weight by oxide
-    - Depends on which model performs best
+## Multivariate Oxide Compositions
+::: {style="width=100%;"}
+![](/static/methodology/pipeline.png){fig-align="center" width="35%"}
+:::
+::: {data-id="moc-box"}
+<div style="position: absolute; top: 75.5%; left: 40.9%; width: 18%; height: 21%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+:::
+
+::: {.notes}
+- Varying weight by oxide
+- Depends on which model performs best
+:::
 
 ## Differences
 - We do not weighing by inverse IRF
