@@ -95,7 +95,7 @@ PLS1 is the case where there's only a single dependent variable --- so it's for 
 ## PLS-SM Motivation {.unlisted auto-animate="true"}
 - PLS
 - PLS2 vs. PLS1
-- **Solution: Submodels**
+- **Submodels**
     - More accurate when focusing on specific concentration ranges
     - Single regression model: good general performance, worse on some individual samples
     - So combine several models trained on subsets of the full compositional range
