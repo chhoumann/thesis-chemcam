@@ -265,7 +265,7 @@ Now we normalize.<br>
 <br>
 **Norm 1** normalizes full spectrum by total across the total across all three spectrometers, so the resulting spectrum adds up to 1.<br>
 <br>
-**Norm 3** normalizes on a per-spectrometer basis, resulting in a full normalized spectrum adds up to 3 (because there are 3 separate detectors...).
+**Norm 3** normalizes on a per-spectrometer basis, resulting in a full normalized spectrum adds up to 3 (because there are 3 separate spectrometers...).
 :::
 
 
