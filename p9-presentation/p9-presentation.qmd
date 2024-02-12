@@ -10,7 +10,7 @@ format:
     revealjs:
         theme: serif
         progress: true
-        toc: true
+        toc: false
         css: styles.css
         transition: slide
         transition-speed: fast
@@ -20,7 +20,7 @@ format:
 # Introduction
 {{< include sections/_introduction.qmd >}}
 
-# Methodology
+# MOC Pipeline Replica
 {{< include sections/_methodology.qmd >}}
 
 # Experiments

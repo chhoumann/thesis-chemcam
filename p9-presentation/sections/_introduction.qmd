@@ -7,10 +7,8 @@ Presenter: Patrick Frostholm Østergaard.
 
 :::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
-- 1970s: Viking missions
+- 1970s: NASA Viking missions
 	- *"Is there life on Mars?"*
-:::
 
 ::: {.fragment .fade-up fragment-index=2}
 - 1990s: Philosophical shift
@@ -35,9 +33,7 @@ Presenter: Patrick Frostholm Østergaard.
 
 :::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1 style="border-radius: 10px;"}
 ![Viking Lander](static/introduction/viking-lander.jpg){width="60%" height="60%" .rounded-fig}
-:::
 
 ::: {.fragment .fade-up fragment-index=4}
 ![Mars Science Laboratory Curiosity Rover](static/introduction/msl.jpg){width="75%" height="75%" .rounded-fig}
@@ -48,7 +44,7 @@ Presenter: Patrick Frostholm Østergaard.
 :::::
 
 ::: {.notes}
-In the 1970s, the Viking missions were the first to land on Mars.<br>
+In the 1970s, the NASA Viking mission was the first to land a spacecraft on Mars.<br>
 Goal: Is there life on Mars?<br>
 Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
 
@@ -57,6 +53,7 @@ Experiments showed positive results, but the results were inconclusive and were 
 In 2004, the Mars Exploration Rover mission landed the rovers Spirit and Opportunity on Mars, which quickly discovered evidence of water on Mars.
 
 A few years later in 2012, the Mars Science Laboratory (MSL) mission landed the Curiosity rover on Mars.<br>
+This is the rover that we concern ourselves with in this project.<br>
 Rover is equipped with a suite of instruments to study the Martian climate and geology and to search for organic material.
 
 One of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance.<br>
@@ -65,8 +62,8 @@ This requires the development of machine learning models to analyze the data, wh
 Specifically, this type of problem is a supervised learning, multivariate regression problem.<br>
 It is supervised because we have labeled data, and it is multivariate because we are predicting multiple outputs.<br>
 NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.<br>
-We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the models are far from perfect and that there is room for improvement.<br>
-Following this, we have decided to replicate and attempt to improve upon their work.
+We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the current model is far from perfect and that there is room for improvement.<br>
+Following this, we have decided to replicate and identify limitations in their work, which is the focus of our pre-thesis project.
 :::
 
 
@@ -76,9 +73,7 @@ Following this, we have decided to replicate and attempt to improve upon their w
 
 ::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
 - Current model: **M**ultivariate **O**xide **C**omposition (*MOC*)
-:::
 
 ::: {.fragment .fade-up}
 - Predicts composition from **C**lean, **c**alibrated **s**pectra (*CCS*)
@@ -95,9 +90,7 @@ Following this, we have decided to replicate and attempt to improve upon their w
 :::
 
 ::: {.column width="50%" style='display: flex; justify-content: center; align-items: center;'}
-::: {.fragment .fade-up fragment-index=1}
 ![](static/introduction/pipeline.png){width="65%" height="65%"}
-:::
 :::
 
 ::::
@@ -120,7 +113,7 @@ Our goal was to replicate the MOC model and perform experiments to identify the 
 We do this through a series of experiments, which Ivik will explain in more detail later in the presentation.
 
 By doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved.<br>
-This is the focus of our pre-thesis project, and we will present our findings in this presentation and talk about our plans for the thesis project next semester.
+Later on in the presentation, we will present our findings and talk about our plans for the thesis project next semester.
 :::
 
 
@@ -181,34 +174,32 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 
 ::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
 - 408 pressed powder samples
-- 5 locations per sample
-- 50 shots location
-:::
+	- 5 locations per sample
+	- 50 shots location
+	- 3 spectrometers
 
 ::: {.fragment .fade-up fragment-index=2}
 - Grouped into folders:
 	- Each folder corresponds to a sample
 :::
-::: {.fragment .fade-up}
-- Masked regions:
-	- 240.811 — 246.635 nm
-	- 338.457 — 340.797 nm
-	- 382.138 — 387.859 nm
-	- 473.184 — 492.427 nm
-	- 849.000 — 905.574 nm
+
+::: {.fragment .fade-up fragment-index=3}
+- Spectrum for cadillac
+	- x-axis: wavelength
+	- y-axis: intensity
+	- Some regions masked
 :::
 
 :::
 
 ::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
+::: {.fragment .fade-up fragment-index=2}
 ![](static/introduction/folder-structure.png){width="35%" height="35%" fig-align="center"}
 :::
 
-::: {.fragment .fade-up fragment-index=2}
+::: {.fragment .fade-up fragment-index=3}
 ![](static/introduction/spectrum.png)
 :::
 
@@ -219,7 +210,8 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 ::: {.notes}
 Now we will take a closer look at data that we have worked with this semester.<br>
 First, we have the calibration dataset, which consists of 408 pressed powder samples.<br>
-Each sample was shot at 5 different locations, and 50 shots were taken at each location.
+Each sample was shot at 5 different locations, and 50 shots were taken at each location.<br>
+The emitted light for each shot is then captured by 3 different spectrometers, each designed to analyze specific portions of the light spectrum.
 
 The data is grouped into folders where each folder corresponds to a sample.<br>
 Each folder contains a .csv file for each location, and each .csv file contains the spectra for the 3 spectrometers.<br>
@@ -228,7 +220,6 @@ This is what we refer to as the CCS data.
 An example of a spectrum is shown in the figure on the right.<br>
 The x-axis represents the wavelength, and the y-axis represents the intensity of the light at each wavelength.<br>
 As you can see, there are some regions of the spectrum that are masked out.<br>
-These regions are at the edges of each of the spectrometers' ranges and are not used in the analysis because they are noisy and not very informative.<br>
 This masking is part of the preprocessing of the CCS data, which is something we will talk more about later in the presentation.
 :::
 
@@ -240,9 +231,10 @@ This masking is part of the preprocessing of the CCS data, which is something we
 
 ::: {.fragment .fade-up}
 - Composition data is used to train the MOC model
+\
 
-::: {style="font-size: 0.5em;"}
-| Target | Spectrum Name | Sample Name | SiO2 | TiO2 | Al2O3 | FeOT | MnO | MgO | CaO | Na2O | K2O | MOC total |
+::: {style="font-size: 0.7em; padding-bottom: 20px;"}
+| Target | Spectrum<br>Name | Sample<br>Name | SiO2 | TiO2 | Al2O3 | FeOT | MnO | MgO | CaO | Na2O | K2O | MOC total |
 |--------|---------------|-------------|------|------|-------|------|-----|-----|-----|------|-----|-----------|
 | AGV2   | AGV2          | AGV2        | 59.3 | 1.05 | 16.91 | 6.02 | 0.099 | 1.79 | 5.2 | 4.19 | 2.88 | 97.44 |
 | BCR-2  | BCR2          | BCR2        | 54.1 | 2.26 | 13.5 | 12.42 | 0.2 | 3.59 | 7.12 | 3.16 | 1.79 | 98.14 |
@@ -253,23 +245,42 @@ This masking is part of the preprocessing of the CCS data, which is something we
 :::
 
 ::: {.fragment .fade-up}
-![](static/introduction/oxide_corr.png){width="60%" height="60%" fig-align="center"}
+- Uncertainties:
+	- Presence of other elements
+	- Measurement uncertainties
 :::
+
 
 ::: {.notes}
 Next, we have the composition data, which is our ground truth.<br>
 It contains 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, and $\text{K}_2\text{O}$.<br>
-For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides.
-
+For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides.<br>
 This data is used to train the MOC model.<br>
+
 This table here shows an excerpt of the composition data for a few samples.<br>
 You can see that we know the composition of each sample in terms of the weight percentage of each of the major oxides.<br>
 The last column is the total weight percentage of the oxides, which should in theory sum to 100%.<br>
-However, as you can see, the sum is not always exactly 100%, which is due to the presence of other elements in the samples that are not considered major oxides.<br>
-In the last row, you can see that the sum is actually greater than 100%, which is a physical impossibility.
+However, as you can see, the total percentages might not always add up to exactly 100%, occasionally even exceeding it.<br>
+This discrepancy arises from two main factors.
 
+Firstly, the samples often contain additional elements beyond the major oxides we focus on, which can result in a total below 100%.<br>
+Secondly, the inherent uncertainties in experimental measurements can cause the sum to vary, causing the total to etiher fall below or exceed 100%.<br>
+:::
+
+## Correlations {.smaller}
+![](static/introduction/oxide_corr.png){width="80%" height="80%" fig-align="center"}
+
+- Pearson correlation coefficient
+
+::: {.fragment .fade-up}
+- Some strong correlations
+	- For example $\text{SiO}_2$ and $\text{CaO}$
+:::
+
+::: {.notes}
 This figure here shows the correlation between the different oxides as a heatmap.<br>
 The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.<br>
+
 For example, $\text{SiO}_2$ and $\text{CaO}$ are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases.<br>
-This is the data that we use to train our models, which Christian will talk about next.
+So that was the data we used to train our models, and now Christian will talk about the models themselves.
 :::
