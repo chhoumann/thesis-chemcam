@@ -340,7 +340,7 @@ Then we remove outliers from the dataset, retrain a PLS model, and then repeat t
 ::: {.notes}
 The process itself is easily seen as we step through these influence plots.<br>
 <br>
-As you can see, those items with both a high error and leverage are classified as outliers and are promptly removed.
+As you can see, data points with both a high error and leverage are classified as outliers and are promptly removed.
 :::
 
 ## MOC Pipeline {auto-animate="true"}
