@@ -146,8 +146,7 @@ However, given that our results with both types of outlier removal are generally
 Moving on to our third outlier experiment, we wanted to actually implement MAD for ICA. 
 As we mentioned in the report we were unsure about how they had actually implemented it. 
 Therefore we chose to have it be an experiment to implement a version which we thought was most appropiate.
-Initially, one would think that this is not necessarily the most informative experiment since we would just be implementing what should already have been there. 
-However, it allowed us to do a with/without outlier removal test, similar to the PLS, and as such test the intrinsic robustness of the ICA model.
+This experiment allowed us to do a with/without outlier removal test, similar to the PLS, and as such test the intrinsic robustness of the ICA model.
 
 **Table 3**
 <br>
