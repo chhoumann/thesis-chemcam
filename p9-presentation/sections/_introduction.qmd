@@ -210,7 +210,7 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 ::: {.notes}
 Now we will take a closer look at data that we have worked with this semester.<br>
 First, we have the calibration dataset, which consists of 408 pressed powder samples.<br>
-Each sample was shot at 5 different locations, and 50 shots were taken at each location.
+Each sample was shot at 5 different locations, and 50 shots were taken at each location.<br>
 The emitted light for each shot is then captured by 3 different spectrometers, each designed to analyze specific portions of the light spectrum.
 
 The data is grouped into folders where each folder corresponds to a sample.<br>
