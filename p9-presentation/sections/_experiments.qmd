@@ -1,1 +1,404 @@
 Presenter: Ivik Lau Dalgas Hostrup.
+
+## Answering the Problem Definition {.smaller}
+<div class="experiments-spacing">
+<p class="experiments-header">The Problem Definition:</p>
+<div class="experiments-align-center">
+<p style="font-size: 30px">*Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error E(M)* 
+</p>
+</div>
+</div>
+
+::: {.fragment .fade-up}
+<div class="experiments-spacing">
+<p class="experiments-header">The Challenges:</p>
+::: {.fragment .fade-up}
+- Determine what a component is
+:::
+::: {.fragment .fade-up}
+- Figuring out which components to conduct experiments on
+:::
+::: {.fragment .fade-up}
+- Time is a contraint - which experiments are most meaningful?
+:::
+</div>
+::: 
+
+::: notes
+**Experiments introduction**
+<br>
+Once the replication process was done we had to decide on a set of experiments that would best answer our problem definition.
+<br>
+A tricky aspects of answering the problem definition is defining what constitutes a component and in turn, how to define an experiment that would allow us to determine its contribution to the over all error.
+<br>
+On top of this, was the looming time constraint for delivery on the project. This meant that we had to be selective on the type of experiments that we chose.
+We had to ensure that the experiments were impactful enough to be able to determine something about the pipeline.
+:::
+
+## Our Choice of Experiments
+<div class="experiments-spacing">
+<p class="experiments-header" style="font-size: 30px;">Outlier based experiments</p>
+</div>
+
+::: {.fragment .fade-up}
+1. Evaluating the necessity of automated outlier removal in the PLS1-SM
+:::
+::: {.fragment .fade-up}
+::: {style="font-size: 0.5em;"}
+| Element | Baseline | Without outlier removal | PLS1-SM (Clegg) |
+|---------|---------:|------------------------:|----------------:|
+| SiO2    |     5.81 |                    5.81 |            4.33 |
+| TiO2    |     0.47 |                    0.47 |            0.94 |
+| Al2O3   |     1.94 |                    1.91 |            2.85 |
+| FeOT    |     4.35 |                    4.35 |            2.01 |
+| MgO     |     1.17 |                    1.17 |            1.06 |
+| CaO     |     1.43 |                    1.44 |            2.65 |
+| Na2O    |     0.66 |                    0.67 |            0.62 |
+| K2O     |     0.72 |                    0.70 |            0.72 |
+
+
+:::
+:::
+
+::: {.notes}
+**The experiments that we chose**
+<br>
+We settled on conducting 5 sets of experiments. 
+The first set of experiments were centered around outlier removal.
+In the initial stages of our implementation we realized that we would not be able to do outlier detection in the same way that Clegg et. al did it. 
+Both in terms of the PLS side of the pipeline and also in the ICA side of the pipeline.
+Therefore we thought it would be interesting to conduct experiments that tested different aspects of our outlier removal process.
+
+**(1) Automated outlier removal**
+<br>
+The first experiment that we decided to conduct was to evaluate the effects of not doing outlier removal vs. our automated outlier removal for PLS-SM. 
+The outcome of this experiment would provide us answers to two things. The first being an evaluation of our automated outlier removal. 
+The second being an evaluation of the PLS model's intrinsic ability to handle outliers. 
+
+
+**Table 1**
+<br>
+As you can see from the table, our outlier removal had almost no effect on the RMSE. 
+This result was surprising to us. 
+We did not necessarily have any expectation that our outlier removal would perform better than clegg et. al's, however, we would have expected to see more of an effect since we were removing quite a few outliers that theoretically should have a high, negative impact on the model's predictions.  
+The interesting result, though, is the fact that PLS performed very well without our outlier removal and in fact comparable to clegg's results, who manually picked out outliers.
+This result indicates that our outlier removal is not particularly effective in terms of improving RMSE, but also that PLS is seemingly a robust method in itself.
+Given the fact that we did not see much improvement, and the fact that we do not have the expertise to do manual outlier removal, it would have been beneficial to have investigated other methods such as clustering-based outlier detection rather than statistical approaches like we have used. 
+
+:::
+
+---
+
+## {.smaller}
+
+<div class="experiments-spacing">
+<p class="experiments-header" style="font-size: 30px;">Outlier based experiments</p>
+</div>
+
+2. Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM
+
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.6em;"}
+| Element | Baseline | Fixed thresholds |
+|---------|---------:|-----------------:|
+| SiO2    |     5.81 |             5.81 |
+| TiO2    |     0.47 |             0.47 |
+| Al2O3   |     1.94 |             1.94 |
+| FeOT    |     4.35 |             4.35 |
+| MgO     |     1.17 |             1.18 |
+| CaO     |     1.43 |             1.44 |
+| Na2O    |     0.66 |              0.6 |
+| K2O     |     0.72 |             0.72 |
+
+:::
+:::
+
+::: {.notes}
+**(2) Maintaining leverage and residuals**
+<br>
+In order to further verify the results from the previous slide, we attempted a different approach where instead of recalculating the leverage and residuals for each iteration, we would instead maintain the ones from the second iteration.
+We did this to ensure that we were not being too aggressive in our outlier removal process, since this approach would result in fewer points overall being removed.
+
+**Table 2**
+<br>
+As can be seen in the table, this approach did not provide any improvements to the RMSE, either.
+Perhaps a more specialized outlier approach would yield greater performance of the PLS model. 
+However, given that our results with both types of outlier removal are close to the results of Clegg et. al's we have some evidence, although not conclusive, that the outlier removal component of the PLS phase is not a component that would provide many improvements to the overall RMSE. But as stated before, this may be different with different methods of outlier removal.
+:::
+
+---
+
+## {.smaller}
+
+<div class="experiments-spacing">
+<p class="experiments-header" style="font-size: 30px;">Outlier based experiments</p>
+</div>
+
+
+3. Assessing the impact of the MAD-based method for outlier removal in the ICA phase
+
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.6em;"}
+| Element | ICA baseline | ICA with MAD | ICA (clegg)|
+|---------|-------------:|-------------:|-----------:|
+| SiO2    |        10.68 |         8.64 |        8.31|
+| TiO2    |         0.63 |         0.53 |        1.44|
+| Al2O3   |         5.55 |         3.69 |        4.77|
+| FeOT    |         8.30 |         7.07 |        5.17|
+| MgO     |         2.90 |         2.10 |        4.08|
+| CaO     |         3.52 |         4.00 |        3.07|
+| Na2O    |         1.72 |         1.45 |        2.29|
+| K2O     |         1.37 |         1.15 |        0.98|
+
+:::
+:::
+
+::: {.notes}
+**(3) Median Absolute Deviation outlier ICA**
+<br>
+Moving on to our third outlier experiment, we wanted to actually implement MAD for ICA. 
+As we mentioned in the report we were unsure where in the ICA phase they had implemented it. 
+Therefore we chose to experiment with different placements until we found a version which we thought was most appropiate.
+This experiment allowed us to do a with/without outlier removal test, similar to the PLS, which tests the intrinsic robustness of the ICA model.
+
+**Table 3**
+<br>
+Looking at the results then, we see that using MAD did in fact have a pretty significant effect on the results of ICA. This told us that ICA seems quite susceptible to outliers.
+Additionally, since ICA is worse across all oxides compared to PLS we wonder what the benefit of ICA in this context. A recent paper related to supercam model selection seems to agree with this observation since NASA chose to exclude it in their recent model.
+
+:::
+
+## Our Choice of Experiments {.smaller}
+<div class="experiments-spacing">
+<p class="experiments-header" style="font-size: 30px;">Aggregating datasets for ICA</p>
+</div>
+4. Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset
+
+
+::::: {.columns}
+
+:::: {.column width="33%"}
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.5em;"}
+|          | 1 location | Aggregated |
+|----------|-----------:|-----------:|
+| SiO2     |      10.68 |      12.01 |
+| TiO2     |       0.63 |       0.60 |
+| Al2O3    |       5.55 |       4.81 |
+| FeOT     |       8.30 |       8.56 |
+| MgO      |       2.90 |       2.51 |
+| CaO      |       3.52 |       3.71 |
+| Na2O     |       1.72 |       1.41 |
+| K2O      |       1.37 |       1.51 |
+
+: ICA replica **without** MAD
+
+:::
+:::
+
+::::
+
+:::: {.column width="33%"}
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.5em;"}
+|          | 1 location | Aggregated |
+|----------|-----------:|-----------:|
+| SiO2     |       8.64 |       9.47 |
+| TiO2     |       0.53 |       **0.48** |
+| Al2O3    |       3.69 |       **2.66** |
+| FeOT     |       7.07 |       7.05 |
+| MgO      |       2.10 |       **2.83** |
+| CaO      |       4.00 |       **1.90** |
+| Na2O     |       1.45 |       **1.60** |
+| K2O      |       1.15 |       1.08 |
+
+: ICA replica with MAD
+
+:::
+:::
+
+::::
+
+:::: {.column width="33%"}
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.5em;"}
+| Element | Original |
+|---------|---------:|
+| SiO2    |     8.31 |
+| TiO2    |     1.44 |
+| Al2O3   |     4.77 |
+| FeOT    |     5.17 |
+| MgO     |     4.08 |
+| CaO     |     3.07 |
+| Na2O    |     2.29 |
+| K2O     |     0.98 |
+
+: ICA (Clegg et. al)
+
+:::
+:::
+
+::::
+
+:::::
+
+::: {.notes}
+**(4) ICA aggregated**
+The next type experiment that we conducted was based on aggregating the datasets for a sample.
+In the report we mentioned being unsure how they utilized all 5 datasets for a sample in the ICA phase.
+Based on our understanding from the papers and through discussions with our external supervisor Jens, we identified two candidate methods of approaching this.
+The first being running ICA on each of the 5 datasets per sample and training the regression model on the results and the second being aggregating the 5 dataset into a single, average dataset as they do in PLS-SM.
+We chose the simpler second option, as we believed that averaging could help ICA more easily identify principal components, since we noticed that ICA seemed sensitive to outliers.
+
+**Table 4.1**
+As can be seen in the first table the results are fairly similar across all oxides, except for Silicon where the results are worse. 
+These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which indicates that it was easier for ICA to separate out signals for those oxides. 
+However, as the results show it may also have had the opposite effect for some oxides.
+One possible interpretation of this is that noise in some areas might have been increased, making it harder to separate the signals properly.
+This is likely due to the smoothing effect of avereging which may have made some signals less distinct and therefore harder to identify.  
+
+**Table 4.2**
+The previous results then led us to wonder how much of an effect outlier detection would have with this aggregated dataset. We reasoned that noise would be amplified by this process and that it therefore would be easier to detect outliers.
+Surprisingly, there seemed to be some merit to this as there were quite a few improvements. 
+In fact, for 5 out of 8 oxides we saw better results than clegg.
+This highligts two key points: First, the effectiveness of ICA seems depend on a robust outlier removal strategy, particularly with LIBS data.
+Second, the success of ICA seems to rely on the structure of the data. 
+This would mean spending more effort on creating calibration data which is suitable for ICA. 
+However, given the substantial time and resources required to generate such calibration data, the benefits of using ICA appear limited.
+:::
+
+---
+
+## Our Choice of Experiments {.smaller}
+<div class="experiments-spacing">
+<p class="experiments-header" style="font-size: 30px">Using different models</p>
+</div>
+5. Comparing the performance of PLS1-SM and ICA models against XGBoost and ANN.
+
+::: {.fragment .fade-up}
+::: {style="font-size: 0.6em;"}
+| Element | ANN (Norm1) | ANN (Norm3) | XGBoost (Norm1) | XGBoost (Norm3) | MOC (original) | MOC (replica) |
+|---------|------------:|------------:|----------------:|----------------:|---------------:|--------------:|
+| SiO2    |        5.62 |        5.01 |            5.12 |            **4.67** |           5.30 |          7.29 |
+| TiO2    |        0.58 |        0.62 |            **0.44** |            0.45 |           1.03 |          0.49 |
+| Al2O3   |        2.12 |        2.27 |            **1.93** |            1.97 |           3.47 |          2.39 |
+| FeOT    |        4.05 |        4.00 |            4.40 |            5.02 |           **2.31** |          5.21 |
+| MgO     |        1.61 |        1.49 |            0.99 |            **0.96** |           2.21 |          1.67 |
+| CaO     |        1.33 |        1.26 |            **1.23** |            1.26 |           2.72 |          1.81 |
+| Na2O    |        1.17 |        1.09 |            **0.49** |            0.51 |           0.62 |          1.10 |
+| K2O     |        1.05 |        0.88 |            **0.50** |            0.51 |           0.82 |          1.09 |
+
+
+:::
+:::
+
+::: {.notes}
+The final experiments that we wanted to do was based on the desire to do some due diligence that we felt was lacking from clegg's paper. 
+This was comparing the MOC pipeline to other methods that exist.
+For this we chose to work with XGBoost and ANN's.
+The decision to use these specifically was the fact they represented two fairly different approaches that both have the ability to learn complex patterns in data. 
+Given the time constraint that we had, we felt that it would be sufficient to demonstrate whether the current MOC model could potentially be updated to include other models or perhaps that entirely different approaches to oxide predictions in LIBS data should be persued.
+
+**Table 5**
+As you can see from the table XGBoost performed better in most cases and for some oxides even showed an improvement from the MOC model. 
+Additionally, the ANN model also showed to be better than the MOC model in many cases.
+Given the results of our outlier removal experiments, despite them not being comprehensive, and the good results of XGBoost and ANN's, perhaps the most improvements could be found with better model selection.
+:::
+
+## Conclusion {.smaller}
+
+<div class="experiments-spacing">
+<p class="experiments-header">So what did we learn?</p>
+</div>
+
+::: {.fragment .fade-up}
+- Outlier removal is beneficial to some extend
+    - Specialty approaches needs to be developed for further improvements
+:::
+
+::: {.fragment .fade-up}
+- Rethinking the choice of models may be a better solution 
+    - Current pipeline has a lot of complexity and moving parts
+:::
+
+::: {.notes}
+**Outlier removal**
+For the outlier removal we found that depending on the model, PLS-SM or ICA, outlier removal has varying success. For PLS-SM there seems to be neglible gains from outlier removal, while ICA benefits more from it.
+Generally, however, we determine that a "one size fits all" approach to outlier detection does not provide many benefits and perhaps different approaches needs to be developed. 
+Such approaches could either involve entirely new algorithms or specialized approaches that account for the structure of data that mimics what an expert could do manually.
+
+**Data preprocessing**
+
+**Rethinking**
+While the current setup with PLS and ICA allows for interpretability e.g. regression plots and independent components, the MOC model as a whole loses the benefit of that because of the complexity of the pipeline. 
+This is because you are interleaving to different models that are operating in distinct ways and adjusting everything from data preprocessing to outlier removal introduces complexity with diminishing returns.
+:::
+
+## Reflections {.smaller}
+
+<div class="experiments-spacing">
+<p class="experiments-header">Taking a critical look at our project</p>
+</div>
+
+::: {.fragment .fade-up}
+- We accomplished most of what we wanted
+    - Finished replica
+    - Conducted meaningful experiments
+:::
+
+::: {.fragment .fade-up}
+- However... We lack depth in our experiments
+    - For example:
+    - Investigate the causes of varying RMSEs with aggregated datasets for ICA
+    - Thorough investigation of ANNs and XGBoost and why exactly they perform better
+        - Useful components that might be beneficial for future research
+:::
+
+::: {.notes}
+Reflecting on the project we achieved what we wanted on a general level. We completed a replica that is similar to Clegg et. al's and demonstrated this fact with a t-test. 
+We also managed to complete a set of experiments that helped us determine the effects on some of the components to the overall RMSE.
+
+However, what we realize is that there was not a lot of depth to the experiments. We did not have the opportunity to spend nearly as much time as we would have liked to go into depth about the "why's" of the results we saw.
+
+For example, in the experiment with the aggregated datasets for ICA we saw mixed results across the different oxides. In some cases the RMSE improved, in others it did not. It would have been great to look more closely into the mechanisms that caused ICA to produce such results so that we could learn something from that.
+A second example is that we would have liked to have spent more time investigating the aspects of ANN and XGBoost that makes them so good for LIBS data. Understanding the specific components or mechanisms that make them produce such good results would have been tremendously useful and interesting.
+:::
+
+## Recommendations for Future Work
+
+
+::: {.fragment .fade-up}
+- Ensemble and advanced machine learning methods
+:::
+
+::: {.fragment .fade-up}
+- Advanced outlier detection techniques 
+:::
+
+::: {.fragment .fade-up}
+- Dimensionality reduction techniques
+:::
+
+::: {.notes}
+Finally, we will finish off with looking at what could be done in the future. 
+
+In our report we suggest three avenues that could be explored based on what we have learned from our project.
+
+The first is to explore ensemble and advanced machine learning methods. This idea stems from our own results from XGBoost and ANN's, which showed to be able to handle the complexities of the LIBS data very well. 
+Exploring ensemble techniques such as Random forest or gradient boosting as well as machine learning methods such as convolutional neural networks might offer advancements in the analysis of LIBS data.
+This notion is supported by papers such as supercam related paper that Patrick mentioned in the beginning.
+
+The second avenue that could be explored is in the outlier detection domain. 
+As I mentioned earlier, there might be benefits from exploring different or more advanced outlier detection methods. Exploring this avenue, potentially in conjunction with other prediction models, may yield results that could be beneficial for both existing Mars missions but also future ones.
+
+The last suggestion that we give is to explore techniques that are based on dimensionality reduction such as PCA and Autoencoders to further simplify and improve the analysis. 
+As you know, LIBS data is considered not only to be complex but also high dimensionality. This is why PLS and ICA are viable algorithms to consider in this context. 
+This is because they are designed to reduce the dimensionality of the data without sacrificing the integrity of the data.
+Investigating new dimensionaly reduction techniques that could integrate with models that do not inherently do this, may yield interesting results as you may be able to leverage the strength of models that would otherwise not fit in the LIBS context.
+
+:::
