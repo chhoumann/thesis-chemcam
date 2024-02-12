@@ -7,10 +7,8 @@ Presenter: Patrick Frostholm Østergaard.
 
 :::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
-- 1970s: Viking missions
+- 1970s: NASA Viking missions
 	- *"Is there life on Mars?"*
-:::
 
 ::: {.fragment .fade-up fragment-index=2}
 - 1990s: Philosophical shift
@@ -35,9 +33,7 @@ Presenter: Patrick Frostholm Østergaard.
 
 :::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1 style="border-radius: 10px;"}
 ![Viking Lander](static/introduction/viking-lander.jpg){width="60%" height="60%" .rounded-fig}
-:::
 
 ::: {.fragment .fade-up fragment-index=4}
 ![Mars Science Laboratory Curiosity Rover](static/introduction/msl.jpg){width="75%" height="75%" .rounded-fig}
@@ -48,7 +44,7 @@ Presenter: Patrick Frostholm Østergaard.
 :::::
 
 ::: {.notes}
-In the 1970s, the Viking missions were the first to land on Mars.<br>
+In the 1970s, the NASA Viking missions were the first to land on Mars.<br>
 Goal: Is there life on Mars?<br>
 Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
 
@@ -76,9 +72,7 @@ Following this, we have decided to replicate and attempt to improve upon their w
 
 ::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
 - Current model: **M**ultivariate **O**xide **C**omposition (*MOC*)
-:::
 
 ::: {.fragment .fade-up}
 - Predicts composition from **C**lean, **c**alibrated **s**pectra (*CCS*)
@@ -95,9 +89,7 @@ Following this, we have decided to replicate and attempt to improve upon their w
 :::
 
 ::: {.column width="50%" style='display: flex; justify-content: center; align-items: center;'}
-::: {.fragment .fade-up fragment-index=1}
 ![](static/introduction/pipeline.png){width="65%" height="65%"}
-:::
 :::
 
 ::::
@@ -181,17 +173,14 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 
 ::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
-- 408 pressed powder samples
 - 5 locations per sample
 - 50 shots location
-:::
 
 ::: {.fragment .fade-up fragment-index=2}
 - Grouped into folders:
 	- Each folder corresponds to a sample
 :::
-::: {.fragment .fade-up}
+::: {.fragment .fade-up fragment-index=3}
 - Masked regions:
 	- 240.811 — 246.635 nm
 	- 338.457 — 340.797 nm
@@ -204,11 +193,11 @@ This is why we chose to include XGBoost in our experiments, as it is a popular a
 
 ::: {.column width="50%"}
 
-::: {.fragment .fade-up fragment-index=1}
+::: {.fragment .fade-up fragment-index=2}
 ![](static/introduction/folder-structure.png){width="35%" height="35%" fig-align="center"}
 :::
 
-::: {.fragment .fade-up fragment-index=2}
+::: {.fragment .fade-up fragment-index=3}
 ![](static/introduction/spectrum.png)
 :::
 
