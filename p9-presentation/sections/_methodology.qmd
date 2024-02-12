@@ -50,7 +50,7 @@ Starting with the PLS-SM method, we have attempted to recreate the system presen
 ::: {.notes}
 Let me start by explaining what motivated PLS-SM, because that will help us understand why it does what it does.<br>
 <br>
-First: they chose PLS because it can handle noisy data with many more variables than observations, and with significant correlation between variables.<br>
+First: they chose PLS because it can handle noisy data with far more variables than observations, and with significant correlation between variables.<br>
 It's also readily intrepretable by plotting the regression coefficients as a function of the spectral channels. This shows which wavelength ranges show correlations with the prediction composition.
 :::
 
