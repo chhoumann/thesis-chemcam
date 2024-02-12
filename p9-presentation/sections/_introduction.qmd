@@ -44,7 +44,7 @@ Presenter: Patrick Frostholm Østergaard.
 :::::
 
 ::: {.notes}
-In the 1970s, the NASA Viking missions were the first to land on Mars.<br>
+In the 1970s, the NASA Viking mission was the first to land a spacecraft on Mars.<br>
 Goal: Is there life on Mars?<br>
 Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.
 
