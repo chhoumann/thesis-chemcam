@@ -371,7 +371,7 @@ The process mostly follows the same steps as in PLS-SM, except we don't filter f
 <br>
 We also do not average the shots, and instead preserve the intensity values for each shot, except the first five.<br>
 <br>
-Finally, we don't use all five location datasets for each sample. That is left as an experiment, which Ivik will go into details about. We chose to do it this way because it was unclear whether the original authors used all location datasets or just one per sample.
+Finally, we don't use all five location datasets for each sample. That is left as an experiment, which Ivik will go into detail about. We chose to do it this way because it was unclear how the original authors used all location datasets.
 :::
 
 
