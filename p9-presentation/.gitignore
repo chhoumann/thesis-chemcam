@@ -6,3 +6,6 @@ publish
 
 **/libs/
 *.html
+
+# quarto build files
+p9-presentation_files/

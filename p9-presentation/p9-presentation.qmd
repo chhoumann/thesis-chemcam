@@ -20,7 +20,7 @@ format:
 # Introduction
 {{< include sections/_introduction.qmd >}}
 
-# Methodology
+# MOC Pipeline Replica
 {{< include sections/_methodology.qmd >}}
 
 # Experiments
