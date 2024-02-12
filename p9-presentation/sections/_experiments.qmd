@@ -78,7 +78,7 @@ The second being an evaluation of the PLS model's intrinsic ability to handle ou
 
 **Table 1**
 <br>
-As you can see from the table, our outlier removal had almost no efffect on the RMSE. 
+As you can see from the table, our outlier removal had almost no effect on the RMSE. 
 This result was surprising to us. 
 We did not necessarily have any expectation that our outlier removal would perform better than clegg et. al's, however, we would have expected to see more of an effect since we were removing quite a few outliers that theoretically should have a high, negative impact on the model's predictions.  
 The interesting result, though, is the fact that PLS performed very well without our outlier removal and in fact comparable to clegg's results, who manually picked out outliers.
