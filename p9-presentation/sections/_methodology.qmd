@@ -64,7 +64,7 @@ It's also readily intrepretable by plotting the regression coefficients as a fun
 ::: {.notes}
 For the original ChemCam calibration, the team used PLS2. This case corresponds to the case where there are several dependent variables, meaning it can perform multivariate predictions.<br>
 <br>
-However, they found that they're seeing better results by using a separate PLS1 model for each of the major oxides.<br>
+However, they achieved better results by using a separate PLS1 model for each of the major oxides.<br>
 <br>
 PLS1 is the case where there's only a single dependent variable --- so it's for univariate regression.
 :::
