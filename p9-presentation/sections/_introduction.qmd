@@ -62,7 +62,8 @@ This requires the development of machine learning models to analyze the data, wh
 Specifically, this type of problem is a supervised learning, multivariate regression problem.<br>
 It is supervised because we have labeled data, and it is multivariate because we are predicting multiple outputs.<br>
 NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam.<br>
-We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the current model is far from perfect and that there is room for improvement.<br>
+We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the current model has room for improvement, especially in its accuracy and robustness.<br>
+In the context of this project, accuracy means how well the model's predictions match reality, while robustness refers to how robust the model is to the variations we see on Mars, since the model is trained on samples from Earth.<br>
 Following this, we have decided to replicate and identify limitations in their work, which is the focus of our pre-thesis project.
 :::
 
@@ -108,7 +109,7 @@ The MOC model is trained on a calibration dataset of clean, calibrated spectra (
 When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample.<br>
 Christian will elaborate on how exactly the MOC model works later in the presentation.
 
-Our goal was to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$, as defined by the root mean squared error (RMSE).
+Our goal was to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error $E(M)$ (accuracy), as defined by the root mean squared error (RMSE).
 
 We do this through a series of experiments, which Ivik will explain in more detail later in the presentation.
 
