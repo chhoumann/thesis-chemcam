@@ -252,7 +252,7 @@ This masking is part of the preprocessing of the CCS data, which is something we
 ::: {.notes}
 Next, we have the composition data, which is our ground truth.<br>
 It contains 8 major oxides: $\text{SiO}_2$, $\text{TiO}_2$, $\text{Al}_2\text{O}_3$, $\text{Fe}_2\text{O}_3$, $\text{MgO}$, $\text{CaO}$, $\text{Na}_2\text{O}$, and $\text{K}_2\text{O}$.<br>
-For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides.
+For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides.<br>
 This data is used to train the MOC model.<br>
 
 This table here shows an excerpt of the composition data for a few samples.<br>
@@ -261,7 +261,7 @@ The last column is the total weight percentage of the oxides, which should in th
 However, as you can see, the total percentages might not always add up to exactly 100%, occasionally even exceeding it.<br>
 This discrepancy arises from two main factors.
 
-Firstly, our samples often contain additional elements beyond the major oxides we focus on, which can result in a total below 100%.<br>
+Firstly, the samples often contain additional elements beyond the major oxides we focus on, which can result in a total below 100%.<br>
 Secondly, the inherent uncertainties in experimental measurements can cause the sum to vary, causing the total to etiher fall below or exceed 100%.<br>
 :::
 
