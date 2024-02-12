@@ -1,0 +1,275 @@
+[
+  {
+    "objectID": "p9-presentation.html#a-brief-history",
+    "href": "p9-presentation.html#a-brief-history",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "A Brief History",
+    "text": "A Brief History\n\n\n\n1970s: NASA Viking missions\n\n“Is there life on Mars?”\n\n\n\n\n1990s: Philosophical shift\n\n“Did Mars ever have the conditions to support life as we know it?”\n\n\n\n\n\n2004: Mars Exploration Rover mission\n\nDiscovered evidence of water\n\n\n\n\n\nAugust 2012: Mars Science Laboratory\n\nCuriosity rover\n\n\n\n\n\nChemCam: Laser-induced breakdown spectroscopy (LIBS) instrument\n\n\n\n\n\n\nViking Lander\n\n\n\n\n\n\nMars Science Laboratory Curiosity Rover\n\n\n\n\n\n\nIn the 1970s, the NASA Viking mission was the first to land a spacecraft on Mars. Goal: Is there life on Mars? Experiments showed positive results, but the results were inconclusive and were not repeated due to budget constraints.\n1990s: Philosophical shift within NASA: “Is there life on Mars?” to “Did Mars ever have the conditions to support life as we know it?”\nIn 2004, the Mars Exploration Rover mission landed the rovers Spirit and Opportunity on Mars, which quickly discovered evidence of water on Mars.\nA few years later in 2012, the Mars Science Laboratory (MSL) mission landed the Curiosity rover on Mars. This is the rover that we concern ourselves with in this project. Rover is equipped with a suite of instruments to study the Martian climate and geology and to search for organic material.\nOne of the instruments is the Chemistry and Camera (ChemCam) instrument, a laser-induced breakdown spectroscopy (LIBS) instrument that can analyze the elemental composition of rocks and soil from a distance. In very simple terms, the instrument shoots a laser at a rock, and the light emitted by the rock is then captured by spectrometers as a spectrum, which can be used to determine the composition of the rock. This requires the development of machine learning models to analyze the data, which is the focus of this presentation. Specifically, this type of problem is a supervised learning, multivariate regression problem. It is supervised because we have labeled data, and it is multivariate because we are predicting multiple outputs. NASA has made most of the ChemCam calibration data publicly available, and they have also published a few papers on the machine learning models they have developed for ChemCam. We have worked with one of the authors of these papers, Jens Frydenvang, who asserted that the current model is far from perfect and that there is room for improvement. Following this, we have decided to replicate and identify limitations in their work, which is the focus of our pre-thesis project."
+  },
+  {
+    "objectID": "p9-presentation.html#problem-definition",
+    "href": "p9-presentation.html#problem-definition",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Problem Definition",
+    "text": "Problem Definition\n\n\n\nCurrent model: Multivariate Oxide Composition (MOC)\n\n\n\nPredicts composition from Clean, calibrated spectra (CCS)\n\n\n\n\nGoal: Identify components contributing most to error \\(E(M)\\) as defined by RMSE\n\n\n\n\nMethod: Replicate MOC model and perform experiments\n\n\n\n\n\n\n\n\nProblem: Given a series of experiments and the resulting models, identify the components that contribute the most to the overall error \\(E(M)\\).\n\n\n\nThe model currently used by the ChemCam team is the Multivariate Oxide Composition (MOC) model, illustrated in the figure on the right.\nThe MOC model is trained on a calibration dataset of clean, calibrated spectra (CCS), which I will give an overview of in a moment. When a new spectrum is collected on Mars, it is first preprocessed into the CCS format and then fed into the MOC model to predict the composition of the sample. Christian will elaborate on how exactly the MOC model works later in the presentation.\nOur goal was to replicate the MOC model and perform experiments to identify the components that contribute the most to the overall error \\(E(M)\\), as defined by the root mean squared error (RMSE).\nWe do this through a series of experiments, which Ivik will explain in more detail later in the presentation.\nBy doing this, we hope to gain a better understanding of the MOC model and to identify areas where it can be improved. Later on in the presentation, we will present our findings and talk about our plans for the thesis project next semester."
+  },
+  {
+    "objectID": "p9-presentation.html#related-work",
+    "href": "p9-presentation.html#related-work",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Related Work",
+    "text": "Related Work\n\n\nTakahashi and Thornton (2017): ANNs for LIBS data non-linearities.\n\n\n\n\nLepore, Ytsma, and Dyar (2022): Full spectrum instead of sub-models often reduces RMSEP, enhancing geochemical accuracy.\n\n\n\n\nBai et al. (2023): Elastic net regression for Mars LIBS data and Norm 3 optimal normalization technique.\n\n\n\n\nDyar and Ytsma (2021): Larger LIBS training sets improve geochemical quantification accuracy.\n\n\n\n\nCastorena et al. (2021): Developed a real-time, efficient deep spectral CNN for LIBS.\n\n\n\n\nChen and Guestrin (2016) presented XGBoost, a gradient boosting system.\nAnderson et al. (2022) found GBR performed well for SuperCam calibration data.\n\n\n\nI will briefly summarize the key aspects of our related work section from our report.\nFirst, Takahashi and Thornton (2017) applied artificial neural networks (ANNs) to LIBS data and found that ANNs showed potential since they are able to learn the non-linear relationship between the LIBS spectra and the composition of the sample. This has inspired one of our experiments, as we compared the performance the MOC model with an ANN model.\nLepore, Ytsma, and Dyar (2022) examined how dividing LIBS spectra into sub-models impacts the prediction of major element compositions. Their findings suggest that using the entire spectrum instead of sub-models often reduces the error and enhances geochemical accuracy. This is interesting considering that sub-models were introduced to the MOC model to improve its performance, which contradicts the findings of this paper.\nBai et al. (2023) explored elastic net regression for Mars LIBS data and found it quite efficient, however perhaps more interestingly, they found that the Norm 3 normalization technique was the optimal normalization technique for their context. This is one of the two normalization techniques used to preprocess the CCS data, and this find is something we considered when performing our experiments.\nDyar and Ytsma (2021) found that accuracy in geochemical quantification with LIBS improves as the training set size increases. This is expected and tells us that we should aim to use as much data as possible when training our models.\nCastorena et al. (2021) developed a real-time, efficient deep spectral CNN for LIBS. While we did not have time to experiment with CNNs this semester, this is something we might consider in the future.\nFinally, Chen and Guestrin (2016) presented XGBoost, which is a gradient boosting system that has become popular among data scientists for its performance in diverse machine learning applications. Interestingly, Anderson et al. (2022) found that Gradient Boosting Regression (GBR) performed well in predicting major oxides for SuperCam, which is ChemCam’s successor. This is why we chose to include XGBoost in our experiments, as it is a popular and effective implementation of GBR."
+  },
+  {
+    "objectID": "p9-presentation.html#calibration-data",
+    "href": "p9-presentation.html#calibration-data",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Calibration Data",
+    "text": "Calibration Data\n\n\n\n408 pressed powder samples\n\n5 locations per sample\n50 shots location\n3 spectrometers\n\n\n\n\nGrouped into folders:\n\nEach folder corresponds to a sample\n\n\n\n\n\nSpectrum for cadillac\n\nx-axis: wavelength\ny-axis: intensity\nSome regions masked\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNow we will take a closer look at data that we have worked with this semester. First, we have the calibration dataset, which consists of 408 pressed powder samples. Each sample was shot at 5 different locations, and 50 shots were taken at each location. The emitted light for each shot is then captured by 3 different spectrometers, each designed to analyze specific portions of the light spectrum.\nThe data is grouped into folders where each folder corresponds to a sample. Each folder contains a .csv file for each location, and each .csv file contains the spectra for the 3 spectrometers. This is what we refer to as the CCS data.\nAn example of a spectrum is shown in the figure on the right. The x-axis represents the wavelength, and the y-axis represents the intensity of the light at each wavelength. As you can see, there are some regions of the spectrum that are masked out. This masking is part of the preprocessing of the CCS data, which is something we will talk more about later in the presentation."
+  },
+  {
+    "objectID": "p9-presentation.html#composition-data",
+    "href": "p9-presentation.html#composition-data",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Composition Data",
+    "text": "Composition Data\n\n8 major oxides: \\(\\text{SiO}_2\\), \\(\\text{TiO}_2\\), \\(\\text{Al}_2\\text{O}_3\\), \\(\\text{Fe}_2\\text{O}_3\\), \\(\\text{MgO}\\), \\(\\text{CaO}\\), \\(\\text{Na}_2\\text{O}\\), \\(\\text{K}_2\\text{O}\\)\nFor each sample, we know the composition weight percentage (wt. %)\n\n\n\nComposition data is used to train the MOC model\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTarget\nSpectrumName\nSampleName\nSiO2\nTiO2\nAl2O3\nFeOT\nMnO\nMgO\nCaO\nNa2O\nK2O\nMOC total\n\n\n\n\nAGV2\nAGV2\nAGV2\n59.3\n1.05\n16.91\n6.02\n0.099\n1.79\n5.2\n4.19\n2.88\n97.44\n\n\nBCR-2\nBCR2\nBCR2\n54.1\n2.26\n13.5\n12.42\n0.2\n3.59\n7.12\n3.16\n1.79\n98.14\n\n\n…\n…\n…\n…\n…\n…\n…\n…\n…\n…\n…\n…\n…\n\n\nTB\n—\n—\n60.23\n0.93\n20.64\n11.6387\n0.052\n1.93\n0.000031\n1.32\n3.87\n100.610731\n\n\nTB2\n—\n—\n60.4\n0.93\n20.5\n11.6536\n0.047\n1.86\n0.2\n1.29\n3.86\n100.7406\n\n\n\n\n\n\n\nUncertainties:\n\nPresence of other elements\nMeasurement uncertainties\n\n\n\n\nNext, we have the composition data, which is our ground truth. It contains 8 major oxides: \\(\\text{SiO}_2\\), \\(\\text{TiO}_2\\), \\(\\text{Al}_2\\text{O}_3\\), \\(\\text{Fe}_2\\text{O}_3\\), \\(\\text{MgO}\\), \\(\\text{CaO}\\), \\(\\text{Na}_2\\text{O}\\), and \\(\\text{K}_2\\text{O}\\). For each sample in the calibration dataset, we know the composition weight percentage of each of these oxides. This data is used to train the MOC model.\nThis table here shows an excerpt of the composition data for a few samples. You can see that we know the composition of each sample in terms of the weight percentage of each of the major oxides. The last column is the total weight percentage of the oxides, which should in theory sum to 100%. However, as you can see, the total percentages might not always add up to exactly 100%, occasionally even exceeding it. This discrepancy arises from two main factors.\nFirstly, the samples often contain additional elements beyond the major oxides we focus on, which can result in a total below 100%. Secondly, the inherent uncertainties in experimental measurements can cause the sum to vary, causing the total to etiher fall below or exceed 100%."
+  },
+  {
+    "objectID": "p9-presentation.html#correlations",
+    "href": "p9-presentation.html#correlations",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Correlations",
+    "text": "Correlations\n\n\n\n\n\n\nPearson correlation coefficient\n\n\n\nSome strong correlations\n\nFor example \\(\\text{SiO}_2\\) and \\(\\text{CaO}\\)\n\n\n\n\nThis figure here shows the correlation between the different oxides as a heatmap. The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.\nFor example, \\(\\text{SiO}_2\\) and \\(\\text{CaO}\\) are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases. So that was the data we used to train our models, and now Christian will talk about the models themselves."
+  },
+  {
+    "objectID": "p9-presentation.html#moc-pipeline",
+    "href": "p9-presentation.html#moc-pipeline",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "MOC Pipeline",
+    "text": "MOC Pipeline\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis is the entire MOC pipeline at inference-time.  We have attempted to replicate this pipeline as faithfully as we could, but have had to make some design choices that differ from the original — mostly due to a lack of information regarding some aspects of the original design.  It’s important to keep in mind that this pipeline is for multivariate regression. That means we create predictions for each of 8 major oxides. However, most of the steps actually involve data being processed for each oxide individually. For both ICA and PLS, you can imagine that after some preprocessing steps, we branch out into 8 branches, each of which predict its own values for its associated oxide. And in the end, we put the outputs together to produce the MOC prediction.  I start by walking through the PLS-SM side, and then the ICA side."
+  },
+  {
+    "objectID": "p9-presentation.html#pls-sm-motivation",
+    "href": "p9-presentation.html#pls-sm-motivation",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "PLS-SM Motivation",
+    "text": "PLS-SM Motivation\n\nPLS\n\nGood for chemometrics\nReadily intrepretable\n\n\n\nLet me start by explaining what motivated PLS-SM, because that will help us understand why it does what it does.  First: they chose PLS because it can handle noisy data with far more variables than observations, and with significant correlation between variables. It’s also readily intrepretable by plotting the regression coefficients as a function of the spectral channels. This shows which wavelength ranges show correlations with the prediction composition."
+  },
+  {
+    "objectID": "p9-presentation.html#pls-sm-motivation-1",
+    "href": "p9-presentation.html#pls-sm-motivation-1",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "PLS-SM Motivation",
+    "text": "PLS-SM Motivation\n\nPLS\nPLS2 vs. PLS1\n\nPLS2: Multivariate\nPLS1: Univariate\nBetter results with separate PLS1 models\n\n\n\nFor the original ChemCam calibration, the team used PLS2. This case corresponds to the case where there are several dependent variables, meaning it can perform multivariate predictions.  However, they achieved better results by using a separate PLS1 model for each of the major oxides.  PLS1 is the case where there’s only a single dependent variable — so it’s for univariate regression."
+  },
+  {
+    "objectID": "p9-presentation.html#pls-sm-motivation-2",
+    "href": "p9-presentation.html#pls-sm-motivation-2",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "PLS-SM Motivation",
+    "text": "PLS-SM Motivation\n\nPLS\nPLS2 vs. PLS1\nSubmodels\n\nMore accurate when focusing on specific concentration ranges\nSingle regression model: good general performance, worse on some individual samples\nSo combine several models trained on subsets of the full compositional range\n\n\n\nOK. So why submodels?  Different parts of the LIBS spectrum react differently to varying amounts of elements in the sample. So, a spectrum from a sample with a medium amount of an element might show patterns that aren’t there when there’s a very high or low amount of that element. This can be because when there’s too much of an element, it can overshadow its own signal, and the presence of other elements can also change the response.  Using sub-models lets them focus on specific concentration ranges for more accurate readings.  It’s hard for a single regression model to account for these variations. It often makes a tradeoff where it has good general performance, but performance worse on some samples. And specialist models (trained on a restricted range) will do good for that range, but much worse outside the range than a model trained on the full set.  So the solution was to combine several regression models trained on subsets of the full compositional range to improve overall performance across the full range, which overcomes the limitations of a single model, and then combine the results via blending.  In this case, they created 3 overlapping submodels for most of the major oxides (low, mid, high), and a full model training on the full compositional range."
+  },
+  {
+    "objectID": "p9-presentation.html#compositional-ranges",
+    "href": "p9-presentation.html#compositional-ranges",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Compositional Ranges",
+    "text": "Compositional Ranges\n\n\n\nOxide\nFull\nLow\nMid\nHigh\n\n\n\n\nSiO2\n(0, 100)\n(0, 50)\n(30, 70)\n(60, 100)\n\n\nTiO2\n(0, 100)\n(0, 2)\n(1, 5)\n(3, 100)\n\n\nAl2O3\n(0, 100)\n(0, 12)\n(10, 25)\n(20, 100)\n\n\nFeOT\n(0, 100)\n(0, 15)\n(5, 25)\n(15, 100)\n\n\nMgO\n(0, 100)\n(0, 3.5)\n(0, 20)\n(8, 100)\n\n\nCaO\n(0, 42)\n(0, 7)\n(0, 15)\n(30, 100)\n\n\nNa2O\n(0, 100)\n(0, 4)\nN/A\n(3.5, 100)\n\n\nK2O\n(0, 100)\n(0, 2)\nN/A\n(1.5, 100)\n\n\n\n\nAll submodel PLS configurations are taken from Clegg et al. (2017).\n\n\nThese are the compositional ranges that Clegg et al. (2017) presented in their paper.  As can be seen, the ranges overlap. This is to avoid discontinuities in the final combined results. They would occur because the samples in each sub-model with the most “extreme” compositions aren’t necessarily weighted as strongly when the model is trained, so may be less accurately predicted.  The N/As here mean that there are no compositional ranges defined there. Essentially meaning there are no Mid submodels for sodium and potassium oxide."
+  },
+  {
+    "objectID": "p9-presentation.html#pls-sm-inference",
+    "href": "p9-presentation.html#pls-sm-inference",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "PLS-SM Inference",
+    "text": "PLS-SM Inference\n\n\nLet me illustrate.   It’s important to understand that, in practice, this flow is executed for each oxide. For simplicity’s sake, we present it as being done wholly.  The full model is used to estimate the composition of an unknown target, and the appropriate sub-model(s) is then chosen based on this estimate for a more accurate prediction.  If the initial estimate falls within the the range of only a single model, we use the full prediction from that model. Conversely, if the estimate falls within an overlapping range (blending range), we blend the predictions of the corresponding submodels such that the prediction is weighted favoring the submodel whose range the initial estimate is closest to."
+  },
+  {
+    "objectID": "p9-presentation.html#preprocessing",
+    "href": "p9-presentation.html#preprocessing",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Preprocessing",
+    "text": "Preprocessing\n\n\n\nRemove ‘dust’ shots\nAverage shot intensities\n\n\n\n\n\nPLS Preprocessing\n\n\n\n\n\n\n\n\nThe initial preprocessing step is to remove the first five shots. These shots usually serve to remove dust from samples, and are therefore often less informative than the remaining shots: the dust doesn’t say much about what’s in the sample.  Then we proceed to averaging the shot intensity values for each wavelength. The final result is a single column representing an intensity value for each wavelength."
+  },
+  {
+    "objectID": "p9-presentation.html#preprocessing-1",
+    "href": "p9-presentation.html#preprocessing-1",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Preprocessing",
+    "text": "Preprocessing\n\n\n\nRemove ‘dust’ shots\nAverage shot intensities\nMask noisy wavelenghts\n\n\n\n\n\nPLS Preprocessing\n\n\n\n\n\n\n\n\nThe preprocessing continues by masking noisy wavelengths. The masking process itself simply involves setting the intensity values for the wavelengths in the masking ranges to zero."
+  },
+  {
+    "objectID": "p9-presentation.html#preprocessing-2",
+    "href": "p9-presentation.html#preprocessing-2",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Preprocessing",
+    "text": "Preprocessing\n\n\nAs we see here, the mask regions are placed at the edges of the spectrometer ranges. This is because they were found to be untrustworthy & to generate outliers in the intensity values."
+  },
+  {
+    "objectID": "p9-presentation.html#preprocessing-3",
+    "href": "p9-presentation.html#preprocessing-3",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Preprocessing",
+    "text": "Preprocessing\n\n\n\nRemove ‘dust’ shots\nAverage shot intensities\nMask noisy wavelenghts\nZero out negative values\n\n\n\n\n\nPLS Preprocessing\n\n\n\n\n\n\n\n\nAfter we’ve masked, we proceed to set negative values to zero. These negative values represent noise that stems from the pre-CCS preprocessing phase — likely the continuum removal step.  Removing the values would imply we don’t know what they mean, but we do. They represent noise, so we set them to zero."
+  },
+  {
+    "objectID": "p9-presentation.html#preprocessing-4",
+    "href": "p9-presentation.html#preprocessing-4",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Preprocessing",
+    "text": "Preprocessing\n\n\n\nRemove ‘dust’ shots\nAverage shot intensities\nMask noisy wavelenghts\nZero out negative values\nTranpose\nSubmodels filter\n\n\n\n\n\nPLS Preprocessing\n\n\n\n\n\n\n\n\nWe transpose the data, meaning the wavelengths are now the columns and the rows are the averaged sample location intensity values for the given wavelengths. Essentially, this means we have 5 locations per samples times 408 samples, giving us 2040 rows. Of course, in practice, we divide the data into five folds, where one represents the test set.  We now filter the data. At this point, as illustrated in the figure, we process the data for each oxide. So for each oxide, we filter it by the compositional range associated with a given submodel. This gives us the training data for this model’s compositional range."
+  },
+  {
+    "objectID": "p9-presentation.html#preprocessing-5",
+    "href": "p9-presentation.html#preprocessing-5",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Preprocessing",
+    "text": "Preprocessing\n\n\n\nRemove ‘dust’ shots\nAverage shot intensities\nMask noisy wavelenghts\nZero out negative values\nTranpose\nSubmodels filter\nNormalize\n\nNorm 1: normalize full spectrum, \\(\\text{sum}=1\\)\nNorm 3: normalize per spectrometer, \\(\\text{sum}=3\\)\n\n\n\n\n\n\nPLS Preprocessing\n\n\n\n\n\n\n\n\nNow we normalize.  Norm 1 normalizes full spectrum by total across the total across all three spectrometers, so the resulting spectrum adds up to 1.  Norm 3 normalizes on a per-spectrometer basis, resulting in a full normalized spectrum adds up to 3 (because there are 3 separate spectrometers…)."
+  },
+  {
+    "objectID": "p9-presentation.html#training-phase",
+    "href": "p9-presentation.html#training-phase",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Training Phase",
+    "text": "Training Phase\n\n\n\nOutlier removal\nEach model trained on subset of data\nCross validated\nTrain on all training folds & evaluate\n\n\n\n\n\nPLS Training"
+  },
+  {
+    "objectID": "p9-presentation.html#outlier-removal",
+    "href": "p9-presentation.html#outlier-removal",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Outlier Removal",
+    "text": "Outlier Removal\nIterative, automated outlier removal process using Influence Plots of Leverage and Spectral Residuals\n\n\n\n\n\n\n\n\nThe outlier removal process is iterative and works using influence plots of leverage and spectral residuals. It is iterative because removing spectra that appear as outliers can reveal additional outliers."
+  },
+  {
+    "objectID": "p9-presentation.html#outlier-removal-1",
+    "href": "p9-presentation.html#outlier-removal-1",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Outlier Removal",
+    "text": "Outlier Removal\n\n\nCompute leverage & spectral residuals\nCalculate Mahalanobis distance \\(d\\)\nGet critical value \\(c\\)\nClassify sample as outlier if \\(d&gt;c\\)\nRemove outliers & train new model\nRepeat until model performance ceases to improve\n\n\n\nWe decided to automate this process, whereas the original authors would manually select outliers based on their expertise.  The process itself follows the steps seen here.  First we calculate the leverage and spectral residuals from the scores and loadings of a PLS model.   Then we calculate the Mahalanobis distance for each point in a matrix of the combined leverage and spectral residuals.  We obtain a critical value that is based on a chi-square distribution for a 97.5% confidence interval given 2 degrees of freedom.  We compare the distances against this critical value, using it as a threshold, where distances above this threshold are classified as outliers.  Then we remove outliers from the dataset, retrain a PLS model, and then repeat the process."
+  },
+  {
+    "objectID": "p9-presentation.html#outlier-removal-2",
+    "href": "p9-presentation.html#outlier-removal-2",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Outlier Removal",
+    "text": "Outlier Removal\n\n\n\n\n\n\n\n\nThe process itself is easily seen as we step through these influence plots.  As you can see, data points with both a high error and leverage are classified as outliers and are promptly removed."
+  },
+  {
+    "objectID": "p9-presentation.html#moc-pipeline-1",
+    "href": "p9-presentation.html#moc-pipeline-1",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "MOC Pipeline",
+    "text": "MOC Pipeline"
+  },
+  {
+    "objectID": "p9-presentation.html#ica-preprocessing",
+    "href": "p9-presentation.html#ica-preprocessing",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "ICA Preprocessing",
+    "text": "ICA Preprocessing\n\n\n\nSimilar preprocessing to PLS-SM, except:\n\nNo averaging\nNo compositional range filtering\nUses only one location per sample\n\n\n\n\n\n\nICA Preprocessing\n\n\n\n\n\nI won’t go into much detail about the preprocessing stage in the ICA phase. The process mostly follows the same steps as in PLS-SM, except we don’t filter for any compositional ranges here.  We also do not average the shots, and instead preserve the intensity values for each shot, except the first five.  Finally, we don’t use all five location datasets for each sample. That is left as an experiment, which Ivik will go into detail about. We chose to do it this way because it was unclear how the original authors used all location datasets."
+  },
+  {
+    "objectID": "p9-presentation.html#ica---jade",
+    "href": "p9-presentation.html#ica---jade",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "ICA - JADE",
+    "text": "ICA - JADE\n\n\n\nICA\nUsing JADE\nGet estimated sources from the data\n\n\n\n\n\nJADE\n\n\n\n\n\nTo actually do Independent Component Analysis (ICA), we use the JADE algorithm, just as the original authors. ICA is conceptually similar to PCA in that it decomposes data to a smaller number of variables. The main idea to to take some original set of data, consisting of mixed signals. \nThen reconstruct these via:\n\na mixing matrix, each column measuring how much each source contributes to the mixed signals, and\na matrix of independent components, called the estimated sources matrix\n\n The result of running JADE is the estimated sources. We’ll use these in the next step, postprocessing."
+  },
+  {
+    "objectID": "p9-presentation.html#ica-postprocessing",
+    "href": "p9-presentation.html#ica-postprocessing",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "ICA Postprocessing",
+    "text": "ICA Postprocessing\n\n\n\nCalculate correlation between ICs and wavelengths\nFind most correlated\nGet composition values for samples\n\n\n\n\n\nICA Postprocessing\n\n\n\n\n\nFor the postprocessing phase, we start by calculating correlations between the estimated sources from JADE and the wavelenghts. Using this, we can identify which wavelengths are associated with which independent components by computing the maximum correlation for each wavelength. This gives us a matrix of ICA scores that we then use for regression. This finds the most relevant spectral lines for each component.  Finally, we curate the compositions for the samples we’ve processed, which will be used to train the regression models."
+  },
+  {
+    "objectID": "p9-presentation.html#ica-score-based-regression-models",
+    "href": "p9-presentation.html#ica-score-based-regression-models",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "ICA-Score based Regression Models",
+    "text": "ICA-Score based Regression Models\n\na\n\nWe train regression models on the ICA scores and composition data\nFirst, the ICA scores go through data transformation to one of the regression laws seen here\nThe regression models are then trained with the scores as inputs and composition data as targets"
+  },
+  {
+    "objectID": "p9-presentation.html#multivariate-oxide-compositions",
+    "href": "p9-presentation.html#multivariate-oxide-compositions",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Multivariate Oxide Compositions",
+    "text": "Multivariate Oxide Compositions\n\n\n\n\n\n\n\n\n\n\n\n\nVarying weight by oxide\nDepends on which model performs best"
+  },
+  {
+    "objectID": "p9-presentation.html#moc-pipeline-2",
+    "href": "p9-presentation.html#moc-pipeline-2",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "MOC Pipeline",
+    "text": "MOC Pipeline\n\n\n\n\n\nOxide\nPLS1-SM (%)\nICA (%)\n\n\n\n\nAl2O3\n75\n25\n\n\nFeOT\n75\n25\n\n\nSiO2\n50\n50\n\n\nNa2O\n40\n60\n\n\nK2O\n25\n75\n\n\nTiO2\n50\n50\n\n\nMgO\n50\n50\n\n\nCaO\n50\n50\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe weights can be seen here."
+  },
+  {
+    "objectID": "p9-presentation.html#differences",
+    "href": "p9-presentation.html#differences",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Differences",
+    "text": "Differences\n\n\nWe do not weighing by inverse IRF\nNo MAD outlier removal for ICA\nAutomated what they did manually (outlier removal PLS)\nOur test fold was not carefully selected to be representative (just randomized)\n\n\n\n\nWe Do Not Weigh by Inverse IRF:\n\nReason: Avoiding the inverse IRF weighting is based on criticism that it distorts the alignment between spectral data from different instruments. The inverse IRF could introduce more noise and disrupt the comparison between spectra collected by different instruments, one in Los Alamos and another on Mars.\n\nNo MAD Outlier Removal for ICA:\n\nReason: The decision to omit MAD-based outlier removal in the ICA phase is due to insufficient description of the method by Clegg et al., making replication without assumptions difficult. Additionally, retaining a comprehensive dataset is preferred to ensure the integrity of analysis.\n\nAutomated Outlier Removal for PLS:\nRandomized Test Fold Selection:\n\nThis approach, while simpler, might not ensure that the test set is fully representative of the broader dataset."
+  },
+  {
+    "objectID": "p9-presentation.html#answering-the-problem-definition",
+    "href": "p9-presentation.html#answering-the-problem-definition",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Answering the Problem Definition",
+    "text": "Answering the Problem Definition\n\n\nThe Problem Definition:\n\n\n\nGiven a series of experiments and the resulting models, identify the components that contribute the most to the overall error E(M)\n\n\n\n\n\n\nThe Challenges:\n\n\n\nDetermine what a component is\n\n\n\n\nFiguring out which components to conduct experiments on\n\n\n\n\nTime is a contraint - which experiments are most meaningful?\n\n\n\n\n\nExperiments introduction  Once the replication process was done we had to decide on a set of experiments that would best answer our problem definition.  A tricky aspects of answering the problem definition is defining what constitutes a component and in turn, how to define an experiment that would allow us to determine its contribution to the over all error.  On top of this, was the looming time constraint for delivery on the project. This meant that we had to be selective on the type of experiments that we chose. We had to ensure that the experiments were impactful enough to be able to determine something about the pipeline."
+  },
+  {
+    "objectID": "p9-presentation.html#our-choice-of-experiments",
+    "href": "p9-presentation.html#our-choice-of-experiments",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Our Choice of Experiments",
+    "text": "Our Choice of Experiments\n\n\nOutlier based experiments\n\n\n\n\nEvaluating the necessity of automated outlier removal in the PLS1-SM\n\n\n\n\n\n\n\nElement\nBaseline\nWithout outlier removal\nPLS1-SM (Clegg)\n\n\n\n\nSiO2\n5.81\n5.81\n4.33\n\n\nTiO2\n0.47\n0.47\n0.94\n\n\nAl2O3\n1.94\n1.91\n2.85\n\n\nFeOT\n4.35\n4.35\n2.01\n\n\nMgO\n1.17\n1.17\n1.06\n\n\nCaO\n1.43\n1.44\n2.65\n\n\nNa2O\n0.66\n0.67\n0.62\n\n\nK2O\n0.72\n0.70\n0.72\n\n\n\n\n\n\nThe experiments that we chose  We settled on conducting 5 sets of experiments. The first set of experiments were centered around outlier removal. In the initial stages of our implementation we realized that we would not be able to do outlier detection in the same way that Clegg et. al did it. Both in terms of the PLS side of the pipeline and also in the ICA side of the pipeline. Therefore we thought it would be interesting to conduct experiments that tested different aspects of our outlier removal process.\n(1) Automated outlier removal  The first experiment that we decided to conduct was to evaluate the effects of not doing outlier removal vs. our automated outlier removal for PLS-SM. The outcome of this experiment would provide us answers to two things. The first being an evaluation of our automated outlier removal. The second being an evaluation of the PLS model’s intrinsic ability to handle outliers.\nTable 1  As you can see from the table, our outlier removal had almost no effect on the RMSE. This result was surprising to us. We did not necessarily have any expectation that our outlier removal would perform better than clegg et. al’s, however, we would have expected to see more of an effect since we were removing quite a few outliers that theoretically should have a high, negative impact on the model’s predictions.\nThe interesting result, though, is the fact that PLS performed very well without our outlier removal and in fact comparable to clegg’s results, who manually picked out outliers. This result indicates that our outlier removal is not particularly effective in terms of improving RMSE, but also that PLS is seemingly a robust method in itself. Given the fact that we did not see much improvement, and the fact that we do not have the expertise to do manual outlier removal, it would have been beneficial to have investigated other methods such as clustering-based outlier detection rather than statistical approaches like we have used."
+  },
+  {
+    "objectID": "p9-presentation.html#section",
+    "href": "p9-presentation.html#section",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "",
+    "text": "Outlier based experiments\n\n\n\nInvestigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM\n\n\n\n\n\n\nElement\nBaseline\nFixed thresholds\n\n\n\n\nSiO2\n5.81\n5.81\n\n\nTiO2\n0.47\n0.47\n\n\nAl2O3\n1.94\n1.94\n\n\nFeOT\n4.35\n4.35\n\n\nMgO\n1.17\n1.18\n\n\nCaO\n1.43\n1.44\n\n\nNa2O\n0.66\n0.6\n\n\nK2O\n0.72\n0.72\n\n\n\n\n\n\n(2) Maintaining leverage and residuals  In order to further verify the results from the previous slide, we attempted a different approach where instead of recalculating the leverage and residuals for each iteration, we would instead maintain the ones from the second iteration. We did this to ensure that we were not being too aggressive in our outlier removal process, since this approach would result in fewer points overall being removed.\nTable 2  As can be seen in the table, this approach did not provide any improvements to the RMSE, either. Perhaps a more specialized outlier approach would yield greater performance of the PLS model. However, given that our results with both types of outlier removal are close to the results of Clegg et. al’s we have some evidence, although not conclusive, that the outlier removal component of the PLS phase is not a component that would provide many improvements to the overall RMSE. But as stated before, this may be different with different methods of outlier removal."
+  },
+  {
+    "objectID": "p9-presentation.html#section-1",
+    "href": "p9-presentation.html#section-1",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "",
+    "text": "Outlier based experiments\n\n\n\nAssessing the impact of the MAD-based method for outlier removal in the ICA phase\n\n\n\n\n\n\nElement\nICA baseline\nICA with MAD\nICA (clegg)\n\n\n\n\nSiO2\n10.68\n8.64\n8.31\n\n\nTiO2\n0.63\n0.53\n1.44\n\n\nAl2O3\n5.55\n3.69\n4.77\n\n\nFeOT\n8.30\n7.07\n5.17\n\n\nMgO\n2.90\n2.10\n4.08\n\n\nCaO\n3.52\n4.00\n3.07\n\n\nNa2O\n1.72\n1.45\n2.29\n\n\nK2O\n1.37\n1.15\n0.98\n\n\n\n\n\n\n(3) Median Absolute Deviation outlier ICA  Moving on to our third outlier experiment, we wanted to actually implement MAD for ICA. As we mentioned in the report we were unsure where in the ICA phase they had implemented it. Therefore we chose to experiment with different placements until we found a version which we thought was most appropiate. This experiment allowed us to do a with/without outlier removal test, similar to the PLS, which tests the intrinsic robustness of the ICA model.\nTable 3  Looking at the results then, we see that using MAD did in fact have a pretty significant effect on the results of ICA. This told us that ICA seems quite susceptible to outliers. Additionally, since ICA is worse across all oxides compared to PLS we wonder what the benefit of ICA in this context. A recent paper related to supercam model selection seems to agree with this observation since NASA chose to exclude it in their recent model."
+  },
+  {
+    "objectID": "p9-presentation.html#our-choice-of-experiments-1",
+    "href": "p9-presentation.html#our-choice-of-experiments-1",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Our Choice of Experiments",
+    "text": "Our Choice of Experiments\n\n\nAggregating datasets for ICA\n\n\n\nDetermining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset\n\n\n\n\n\n\nICA replica without MAD\n\n\n\n1 location\nAggregated\n\n\n\n\nSiO2\n10.68\n12.01\n\n\nTiO2\n0.63\n0.60\n\n\nAl2O3\n5.55\n4.81\n\n\nFeOT\n8.30\n8.56\n\n\nMgO\n2.90\n2.51\n\n\nCaO\n3.52\n3.71\n\n\nNa2O\n1.72\n1.41\n\n\nK2O\n1.37\n1.51\n\n\n\n\n\n\n\n\n\nICA replica with MAD\n\n\n\n1 location\nAggregated\n\n\n\n\nSiO2\n8.64\n9.47\n\n\nTiO2\n0.53\n0.48\n\n\nAl2O3\n3.69\n2.66\n\n\nFeOT\n7.07\n7.05\n\n\nMgO\n2.10\n2.83\n\n\nCaO\n4.00\n1.90\n\n\nNa2O\n1.45\n1.60\n\n\nK2O\n1.15\n1.08\n\n\n\n\n\n\n\n\n\nICA (Clegg et. al)\n\n\nElement\nOriginal\n\n\n\n\nSiO2\n8.31\n\n\nTiO2\n1.44\n\n\nAl2O3\n4.77\n\n\nFeOT\n5.17\n\n\nMgO\n4.08\n\n\nCaO\n3.07\n\n\nNa2O\n2.29\n\n\nK2O\n0.98\n\n\n\n\n\n\n\n\n(4) ICA aggregated The next type experiment that we conducted was based on aggregating the datasets for a sample. In the report we mentioned being unsure how they utilized all 5 datasets for a sample in the ICA phase. Based on our understanding from the papers and through discussions with our external supervisor Jens, we identified two candidate methods of approaching this. The first being running ICA on each of the 5 datasets per sample and training the regression model on the results and the second being aggregating the 5 dataset into a single, average dataset as they do in PLS-SM. We chose the simpler second option, as we believed that averaging could help ICA more easily identify principal components, since we noticed that ICA seemed sensitive to outliers.\nTable 4.1 As can be seen in the first table the results are fairly similar across all oxides, except for Silicon where the results are worse. These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which indicates that it was easier for ICA to separate out signals for those oxides. However, as the results show it may also have had the opposite effect for some oxides. One possible interpretation of this is that noise in some areas might have been increased, making it harder to separate the signals properly. This is likely due to the smoothing effect of avereging which may have made some signals less distinct and therefore harder to identify.\nTable 4.2 The previous results then led us to wonder how much of an effect outlier detection would have with this aggregated dataset. We reasoned that noise would be amplified by this process and that it therefore would be easier to detect outliers. Surprisingly, there seemed to be some merit to this as there were quite a few improvements. In fact, for 5 out of 8 oxides we saw better results than clegg. This highligts two key points: First, the effectiveness of ICA seems depend on a robust outlier removal strategy, particularly with LIBS data. Second, the success of ICA seems to rely on the structure of the data. This would mean spending more effort on creating calibration data which is suitable for ICA. However, given the substantial time and resources required to generate such calibration data, the benefits of using ICA appear limited."
+  },
+  {
+    "objectID": "p9-presentation.html#our-choice-of-experiments-2",
+    "href": "p9-presentation.html#our-choice-of-experiments-2",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Our Choice of Experiments",
+    "text": "Our Choice of Experiments\n\n\nUsing different models\n\n\n\nComparing the performance of PLS1-SM and ICA models against XGBoost and ANN.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nElement\nANN (Norm1)\nANN (Norm3)\nXGBoost (Norm1)\nXGBoost (Norm3)\nMOC (original)\nMOC (replica)\n\n\n\n\nSiO2\n5.62\n5.01\n5.12\n4.67\n5.30\n7.29\n\n\nTiO2\n0.58\n0.62\n0.44\n0.45\n1.03\n0.49\n\n\nAl2O3\n2.12\n2.27\n1.93\n1.97\n3.47\n2.39\n\n\nFeOT\n4.05\n4.00\n4.40\n5.02\n2.31\n5.21\n\n\nMgO\n1.61\n1.49\n0.99\n0.96\n2.21\n1.67\n\n\nCaO\n1.33\n1.26\n1.23\n1.26\n2.72\n1.81\n\n\nNa2O\n1.17\n1.09\n0.49\n0.51\n0.62\n1.10\n\n\nK2O\n1.05\n0.88\n0.50\n0.51\n0.82\n1.09\n\n\n\n\n\n\nThe final experiments that we wanted to do was based on the desire to do some due diligence that we felt was lacking from clegg’s paper. This was comparing the MOC pipeline to other methods that exist. For this we chose to work with XGBoost and ANN’s. The decision to use these specifically was the fact they represented two fairly different approaches that both have the ability to learn complex patterns in data. Given the time constraint that we had, we felt that it would be sufficient to demonstrate whether the current MOC model could potentially be updated to include other models or perhaps that entirely different approaches to oxide predictions in LIBS data should be persued.\nTable 5 As you can see from the table XGBoost performed better in most cases and for some oxides even showed an improvement from the MOC model. Additionally, the ANN model also showed to be better than the MOC model in many cases. Given the results of our outlier removal experiments, despite them not being comprehensive, and the good results of XGBoost and ANN’s, perhaps the most improvements could be found with better model selection."
+  },
+  {
+    "objectID": "p9-presentation.html#conclusion",
+    "href": "p9-presentation.html#conclusion",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Conclusion",
+    "text": "Conclusion\n\n\nSo what did we learn?\n\n\n\n\nOutlier removal is beneficial to some extend\n\nSpecialty approaches needs to be developed for further improvements\n\n\n\n\n\nRethinking the choice of models may be a better solution\n\nCurrent pipeline has a lot of complexity and moving parts\n\n\n\n\nOutlier removal For the outlier removal we found that depending on the model, PLS-SM or ICA, outlier removal has varying success. For PLS-SM there seems to be neglible gains from outlier removal, while ICA benefits more from it. Generally, however, we determine that a “one size fits all” approach to outlier detection does not provide many benefits and perhaps different approaches needs to be developed. Such approaches could either involve entirely new algorithms or specialized approaches that account for the structure of data that mimics what an expert could do manually.\nData preprocessing\nRethinking While the current setup with PLS and ICA allows for interpretability e.g. regression plots and independent components, the MOC model as a whole loses the benefit of that because of the complexity of the pipeline. This is because you are interleaving to different models that are operating in distinct ways and adjusting everything from data preprocessing to outlier removal introduces complexity with diminishing returns."
+  },
+  {
+    "objectID": "p9-presentation.html#reflections",
+    "href": "p9-presentation.html#reflections",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Reflections",
+    "text": "Reflections\n\n\nTaking a critical look at our project\n\n\n\n\nWe accomplished most of what we wanted\n\nFinished replica\nConducted meaningful experiments\n\n\n\n\n\nHowever… We lack depth in our experiments\n\nFor example:\nInvestigate the causes of varying RMSEs with aggregated datasets for ICA\nThorough investigation of ANNs and XGBoost and why exactly they perform better\n\nUseful components that might be beneficial for future research\n\n\n\n\n\nReflecting on the project we achieved what we wanted on a general level. We completed a replica that is similar to Clegg et. al’s and demonstrated this fact with a t-test. We also managed to complete a set of experiments that helped us determine the effects on some of the components to the overall RMSE.\nHowever, what we realize is that there was not a lot of depth to the experiments. We did not have the opportunity to spend nearly as much time as we would have liked to go into depth about the “why’s” of the results we saw.\nFor example, in the experiment with the aggregated datasets for ICA we saw mixed results across the different oxides. In some cases the RMSE improved, in others it did not. It would have been great to look more closely into the mechanisms that caused ICA to produce such results so that we could learn something from that. A second example is that we would have liked to have spent more time investigating the aspects of ANN and XGBoost that makes them so good for LIBS data. Understanding the specific components or mechanisms that make them produce such good results would have been tremendously useful and interesting."
+  },
+  {
+    "objectID": "p9-presentation.html#recommendations-for-future-work",
+    "href": "p9-presentation.html#recommendations-for-future-work",
+    "title": "Identifying Limitations in the ChemCam Multivariate Oxide Composition Model for Elemental Quantification in Martian Geological Samples",
+    "section": "Recommendations for Future Work",
+    "text": "Recommendations for Future Work\n\n\nEnsemble and advanced machine learning methods\n\n\n\n\nAdvanced outlier detection techniques\n\n\n\n\nDimensionality reduction techniques\n\n\n\nFinally, we will finish off with looking at what could be done in the future.\nIn our report we suggest three avenues that could be explored based on what we have learned from our project.\nThe first is to explore ensemble and advanced machine learning methods. This idea stems from our own results from XGBoost and ANN’s, which showed to be able to handle the complexities of the LIBS data very well. Exploring ensemble techniques such as Random forest or gradient boosting as well as machine learning methods such as convolutional neural networks might offer advancements in the analysis of LIBS data. This notion is supported by papers such as supercam related paper that Patrick mentioned in the beginning.\nThe second avenue that could be explored is in the outlier detection domain. As I mentioned earlier, there might be benefits from exploring different or more advanced outlier detection methods. Exploring this avenue, potentially in conjunction with other prediction models, may yield results that could be beneficial for both existing Mars missions but also future ones.\nThe last suggestion that we give is to explore techniques that are based on dimensionality reduction such as PCA and Autoencoders to further simplify and improve the analysis. As you know, LIBS data is considered not only to be complex but also high dimensionality. This is why PLS and ICA are viable algorithms to consider in this context. This is because they are designed to reduce the dimensionality of the data without sacrificing the integrity of the data. Investigating new dimensionaly reduction techniques that could integrate with models that do not inherently do this, may yield interesting results as you may be able to leverage the strength of models that would otherwise not fit in the LIBS context."
+  }
+]
