@@ -73,20 +73,24 @@ Therefore we thought it would be interesting to conduct experiments that tested 
 <br>
 The first experiment that we decided to conduct was to evaluate the effects of not doing outlier removal vs. our automated outlier removal for PLS-SM. 
 The outcome of this experiment would provide us answers to two things. The first being an evaluation of our automated outlier removal. 
-The second being an implicit evaluation of the PLS-SM model to handling of outliers. 
-The implicit evaluation of the PLS-SM is interesting since if we did not see a big difference in RMSE between our own and clegg et. al's, then that would call into question of doing outlier removal at all for PLS-SM.
+The second being an evaluation of the PLS model's intrinsic ability to handle outliers. 
+
 
 **Table 1**
 <br>
 As you can see from the table, our outlier removal had almost no efffect on the RMSE. 
-This result was in many ways surprising to us. 
-We did not necessarily have any expectation that our outlier removal would perform better than clegg et. al's, however, we would have expected to see some effect since we were removing quite a few outliers that theoretically should have a high, negative impact on the model's predictions.  
-The interesting result, though, is the fact that PLS performed just as well without our outlier removal and in fact very comparable to clegg's results, who manually picked out outliers.
-This, to us, shows that PLS is a very robust method, but it also poses the question whether it can even be improved any further.
+This result was surprising to us. 
+We did not necessarily have any expectation that our outlier removal would perform better than clegg et. al's, however, we would have expected to see more of an effect since we were removing quite a few outliers that theoretically should have a high, negative impact on the model's predictions.  
+The interesting result, though, is the fact that PLS performed very well without our outlier removal and in fact very comparable to clegg's results, who manually picked out outliers.
+This result indicates that our outlier removal is not particularly effective in terms of improving RMSE, but also that PLS is seemingly a robust method in itself.
+Given the fact that we did not see much improvement, and the fact that we do not have the expertise to do manual outlier removal, it would have been beneficial to have investigated other methods such as clustering-based outlier detection rather than statistical approaches like we have used.
 
 :::
 
 ---
+<div class="experiments-spacing">
+<p class="experiments-header">Outlier based experiments:</p>
+</div>
 
 2. Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM
 
@@ -116,11 +120,14 @@ We did this to ensure that we were not being too aggressive in our outlier remov
 <br>
 As can be seen in the table, this approach did not provide any improvements to the RMSE, either.
 Perhaps a more specialized outlier approach would yield greater performance of the PLS-SM model. 
-However, given that our results with both types of outlier removal are generally close to the results of Clegg et. al's we determine that the outlier removal component of the PLS-SM phase is not a component that would provide many improvements to the overall RMSE.
+However, given that our results with both types of outlier removal are generally close to the results of Clegg et. al's we suspect that the outlier removal component of the PLS-SM phase is not a component that would provide many improvements to the overall RMSE.
 
 :::
 
 ---
+<div class="experiments-spacing">
+<p class="experiments-header">Outlier based experiments:</p>
+</div>
 
 3. Assessing the impact of the MAD-based method for outlier removal in the ICA phase
 
@@ -141,21 +148,24 @@ However, given that our results with both types of outlier removal are generally
 :::
 
 ::: {.notes}
-**(3) MAD outlier ICA**
+**(3) Median Absolute Deviation outlier ICA**
 <br>
 Moving on to our third outlier experiment, we wanted to actually implement MAD for ICA. 
-As we mentioned in the report we were unsure about how they had actually implemented it. 
-Therefore we chose to have it be an experiment to implement a version which we thought was most appropiate.
+As we mentioned in the report we were unsure where in the ICA phase they had implemented it. 
+Therefore we chose to experiment with different placements until we found a version which we thought was most appropiate.
 This experiment allowed us to do a with/without outlier removal test, similar to the PLS, and as such test the intrinsic robustness of the ICA model.
 
 **Table 3**
 <br>
 Looking at the results then, we see that using MAD did in fact have a pretty significant effect on the results of ICA. This told us that ICA seems quite susceptible to outliers.
-Couple that with the fact that ICA is worse across all oxides compared to PLS and you start to wonder what the benefit of using ICA is.
+Additionally, since ICA is worse across all oxides compared to PLS we wonder what the benefit of ICA in this context. A recent paper related to supercam seems to agree with this observation since NASA chose to exclude it in their recent model.
+
 :::
 
 ## Our Choice of Experiments
-
+<div class="experiments-spacing">
+<p class="experiments-header">Aggregating datasets for ICA</p>
+</div>
 4. Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset
 
 
@@ -190,12 +200,12 @@ Couple that with the fact that ICA is worse across all oxides compared to PLS an
 |          | 1 location | Aggregated |
 |----------|-----------:|-----------:|
 | SiO2     |       8.64 |       9.47 |
-| TiO2     |       0.53 |       0.48 |
-| Al2O3    |       3.69 |       2.66 |
+| TiO2     |       0.53 |       **0.48** |
+| Al2O3    |       3.69 |       **2.66** |
 | FeOT     |       7.07 |       7.05 |
-| MgO      |       2.10 |       2.83 |
-| CaO      |       4.00 |       1.90 |
-| Na2O     |       1.45 |       1.60 |
+| MgO      |       2.10 |       **2.83** |
+| CaO      |       4.00 |       **1.90** |
+| Na2O     |       1.45 |       **1.60** |
 | K2O      |       1.15 |       1.08 |
 
 : ICA replica with MAD
@@ -234,27 +244,27 @@ Couple that with the fact that ICA is worse across all oxides compared to PLS an
 Another thing that we mentioned being unsure about is how they utilized all 5 datasets for a sample in the ICA phase.
 Based on our understanding from the papers and through discussions with our external supervisor Jens, there we two candidate methods of approaching this.
 The first being running ICA on each of the 5 datasets per sample and training the regression model on the results and the second being aggregating the 5 dataset into a single, average dataset as they do in PLS-SM.
-Recall that in our baseline implementation we used 1 dataset per sample.
 
 We chose the second option for its simplicity and since we had already confirmed that ICA seemed susceptible to outliers, we thought that averaging could help stabilize the values and perhaps make it easier for ICA to identify the principal components. 
 
 **Table 4.1**
-As can be seen in the first table the results are fairly similar across all oxides, except for Silicium where the results are quite a bit worse. These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which suggests that it made it easier for ICA to separate out these signals. However, as can be seen it also had the opposite effect for some other oxides as noise in some areas of the dataset were magnified, making it harder to separate out signals for oxides such as silicium. 
+As can be seen in the first table the results are fairly similar across all oxides, except for Silicon where the results are worse. 
+These variations in the results across the oxides did partly confirm our suspicion, in that for some oxides the results improved which suggests that it made it easier for ICA to separate out these signals. However, as can be seen it also had the opposite effect for some other oxides as noise in some areas of the dataset were magnified, making it harder to separate out signals for oxides such as silicium. 
 This is likely do to the smoothing effect that averaging can have on the dataset and silicium may be found in regions that is close to other elements, making the distinction harder for ICA.  
 
 **Table 4.2**
-The previous results then led us to wonder how much of an effect outlier detection would have with this aggregated dataset. Since the signal in data was likely being obscured, we reasoned that this would also make it easier to pick out any outliers. 
-And surprisingly, it did. 
-Looking at the results and comparing to the original from clegg, we see that for 5 out 8 oxides the results were significantly better. 
-This tells us two things. Firstly, we confirm once again that ICA is very dependent on a strategic outlier removal process, especially for LIBS data, as the results of some oxide predictions require more available data, while others need less. 
-Secondly, this dependency implies that ICA is much more dependent on calibration data that is tailored towards its strengths. 
-Since creating calibration data is a time consuming and expensive effort, opting to use ICA seems less beneficial.
+The previous results then led us to wonder how much of an effect outlier detection would have with this aggregated dataset. We reasoned that noise would be amplified by this process and that it therefore would be easier to detect outliers.
+Surprisingly, there seemed to be some merit to this as there were quite a few improvements. In fact, for 5 out of 8 oxides we saw better results than clegg.
+This highligts two key points: First, the effectiveness of ICA seems depend on a robust outlier removal strategy, particularly with LIBS data.
+Second, the success of ICA seems to rely on carefully calibrated data that leverages its strengths. However, given the substantial time and resources required to generate such calibration data, the benefits of using ICA appear limited.
 :::
 
 ---
 
 ## Our Choice of Experiments
-
+<div class="experiments-spacing">
+<p class="experiments-header">Using different models</p>
+</div>
 5. Comparing the performance of PLS1-SM and ICA models against XGBoost and ANN.
 
 ::: {.fragment .fade-up}
@@ -281,9 +291,9 @@ The decision to use these specifically was the fact they represented two fairly 
 Given the time constraint that we had, we felt that this would be sufficient to demonstrate whether the current MOC model could potentially be updated to include other models or perhaps that entirely different approaches to oxide predictions in LIBS data should be persued.
 
 **Table 5**
-As you can see from the table XGBoost performed better in most cases and for some oxides even showed a significant improvement from the MOC model. 
-Additionally, the ANN model also showed to be better than the MOC model in many cases. 
-This conforms that potential improvements could be seen from either integrating such models in the pipeline or perhaps by focusing on new directions, where optimizing on these models could perhaps yield better results.
+As you can see from the table XGBoost performed better in most cases and for some oxides even showed an improvement from the MOC model. 
+Additionally, the ANN model also showed to be better than the MOC model in many cases.
+This suggests that potential improvements to the pipeline can perhaps be found with better model selection. Even though our experiments with outlier removal were not comprehensive, they also seem to suggest that outlier removal does not provide the biggest overall impact.
 :::
 
 ## Conclusion {.smaller}
@@ -305,7 +315,7 @@ This conforms that potential improvements could be seen from either integrating 
 ::: {.notes}
 **Outlier removal**
 For the outlier removal we found that depending on the model, PLS-SM or ICA, outlier removal has varying success. For PLS-SM there seems to be neglible gains from outlier removal, while ICA benefits more from it.
-Generally, however, we determine that a "one size fits all" approach to outlier detection does not provide sufficient benefits and therefore specialty approaches needs to be developed. Perhaps this involves developing approaches that cater more specifically to each oxide.
+Generally, however, we determine that a "one size fits all" approach to outlier detection does not provide many benefits and perhaps more specialty approaches needs to be developed. This could involve developing approaches that cater more specifically to each oxide.
 
 **Data preprocessing**
 
