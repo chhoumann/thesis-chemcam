@@ -133,7 +133,7 @@ Let me illustrate.<br>
 It's important to understand that, in practice, this flow is executed for each oxide.<br>
 For simplicity's sake, we present it as being done wholly.<br>
 <br>
-The full model is used to estimate the composition of an unknown target, and the appropriate sub-model(s) is then chosen based on this estimation for a more accurate prediction.<br>
+The full model is used to estimate the composition of an unknown target, and the appropriate sub-model(s) is then chosen based on this estimate for a more accurate prediction.<br>
 <br>
 If the initial estimate falls within the the range of only a single model, we use the full prediction from that model.<br>
 Conversely, if the estimate falls within an overlapping range (blending range), we blend the predictions of the corresponding submodels such that the prediction is weighted favoring the submodel whose range the initial estimate is closest to.
