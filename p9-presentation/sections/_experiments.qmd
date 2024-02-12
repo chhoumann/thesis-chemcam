@@ -74,7 +74,7 @@ Therefore we thought it would be interesting to conduct experiments that tested 
 The first experiment that we decided to conduct was to evaluate the effects of not doing outlier removal vs. our automated outlier removal for PLS-SM. 
 The outcome of this experiment would provide us answers to two things. The first being an evaluation of our automated outlier removal. 
 The second being an implicit evaluation of the PLS-SM model to handling of outliers. 
-The implicit evaluation of the PLS-SM is interesting since if we did not see a big in RMSE between our own and clegg et. al's, then that would call into question of doing outlier removal at all for PLS-SM.
+The implicit evaluation of the PLS-SM is interesting since if we did not see a big difference in RMSE between our own and clegg et. al's, then that would call into question of doing outlier removal at all for PLS-SM.
 
 **Table 1**
 <br>
