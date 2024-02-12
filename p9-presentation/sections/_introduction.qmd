@@ -282,5 +282,5 @@ This figure here shows the correlation between the different oxides as a heatmap
 The correlation is calculated using the Pearson correlation coefficient, and you can see that there are some strong correlations between some of the oxides.<br>
 
 For example, $\text{SiO}_2$ and $\text{CaO}$ are strongly negatively correlated, indicating that when the weight percentage of one of these oxides increases, the weight percentage of the other decreases.<br>
-This is the data that we use to train our models, which Christian will talk about next.
+So that was the data we used to train our models, and now Christian will talk about the models themselves.
 :::
