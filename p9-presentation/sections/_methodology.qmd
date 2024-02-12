@@ -10,11 +10,11 @@ This is what we used to establish baselines for our experiments.
 ![](/static/methodology/pipeline.png){fig-align="center" width="35%"}
 :::
 ::: {.fragment data-id="moc-box"}
-<div style="position: absolute; top: 34.45%; left: 30.5%; width: 18%; height: 35.25%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 34.45%; left: 30.5%; width: 18%; height: 35.25%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;"></div>
 :::
 
 ::: {.fragment data-id="moc-box"}
-<div style="position: absolute; top: 34.45%; left: 51.25%; width: 18%; height: 35.25%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 34.45%; left: 51.25%; width: 18%; height: 35.25%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;"></div>
 :::
 
 ::: {.notes}
@@ -115,7 +115,10 @@ These are the compositional ranges that @cleggRecalibrationMarsScience2017 prese
 <br>
 As can be seen, the ranges overlap.<br>
 This is to avoid discontinuities in the final combined results.<br>
-They would occur because the samples in each sub-model with the most "extreme" compositions aren't necessarily weighted as strongly when the model is trained, so may be less accurately predicted.
+They would occur because the samples in each sub-model with the most "extreme" compositions aren't necessarily weighted as strongly when the model is trained, so may be less accurately predicted.<br>
+<br>
+The N/As here mean that there are no compositional ranges defined there.<br>
+Essentially meaning there are no Mid submodels for sodium and potassium oxide.
 :::
 
 
@@ -136,7 +139,7 @@ If the initial estimate falls within the the range of only a single model, we us
 Conversely, if the estimate falls within an overlapping range (blending range), we blend the predictions of the corresponding submodels such that the prediction is weighted favoring the submodel whose range the initial estimate is closest to.
 :::
 
-## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted .smaller}
 :::::: {.columns}
 ::::: {.column width="50%"}
 - Remove 'dust' shots
@@ -145,7 +148,7 @@ Conversely, if the estimate falls within an overlapping range (blending range), 
 
 ::::: {.column width="50%"}
 ![PLS Preprocessing](static/methodology/pls_preprocessing.png){top="-400px" style="position: relative;" data-id="x1"}
-<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;"></div>
 :::::
 ::::::
 
@@ -157,7 +160,7 @@ Then we proceed to averaging the shot intensity values for each wavelength.<br>
 The final result is a single column representing an intensity value for each wavelength.
 :::
 
-## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted .smaller}
 ::::: {.columns}
 :::: {.column width="50%"}
 - Remove 'dust' shots
@@ -167,7 +170,7 @@ The final result is a single column representing an intensity value for each wav
 
 :::: {.column width="50%"}
 ![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top: -400px;" data-id="x1"}
-<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;" data-id="pbox"></div>
 ::::
 :::::
 
@@ -176,7 +179,7 @@ The preprocessing continues by masking noisy wavelengths.<br>
 The masking process itself simply involves setting the intensity values for the wavelengths in the masking ranges to zero.
 :::
 
-## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted .smaller}
 ![](/static/methodology/masked_regions.png){fig-align="center"}
 
 ::: {.notes}
@@ -185,7 +188,7 @@ This is because they were found to be untrustworthy & to generate outliers in th
 :::
 
 
-## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted .smaller}
 ::::: {.columns}
 :::: {.column width="50%"}
 - Remove 'dust' shots
@@ -196,16 +199,19 @@ This is because they were found to be untrustworthy & to generate outliers in th
 
 :::: {.column width="50%"}
 ![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top: -400px;" data-id="x1"}
-<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px; border-radius: 10px;" data-id="pbox"></div>
 ::::
 :::::
 
 ::: {.notes}
 After we've masked, we proceed to set negative values to zero.<br>
-These negative values represent noise that stems from the pre-CCS preprocessing phase --- likely the continuum removal step.
+These negative values represent noise that stems from the pre-CCS preprocessing phase --- likely the continuum removal step.<br>
+<br>
+Removing the values would imply we don't know what they mean, but we do.<br>
+They represent noise, so we set them to zero.
 :::
 
-## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted .smaller}
 :::: {.columns}
 ::: {.column width="50%"}
 - Remove 'dust' shots
@@ -218,7 +224,7 @@ These negative values represent noise that stems from the pre-CCS preprocessing 
 
 ::: {.column width="50%"}
 ![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top:-800px;" data-id="x1"}
-<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 57%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 57%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;" data-id="pbox"></div>
 :::
 ::::
 
@@ -227,8 +233,6 @@ We transpose the data, meaning the wavelengths are now the columns and the rows 
 Essentially, this means we have 5 locations per samples times 408 samples, giving us 2040 rows.<br>
 Of course, in practice, we divide the data into five folds, where one represents the test set.<br>
 <br>
-From here on, the steps become easier to imagine if you <br>
-<br>
 We now filter the data.<br>
 At this point, as illustrated in the figure, we process the data for each oxide.<br>
 So for each oxide, we filter it by the compositional range associated with a given submodel.<br>
@@ -236,7 +240,7 @@ This gives us the training data for this model's compositional range.
 :::
 
 
-## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted}
+## Preprocessing {auto-animate="true" auto-animate-id="p1" transition="slide-in fade-out" .unlisted .smaller}
 :::: {.columns}
 ::: {.column width="50%"}
 - Remove 'dust' shots
@@ -246,11 +250,13 @@ This gives us the training data for this model's compositional range.
 - Tranpose
 - Submodels filter
 - Normalize
+    - Norm 1: *normalize full spectrum,* $\text{sum}=1$
+    - Norm 3: *normalize per spectrometer,* $\text{sum}=3$
 :::
 
 ::: {.column width="50%"}
 ![PLS Preprocessing](static/methodology/pls_preprocessing.png){style="position: relative; top:-1200px;" data-id="x1"}
-<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 50%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
+<div style="position: absolute; top: 25%; left: 55%; width: 38%; height: 45%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;" data-id="pbox"></div>
 :::
 ::::
 
@@ -278,22 +284,32 @@ Now we normalize.<br>
 ::::
 
 ## Outlier Removal {.unlisted}
-Iterative, automated outlier removal process:
+Iterative, automated outlier removal process using Influence Plots of Leverage and Spectral Residuals
 
+::: {width="100%"}
+![](/static/methodology/FeOT_Full_5.png){width="70%" fig-align="center"}
+:::
+
+::: {.notes}
+The outlier removal process is iterative and works using influence plots of leverage and spectral residuals.<br>
+It is iterative because removing spectra that appear as outliers can reveal additional outliers.<br>
+:::
+
+## Outlier Removal {.unlisted}
+::: {.incremental}
 1. Compute leverage & spectral residuals
 2. Calculate Mahalanobis distance $d$
 3. Get critical value $c$
 4. Classify sample as outlier if $d>c$
 5. Remove outliers & train new model
 6. Repeat until model performance ceases to improve
+:::
 
 ::: {.notes}
-The outlier removal process is iterative and works using influence plots of leverage and spectral residuals.<br>
-It is iterative because removing spectra that appear as outliers can reveal additional outliers.<br>
-<br>
-We decided to automate this process, whereas the original authors would manually select outliers based on expertise.<br>
+We decided to automate this process, whereas the original authors would manually select outliers based on their expertise.<br>
 <br>
 The process itself follows the steps seen here.<br>
+<br>
 First we calculate the leverage and spectral residuals from the scores and loadings of a PLS model.<br>
 <br>
 <!-- Leverage is a measure of how far the independent variable values of an observation are from other observations. High-leverage points are outliers w.r.t the independent variables, as they have no neighboring points in space.<br>
@@ -307,8 +323,6 @@ We compare the distances against this critical value, using it as a threshold, w
 <br>
 Then we remove outliers from the dataset, retrain a PLS model, and then repeat the process.
 :::
-
-
 
 ## Outlier Removal {.unlisted}
 ::: {.r-stack}
@@ -327,6 +341,15 @@ Then we remove outliers from the dataset, retrain a PLS model, and then repeat t
 The process itself is easily seen as we step through these influence plots.<br>
 <br>
 As you can see, those items with both a high error and leverage are classified as outliers and are promptly removed.
+:::
+
+## MOC Pipeline {auto-animate="true"}
+::: {style="width=100%;"}
+![](/static/methodology/pipeline.png){fig-align="center" width="35%"}
+:::
+
+::: {data-id="moc-box"}
+<div style="position: absolute; top: 34.45%; left: 51.25%; width: 18%; height: 35.25%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;"></div>
 :::
 
 ## ICA Preprocessing
@@ -370,6 +393,7 @@ ICA is conceptually similar to PCA in that it decomposes data to a smaller numbe
 The main idea to to take some original set of data, consisting of mixed signals. <br>
 
 Then reconstruct these via:
+
 - a mixing matrix, each column measuring how much each source contributes to the mixed signals, and
 - a matrix of independent components, called the estimated sources matrix
 
@@ -412,23 +436,59 @@ Finally, we curate the compositions for the samples we've processed, which will 
 :::
 
 
-## Multivariate Oxide Compositions
+## Multivariate Oxide Compositions {auto-animate="true"}
 ::: {style="width=100%;"}
 ![](/static/methodology/pipeline.png){fig-align="center" width="35%"}
 :::
-::: {data-id="moc-box"}
-<div style="position: absolute; top: 75.5%; left: 40.9%; width: 18%; height: 21%; border: 2px solid red; box-sizing: border-box; pointer-events: none;"></div>
-:::
+<div style="position: absolute; top: 75.5%; left: 40.9%; width: 18%; height: 21%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;" data-id="moc-box"></div>
 
 ::: {.notes}
 - Varying weight by oxide
 - Depends on which model performs best
 :::
 
+## MOC Pipeline {auto-animate="true" .smaller}
+::::: {.columns}
+:::: {.column width="50%"}
+| Oxide  | PLS1-SM (%) | ICA (%) |
+|--------|-------------|---------|
+| Al2O3  | 75          | 25      |
+| FeOT   | 75          | 25      |
+| SiO2   | 50          | 50      |
+| Na2O   | 40          | 60      |
+| K2O    | 25          | 75      |
+| TiO2   | 50          | 50      |
+| MgO    | 50          | 50      |
+| CaO    | 50          | 50      |
+
+::::
+
+:::: {.column width="50%"}
+![](/static/methodology/pipeline.png){fig-align="center" width="75%"}
+
+<div style="position: absolute; top: 79%; left: 65%; width: 18%; height: 21%; border: 2px solid red; box-sizing: border-box; pointer-events: none; border-radius: 10px;" data-id="moc-box"></div>
+::::
+:::::
+
+::: {.notes}
+The weights can be seen here.<br>
+:::
+
 ## Differences
+::: {.incremental}
 - We do not weighing by inverse IRF
 - No MAD outlier removal for ICA
 - Automated what they did manually (outlier removal PLS)
 - Our test fold was not carefully selected to be representative (just randomized)
+:::
 
+::: {.notes}
+1. **We Do Not Weigh by Inverse IRF**: 
+   - **Reason**: Avoiding the inverse IRF weighting is based on criticism that it distorts the alignment between spectral data from different instruments. The inverse IRF could introduce more noise and disrupt the comparison between spectra collected by different instruments, one in Los Alamos and another on Mars.
+2. **No MAD Outlier Removal for ICA**:
+   - **Reason**: The decision to omit MAD-based outlier removal in the ICA phase is due to insufficient description of the method by Clegg et al., making replication without assumptions difficult. Additionally, retaining a comprehensive dataset is preferred to ensure the integrity of analysis.
+3. **Automated Outlier Removal for PLS**:
+4. **Randomized Test Fold Selection**:
+   - This approach, while simpler, might not ensure that the test set is fully representative of the broader dataset.
+:::
 
