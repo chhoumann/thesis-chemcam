@@ -37,7 +37,7 @@ We had to ensure that the experiments were impactful enough to be able to determ
 
 ## Our Choice of Experiments
 <div class="experiments-spacing">
-<p class="experiments-header">Outlier based experiments:</p>
+<p class="experiments-header" style="font-size: 30px;">Outlier based experiments</p>
 </div>
 
 ::: {.fragment .fade-up}
@@ -88,11 +88,15 @@ Given the fact that we did not see much improvement, and the fact that we do not
 :::
 
 ---
+
+## {.smaller}
+
 <div class="experiments-spacing">
-<p class="experiments-header">Outlier based experiments:</p>
+<p class="experiments-header" style="font-size: 30px;">Outlier based experiments</p>
 </div>
 
 2. Investigating the effect of maintaining the leverage and residuals in the outlier removal process of PLS1-SM
+
 
 ::: {.fragment .fade-up}
 ::: {style="font-size: 0.6em;"}
@@ -124,11 +128,16 @@ However, given that our results with both types of outlier removal are close to 
 :::
 
 ---
+
+## {.smaller}
+
 <div class="experiments-spacing">
-<p class="experiments-header">Outlier based experiments:</p>
+<p class="experiments-header" style="font-size: 30px;">Outlier based experiments</p>
 </div>
 
+
 3. Assessing the impact of the MAD-based method for outlier removal in the ICA phase
+
 
 ::: {.fragment .fade-up}
 ::: {style="font-size: 0.6em;"}
@@ -161,9 +170,9 @@ Additionally, since ICA is worse across all oxides compared to PLS we wonder wha
 
 :::
 
-## Our Choice of Experiments
+## Our Choice of Experiments {.smaller}
 <div class="experiments-spacing">
-<p class="experiments-header">Aggregating datasets for ICA</p>
+<p class="experiments-header" style="font-size: 30px;">Aggregating datasets for ICA</p>
 </div>
 4. Determining the effect on ICA performance when aggregating datasets from five locations compared to a single dataset
 
@@ -265,9 +274,9 @@ However, given the substantial time and resources required to generate such cali
 
 ---
 
-## Our Choice of Experiments
+## Our Choice of Experiments {.smaller}
 <div class="experiments-spacing">
-<p class="experiments-header">Using different models</p>
+<p class="experiments-header" style="font-size: 30px">Using different models</p>
 </div>
 5. Comparing the performance of PLS1-SM and ICA models against XGBoost and ANN.
 
@@ -360,3 +369,36 @@ For example, in the experiment with the aggregated datasets for ICA we saw mixed
 A second example is that we would have liked to have spent more time investigating the aspects of ANN and XGBoost that makes them so good for LIBS data. Understanding the specific components or mechanisms that make them produce such good results would have been tremendously useful and interesting.
 :::
 
+## Recommendations for Future Work
+
+
+::: {.fragment .fade-up}
+- Ensemble and advanced machine learning methods
+:::
+
+::: {.fragment .fade-up}
+- Advanced outlier detection techniques 
+:::
+
+::: {.fragment .fade-up}
+- Dimensionality reduction techniques
+:::
+
+::: {.notes}
+Finally, we will finish off with looking at what could be done in the future. 
+
+In our report we suggest three avenues that could be explored based on what we have learned from our project.
+
+The first is to explore ensemble and advanced machine learning methods. This idea stems from our own results from XGBoost and ANN's, which showed to be able to handle the complexities of the LIBS data very well. 
+Exploring ensemble techniques such as Random forest or gradient boosting as well as machine learning methods such as convolutional neural networks might offer advancements in the analysis of LIBS data.
+This notion is supported by papers such as supercam related paper that Patrick mentioned in the beginning.
+
+The second avenue that could be explored is in the outlier detection domain. 
+As I mentioned earlier, there might be benefits from exploring different or more advanced outlier detection methods. Exploring this avenue, potentially in conjunction with other prediction models, may yield results that could be beneficial for both existing Mars missions but also future ones.
+
+The last suggestion that we give is to explore techniques that are based on dimensionality reduction such as PCA and Autoencoders to further simplify and improve the analysis. 
+As you know, LIBS data is considered not only to be complex but also high dimensionality. This is why PLS and ICA are viable algorithms to consider in this context. 
+This is because they are designed to reduce the dimensionality of the data without sacrificing the integrity of the data.
+Investigating new dimensionaly reduction techniques that could integrate with models that do not inherently do this, may yield interesting results as you may be able to leverage the strength of models that would otherwise not fit in the LIBS context.
+
+:::
