@@ -7,14 +7,19 @@ python3 -m pip install --user virtualenv
 
 Set up venv environment
 ```bash
-python3 -m venv env
+python3 -m venv venv
 ```
 Activate venv
 ```bash
-source env/bin/activate
+source venv/bin/activate
 ```
 
 Install requirements
 ```bash
 pip install -r requirements.txt
+```
+
+You may need to install the project as a package
+```bash
+pip install -e .
 ```
