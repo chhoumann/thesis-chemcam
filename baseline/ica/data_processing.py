@@ -27,10 +27,9 @@ def average_each_shot_across_locations(data):
 class ICASampleProcessor:
     def __init__(self, sample_name: str, num_components: int):
         self.sample_name = sample_name
-        self.sample_id = None
         self.num_components = num_components
         self.compositions_df = None
-        self.df = None
+        self.dfs = []
         self.ic_wavelengths = None
 
     def try_load_composition_df(self, composition_data_loc: str) -> bool:
@@ -53,48 +52,51 @@ class ICASampleProcessor:
 
     def preprocess(self, calib_data_path: Path, average_locations=False, norm: Norm = Norm.NORM_1) -> None:
         sample_data = get_preprocessed_sample_data(self.sample_name, calib_data_path, average_shots=False)
-        location_name_ss, single_sample = list(sample_data.items())[0]
 
-        self.sample_id = self.sample_name if average_locations else f"{self.sample_name}_{location_name_ss}"
+        dfs = []
 
-        # Average all of the five location datasets into one single dataset
-        final_avg_shots_df = (
-            average_each_shot_across_locations(sample_data) if average_locations else single_sample
-        )
+        if average_locations:
+            dfs.append((self.sample_name, average_each_shot_across_locations(sample_data)))
+        else:
+            for location_name, location_df in sample_data.items():
+                dfs.append((location_name, location_df))
 
-        # Assuming `identify_outliers_with_mad_iterative_multidim` returns indices of non-outliers.
-        non_outlier_indices, iterations = identify_outliers_with_mad_iterative_multidim(final_avg_shots_df.drop("wave", axis=1))
+        for name, data in dfs:
+            sample_id = self.sample_name if average_locations else f"{self.sample_name}_{name}"
 
-        # Create a full boolean array with False values
-        outlier_mask = np.zeros(len(final_avg_shots_df), dtype=bool)
+            # Assuming `identify_outliers_with_mad_iterative_multidim` returns indices of non-outliers.
+            non_outlier_indices, iterations = identify_outliers_with_mad_iterative_multidim(data.drop("wave", axis=1))
 
-        # Set True for non-outliers
-        outlier_mask[non_outlier_indices] = True
+            # Create a full boolean array with False values
+            outlier_mask = np.zeros(len(data), dtype=bool)
 
-        # Invert the mask to get outliers
-        outlier_mask = ~outlier_mask
+            # Set True for non-outliers
+            outlier_mask[non_outlier_indices] = True
 
-        # Create a mask for columns to apply zeroing to (all columns except 'wave').
-        columns_to_zero = final_avg_shots_df.columns != 'wave'
+            # Invert the mask to get outliers
+            outlier_mask = ~outlier_mask
 
-        # Set the outliers to 0
-        final_avg_shots_df.loc[outlier_mask, columns_to_zero] = 0
+            # Create a mask for columns to apply zeroing to (all columns except 'wave').
+            columns_to_zero = data.columns != 'wave'
 
-        # Apply masking
-        wmt = WavelengthMaskTransformer(masks)
-        df = wmt.fit_transform(final_avg_shots_df)
+            # Set the outliers to 0
+            data.loc[outlier_mask, columns_to_zero] = 0
 
-        # set the wave column as the index
-        final_avg_shots_df.set_index("wave", inplace=True)
+            # Apply masking
+            wmt = WavelengthMaskTransformer(masks)
+            df = wmt.fit_transform(data)
 
-        # Normalize the data
-        scaler = Norm1Scaler() if norm.value == 1 else Norm3Scaler()
-        final_avg_shots_df = pd.DataFrame(scaler.fit_transform(df))
+            # set the wave column as the index
+            data.set_index("wave", inplace=True)
 
-        self.df = final_avg_shots_df.transpose()
+            # Normalize the data
+            scaler = Norm1Scaler() if norm.value == 1 else Norm3Scaler()
+            data = pd.DataFrame(scaler.fit_transform(df))
 
-    def postprocess(self, ica_estimated_sources: np.ndarray) -> None:
-        columns = self.df.columns
+            self.dfs.append((sample_id, data.transpose()))
+
+    def postprocess(self, ica_estimated_sources: np.ndarray, df: pd.DataFrame) -> None:
+        columns = df.columns
 
         corrcols = [f"IC{i+1}" for i in range(self.num_components)]
         df_ics = pd.DataFrame(
@@ -103,10 +105,10 @@ class ICASampleProcessor:
             columns=corrcols,
         )
 
-        self.df = pd.concat([self.df, df_ics], axis=1)
+        df = pd.concat([df, df_ics], axis=1)
 
         # Correlate the loadings
-        corrdf, ids = self.__correlate_loadings__(corrcols, columns)
+        corrdf, ids = self.__correlate_loadings__(corrcols, columns, df)
 
         # Create the wavelengths matrix for each component
         self.ic_wavelengths = pd.DataFrame(index=[self.sample_name], columns=columns)
@@ -125,8 +127,8 @@ class ICASampleProcessor:
 
     # This is a function that finds the correlation between loadings and a set of columns
     # The idea is to somewhat automate identifying which element the loading corresponds to.
-    def __correlate_loadings__(self, corrcols: list, icacols: list) -> (pd.DataFrame, list):
-        corrdf = self.df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
+    def __correlate_loadings__(self, corrcols: list, icacols: list, df: pd.DataFrame) -> (pd.DataFrame, list):
+        corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
         # set all corrdf nans to 0 - they were set to 0 during masking, and
         # .corr() sets values that don't vary to NaN
         corrdf = corrdf.fillna(0)
