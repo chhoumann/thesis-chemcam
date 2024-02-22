@@ -30,7 +30,7 @@ where $y_i$ represents the actual values, $\hat{y}_i$ the predicted values, and 
 To address robustness, we propose considering the standard deviation of prediction errors across each oxide and test instance, defined as:
 
 \begin{equation}
-    \sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
+    \sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2},
 \end{equation}
 
 where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error.
