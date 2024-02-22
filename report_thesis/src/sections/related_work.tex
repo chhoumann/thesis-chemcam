@@ -39,3 +39,16 @@ For \ce{Si}, SVR performs the best.
 For \ce{Zn}, PCA-SVR performs the best.
 For the rest of the elements, \gls{pca}-\gls{ksvr} performs the best.
 The superiority of \gls{ksvr} is attributed to the its ability to handle non-linear relationships in the data effectively, especially when combined with PCA's capability to compress and simplify the input data by focusing on the most relevant variations.
+
+\citet{yang_laser-induced_2022} present a study on the application of a deep \gls{cnn} for classifying geochemical samples using \gls{libs}, with a particular focus on planetary exploration missions such as China's Tianwen-1 Mars mission.
+The authors demonstrate the effectiveness of a deep CNN in classifying geochemical standard samples using LIBS spectra collected at varying distances.
+This addresses the challenge of spectral differences induced by distance, showcasing that \gls{cnn} can learn to classify samples without the need for traditional spectral preprocessing or distance correction.
+Using a dataset of over 18,000 \gls{libs} spectra from 39 geochemical standard samples, the study compares the \gls{cnn} model's performance against four other machine learning models: \gls{bpnn} \gls{svm}, \gls{lda}, and \gls{lr}.
+The CNN model exhibits superior classification accuracy, emphasizing its potential for geochemical sample identification/classification in planetary exploration.
+The paper includes a detailed comparative analysis, proving the \gls{cnn} model's superior performance.
+With classification accuracies on the validation set for all models exceeding 95\%, the \gls{cnn} model demonstrated the highest overall accuracy.
+This was particularly evident as the training set size increased, indicating the model's robustness to varying distances without requiring distance correction.
+Statistical analysis further confirmed the \gls{cnn} model's superiority, with higher average Ncorr values compared to other models.
+The CNN model's ability to accurately classify geochemical samples without preprocessing for distance correction is quite impressive.
+This is particularly relevant to our work because we are also working with \gls{libs} spectra collected at varying distances.
+The comparative analysis underscores the CNN model as a best-fit approach for \gls{libs} data analysis, potentially setting a new standard for future research and applications in the field.
