@@ -15,15 +15,15 @@ from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
 from lib.norms import Norm
 
-TEST = True
+TEST = False
 AVERAGE_LOCATION_DATASETS = False
-#mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_tracking_uri("http://localhost:5001")
 experiment_name = f"""ICA_MAD_{
     'TEST' if TEST else 'TRAIN'
     }_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"""
 # experiment_name = "ICA_Train_Test_Split"
-#mlflow.set_experiment(experiment_name)
-#mlflow.autolog()
+mlflow.set_experiment(experiment_name)
+mlflow.autolog()
 
 env = dotenv.dotenv_values(dotenv.find_dotenv())
 CALIB_DATA_PATH = env.get("DATA_PATH", "")
@@ -43,7 +43,6 @@ model_configs = {
     "Na2O": {"law": "Parabolic", "norm": Norm.NORM_3},
     "K2O": {"law": "Geometric", "norm": Norm.NORM_3},
 }
-
 
 def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     # This is not suited for more than a single location per sample.
@@ -251,7 +250,10 @@ def create_processed_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     composition_data_loc = CALIB_COMP_PATH
 
+    ic_wavelengths_list = []
     ica_df = pd.DataFrame()
+
+    filtered_compositions_list = []
     compositions_df = pd.DataFrame()
 
     test_train_split_idx = pd.read_csv("./train_test_split.csv")
@@ -287,19 +289,21 @@ def create_processed_data(
 
         processor.preprocess(calib_data_path, AVERAGE_LOCATION_DATASETS, norm)
 
-        for location_name, location_df in processor.dfs:
-            # Run ICA and get the estimated sources
-            ica_estimated_sources = run_ica(location_df, model=ica_model, num_components=num_components)
+        for sample_id, sample_data in processor.dfs:
+            # Run ICA for each location in sample and get the estimated sources
+            ica_estimated_sources = run_ica(sample_data, model=ica_model, num_components=num_components)
 
             # Postprocess the data
-            processor.postprocess(ica_estimated_sources, location_df)
+            ic_wavelengths, filtered_compositions_df = processor.postprocess(ica_estimated_sources, sample_id)
 
-            # Aggregate the ICA results and composition data to their respective DataFrames
-            compositions_df = pd.concat([compositions_df, processor.composition_df])
-            processor.try_load_composition_df(composition_data_loc=composition_data_loc)
             # Add the sample ID to the ICA DataFrame
-            processor.ic_wavelengths["id"] = location_name
-            ica_df = pd.concat([ica_df, processor.ic_wavelengths])
+            ic_wavelengths["id"] = sample_id
+
+            ic_wavelengths_list.append(ic_wavelengths)
+            filtered_compositions_list.append(filtered_compositions_df)
+
+    ica_df = pd.concat(ic_wavelengths_list)
+    compositions_df = pd.concat(filtered_compositions_list)
 
     # Set the index and column names for the DataFrames
     ica_df.index.name = "target"

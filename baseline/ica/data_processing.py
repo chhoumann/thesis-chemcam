@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -30,7 +31,6 @@ class ICASampleProcessor:
         self.num_components = num_components
         self.compositions_df = None
         self.dfs = []
-        self.ic_wavelengths = None
 
     def try_load_composition_df(self, composition_data_loc: str) -> bool:
         # Check if we have composition data for this sample
@@ -95,7 +95,7 @@ class ICASampleProcessor:
 
             self.dfs.append((sample_id, data.transpose()))
 
-    def postprocess(self, ica_estimated_sources: np.ndarray, df: pd.DataFrame) -> None:
+    def postprocess(self, ica_estimated_sources: np.ndarray, df: pd.DataFrame, sample_id: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
         columns = df.columns
 
         corrcols = [f"IC{i+1}" for i in range(self.num_components)]
@@ -111,7 +111,7 @@ class ICASampleProcessor:
         corrdf, ids = self.__correlate_loadings__(corrcols, columns, df)
 
         # Create the wavelengths matrix for each component
-        self.ic_wavelengths = pd.DataFrame(index=[self.sample_name], columns=columns)
+        ic_wavelengths = pd.DataFrame(index=[sample_id], columns=columns)
 
         for i in range(len(ids)):
             ic = ids[i].split(" ")[0]
@@ -119,11 +119,13 @@ class ICASampleProcessor:
             wavelength = corrdf.index[i]
             corr = corrdf.iloc[i].iloc[component_idx]
 
-            self.ic_wavelengths.loc[self.sample_name, wavelength] = corr
+            ic_wavelengths.loc[self.sample_name, wavelength] = corr
 
         # Filter the composition data to only include the oxides and their compositions
-        self.composition_df = self.composition_df.iloc[:, 3:12]
-        self.composition_df.index = [self.sample_name]
+        filtered_composition_df = self.composition_df.iloc[:, 3:12]
+        filtered_composition_df.index = [self.sample_name]
+
+        return ic_wavelengths, filtered_composition_df
 
     # This is a function that finds the correlation between loadings and a set of columns
     # The idea is to somewhat automate identifying which element the loading corresponds to.
