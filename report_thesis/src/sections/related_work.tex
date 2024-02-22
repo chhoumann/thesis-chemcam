@@ -31,3 +31,11 @@ This is particularly valuable in fields like spectroscopy, where understanding t
 The DF-K-ELM method showcases how hybrid models can outperform traditional machine learning approaches.
 The approach demonstrates a practical application of kernel extreme learning machines combined with domain-specific insights.
 This is very relevant to our work considering interpretability is a key requirement for NASA and something they considered when choosing the PLS model for the ChemCam instrument.
+
+\citet{rezaei_dimensionality_reduction} explore a variety of statistical and machine learning methods, including \gls{mlr}, \gls{svr}, \gls{ksvr}, and \gls{ann}, alongside their integrations with \gls{pca} to reduce dimensionality and improve model performance.
+This paper clearly demonstrates the effectiveness of dimensionality reduction techniques in improving the performance of machine learning models because it compares the performance of many models with and without \gls{pca}: \gls{ann}, \gls{mlr}, \gls{svr}, \gls{ksvr}, \gls{pca}-\gls{ann}, \gls{pca}-\gls{mlr}, \gls{pca}-\gls{svr}, and \gls{pca}-\gls{ksvr}.
+For all elements, a variant SVR performs the best.
+For \ce{Si}, SVR performs the best.
+For \ce{Zn}, PCA-SVR performs the best.
+For the rest of the elements, \gls{pca}-\gls{ksvr} performs the best.
+The superiority of \gls{ksvr} is attributed to the its ability to handle non-linear relationships in the data effectively, especially when combined with PCA's capability to compress and simplify the input data by focusing on the most relevant variations.
