@@ -1,18 +1,18 @@
 \section{Problem Definition}
 \label{sec:problem_definition}
 
-Our research aims to improve the accuracy and robustness of major oxide predictions derived from \gls{libs} data, building upon the baseline established in \cite{p9_paper}.
+Our work aims to improve the accuracy and robustness of major oxide predictions derived from \gls{libs} data, building upon the baseline established in \citet{p9_paper}.
 There are many challenges in predicting major oxides from \gls{libs} data, including the high dimensionality and non-linearity of the data, as well as the presence of multicollinearity.
 Some of these are caused by \textit{matrix effects}\cite{andersonImprovedAccuracyQuantitative2017}, which is a catch-all term for any effect that can cause the intensity of emission lines from an element to vary, independent of that element's concentration. So it's unknown variables that affect the results.
 Furthermore, due to the high cost of data collection, datasets are often small, which further complicates the task of building accurate and robust models.
 
-Based on the limitations with the current MOC pipeline, as reported in \cite{p9_paper}, we identified three key areas for further investigation: dimensionality reduction, model selection, and outlier removal.
+Based on the limitations with the current \gls{moc} pipeline, as reported in \citet{p9_paper}, we identified three key areas for further investigation: dimensionality reduction, model selection, and outlier removal.
 
 In this work, we focus on dimensionality reduction and model selection over outlier removal.
-This is justified by the low incidence of outliers in the ChemCam \gls{libs} calibration dataset, as reported in \cite{p9_paper}.
+This is justified by the low incidence of outliers in the \gls{chemcam} \gls{libs} calibration dataset, as reported in \citet{p9_paper}.
 Dimensionality reduction is crucial for managing the high-dimensional nature of \gls{libs} data. % TODO: There are lots of related works which explore DR in LIBS data. We can back this up with citations.
-Furthermore, model selection shows promise in addressing the limitations of the current MOC pipeline, as it allows for the exploration of a wider range of algorithms, potentially leading to improved performance.
-We showed that advanced ensemble methods, such as \gls{gbr}, and deep learning models, such as \gls{ann}, have the potential to outperform the current MOC pipeline.
+Furthermore, model selection shows promise in addressing the limitations of the current \gls{moc} pipeline, as it allows for the exploration of a wider range of algorithms, potentially leading to improved performance.
+We showed that advanced ensemble methods like \gls{gbr} and deep learning models like \gls{ann}s have the potential to outperform the current \gls{moc} pipeline.
 Methods are selected based on their promise in handling high-dimensional, non-linear data. Ideally, the selected methods should also be feasible for small datasets, a common scenario in \gls{libs} analyses. 
 In order to address the aforementioned challenges, we propose to explore advanced ensemble methods and deep learning models, which have shown promise in handling high-dimensional, non-linear data.
 
@@ -22,7 +22,7 @@ In \cite{p9_paper}, we proposed to use the \gls{rmse} as a proxy for accuracy.
 \gls{rmse} is given by:
 
 \begin{equation}
-    RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
+    RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2},
 \end{equation}
 
 where $y_i$ represents the actual values, $\hat{y}_i$ the predicted values, and $n$ the number of observations.
@@ -30,7 +30,7 @@ where $y_i$ represents the actual values, $\hat{y}_i$ the predicted values, and 
 To address robustness, we propose considering the standard deviation of prediction errors across each oxide and test instance, defined as:
 
 \begin{equation}
-    \sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
+    \sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2},
 \end{equation}
 
 where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error.
