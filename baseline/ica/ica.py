@@ -47,6 +47,14 @@ model_configs = {
 def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     # This is not suited for more than a single location per sample.
     id_col = ica_df_n1["id"]
+
+    print(ica_df_n1.columns)
+    print(ica_df_n3.columns)
+    print(compositions_df_n1.columns)
+    print(compositions_df_n3.index)
+    #print(ica_df_n1.index[1])
+    
+
     ica_df_n1.drop(columns=["id"], inplace=True)
     ica_df_n3.drop(columns=["id"], inplace=True)
 
@@ -262,7 +270,7 @@ def create_processed_data(
     missing = []
 
     desired_dataset = "test" if TEST else "train"
-    for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
+    for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path)[0:10])):
         split_info_sample_row = test_train_split_idx[test_train_split_idx["sample_name"] == sample_name]["train_test"]
 
         if split_info_sample_row.empty:
@@ -294,7 +302,7 @@ def create_processed_data(
             ica_estimated_sources = run_ica(sample_data, model=ica_model, num_components=num_components)
 
             # Postprocess the data
-            ic_wavelengths, filtered_compositions_df = processor.postprocess(ica_estimated_sources, sample_id)
+            ic_wavelengths, filtered_compositions_df = processor.postprocess(ica_estimated_sources, sample_data, sample_id)
 
             # Add the sample ID to the ICA DataFrame
             ic_wavelengths["id"] = sample_id

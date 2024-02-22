@@ -123,7 +123,7 @@ class ICASampleProcessor:
 
         # Filter the composition data to only include the oxides and their compositions
         filtered_composition_df = self.composition_df.iloc[:, 3:12]
-        filtered_composition_df.index = [self.sample_name]
+        filtered_composition_df.index = [sample_id]
 
         return ic_wavelengths, filtered_composition_df
 
