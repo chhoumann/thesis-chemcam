@@ -119,11 +119,11 @@ class ICASampleProcessor:
             wavelength = corrdf.index[i]
             corr = corrdf.iloc[i].iloc[component_idx]
 
-            ic_wavelengths.loc[self.sample_name, wavelength] = corr
+            ic_wavelengths.loc[sample_id, wavelength] = corr
 
         # Filter the composition data to only include the oxides and their compositions
         filtered_composition_df = self.composition_df.iloc[:, 3:12]
-        filtered_composition_df.index = [sample_id]
+        filtered_composition_df.index = pd.Index([sample_id])
 
         return ic_wavelengths, filtered_composition_df
 
