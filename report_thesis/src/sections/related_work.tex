@@ -1,0 +1,19 @@
+\section{Related Work}
+\citet{andersonPostlandingMajorElement2022} experimented with different machine learning models for quantifying major oxides on Mars using the SuperCam instrument on the Mars 2020 Perseverance rover.
+They discuss preprocessing, normalization of LIBS spectra, and the development of multivariate regression models to predict major element compositions.
+For each oxide, they tested different models and selected the best performing one.
+In some cases, they used a blend of models to improve the predictions.
+The models they tested include: \gls{ols}, \gls{pls}, \gls{lasso}, Ridge, \gls{enet}, \gls{omp}, \gls{svr}, \gls{rf}, \gls{gbr}, and local \gls{enet} and blended submodels.
+For \ce{SiO2}, they used a blend of \gls{gbr} and \gls{pls} models.
+Interestingly, they found that PLS performed better at longer distances (4.25m), but GBR was better at 3m.
+For \ce{TiO2}, they selected the \gls{rf} model for its superior performance at 4.25m and overall lower RMSEP.
+For \ce{Al2O3}, they used an average of predictions from four models (Local Elastic Net, \gls{rf}, two variants of \gls{pls}) to obtain the lowest RMSEP.
+For \ce{FeO_T}, they initially selected \gls{rf} but later replaced it with \gls{gbr} due to its more realistic stoichiometry predictions for high-Ca pyroxenes and overall performance.
+For \ce{MgO}, they selected \gls{gbr} for having the lowest RMSEP and avoiding negative predictions, despite slightly overpredicting \ce{MgO} for high concentration samples.
+For \ce{CaO}, they used a blend of \gls{rf} and \gls{pls} to address the bimodal distribution of \ce{CaO} predictions by the \gls{rf} model alone.
+For \ce{Na2O}, they used a blend of \gls{gbr} and \gls{lasso} models to utilize \gls{gbr}'s accuracy at low concentrations and \gls{lasso}'s superior predictions at higher concentrations.
+For \ce{K2O}, they selected \gls{lasso} for its better performance on high \ce{K2O} samples, despite the averaged model of five algorithms showing slight improvements at lower concentrations.
+The findings of this paper are significant to us because they provide a benchmark for the performance of different machine learning models on LIBS spectra.
+We can use this information to guide our model selection and to compare our results with theirs.
+Additionally, we might want to try out different models from the ones they tested to see if we can improve the predictions further, or perhaps find a model that is more suitable for our specific use case.
+Also, SuperCam being the successor to ChemCam means that the findings of this paper are directly relevant to our work.
