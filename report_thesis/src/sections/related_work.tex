@@ -1,0 +1,56 @@
+\section{Related Work}
+\citet{andersonPostlandingMajorElement2022} experimented with different machine learning models for quantifying major oxides on Mars using the SuperCam instrument on the Mars 2020 Perseverance rover.
+They discuss preprocessing, normalization of \gls{libs} spectra, and the development of multivariate regression models to predict major element compositions.
+For each oxide, they tested different models and selected the best performing one.
+In some cases, they used a blend of models to improve the predictions.
+The models they tested include: \gls{ols}, \gls{pls}, \gls{lasso}, Ridge, \gls{enet}, \gls{omp}, \gls{svr}, \gls{rf}, \gls{gbr}, and local \gls{enet} and blended submodels.
+For \ce{SiO2}, they used a blend of \gls{gbr} and \gls{pls} models.
+Interestingly, they found that PLS performed better at longer distances (4.25m), but GBR was better at 3m.
+For \ce{TiO2}, they selected the \gls{rf} model for its superior performance at 4.25m and overall lower \gls{rmsep}.
+For \ce{Al2O3}, they used an average of predictions from four models (Local \gls{enet}, \gls{rf}, two variants of \gls{pls}) to obtain the lowest \gls{rmsep}.
+For \ce{FeO_T}, they initially selected \gls{rf} but later replaced it with \gls{gbr} due to its more realistic stoichiometry predictions for high-\ce{Ca} pyroxenes and overall performance.
+For \ce{MgO}, they selected \gls{gbr} for having the lowest \gls{rmsep} and avoiding negative predictions, despite slightly overpredicting \ce{MgO} for high concentration samples.
+For \ce{CaO}, they used a blend of \gls{rf} and \gls{pls} to address the bimodal distribution of \ce{CaO} predictions by the \gls{rf} model alone.
+For \ce{Na2O}, they used a blend of \gls{gbr} and \gls{lasso} models to utilize \gls{gbr}'s accuracy at low concentrations and \gls{lasso}'s superior predictions at higher concentrations.
+For \ce{K2O}, they selected \gls{lasso} for its better performance on high \ce{K2O} samples, despite the averaged model of five algorithms showing slight improvements at lower concentrations.
+The findings of this paper are significant to us because they provide a benchmark for the performance of different machine learning models on \gls{libs} spectra.
+We can use this information to guide our model selection and to compare our results with theirs.
+Additionally, we might want to try out different models from the ones they tested to see if we can improve the predictions further, or perhaps find a model that is more suitable for our specific use case.
+Also, SuperCam being the successor to \gls{chemcam} means that the findings of this paper are directly relevant to our work.
+
+\citet{song_DF-K-ELM} present a novel approach to enhance the performance and interpretability of machine learning models in the context of \gls{libs} quantification.
+The authors use "knowledge-based spectral lines, related to analyte compositions, to construct a linear physical principle based model and adopts K-ELM to account for the residuals of the linear model."
+This method stands out by offering an intuitive explanation of how knowledge-based spectral lines impact prediction results, thereby enhancing model interpretability without compromising model complexity.
+DF-K-ELM was tested across 10 regression tasks based on 3 \gls{libs} datasets, comparing its performance against six baseline methods using \gls{rmsep} as the evaluation metric.
+They have 3 coal datasets, and they do regression tasks involving carbon, ash, volatile matter, and heat value analysis.
+It achieved the best performance in 4 tasks and the second-best in 2 tasks, demonstrating its efficacy.
+Incorporation of domain knowledge not only improved the accuracy of the models but also enhanced their generalizability across different tasks.
+The method's design allows for a more interpretable machine learning model that adheres closer to the physical principles underlying \gls{libs} quantification.
+The integration of domain knowledge into machine learning models addresses two critical challenges: improving the interpretability of complex models and enhancing their performance by leveraging specific domain insights.
+The approach demonstrates a practical application of kernel extreme learning machines combined with domain-specific insights.
+This is particularly valuable in fields like spectroscopy, where understanding the relationship between the spectral data and the analyte concentration is vital.
+The DF-K-ELM method showcases how hybrid models can outperform traditional machine learning approaches.
+The approach demonstrates a practical application of kernel extreme learning machines combined with domain-specific insights.
+This is very relevant to our work considering interpretability is a key requirement for NASA and something they considered when choosing the PLS model for the \gls{chemcam} instrument.
+
+\citet{rezaei_dimensionality_reduction} explore a variety of statistical and machine learning methods, including \gls{mlr}, \gls{svr}, \gls{ksvr}, and \gls{ann}, alongside their integrations with \gls{pca} to reduce dimensionality and improve model performance.
+They use \gls{mse} and \gls{mae} as evaluation metrics to compare the performance of the models.
+This paper clearly demonstrates the effectiveness of dimensionality reduction techniques in improving the performance of machine learning models because it compares the performance of many models with and without \gls{pca}: \gls{ann}, \gls{mlr}, \gls{svr}, \gls{ksvr}, \gls{pca}-\gls{ann}, \gls{pca}-\gls{mlr}, \gls{pca}-\gls{svr}, and \gls{pca}-\gls{ksvr}.
+For all elements, a variant SVR performs the best.
+For \ce{Si}, SVR performs the best.
+For \ce{Zn}, PCA-SVR performs the best.
+For the rest of the elements, \gls{pca}-\gls{ksvr} performs the best.
+The superiority of \gls{ksvr} is attributed to the its ability to handle non-linear relationships in the data effectively, especially when combined with PCA's capability to compress and simplify the input data by focusing on the most relevant variations.
+
+\citet{yang_laser-induced_2022} present a study on the application of a deep \gls{cnn} for classifying geochemical samples using \gls{libs}, with a particular focus on planetary exploration missions such as China's Tianwen-1 Mars mission.
+The authors demonstrate the effectiveness of a deep CNN in classifying geochemical standard samples using \gls{libs} spectra collected at varying distances.
+This addresses the challenge of spectral differences induced by distance, showcasing that \gls{cnn} can learn to classify samples without the need for traditional spectral preprocessing or distance correction.
+Using a dataset of over 18,000 \gls{libs} spectra from 39 geochemical standard samples, the study compares the \gls{cnn} model's performance against four other machine learning models: \gls{bpnn} \gls{svm}, \gls{lda}, and \gls{lr}.
+The CNN model exhibits superior classification accuracy, emphasizing its potential for geochemical sample identification/classification in planetary exploration.
+The paper includes a detailed comparative analysis, proving the \gls{cnn} model's superior performance.
+With classification accuracies on the validation set for all models exceeding 95\%, the \gls{cnn} model demonstrated the highest overall accuracy.
+This was particularly evident as the training set size increased, indicating the model's robustness to varying distances without requiring distance correction.
+Statistical analysis further confirmed the \gls{cnn} model's superiority, with higher average Ncorr values compared to other models.
+The CNN model's ability to accurately classify geochemical samples without preprocessing for distance correction is quite impressive.
+This is particularly relevant to our work because we are also working with \gls{libs} spectra collected at varying distances.
+The comparative analysis underscores the CNN model as a best-fit approach for \gls{libs} data analysis, potentially setting a new standard for future research and applications in the field.
