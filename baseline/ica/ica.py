@@ -26,10 +26,10 @@ if CALIB_DATA_PATH is None or CALIB_COMP_PATH is None or MLFLOW_TRACKING_URI is 
     )
     exit(1)
 
-TEST = False
+TEST = True
 AVERAGE_LOCATION_DATASETS = False
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-experiment_name = f"""ICA_MAD_{
+experiment_name = f"""P10_ICA_MAD_{
     'TEST' if TEST else 'TRAIN'
     }_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"""
 mlflow.set_experiment(experiment_name)
@@ -134,7 +134,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
 def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     models = {}
-    experiment_id = "627022602655107420"
+    experiment_id = "840799496769498027"
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
     for _, run in runs.iterrows():
@@ -345,13 +345,6 @@ def create_processed_data(
 
     compositions_df.index.name = "target"
     compositions_df.columns.name = "oxide"
-
-    print(f"#{len(not_in_set)} | Samples not in {desired_dataset} set: {not_in_set}")
-    print(f"#{len(missing)} | Samples missing composition data: {missing}")
-    print(f"#{len(ica_df)} | Samples with ICA data: {ica_df.index.unique()}")
-    print(
-        f"#{len(compositions_df)} | Samples with composition data: {compositions_df.index.unique()}"
-    )
 
     return ica_df, compositions_df
 
