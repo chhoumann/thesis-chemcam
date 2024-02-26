@@ -6,6 +6,13 @@ There are many challenges in predicting major oxides from \gls{libs} data, inclu
 Some of these are caused by \textit{matrix effects}\cite{andersonImprovedAccuracyQuantitative2017}, which is a catch-all term for any effect that can cause the intensity of emission lines from an element to vary, independent of that element's concentration. So it's unknown variables that affect the results.
 Furthermore, due to the high cost of data collection, datasets are often small, which further complicates the task of building accurate and robust models.
 
+Therefore, in this work, we address a critical challenge in computer science: developing machine learning models that can effectively manage the complexities of \gls{libs} data, marked by multicollinearity, high-dimensionality, non-linearity, and limited data availability.
+The presence of multicollinearity within the spectral data complicates the identification of distinct patterns, due to strong correlations among variables that can mask the impacts of individual predictors.
+The high dimensionality of \gls{libs} data further exacerbates this issue, necessitating efficient dimensionality reduction techniques to manage the vast number of variables.
+Moreover, the non-linear relationships between the spectral features and the concentrations of major oxides necessitate the use of sophisticated modeling techniques that can capture these complex interactions.
+The limited size of available datasets, a consequence of the high costs and logistical challenges associated with data collection in space exploration, underscores the need for models that are robust against overfitting and capable of generalizing well from small sample sizes.
+Tackling these challenges is essential for improving the accuracy of major oxide composition predictions in Martian geological samples, contributing significantly to our understanding of the planet's habitability and geological history.
+
 Based on the limitations with the current \gls{moc} pipeline, as reported in \citet{p9_paper}, we identified three key areas for further investigation: dimensionality reduction, model selection, and outlier removal.
 
 In this work, we focus on dimensionality reduction and model selection over outlier removal.
