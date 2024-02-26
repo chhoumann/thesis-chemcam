@@ -1,7 +1,7 @@
 In \citet{p9_paper}, we presented our efforts to replicate the MOC model by \citet{cleggRecalibrationMarsScience2017}.
 This effort was motivated by our desire to understand the model and its performance better, and to experiment with its components to determine how it could be improved.
 However, as discussed, there were some differences between our replica and the original model.
-For example, because \citet{cleggRecalibrationMarsScience2017} did not describe when in the pipeline MAD-based outlier removal was performed, we did not include it in our pipeline and instead dedicated an experiment to figuring out when in the pipeline it had the best effect.
+To this end, we conducted a series of experiments through which we learned how exactly our replica differed from the original model.
 Following these experiments, we have now updated our pipeline to more accurately reflect the original MOC model.
 Table \ref{tab:replica_results_rmses} shows the RMSEs of the original models and our replicas after these changes.
 Figure~\ref{fig:rmse_histograms} illustrates the distribution of these RMSEs as a grouped histogram.
@@ -35,5 +35,6 @@ Element    & PLS1-SM (original) & PLS1-SM (replica) & ICA (original) & ICA (repl
 	\label{fig:rmse_histograms}
 \end{figure*}
 
+% TODO: Describe every change we made (MAD, using 5 datasets, train/test split). For the changes made to how we used all 5 datasets, describe how one of the experiments showed that aggregating the datasets did not improve the performance, so we instead tried to use them all in the same way as we did in PLS, which did improve performance and bring us closer to the original model.
 % TODO: Discuss how we changed the creation of the train/test splits to match the original paper more closely
 % TODO: Create t-tests and present the results here
