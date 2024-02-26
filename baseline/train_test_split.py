@@ -43,6 +43,8 @@ def get_all_samples(cd: CompositionData, dataset_loc: str):
         if composition[major_oxides].isnull().values.any():
             continue
 
+        composition["sample_name"] = sample
+
         sample_compositions.append(composition)
 
     samples_df = pd.concat(sample_compositions)
