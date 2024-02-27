@@ -15,7 +15,7 @@ We initially assumed that the datasets were aggregated and used as a single data
 This approach, however, did not align with the original model's results, likely due to the loss of information from the individual datasets.
 Following this discovery, we instead used the datasets in the same way as we did in the \gls{pls1-sm} phase, which yielded results aligning more closely with the original model.
 
-Finally, our original replica used a random train/test split for training, in contrast to the original model's manual curation to ensure representation of extreme compositions in both sets.
+Finally, our initial replica used a random train/test split for training, in contrast to the original model's manual curation to ensure representation of extreme compositions in both sets.
 This difference stemmed from the original authors' application of domain expertize in their dataset curation --- a process we could not directly replicate.
 Nevertheless, we found that automatically identifying extreme compositions and ensuring that they were present in both the training and testing sets brought us closer to the original model.
 We chose to pull out the $n$ largest and smallest samples by concentration range, for each oxide, and reserve them for the training set.
@@ -32,7 +32,7 @@ These differences are due to a number of factors.
 
 Firstly, the original models were trained with datasets from 1600mm and 3000mm standoff distances, while we only had access to the 1600mm dataset for our replicas.
 Additionally, we automated the outlier removal for the PLS1-SM phase, unlike the original manual process.
-As mentioned, the original authors manually curated their training and test sets, ensuring a broad elemental range, while implemented an automatic process for our replicas due to lack of domain expertise.
+As mentioned, the original authors manually curated their training and test sets, ensuring a broad elemental range, while we implemented an automatic process for our replicas due to lack of domain expertise.
 Differences might also stem from varied implementation specifics, such as programming languages and libraries used.
 
 \begin{table*}
