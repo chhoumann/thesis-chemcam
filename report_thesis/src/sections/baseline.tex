@@ -1,12 +1,24 @@
 In \citet{p9_paper}, we presented our efforts to replicate the MOC model by \citet{cleggRecalibrationMarsScience2017}.
 This effort was motivated by our desire to understand the model and its performance better, and to experiment with its components to determine how it could be improved.
 However, as discussed, there were some differences between our replica and the original model.
-To this end, we conducted a series of experiments through which we learned how exactly our replica differed from the original model.
-Following these experiments, we have now updated our pipeline to more accurately reflect the original MOC model.
+These differences were caused by missing information in the original paper, and so rather than introducing our own assumptions, we designed experiments to determine the best way to replicate the model.
+
+First, our original replica did not use \gls{MAD} to remove outliers from the dataset before the \gls{ICA}, as the original model did, since the original paper did not specify when in the pipeline this was done.
+To this end, we conducted an experiment where we used \gls{MAD} to remove outliers in different stages of the pipeline.
+We found that using \gls{MAD} during the preprocessing phase after removing the first five shots but before applying masking and normalization produced results that were closest to the original model.
+
+Second, our original replica used only one dataset for the \gls{ICA} phase, while the original model used five.
+This was due to the original paper not specifying how the five datasets were used, and so we designed an experiment to determine the best way to use them.
+We initially assumed that the datasets were aggregated and used as a single dataset, however, we found that this did not bring us closer to the original model.
+Following this discovery, we instead used the datasets in the same way as we did in the \gls{PLS1-SM} phase, which did give us results closer to the original model.
+
+Finally, our original replica used a random train/test split for the \gls{ICA} phase, while the original model curated a specific split to ensure that extreme compositions were present in both the training and testing sets.
+This difference was due to the fact that the original authors used their domain expertise to manually create the split, something that we could not replicate.
+However, we found that automatically identifying the extreme compositions and ensuring that they were present in both the training and testing sets brought us closer to the original model.
+
+With these changes, we have created a more accurate replica of the MOC model, which we will use as our baseline for the rest of the paper.
 Table \ref{tab:replica_results_rmses} shows the RMSEs of the original models and our replicas after these changes.
 Figure~\ref{fig:rmse_histograms} illustrates the distribution of these RMSEs as a grouped histogram.
-This replica serves as our baseline for the rest of the paper.
-
 
 \begin{table*}
 \centering
