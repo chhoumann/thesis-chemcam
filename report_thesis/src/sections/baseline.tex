@@ -17,6 +17,8 @@ Following this discovery, we instead used the datasets in the same way as we did
 Finally, our original replica used a random train/test split for training, in contrast to the original model's manual curation to ensure representation of extreme compositions in both sets.
 This difference stemmed from the original authors' application of domain expertize in their dataset curation --- a process we could not directly replicate.
 Nevertheless, we found that automatically identifying extreme compositions and ensuring that they were present in both the training and testing sets brought us closer to the original model.
+We chose to pull out the $n$ largest and smallest samples by concentration range, for each oxide, and reserve them for the training set.
+Then we would do a random split on the remaining dataset, such that the final train/test split would be a $80\%/20\%$ split.
 
 With these changes, we have created a more accurate replica of the \gls{moc} model, which we will use as our baseline for the rest of this paper.
 As an additional measure, we have presented these changes to one of the original authors of \citet{cleggRecalibrationMarsScience2017}, who confirmed that they were reasonable and in line with the original model's implementation.
