@@ -112,6 +112,7 @@ This indicates that \gls{cnn}-supported \gls{libs} classification is a promising
 They employ unsupervised clustering to group similar samples before applying a tailored linear calibration model to each cluster.
 This approach, tested on lithium in exploration drills, outperforms standard linear models, especially in lower concentration regions, and demonstrates good generalizability to unseen data from different rock veins.
 The study highlights the potential of clustered regression methods in improving \gls{libs} quantification accuracy and robustness, particularly valuable in mining environments.
+Uses Ridge regression, \gls{pls}, dimensionality reduction with UMAp and then k-means clustering, followed by a local model for each cluster, univariate calibration curves.
 
 \citet{woldPrincipalComponentAnalysis1987} provides an in-depth tutorial on \gls{pca}, a fundamental method in multivariate data analysis used for dimensionality reduction, outlier detection, and uncovering the underlying structure in data sets.
 The paper covers the history and development of \gls{pca}, its mathematical foundations, applications across various fields, and detailed instructions for data pre-treatment and \gls{pca} implementation.
