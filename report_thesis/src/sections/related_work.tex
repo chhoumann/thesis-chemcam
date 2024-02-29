@@ -34,21 +34,21 @@ The approach demonstrates a practical application of kernel extreme learning mac
 This is particularly valuable in fields like spectroscopy, where understanding the relationship between the spectral data and the analyte concentration is vital.
 The DF-K-ELM method showcases how hybrid models can outperform traditional machine learning approaches.
 The approach demonstrates a practical application of kernel extreme learning machines combined with domain-specific insights.
-This is very relevant to our work considering interpretability is a key requirement for NASA and something they considered when choosing the PLS model for the \gls{chemcam} instrument.
+This is very relevant to our work considering interpretability is a key requirement for NASA and something they considered when choosing the \gls{pls} model for the \gls{chemcam} instrument.
 
 \citet{rezaei_dimensionality_reduction} explore a variety of statistical and machine learning methods, including \gls{mlr}, \gls{svr}, \gls{ksvr}, and \gls{ann}, alongside their integrations with \gls{pca} to reduce dimensionality and improve model performance.
 They use \gls{mse} and \gls{mae} as evaluation metrics to compare the performance of the models.
 This paper clearly demonstrates the effectiveness of dimensionality reduction techniques in improving the performance of machine learning models because it compares the performance of many models with and without \gls{pca}: \gls{ann}, \gls{mlr}, \gls{svr}, \gls{ksvr}, \gls{pca}-\gls{ann}, \gls{pca}-\gls{mlr}, \gls{pca}-\gls{svr}, and \gls{pca}-\gls{ksvr}.
-For all elements, a variant SVR performs the best.
-For \ce{Si}, SVR performs the best.
-For \ce{Zn}, PCA-SVR performs the best.
+For all elements, a variant of \gls{svr} performs the best.
+For \ce{Si}, \gls{svr} performs the best.
+For \ce{Zn}, \gls{pca}-\gls{svr} performs the best.
 For the rest of the elements, \gls{pca}-\gls{ksvr} performs the best.
-The superiority of \gls{ksvr} is attributed to the its ability to handle non-linear relationships in the data effectively, especially when combined with PCA's capability to compress and simplify the input data by focusing on the most relevant variations.
+The superiority of \gls{ksvr} is attributed to the its ability to handle non-linear relationships in the data effectively, especially when combined with \gls{pca}'s capability to compress and simplify the input data by focusing on the most relevant variations.
 
 \citet{yang_laser-induced_2022} present a study on the application of a deep \gls{cnn} for classifying geochemical samples using \gls{libs}, with a particular focus on planetary exploration missions such as China's Tianwen-1 Mars mission.
 The authors demonstrate the effectiveness of a deep CNN in classifying geochemical standard samples using \gls{libs} spectra collected at varying distances.
 This addresses the challenge of spectral differences induced by distance, showcasing that \gls{cnn} can learn to classify samples without the need for traditional spectral preprocessing or distance correction.
-Using a dataset of over 18,000 \gls{libs} spectra from 39 geochemical standard samples, the study compares the \gls{cnn} model's performance against four other machine learning models: \gls{bpnn} \gls{svm}, \gls{lda}, and \gls{lr}.
+Using a dataset of over 18,000 \gls{libs} spectra from 39 geochemical standard samples, the study compares the \gls{cnn} model's performance against four other machine learning models: \gls{bpnn} \gls{svm}, \gls{lda}, and \gls{logreg}.
 The \gls{cnn} model exhibits superior classification accuracy, emphasizing its potential for geochemical sample identification/classification in planetary exploration.
 The paper includes a detailed comparative analysis, proving the \gls{cnn} model's superior performance.
 With classification accuracies on the validation set for all models exceeding 95\%, the \gls{cnn} model demonstrated the highest overall accuracy.
@@ -78,7 +78,7 @@ The method showed remarkable improvement in \gls{tas} classification accuracy fo
 This demonstrates the effectiveness of transfer learning in addressing the physical matrix effect and enhancing model robustness for rock classification on Mars.
 
 \citet{wangDeterminationElementalComposition2023} discusses an advanced methodology for analyzing stream sediments using remote \gls{libs} combined with a \gls{mdsbpnn} algorithm.
-This approach yielded highly accurate quantitative analyses of both major and trace elements, with determination coefficients (R2) for major elements exceeding 0.9996 and for trace elements greater than 0.9837, and RMSE less than 0.73 (major elements).
+This approach yielded highly accurate quantitative analyses of both major and trace elements, with determination coefficients (R2) for major elements exceeding 0.9996 and for trace elements greater than 0.9837, and \gls{rmse} less than 0.73 (major elements).
 The study emphasizes the potential of remote \gls{libs} technology, especially for identifying biominerals in geological samples, highlighting its significance for studying ancient planetary environments.
 
 % We had this one last semester IIRC. Might be good to have again?
@@ -94,17 +94,17 @@ This approach outperforms some existing models for specific oxides, demonstratin
 
 \citet{ferreiraComprehensiveComparisonLinear2022} presents an extensive comparison of various algorithms for quantifying lithium in geological samples, with a focus on both linear and non-linear methods.
 The study tested algorithms on spectra acquired from a commercial handheld device and a laboratory prototype, highlighting the challenges in quantifying lithium due to effects like saturation and matrix interference.
-The results showed that non-linear methodologies, such as K-nearest neighbors regression, Support Vector Machine regression, and Artificial Neural Networks regression, generally outperformed linear methods by effectively managing saturation and matrix effects, which are common in geological samples.
+The results showed that non-linear methodologies, such as \gls{knn} regression, \gls{svr}, and \gls{ann} regression, generally outperformed linear methods by effectively managing saturation and matrix effects, which are common in geological samples.
 This research provides valuable insights for future applications in geological sample analysis and could potentially be generalized for other elements in similar contexts.
 The paper's findings are particularly relevant to our project as it demonstrates the effectiveness of non-linear machine learning techniques in handling complex, non-linear relationships in high-dimensional \gls{libs} data, aligning with our research objectives of improving major oxide composition predictions from \gls{libs} data.
 
 The study by \citet{liuComparisonQuantitativeAnalysis2022} explores the use of \gls{marscode} \gls{libs} for quantitative analysis of olivine in a simulated Martian atmosphere, focusing on multivariate analysis methods to address challenges posed by \gls{libs} data, such as high dimensionality and multicollinearity.
-The methods evaluated include univariate linear regression (ULR), multivariate linear regression (MLR), principal component regression (PCR), partial least squares regression (PLSR), ridge regression, \gls{lasso}, \gls{enet}, and back-propagation neural networks.
-The findings demonstrate the effectiveness of dimension reduction techniques, especially PLSR, and nonlinear analysis for improving quantitative analysis accuracy of olivine using \gls{libs} data.
+The methods evaluated include \gls{ulr}, \gls{mlr}, \gls{pcr}, \gls{plsr}, ridge regression, \gls{lasso}, \gls{enet}, and \gls{bpnn}.
+The findings demonstrate the effectiveness of dimension reduction techniques, especially \gls{plsr}, and nonlinear analysis for improving quantitative analysis accuracy of olivine using \gls{libs} data.
 This approach is particularly relevant to our work due to the focus on advanced statistical methods and machine learning algorithms for handling complex, high-dimensional \gls{libs} data, aligning with our objectives of improving accuracy and robustness in predicting major oxide compositions.
 
 \cite{yangConvolutionalNeuralNetwork2022} is a study where a \gls{cnn} model is designed to identify twelve types of rocks using \gls{libs} data from the \gls{marscode} for the Tianwen-1 Mars exploration mission.
-The classification performance of the \gls{cnn} is compared with logistic regression (LR), \gls{svm}, and linear discriminant analysis (LDA).
+The classification performance of the \gls{cnn} is compared with \gls{logreg}, \gls{svm}, and \gls{lda}.
 The \gls{cnn} model achieved the highest classification accuracy, demonstrating its efficiency in rock identification with \gls{libs} spectra collected in a simulated Martian environment.
 This indicates that \gls{cnn}-supported \gls{libs} classification is a promising analytical technique for planetary exploration missions.
 
@@ -112,7 +112,7 @@ This indicates that \gls{cnn}-supported \gls{libs} classification is a promising
 They employ unsupervised clustering to group similar samples before applying a tailored linear calibration model to each cluster.
 This approach, tested on lithium in exploration drills, outperforms standard linear models, especially in lower concentration regions, and demonstrates good generalizability to unseen data from different rock veins.
 The study highlights the potential of clustered regression methods in improving \gls{libs} quantification accuracy and robustness, particularly valuable in mining environments.
-Uses Ridge regression, \gls{pls}, dimensionality reduction with UMAp and then k-means clustering, followed by a local model for each cluster, univariate calibration curves.
+Uses Ridge regression, \gls{pls}, dimensionality reduction with \gls{umap} and then k-means clustering, followed by a local model for each cluster, univariate calibration curves.
 
 \citet{woldPrincipalComponentAnalysis1987} provides an in-depth tutorial on \gls{pca}, a fundamental method in multivariate data analysis used for dimensionality reduction, outlier detection, and uncovering the underlying structure in data sets.
 The paper covers the history and development of \gls{pca}, its mathematical foundations, applications across various fields, and detailed instructions for data pre-treatment and \gls{pca} implementation.
