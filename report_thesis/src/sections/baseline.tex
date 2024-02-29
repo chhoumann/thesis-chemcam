@@ -5,7 +5,6 @@ However, as discussed in that paper, there were some differences between our rep
 These differences were caused by missing information in the original paper, and so rather than introducing our own assumptions, we designed experiments to determine the best way to replicate the model.
 
 Initially, our replication omitted the use of the \gls{mad} for outlier removal in the data preprocessing stage, a step included in the original model.
-The omission was due to the lack of information regarding its implementation within the processing pipeline.
 To rectify this, we experimented with applying \gls{mad} at various stages in the pipeline.
 We determined that its application post-removal of the initial five shots, and prior to masking and normalization, most closely mirrored the outcomes of the original model.
 
