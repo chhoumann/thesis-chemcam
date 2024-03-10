@@ -174,6 +174,7 @@ if __name__ == "__main__":
     env = dotenv_values()
     comp_data_loc = env.get("COMPOSITION_DATA_PATH")
     dataset_loc = env.get("DATA_PATH")
+    save_path = env.get("TRAIN_TEST_SPLIT_PATH")
 
     if not comp_data_loc:
         print("Please set COMPOSITION_DATA_PATH in .env file")
@@ -183,6 +184,10 @@ if __name__ == "__main__":
         print("Please set DATA_PATH in .env file")
         exit(1)
 
+    if not save_path:
+        print("Please set TRAIN_TEST_SPLIT_PATH in .env file")
+        exit(1)
+
     cd = CompositionData(composition_data_loc=comp_data_loc)
 
     samples = get_all_samples(cd, dataset_loc)
@@ -190,7 +195,5 @@ if __name__ == "__main__":
     split = create_train_test_split_with_extremes(
         filtered_samples, n_extremes=2, test_size=0.2, random_state=42
     )
-
-    save_path: str = "train_test_split.csv"
 
     split.to_csv(str(save_path), index=False)
