@@ -37,9 +37,7 @@ def load_full_flow_data():
         or not test_path.exists()
     ):
         logger.info("Loading data from location: %s", dataset_loc)
-        train_data, test_data = load_split_data(
-            str(dataset_loc), average_shots=True
-        )
+        train_data, test_data = load_split_data(str(dataset_loc), average_shots=True)
         logger.info("Data loaded successfully.")
 
         logger.info("Initializing CustomSpectralPipeline.")
@@ -87,12 +85,11 @@ def load_and_scale_data(norm: int):
     return train, test
 
 
-def load_train_test_data(norm: int):
+def load_train_test_data(norm: int, drop_cols: list = ["ID", "Sample Name"]):
     """
     Loads the train and test data and returns the X and y values.
     """
     train, test = load_and_scale_data(norm)
-    drop_cols = major_oxides + ["ID", "Sample Name"]
 
     # Converting train set
     X_train = train.drop(columns=drop_cols)
