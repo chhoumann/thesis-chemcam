@@ -9,27 +9,9 @@ import typer
 from sklearn.metrics import mean_squared_error
 from tpot import TPOTRegressor
 
-from lib import full_flow_dataloader
 from lib.config import load_config
-from lib.norms import Norm1Scaler, Norm3Scaler
+from lib.full_flow_dataloader import load_and_scale_data
 from lib.reproduction import major_oxides
-
-
-def load_and_scale_data(norm: int):
-    train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
-
-    train_cols = train_processed.columns
-    test_cols = test_processed.columns
-
-    scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
-    train = scaler.fit_transform(train_processed)
-    test = scaler.fit_transform(test_processed)
-
-    # turn back into dataframe
-    train = pd.DataFrame(train, columns=train_cols)
-    test = pd.DataFrame(test, columns=test_cols)
-
-    return train, test
 
 
 def train_and_log_model(
