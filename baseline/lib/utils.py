@@ -1,5 +1,6 @@
-from os import path
 from pathlib import Path
+
+
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 
@@ -131,5 +132,5 @@ def get_train_test_split(split_loc: str | None = None) -> pd.DataFrame:
     train_test_split_path = Path(split_loc)
     if not train_test_split_path.exists():
         raise FileNotFoundError(f"File {train_test_split_path} not found.")
-    
+
     return pd.read_csv(train_test_split_path)
