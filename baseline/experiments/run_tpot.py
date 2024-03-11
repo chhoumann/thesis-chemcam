@@ -9,7 +9,7 @@ import typer
 from sklearn.metrics import mean_squared_error
 from tpot import TPOTRegressor
 
-from lib.config import load_config
+from lib.config import AppConfig
 from lib.full_flow_dataloader import load_and_scale_data
 from lib.reproduction import major_oxides
 
@@ -78,7 +78,7 @@ def run(
     n_jobs: int = typer.Option(default=-1, help="Number of jobs"),
     verbosity: int = typer.Option(default=2, help="Verbosity level"),
 ):
-    config = load_config()
+    config = AppConfig()
     train, test = load_and_scale_data(norm)
     drop_cols = major_oxides + ["ID", "Sample Name"]
 
