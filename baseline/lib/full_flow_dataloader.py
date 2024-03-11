@@ -5,6 +5,7 @@ import pandas as pd
 from dotenv import dotenv_values
 
 from lib.data_handling import CustomSpectralPipeline, load_split_data
+from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.reproduction import major_oxides, masks
 
 
@@ -64,3 +65,20 @@ def load_full_flow_data():
         test_processed = pd.read_csv(test_path)
 
     return train_processed, test_processed
+
+
+def load_and_scale_data(norm: int):
+    train_processed, test_processed = load_full_flow_data()
+
+    train_cols = train_processed.columns
+    test_cols = test_processed.columns
+
+    scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
+    train = scaler.fit_transform(train_processed)
+    test = scaler.fit_transform(test_processed)
+
+    # turn back into dataframe
+    train = pd.DataFrame(train, columns=train_cols)
+    test = pd.DataFrame(test, columns=test_cols)
+
+    return train, test
