@@ -1,5 +1,5 @@
 import datetime
-from typing import Callable, Optional
+from typing import Callable
 
 import mlflow
 import pandas as pd
@@ -7,10 +7,6 @@ from sklearn.base import BaseEstimator
 
 from lib.config import AppConfig
 from lib.full_flow_dataloader import load_train_test_data
-
-Run_Function = Callable[
-    [pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, Optional[str], int], None
-]
 
 
 class Experiment:
@@ -30,14 +26,16 @@ class Experiment:
 
     def run_univariate(
         self,
-        func: Run_Function,
+        func: Callable[
+            [pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, str, int], None
+        ],
     ):
         """
         Run the specified function for each target variable in a univariate manner.
         This runs iteratively for each target variable.
 
         Args:
-            func (X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame, target: Optional[str], norm: int): The function to be executed for each target variable.
+            func (X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame, target: str, norm: int): The function to be executed for each target variable.
 
         Returns:
             None
@@ -57,13 +55,15 @@ class Experiment:
 
     def run_multivariate(
         self,
-        func: Run_Function,
+        func: Callable[
+            [pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, int], None
+        ],
     ):
         """
         Run the specified function for each target variable in a multivariate manner.
 
         Args:
-            func (X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame, target: Optional[str], norm: int): The function to be executed for each target variable.
+            func (X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame, target: str, norm: int): The function to be executed for each target variable.
 
         Returns:
             None
@@ -75,7 +75,6 @@ class Experiment:
                 self.X_test,
                 self.y_train,
                 self.y_test,
-                None,
                 self.norm,
             )
 
