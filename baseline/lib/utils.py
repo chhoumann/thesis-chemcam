@@ -1,3 +1,5 @@
+from os import path
+from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 
@@ -104,3 +106,32 @@ def filter_data_by_compositional_range(data, compositional_range, oxide, oxide_r
         )
 
     return filtered_data
+
+
+def get_train_test_split(split_loc: str | None = None) -> pd.DataFrame:
+    """
+    Reads the train-test split data from a CSV file.
+
+    Args:
+        split_loc (str | None): The path to the train-test split CSV file. If None, it will be read from the .env file.
+
+    Returns:
+        pd.DataFrame: The train-test split data as a pandas DataFrame.
+
+    Raises:
+        ValueError: If TRAIN_TEST_SPLIT_PATH is not set in the .env file.
+        FileNotFoundError: If the specified file does not exist.
+    """
+    if split_loc is None:
+        from dotenv import dotenv_values, find_dotenv
+        config = dotenv_values(find_dotenv())
+        
+        split_loc = config["TRAIN_TEST_SPLIT_PATH"]
+        if split_loc is None:
+            raise ValueError("TRAIN_TEST_SPLIT_PATH not set in .env")
+
+    train_test_split_path = Path(split_loc)
+    if not train_test_split_path.exists():
+        raise FileNotFoundError(f"File {train_test_split_path} not found.")
+    
+    return pd.read_csv(train_test_split_path)

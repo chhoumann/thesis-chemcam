@@ -14,6 +14,7 @@ from sklearn.metrics import mean_squared_error
 from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
 from lib.norms import Norm
+from lib.utils import get_train_test_split
 
 env = dotenv.dotenv_values(dotenv.find_dotenv())
 CALIB_DATA_PATH = env.get("DATA_PATH", "")
@@ -282,7 +283,7 @@ def create_processed_data(
     filtered_compositions_list = []
     compositions_df = pd.DataFrame()
 
-    test_train_split_idx = pd.read_csv("./train_test_split.csv")
+    test_train_split_idx = get_train_test_split()
 
     not_in_set = []
     missing = []

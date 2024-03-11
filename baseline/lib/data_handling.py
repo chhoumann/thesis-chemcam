@@ -6,6 +6,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from tqdm import tqdm
 
 from lib.reproduction import folder_to_composition_sample_name
+from lib.utils import get_train_test_split
 
 
 def get_location_dataset_paths_for_sample(sample_name: str, data_path: Path):
@@ -122,15 +123,10 @@ def load_data(
     return sample_data
 
 
-def load_split_data(dataset_loc: str, split_loc: str, average_shots=True):
+def load_split_data(dataset_loc: str, split_loc: Optional[str] = None, average_shots=True):
     sample_data = load_data(dataset_loc, average_shots=average_shots)
 
-    train_test_split_path = Path(split_loc)
-
-    if not train_test_split_path.exists():
-        raise ValueError(f"Could not find train/test split at {split_loc}")
-
-    train_test_split_df = pd.read_csv(train_test_split_path)
+    train_test_split_df = get_train_test_split(split_loc)
 
     train_samples = train_test_split_df.loc[
         train_test_split_df["train_test"] == "train"
