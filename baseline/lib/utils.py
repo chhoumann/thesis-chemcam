@@ -3,6 +3,8 @@ from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 
+from lib.config import AppConfig
+
 
 def custom_kfold_cross_validation(data, k: int, group_by: str, random_state=None):
     """
@@ -123,12 +125,8 @@ def get_train_test_split(split_loc: str | None = None) -> pd.DataFrame:
         FileNotFoundError: If the specified file does not exist.
     """
     if split_loc is None:
-        from dotenv import dotenv_values, find_dotenv
-        config = dotenv_values(find_dotenv())
-        
-        split_loc = config["TRAIN_TEST_SPLIT_PATH"]
-        if split_loc is None:
-            raise ValueError("TRAIN_TEST_SPLIT_PATH not set in .env")
+        config = AppConfig()
+        split_loc = config.train_test_split_path
 
     train_test_split_path = Path(split_loc)
     if not train_test_split_path.exists():
