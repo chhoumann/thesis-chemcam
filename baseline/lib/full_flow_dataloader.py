@@ -68,6 +68,9 @@ def load_full_flow_data():
 
 
 def load_and_scale_data(norm: int):
+    """
+    Loads the data and scales it using the specified normalization method.
+    """
     train_processed, test_processed = load_full_flow_data()
 
     train_cols = train_processed.columns
@@ -82,3 +85,21 @@ def load_and_scale_data(norm: int):
     test = pd.DataFrame(test, columns=test_cols)
 
     return train, test
+
+
+def load_train_test_data(norm: int):
+    """
+    Loads the train and test data and returns the X and y values.
+    """
+    train, test = load_and_scale_data(norm)
+    drop_cols = major_oxides + ["ID", "Sample Name"]
+
+    # Converting train set
+    X_train = train.drop(columns=drop_cols)
+    y_train = train[major_oxides]
+
+    # Converting test set
+    X_test = test.drop(columns=drop_cols)
+    y_test = test[major_oxides]
+
+    return X_train, y_train, X_test, y_test
