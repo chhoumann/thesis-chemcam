@@ -45,7 +45,7 @@ class Experiment:
             [pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, int], None
         ],
     ):
-        with mlflow.start_run(run_name=f"{self.name}"):
+        with mlflow.start_run(run_name=self.name):
             mlflow.log_param("norm", self.norm)
             func(
                 self.X_train,
