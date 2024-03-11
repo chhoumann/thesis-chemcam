@@ -1,10 +1,16 @@
-import mlflow
 import datetime
-import pandas as pd
+from typing import Callable, Optional
 
+import mlflow
+import pandas as pd
 from sklearn.base import BaseEstimator
-from typing import Callable
+
+from lib.config import AppConfig
 from lib.full_flow_dataloader import load_train_test_data
+
+Run_Function = Callable[
+    [pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, Optional[str], int], None
+]
 
 
 class Experiment:
@@ -15,6 +21,8 @@ class Experiment:
             norm=norm
         )
 
+        mlflow.set_tracking_uri(AppConfig().mlflow_tracking_uri)
+
         if create_mlflow_experiment:
             mlflow.set_experiment(
                 f'{self.name}_Norm{self.norm}_{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}'
@@ -22,10 +30,18 @@ class Experiment:
 
     def run_univariate(
         self,
-        func: Callable[
-            [pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, str, int], None
-        ],
+        func: Run_Function,
     ):
+        """
+        Run the specified function for each target variable in a univariate manner.
+        This runs iteratively for each target variable.
+
+        Args:
+            func (X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame, target: Optional[str], norm: int): The function to be executed for each target variable.
+
+        Returns:
+            None
+        """
         for target in self.y_train.columns:
             with mlflow.start_run(run_name=f"{self.name}_{target}"):
                 mlflow.log_param("norm", self.norm)
@@ -41,10 +57,17 @@ class Experiment:
 
     def run_multivariate(
         self,
-        func: Callable[
-            [pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, int], None
-        ],
+        func: Run_Function,
     ):
+        """
+        Run the specified function for each target variable in a multivariate manner.
+
+        Args:
+            func (X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame, target: Optional[str], norm: int): The function to be executed for each target variable.
+
+        Returns:
+            None
+        """
         with mlflow.start_run(run_name=self.name):
             mlflow.log_param("norm", self.norm)
             func(
@@ -52,6 +75,7 @@ class Experiment:
                 self.X_test,
                 self.y_train,
                 self.y_test,
+                None,
                 self.norm,
             )
 
