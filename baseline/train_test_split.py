@@ -3,8 +3,8 @@ from enum import Enum
 from typing import List
 
 import pandas as pd
-from dotenv import dotenv_values
 from sklearn.model_selection import train_test_split
+from lib.config import load_config
 
 from lib.data_handling import CompositionData
 from lib.reproduction import folder_to_composition_sample_name, major_oxides
@@ -50,7 +50,7 @@ def get_all_samples(cd: CompositionData, dataset_loc: str):
     samples_df = pd.concat(sample_compositions)
 
     for oxide in major_oxides:
-            samples_df[oxide] = pd.to_numeric(samples_df[oxide], errors='coerce')
+        samples_df[oxide] = pd.to_numeric(samples_df[oxide], errors="coerce")
 
     return samples_df
 
@@ -171,17 +171,10 @@ def create_train_test_split_with_extremes(
 
 
 if __name__ == "__main__":
-    env = dotenv_values()
-    comp_data_loc = env.get("COMPOSITION_DATA_PATH")
-    dataset_loc = env.get("DATA_PATH")
-
-    if not comp_data_loc:
-        print("Please set COMPOSITION_DATA_PATH in .env file")
-        exit(1)
-
-    if not dataset_loc:
-        print("Please set DATA_PATH in .env file")
-        exit(1)
+    config = load_config()
+    comp_data_loc = config["composition_data_path"]
+    dataset_loc = config["data_path"]
+    save_path = config["train_test_split_path"]
 
     cd = CompositionData(composition_data_loc=comp_data_loc)
 
@@ -190,7 +183,5 @@ if __name__ == "__main__":
     split = create_train_test_split_with_extremes(
         filtered_samples, n_extremes=2, test_size=0.2, random_state=42
     )
-
-    save_path: str = "train_test_split.csv"
 
     split.to_csv(str(save_path), index=False)
