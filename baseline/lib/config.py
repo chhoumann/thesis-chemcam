@@ -1,16 +1,15 @@
 import os
-from enum import Enum
 
 from dotenv import find_dotenv, load_dotenv
 
-
-class EnvVars(Enum):
-    MLFLOW_TRACKING_URI = "MLFLOW_TRACKING_URI"
-    DATA_PATH = "DATA_PATH"
-    COMPOSITION_DATA_PATH = "COMPOSITION_DATA_PATH"
-    TRAIN_TEST_SPLIT_PATH = "TRAIN_TEST_SPLIT_PATH"
-    CCAM_DATA_PATH = "CCAM_DATA_PATH"
-    CCAM_COMPOSITION_DATA_PATH = "CCAM_COMPOSITION_DATA_PATH"
+_ENV_VARS = [
+    "MLFLOW_TRACKING_URI",
+    "DATA_PATH",
+    "COMPOSITION_DATA_PATH",
+    "TRAIN_TEST_SPLIT_PATH",
+    "CCAM_DATA_PATH",
+    "CCAM_COMPOSITION_DATA_PATH",
+]
 
 
 class AppConfig:
@@ -19,13 +18,13 @@ class AppConfig:
         self._config = self._load_config()
 
     def _load_config(self):
-        missing_vars = [var.value for var in EnvVars if var.value not in os.environ]
+        missing_vars = [var for var in _ENV_VARS if var not in os.environ]
         if missing_vars:
             raise ValueError(
                 f"Missing environment variables: {', '.join(missing_vars)}"
             )
 
-        return {var.name: os.environ[var.value] for var in EnvVars}
+        return {var: os.environ[var] for var in _ENV_VARS}
 
     @property
     def mlflow_tracking_uri(self):
