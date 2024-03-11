@@ -123,7 +123,7 @@ def load_data(
     return sample_data
 
 
-def load_split_data(dataset_loc: str, split_loc: str | None = None, average_shots=True):
+def load_split_data(dataset_loc: str, split_loc: Optional[str] = None, average_shots=True):
     sample_data = load_data(dataset_loc, average_shots=average_shots)
 
     train_test_split_df = get_train_test_split(split_loc)
