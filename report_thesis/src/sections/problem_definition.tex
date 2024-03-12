@@ -33,6 +33,42 @@ To address robustness, we will consider the standard deviation of prediction err
 
 where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error.
 
+For data normalization, \citet{cleggRecalibrationMarsScience2017} proposes two different normalization methods, Norm 1 and Norm 3.
+Norm 1 normalizes the data across the entire spectrum, while Norm 3 normalizes the data across individual spectrometers' wavelength ranges.
+
+Formally, Norm 1 is defined as:
+
+\begin{equation}
+    \tilde{X}_{i,j} = \frac{X_{i,j}}{\sum_{j=1}^{N} X_{i,j}},
+\end{equation}
+
+where,
+
+\begin{itemize}
+    \item $\tilde{X}_{i,j}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel.
+    \item $X_{i,j}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel.
+    \item $N$ is the number of channels in each spectrometer (for the \gls{chemcam} instrument, $N = 2048$).
+\end{itemize}
+
+Norm 3 is defined as:
+
+\begin{equation}
+    \tilde{X}_{j,k}^{(i)} = \frac{X_{j,k}}{\sum_{k'=N(i-1)+1}^{N \cdot i} X_{j,k'}},
+\end{equation}
+
+where:
+
+\begin{itemize}
+    \item $\tilde{X}_{j,k}^{(i)}$ is the normalized wavelength intensity for the $j$-th sample in the $k$-th channel on the $i$-th spectrometer.
+    \item $X_{j,k}$ is the original wavelength intensity for the $j$-th sample in the $k$-th channel on the $i$-th spectrometer.
+    \item $N$ is the number of channels in each spectrometer (for the \gls{chemcam} instrument, $N = 2048$)
+    \item $i$ is the index of the spectrometer (for the \gls{chemcam} instrument, $i \in \{1, 2, 3\}$)
+    \item $k'$ indexes over the channels of the $i$-th spectrometer, ensuring the $N$ channels of each spectrometer are normalized separately.
+\end{itemize}
+
+Following the approach taken by the SuperCam team, we opt to always normalize across individual spectrometers' wavelength ranges (Norm 3), rather than normalizing across the entire spectrum (Norm 1).
+This decision is guided by the approach taken by the SuperCam team, where they do not normalize across the entire spectrum, but rather across individual spectrometers' wavelength ranges~\cite{andersonPostlandingMajorElement2022}.
+
 The goal of improving both robustness and accuracy is to ensure that our models can generalize well to new data and provide reliable predictions in the presence of noise and uncertainty.
 Essentially, the model should be as accurate as possible, as often as possible.
 It is undesirable for a model to be accurate only in specific scenarios, as this would limit its practical utility.
@@ -43,8 +79,5 @@ In order to narrow down the scope of our research, we set the following constrai
     \item Focus on techniques proven effective for non-linear, high-dimensional data, even outside the \gls{libs} context.
     \item Ensure methods are feasible for small datasets.
 \end{itemize}
-
-Following the approach taken by the SuperCam team, we opt to always normalize across individual spectrometers' wavelength ranges (Norm 3), rather than normalizing across the entire spectrum (Norm 1).
-This decision is guided by the approach taken by the SuperCam team, where they do not normalize across the entire spectrum, but rather across individual spectrometers' wavelength ranges~\cite{andersonPostlandingMajorElement2022}.
 
 Through these focused objectives and methodologies, our work seeks to improve the prediction of major oxide compositions in Martian geological samples.
