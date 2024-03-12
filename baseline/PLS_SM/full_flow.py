@@ -31,13 +31,14 @@ from lib.reproduction import (
     training_info,
 )
 from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
+from lib.variance_threshold import VarTrim
 from PLS_SM.inference import predict_composition_with_blending
 
 # ignore all future warnings
 simplefilter(action="ignore", category=FutureWarning)
 
 logger = logging.getLogger("train")
-mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_tracking_uri("http://localhost:5001")
 
 
 app = typer.Typer()
@@ -90,15 +91,18 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
             logger.debug("Fitting and transforming training data.")
+            variance_threshold = VarTrim(VarTrim.ThresholdLevel.LOW)
+            
             train = scaler.fit_transform(train.copy())
+
+            train = variance_threshold.fit_transform(train)
+
             logger.debug("Transforming test data.")
+
             test = scaler.fit_transform(test.copy())
+            test = variance_threshold.transform(test)
 
             drop_cols = major_oxides + ["Sample Name", "ID"]
-
-            # turn back into dataframe
-            train = pd.DataFrame(train, columns=train_cols)
-            test = pd.DataFrame(test, columns=test_cols)
 
             with mlflow.start_run(run_name=f"{oxide}_{compositional_range}"):
                 mlflow.log_metric("paper_rmse", paper_individual_sm_rmses[compositional_range][oxide])
@@ -122,6 +126,7 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
                 y_train_OR = train[oxide].to_numpy()
 
                 pls_OR.fit(X_train_OR, y_train_OR)
+
 
                 current_performance = mean_squared_error(y_train_OR, pls_OR.predict(X_train_OR), squared=False)
 
