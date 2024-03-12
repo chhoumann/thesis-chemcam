@@ -5,7 +5,7 @@ Predicting major oxide compositions from \gls{libs} data presents significant co
 These effects can cause the intensity of emission lines from an element to vary independently of that element's concentration, introducing unknown variables that complicate the analysis.
 Furthermore, due to the high cost of data collection, datasets are often small, which further complicates the task of building accurate and robust models.
 
-Building upon the baseline established in \citet{p9_paper}, our work aims to address the significant challenges inherent in predicting major oxide compositions from \gls{libs} data by improving the accuracy and robustness of these predictions.
+Building upon the baseline established in~\citet{p9_paper}, our work aims to address the significant challenges inherent in predicting major oxide compositions from \gls{libs} data by improving the accuracy and robustness of these predictions.
 The presence of multicollinearity within the spectral data, for example, makes it difficult to discern distinct patterns due to the strong correlations among variables that can obscure the impact of individual predictors.
 Additionally, the high dimensionality of \gls{libs} data necessitates dimensionality reduction to manage the vast number of variables efficiently.
 
@@ -13,10 +13,10 @@ Our research objectives include exploring sophisticated modeling techniques that
 Given the limited size of available datasets, our methodologies must also be robust against overfitting and capable of generalizing well from small sample sizes.
 To this end, we propose the exploration of advanced ensemble methods and deep learning models, selected for their potential to handle high-dimensional, non-linear data effectively.
 
-In addressing the limitations of the current \gls{moc} pipeline identified in \citet{p9_paper}, we have prioritized dimensionality reduction and model selection.
+In addressing the limitations of the current \gls{moc} pipeline identified in~\citet{p9_paper}, we have prioritized dimensionality reduction and model selection.
 This decision is supported by the low incidence of outliers in the \gls{chemcam} \gls{libs} calibration dataset.
 Dimensionality reduction is essential for managing the high-dimensional nature of \gls{libs} data, and model selection offers the opportunity to explore a wider range of algorithms, potentially leading to improved performance.
-Our focus on advanced ensemble methods like \gls{gbr} and deep learning models like \gls{ann}s is motivated by their demonstrated ability to outperform the existing \gls{moc} pipeline in handling complex data scenarios, as shown in \citet{p9_paper} and \citet{andersonPostlandingMajorElement2022}.
+Our focus on advanced ensemble methods like \gls{gbr} and deep learning models like \gls{ann}s is motivated by their demonstrated ability to outperform the existing \gls{moc} pipeline in handling complex data scenarios, as shown in~\citet{p9_paper} and~\citet{andersonPostlandingMajorElement2022}.
 
 To evaluate the performance of these models, we will use \gls{rmse} as a proxy for accuracy, defined by the equation:
 
@@ -45,6 +45,6 @@ In order to narrow down the scope of our research, we set the following constrai
 \end{itemize}
 
 Following the approach taken by the SuperCam team, we opt to always normalize across individual spectrometers' wavelength ranges (Norm 3), rather than normalizing across the entire spectrum (Norm 1).
-This decision is guided by the approach taken by the SuperCam team, where they do not normalize across the entire spectrum, but rather across individual spectrometers' wavelength ranges\cite{andersonPostlandingMajorElement2022}.
+This decision is guided by the approach taken by the SuperCam team, where they do not normalize across the entire spectrum, but rather across individual spectrometers' wavelength ranges~\cite{andersonPostlandingMajorElement2022}.
 
 Through these focused objectives and methodologies, our work seeks to improve the prediction of major oxide compositions in Martian geological samples.
