@@ -41,7 +41,7 @@ class Norm1Scaler(BaseEstimator, TransformerMixin):
                 continue
 
         df_float = df[wavelength_columns]
-        row_sums = df_float.sum(axis=1)
+        row_sums = df_float.sum(axis=1).sum()
         normalized_df = df_float.div(row_sums, axis=0)
         df.update(normalized_df)
 
@@ -84,9 +84,9 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         channel_3 = df.iloc[:, no_channels * 2 : no_channels * 3]
 
         # sum the intensities for each channel
-        channel_1_sum = channel_1.sum(axis=1)
-        channel_2_sum = channel_2.sum(axis=1)
-        channel_3_sum = channel_3.sum(axis=1)
+        channel_1_sum = channel_1.sum(axis=1).sum()
+        channel_2_sum = channel_2.sum(axis=1).sum()
+        channel_3_sum = channel_3.sum(axis=1).sum()
 
         # divide each channel by its total intensity
         channel_1_normalized = channel_1.div(channel_1_sum, axis=0)
