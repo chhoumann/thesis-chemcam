@@ -1,8 +1,10 @@
 import enum
 
-from sklearn.base import BaseEstimator, TransformerMixin
-from lib.reproduction import spectral_ranges
 import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+
+from lib.reproduction import spectral_ranges
+
 
 class Norm(enum.Enum):
     NORM_1 = 1
@@ -71,7 +73,6 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         """
         return self
 
-
     def transform(self, df):
         """
         Apply norm3 normalization to the DataFrame.
@@ -85,15 +86,15 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
                 if col >= spectral_ranges[spectrometer][0]:
                     spectrometer_start_indices.append(i)
                     break
-                    
+
         for i in range(len(spectrometer_start_indices)):
             start = spectrometer_start_indices[i]
+            end = (
+                len(columns)
+                if i == len(spectrometer_start_indices) - 1
+                else spectrometer_start_indices[i + 1]
+            )
 
-            if i == len(spectrometer_start_indices) - 1:
-                end = len(columns)
-            else:
-                end = spectrometer_start_indices[i + 1]
-                
             spectrometer_df = df.iloc[:, start:end]
             row_sums = spectrometer_df.sum(axis=1).sum()
             normalized_df = spectrometer_df.div(row_sums, axis=0)
