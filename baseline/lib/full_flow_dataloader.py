@@ -5,6 +5,7 @@ import pandas as pd
 from dotenv import dotenv_values
 
 from lib.data_handling import CustomSpectralPipeline, load_split_data
+from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.reproduction import major_oxides, masks
 
 
@@ -36,9 +37,7 @@ def load_full_flow_data():
         or not test_path.exists()
     ):
         logger.info("Loading data from location: %s", dataset_loc)
-        train_data, test_data = load_split_data(
-            str(dataset_loc), split_loc="/home/ubuntu/projects/thesis-chemcam/baseline/train_test_split.csv", average_shots=True
-        )
+        train_data, test_data = load_split_data(str(dataset_loc), average_shots=True)
         logger.info("Data loaded successfully.")
 
         logger.info("Initializing CustomSpectralPipeline.")
@@ -64,3 +63,40 @@ def load_full_flow_data():
         test_processed = pd.read_csv(test_path)
 
     return train_processed, test_processed
+
+
+def load_and_scale_data(norm: int):
+    """
+    Loads the data and scales it using the specified normalization method.
+    """
+    train_processed, test_processed = load_full_flow_data()
+
+    train_cols = train_processed.columns
+    test_cols = test_processed.columns
+
+    scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
+    train = scaler.fit_transform(train_processed)
+    test = scaler.fit_transform(test_processed)
+
+    # turn back into dataframe
+    train = pd.DataFrame(train, columns=train_cols)
+    test = pd.DataFrame(test, columns=test_cols)
+
+    return train, test
+
+
+def load_train_test_data(norm: int, drop_cols: list = ["ID", "Sample Name"]):
+    """
+    Loads the train and test data and returns the X and y values.
+    """
+    train, test = load_and_scale_data(norm)
+
+    # Converting train set
+    X_train = train.drop(columns=drop_cols)
+    y_train = train[major_oxides]
+
+    # Converting test set
+    X_test = test.drop(columns=drop_cols)
+    y_test = test[major_oxides]
+
+    return X_train, y_train, X_test, y_test
