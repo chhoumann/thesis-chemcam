@@ -1,7 +1,8 @@
 import enum
 
 from sklearn.base import BaseEstimator, TransformerMixin
-
+from lib.reproduction import spectral_ranges
+import pandas as pd
 
 class Norm(enum.Enum):
     NORM_1 = 1
@@ -70,32 +71,32 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         """
         return self
 
+
     def transform(self, df):
         """
         Apply norm3 normalization to the DataFrame.
         """
-        no_channels = 2048
+        spectrometer_start_indices = []
+        columns = pd.to_numeric(df.columns, errors="coerce")
+        columns = columns[~columns.isna()]
 
-        # first no_channels columns are the wavelengths for the first spectrometer
-        # second no_channels columns are the wavelengths for the second spectrometer
-        # third no_channels columns are the wavelengths for the third spectrometer
-        channel_1 = df.iloc[:, :no_channels]
-        channel_2 = df.iloc[:, no_channels : no_channels * 2]
-        channel_3 = df.iloc[:, no_channels * 2 : no_channels * 3]
+        for spectrometer in spectral_ranges:
+            for i, col in enumerate(columns):
+                if col >= spectral_ranges[spectrometer][0]:
+                    spectrometer_start_indices.append(i)
+                    break
+                    
+        for i in range(len(spectrometer_start_indices)):
+            start = spectrometer_start_indices[i]
 
-        # sum the intensities for each channel
-        channel_1_sum = channel_1.sum(axis=1)
-        channel_2_sum = channel_2.sum(axis=1)
-        channel_3_sum = channel_3.sum(axis=1)
-
-        # divide each channel by its total intensity
-        channel_1_normalized = channel_1.div(channel_1_sum, axis=0)
-        channel_2_normalized = channel_2.div(channel_2_sum, axis=0)
-        channel_3_normalized = channel_3.div(channel_3_sum, axis=0)
-
-        # update the dataframe with the normalized values
-        df.update(channel_1_normalized)
-        df.update(channel_2_normalized)
-        df.update(channel_3_normalized)
+            if i == len(spectrometer_start_indices) - 1:
+                end = len(columns)
+            else:
+                end = spectrometer_start_indices[i + 1]
+                
+            spectrometer_df = df.iloc[:, start:end]
+            row_sums = spectrometer_df.sum(axis=1)
+            normalized_df = spectrometer_df.div(row_sums, axis=0)
+            df.update(normalized_df)
 
         return df

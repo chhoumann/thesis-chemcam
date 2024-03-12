@@ -22,7 +22,7 @@ class VarTrim(BaseEstimator, TransformerMixin):
     """
     class ThresholdLevel(Enum):
         """
-        Enumeration of predefined variance threshold levels ranging from 'LEAST' to 'MOST', allowing for easy specification of common thresholds.
+        Enumeration of predefined variance threshold level with the following options: 'LEAST', 'VERY_LOW', 'LOW', 'MODERATE_LOW', 'MODERATE', 'MODERATE_HIGH', 'HIGH', 'VERY_HIGH', 'MOST'
         """
         LEAST = 1e-10
         VERY_LOW = 1e-9
@@ -44,6 +44,7 @@ class VarTrim(BaseEstimator, TransformerMixin):
         self.features_to_keep_ = None
         self.threshold = threshold
         self.selector = None
+        self.non_float_columns_ = None
         
     def fit(self, data: pd.DataFrame):
         """
@@ -58,16 +59,28 @@ class VarTrim(BaseEstimator, TransformerMixin):
         Raises:
             ValueError: If the threshold is not a ThresholdLevel or float.
         """
+        
+        float_columns, non_float_columns = [], []
+        for col in data.columns:
+            try:
+                float(col)
+                float_columns.append(col)
+            except ValueError:
+                non_float_columns.append(col)
+
+        data_float = data[float_columns]
+
         if isinstance(self.threshold, VarTrim.ThresholdLevel):
             threshold = self.threshold.value
         elif isinstance(self.threshold, float):
             threshold = self.threshold
         else:
-            raise ValueError("threshold_spec must be either a ThresholdLevel or a float.")
+            raise ValueError("threshold must be either a ThresholdLevel or a float.")
         
         self.selector = VarianceThreshold(threshold=threshold)
-        self.selector.fit(data)
-        self.features_to_keep_ = data.columns[self.selector.get_support(indices=True)]
+        self.selector.fit(data_float)
+        self.features_to_keep_ = data_float.columns[self.selector.get_support(indices=True)]
+        self.non_float_columns_ = non_float_columns
         return self
     
     def transform(self, data: pd.DataFrame):
@@ -86,4 +99,6 @@ class VarTrim(BaseEstimator, TransformerMixin):
         if not isinstance(data, pd.DataFrame):
             raise ValueError("Input data must be a DataFrame.")
         
-        return data[self.features_to_keep_]
+        all_columns = list(self.features_to_keep_) + list(self.non_float_columns_)
+
+        return data[all_columns]
