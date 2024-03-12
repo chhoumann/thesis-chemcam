@@ -37,7 +37,7 @@ def load_full_flow_data():
     ):
         logger.info("Loading data from location: %s", dataset_loc)
         train_data, test_data = load_split_data(
-            str(dataset_loc), split_loc="./train_test_split.csv", average_shots=True
+            str(dataset_loc), split_loc="/home/ubuntu/projects/thesis-chemcam/baseline/train_test_split.csv", average_shots=True
         )
         logger.info("Data loaded successfully.")
 
