@@ -42,7 +42,7 @@ class Norm1Scaler(BaseEstimator, TransformerMixin):
                 continue
 
         df_float = df[wavelength_columns]
-        row_sums = df_float.sum(axis=1)
+        row_sums = df_float.sum(axis=1).sum()
         normalized_df = df_float.div(row_sums, axis=0)
         df.update(normalized_df)
 
@@ -95,7 +95,7 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
                 end = spectrometer_start_indices[i + 1]
                 
             spectrometer_df = df.iloc[:, start:end]
-            row_sums = spectrometer_df.sum(axis=1)
+            row_sums = spectrometer_df.sum(axis=1).sum()
             normalized_df = spectrometer_df.div(row_sums, axis=0)
             df.update(normalized_df)
 
