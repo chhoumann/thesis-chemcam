@@ -1,43 +1,23 @@
 import os
 from pathlib import Path
-from typing import Tuple
+from typing import Dict, Tuple
 
-import dotenv
 import mlflow
 import numpy as np
 import pandas as pd
 import tqdm
+import typer
 from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
 from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
+from lib.config import AppConfig
 from lib.norms import Norm
 from lib.utils import get_train_test_split
 
-env = dotenv.dotenv_values(dotenv.find_dotenv())
-CALIB_DATA_PATH = env.get("DATA_PATH", "")
-CALIB_COMP_PATH = env.get("COMPOSITION_DATA_PATH", "")
-MLFLOW_TRACKING_URI = env.get("MLFLOW_TRACKING_URI", "")
-
-if CALIB_DATA_PATH is None or CALIB_COMP_PATH is None or MLFLOW_TRACKING_URI is None:
-    print(
-        "Please ensure that the following environment variables are set: DATA_PATH, COMPOSITION_DATA_PATH, MLFLOW_TRACKING_URI"
-    )
-    exit(1)
-
-TEST = True
-AVERAGE_LOCATION_DATASETS = False
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-experiment_name = f"""P10_ICA_MAD_{
-    'TEST' if TEST else 'TRAIN'
-    }_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"""
-mlflow.set_experiment(experiment_name)
-mlflow.autolog()
-
-if CALIB_DATA_PATH is None or CALIB_COMP_PATH is None or MLFLOW_TRACKING_URI is None:
-    exit()
+config = AppConfig()
 
 model_configs = {
     "SiO2": {"law": "Log-square", "norm": Norm.NORM_1},
@@ -52,6 +32,11 @@ model_configs = {
 
 
 def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
+    mlflow.set_tracking_uri(config.mlflow_tracking_uri)
+    _experiment_id = mlflow.create_experiment(f"ICA_TRAIN_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
+    experiment = mlflow.set_experiment(_experiment_id)
+    mlflow.autolog()
+
     id_col = ica_df_n1["id"]
 
     ica_df_n1.drop(columns=["id"], inplace=True)
@@ -132,13 +117,14 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
     target_predictions.to_csv("./data/data/jade/ica/TRAIN_tar_pred.csv")
 
+    return experiment
 
-def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
+
+def get_ica_models(experiment_id: str) -> Dict[str, LinearRegression]:
     models = {}
-    experiment_id = "840799496769498027"
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
-    for _, run in runs.iterrows():
+    for _, run in runs.iterrows():  # type: ignore
         run_id = run["run_id"]
         oxide_value = run["params.oxide"]  # Assuming 'oxide' is stored as a parameter
 
@@ -151,9 +137,22 @@ def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
                 model = mlflow.sklearn.load_model(model_uri)
                 models[oxide_value] = model
 
+    return models
+
+
+def test(
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, experiment_id: str
+):
+    models = get_ica_models(experiment_id)
+
     id_col = ica_df_n1["id"]
     ica_df_n1.drop(columns=["id"], inplace=True)
     ica_df_n3.drop(columns=["id"], inplace=True)
+
+    mlflow.set_tracking_uri(config.mlflow_tracking_uri)
+    _experiment_id = mlflow.create_experiment(f"ICA_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
+    mlflow.set_experiment(_experiment_id)
+    mlflow.autolog()
 
     oxide_rmses = {}
     oxide_preds = {}
@@ -215,16 +214,22 @@ def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     mlflow.log_artifact(str(tar_pred_path))
     mlflow.log_table(target_predictions, "target_predictions")
 
+    return target_predictions
 
-def main():
+
+def get_data(is_test_run: bool):
     exclude_columns_abs = ["id"]
 
-    ica_df_n1, compositions_df_n1 = get_data(num_components=8, norm=Norm.NORM_1)
+    ica_df_n1, compositions_df_n1 = _get_data(
+        num_components=8, norm=Norm.NORM_1, isTest=is_test_run
+    )
     temp_df = ica_df_n1.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n1_abs = pd.concat([ica_df_n1[exclude_columns_abs], temp_df], axis=1)
 
-    ica_df_n3, compositions_df_n3 = get_data(num_components=8, norm=Norm.NORM_3)
+    ica_df_n3, compositions_df_n3 = _get_data(
+        num_components=8, norm=Norm.NORM_3, isTest=is_test_run
+    )
     temp_df = ica_df_n3.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n3_abs = pd.concat([ica_df_n3[exclude_columns_abs], temp_df], axis=1)
@@ -237,15 +242,16 @@ def main():
         ica_df_n1_abs["id"] == ica_df_n1_abs["id"]
     ).all(), "The IDs of the two DataFrames must be aligned."
 
-    if TEST:
-        test(ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3)
-    else:
-        train(ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3)
+    return ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3
 
 
-def get_data(num_components: int, norm: Norm) -> (pd.DataFrame, pd.DataFrame):
-    calib_data_path = Path(CALIB_DATA_PATH)
-    output_dir = Path(f"./data/data/jade/ica/norm{norm.value}{'-test' if TEST else ''}")
+def _get_data(
+    num_components: int, norm: Norm, isTest: bool
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    calib_data_path = Path(config.data_path)
+    output_dir = Path(
+        f"./data/data/jade/ica/norm{norm.value}{'-test' if isTest else ''}"
+    )
 
     ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
     compositions_csv_loc = Path(f"{output_dir}/composition_data.csv")
@@ -274,8 +280,10 @@ def create_processed_data(
     ica_model: str = "jade",
     num_components: int = 8,
     norm: Norm = Norm.NORM_3,
+    isTest: bool = False,
+    average_location_datasets: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    composition_data_loc = CALIB_COMP_PATH
+    composition_data_loc = config.composition_data_path
 
     ic_wavelengths_list = []
     ica_df = pd.DataFrame()
@@ -288,7 +296,7 @@ def create_processed_data(
     not_in_set = []
     missing = []
 
-    desired_dataset = "test" if TEST else "train"
+    desired_dataset = "test" if isTest else "train"
     for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
         split_info_sample_row = test_train_split_idx[
             test_train_split_idx["sample_name"] == sample_name
@@ -318,7 +326,7 @@ def create_processed_data(
             missing.append(sample_name)
             continue
 
-        processor.preprocess(calib_data_path, AVERAGE_LOCATION_DATASETS, norm)
+        processor.preprocess(calib_data_path, average_location_datasets, norm)
 
         for sample_id, sample_data in processor.dfs:
             # Run ICA for each location in sample and get the estimated sources
@@ -386,7 +394,7 @@ def run_ica(
     if model == "jade":
         # cols = df.columns
         jade_model = JADE(num_components)
-        mixing_matrix = jade_model.fit(X=df)
+        mixing_matrix = jade_model.fit(X=df)  # noqa: F841
         estimated_sources = jade_model.transform(df)
     elif model == "fastica":
         fastica_model = FastICA(
@@ -399,5 +407,29 @@ def run_ica(
     return estimated_sources
 
 
+app = typer.Typer()
+
+
+@app.command(name="run", help="Runs train & test for ICA")
+def run():
+    # Train
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=False
+    )
+    experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
+
+    # Test
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=True
+    )
+    test(
+        ica_df_n1,
+        ica_df_n3,
+        compositions_df_n1,
+        compositions_df_n3,
+        experiment.experiment_id,
+    )
+
+
 if __name__ == "__main__":
-    main()
+    app()
