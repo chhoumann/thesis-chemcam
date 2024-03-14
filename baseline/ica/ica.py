@@ -422,7 +422,7 @@ def run():
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=True
     )
-    test(
+    return test(
         ica_df_n1,
         ica_df_n3,
         compositions_df_n1,
