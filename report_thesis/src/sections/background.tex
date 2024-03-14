@@ -1,0 +1,44 @@
+\section{Background}\label{sec:background}
+The NASA Viking missions in the 1970s were the first to successfully land on Mars, aiming to determine if life existed on the planet.
+One experiment suggested the presence of life, but the results were ambiguous and inconclusive, and NASA was unable to repeat the experiment.
+Nevertheless, these missions were deemed a monumental success and advanced our knowledge of the Martian environment~\cite{marsnasagov_vikings}.
+
+Leveraging the knowledge gained from the Viking missions, NASA launched the \gls{mer} mission in 2003 to investigate whether Mars ever had the conditions to support life as we know it.
+The mission landed two rovers, Spirit and Opportunity, on Mars in January 2004, and they quickly discovered clear evidence that water once flowed on Mars.
+However, since water alone is not enough to support life, the next objective was to search for organic material as well~\cite{marsnasagov_observer, marsnasagov_spirit_opportunity}.
+
+The Curiosity rover landed on Mars in August 2012 inside Gale Crater as part of the \gls{msl} mission with this very purpose.
+Thanks to its sophisticated equipment, Curiosity was able to find evidence of past habitable environments on Mars based on chemical and mineral findings early in its mission~\cite{marsnasagov_msl}.
+
+One of the instruments aboard the rover is the \gls{chemcam} instrument, which is a remote-sensing laser instrument used to gather \gls{libs} data from geological samples on Mars.
+\gls{libs} is a technique that enables rapid analysis by using a laser to ablate and remove surface contaminants to expose the underlying material and generate a plasma plume from the now-exposed sample material~\cite{wiensChemcam2012}.
+This plasma plume emits light that is captured through three distinct spectrometers to collect a series of spectral readings.
+These spectra consist of emission lines that can be associated with the concentration of a specific element, and their intensity reflects the concentration of that element in the sample.
+Consequently, a spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological samples~\cite{cleggRecalibrationMarsScience2017}.
+
+Analyzing \gls{libs} data is computationally challenging due to high multicollinearity within spectral data, which diminishes the effectiveness of traditional linear analysis.
+The multicollinearity, which stems from correlations among spectral channels and elemental emission characteristics, complicates data interpretation.
+Additionally, \textit{matrix effects} in \gls{libs} spectra arise when various physical interactions cause emission line intensities to change without a corresponding shift in the element's actual concentration
+This phenomenon introduces variability that complicates the straightforward interpretation of spectral data, challenging the accuracy of computational models tasked with predicting elemental composition~\cite{andersonImprovedAccuracyQuantitative2017}.
+
+For analyzing Martian geological samples, the \gls{chemcam} team currently uses the \gls{moc} model~\cite{cleggRecalibrationMarsScience2017}.
+This model integrates \gls{pls} and \gls{ica} to predict the composition of major oxides.
+Though the MOC model has proven useful, it suffers from limitations in predictive accuracy and robustness.
+In~\citet{p9_paper}, we created a replica of the MOC model and identified which components were responsible for these limitations.
+Through a series of comparative experiments, we showed that the model selection was the primary cause of these limitations, and we showed how both \gls{ann} and \gls{gbr} methods could be used to improve the model's predictive accuracy and robustness.
+
+This is further underscored by work from the SuperCam team.
+In 2021, the Perseverance rover landed on Mars, equipped with the SuperCam instrument, which is the successor to the \gls{chemcam} instrument.
+As part of the ongoing work to support the SuperCam instrument, \citet{andersonPostlandingMajorElement2022} experimented with various machine learning models to predict the composition of major oxides in geological samples using the SuperCam \gls{libs} calibration dataset.
+While the team decided to retain \gls{pls} for analyzing certain oxides, \gls{ica} was entirely discontinued.
+Instead, models based on \gls{gbr}, \gls{rf}, and \gls{lasso} were selected for other oxides.
+This decision reinforces our finding that \gls{ica} regression models fall short in accurately predicting the composition of major oxides in geological samples.
+Consistent with our observations, \gls{gbr} was also identified as a high-performing model in their analyses.
+
+However, there remains considerable uncertainty about which machine learning techniques best predict the composition of major oxides in Martian geological samples using \gls{libs} data.
+This underscores the importance of a detailed study into advanced machine learning models for improving predictions in these applications.
+
+In addition, the high dimensionality of \gls{libs} data poses a significant challenge for computational models.
+Therefore, techniques that reduce the dimensionality of the data are crucial for mitigating the effects of multicollinearity and enhancing the model's ability to discern the underlying patterns within the spectral data.
+
+\textit{In this work, we aim to investigate the application of dimensionality reduction techniques and advanced machine learning models to predict the composition of major oxides in Martian geological samples using \gls{libs} data.}
