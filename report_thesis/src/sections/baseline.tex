@@ -1,5 +1,5 @@
 \section{Baseline}
-In \citet{p9_paper}, we presented our efforts to replicate the MOC model by \citet{cleggRecalibrationMarsScience2017}.
+In \citet{p9_paper}, we presented our efforts to replicate the MOC model by~\citet{cleggRecalibrationMarsScience2017}.
 This effort was motivated by our desire to better understand the model and its performance, and to experiment with its components in order to determine how it could be improved.
 However, as discussed in that paper, there were some differences between our replica and the original model.
 These differences were caused by missing information in the original paper, and so rather than introducing our own assumptions, we designed experiments to determine the best way to replicate the model.
@@ -21,15 +21,15 @@ We chose to pull out the $n$ largest and smallest samples by concentration range
 Then we would do a random split on the remaining dataset, such that the final train/test split would be a $80\%/20\%$ split.
 
 With these changes, we have created a more accurate replica of the \gls{moc} model, which we will use as our baseline for the rest of this paper.
-As an additional measure, we have presented these changes to one of the original authors of \citet{cleggRecalibrationMarsScience2017}, who confirmed that they were reasonable and in line with the original model's implementation.
+As an additional measure, we have presented these changes to one of the original authors of~\citet{cleggRecalibrationMarsScience2017}, who confirmed that they were reasonable and in line with the original model's implementation.
 
-Table \ref{tab:replica_results_rmses} shows the \gls{rmse}s of the original models and our replicas after these changes.
+Table~\ref{tab:replica_results_rmses} shows the \gls{rmse}s of the original models and our replicas after these changes.
 Figure~\ref{fig:rmse_histograms} illustrates the distribution of these \gls{rmse}s as a grouped histogram.
 The results show that the \gls{rmse}s of our replicas exhibit similar tendencies to the original models.
 However, in some cases, our replicas have a lower \gls{rmse} than the original models, and in others, they have a higher \gls{rmse}.
 These differences are due to a number of factors.
 
-Firstly, the original models were trained with datasets from 1600mm and 3000mm standoff distances\cite{cleggRecalibrationMarsScience2017}, while we only had access to the 1600mm dataset for our replicas.
+Firstly, the original models were trained with datasets from 1600mm and 3000mm standoff distances~\cite{cleggRecalibrationMarsScience2017}, while we only had access to the 1600mm dataset for our replicas.
 Additionally, we automated the outlier removal for the PLS1-SM phase, unlike the original manual process.
 As mentioned, the original authors manually curated their training and test sets, ensuring a broad elemental range, while we implemented an automatic process for our replicas due to lack of domain expertise.
 Differences might also stem from varied implementation specifics, such as programming languages and libraries used.
