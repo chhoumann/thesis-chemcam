@@ -10,3 +10,4 @@ torchvision
 torchaudio
 seaborn
 nbstripout
+typer
