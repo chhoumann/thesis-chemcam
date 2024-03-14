@@ -33,7 +33,7 @@ model_configs = {
 
 def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment("ICA_TRAIN")
+    _experiment_id = mlflow.create_experiment(f"ICA_TRAIN_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
     experiment = mlflow.set_experiment(_experiment_id)
     mlflow.autolog()
 
@@ -150,7 +150,7 @@ def test(
     ica_df_n3.drop(columns=["id"], inplace=True)
 
     mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment("ICA_TEST")
+    _experiment_id = mlflow.create_experiment(f"ICA_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
     mlflow.set_experiment(_experiment_id)
     mlflow.autolog()
 
