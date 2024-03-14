@@ -1,11 +1,17 @@
 import enum
+from typing import List, Tuple
 
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class Norm(enum.Enum):
     NORM_1 = 1
     NORM_3 = 3
+
+
+def norm(df: pd.DataFrame) -> pd.DataFrame:
+    return df.div(df.sum(axis=1), axis=0)
 
 
 class Norm1Scaler(BaseEstimator, TransformerMixin):
@@ -29,21 +35,12 @@ class Norm1Scaler(BaseEstimator, TransformerMixin):
 
     def transform(self, df):
         """
-        Apply norm1 normalization to the DataFrame.
+        Apply Norm 1 normalization to the DataFrame.
         """
-        wavelength_columns = []
-        for col in df.columns:
-            try:
-                float(col)
-                wavelength_columns.append(col)
-            except ValueError:
-                # Ignore columns that cannot be converted to float
-                continue
+        cols = pd.to_numeric(df.columns, errors="coerce")
+        wavelength_cols = cols[~cols.isna()].astype(str)
 
-        df_float = df[wavelength_columns]
-        row_sums = df_float.sum(axis=1).sum()
-        normalized_df = df_float.div(row_sums, axis=0)
-        df.update(normalized_df)
+        df.update(norm(df[wavelength_cols]))
 
         return df
 
@@ -70,32 +67,20 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         """
         return self
 
-    def transform(self, df):
+    def transform(self, df, ranges: List[Tuple[float, float]]):
         """
-        Apply norm3 normalization to the DataFrame.
+        Apply Norm 3 normalization to the DataFrame.
         """
-        no_channels = 2048
+        cols = pd.to_numeric(df.columns, errors="coerce")
+        wavelength_cols = cols[~cols.isna()]
 
-        # first no_channels columns are the wavelengths for the first spectrometer
-        # second no_channels columns are the wavelengths for the second spectrometer
-        # third no_channels columns are the wavelengths for the third spectrometer
-        channel_1 = df.iloc[:, :no_channels]
-        channel_2 = df.iloc[:, no_channels : no_channels * 2]
-        channel_3 = df.iloc[:, no_channels * 2 : no_channels * 3]
+        for i, (start, end) in enumerate(ranges):
+            cols_in_range = wavelength_cols[
+                (wavelength_cols >= start)
+                & (wavelength_cols <= end)
+            ].astype(str)
 
-        # sum the intensities for each channel
-        channel_1_sum = channel_1.sum(axis=1).sum()
-        channel_2_sum = channel_2.sum(axis=1).sum()
-        channel_3_sum = channel_3.sum(axis=1).sum()
-
-        # divide each channel by its total intensity
-        channel_1_normalized = channel_1.div(channel_1_sum, axis=0)
-        channel_2_normalized = channel_2.div(channel_2_sum, axis=0)
-        channel_3_normalized = channel_3.div(channel_3_sum, axis=0)
-
-        # update the dataframe with the normalized values
-        df.update(channel_1_normalized)
-        df.update(channel_2_normalized)
-        df.update(channel_3_normalized)
+            df.update(norm(df[cols_in_range]))
+            
 
         return df
