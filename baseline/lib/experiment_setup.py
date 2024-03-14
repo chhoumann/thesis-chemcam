@@ -20,7 +20,7 @@ class Experiment:
         mlflow.set_tracking_uri(AppConfig().mlflow_tracking_uri)
 
         if create_mlflow_experiment:
-            mlflow.set_experiment(
+            self.mlflow_experiment = mlflow.set_experiment(
                 f'{self.name}_Norm{self.norm}_{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}'
             )
 
