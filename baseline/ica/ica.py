@@ -6,10 +6,10 @@ import mlflow
 import numpy as np
 import pandas as pd
 import tqdm
+import typer
 from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-import typer
 
 from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
@@ -36,7 +36,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     _experiment_id = mlflow.create_experiment("ICA_TRAIN")
     experiment = mlflow.set_experiment(_experiment_id)
     mlflow.autolog()
-    
+
     id_col = ica_df_n1["id"]
 
     ica_df_n1.drop(columns=["id"], inplace=True)
@@ -119,12 +119,12 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
     return experiment
 
-    
+
 def get_ica_models(experiment_id: str) -> Dict[str, LinearRegression]:
     models = {}
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
-    for _, run in runs.iterrows(): # type: ignore
+    for _, run in runs.iterrows():  # type: ignore
         run_id = run["run_id"]
         oxide_value = run["params.oxide"]  # Assuming 'oxide' is stored as a parameter
 
@@ -138,10 +138,11 @@ def get_ica_models(experiment_id: str) -> Dict[str, LinearRegression]:
                 models[oxide_value] = model
 
     return models
-    
 
 
-def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, experiment_id: str):
+def test(
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, experiment_id: str
+):
     models = get_ica_models(experiment_id)
 
     id_col = ica_df_n1["id"]
@@ -215,16 +216,20 @@ def test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, experimen
 
     return target_predictions
 
-    
+
 def get_data(is_test_run: bool):
     exclude_columns_abs = ["id"]
 
-    ica_df_n1, compositions_df_n1 = _get_data(num_components=8, norm=Norm.NORM_1, isTest=is_test_run)
+    ica_df_n1, compositions_df_n1 = _get_data(
+        num_components=8, norm=Norm.NORM_1, isTest=is_test_run
+    )
     temp_df = ica_df_n1.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n1_abs = pd.concat([ica_df_n1[exclude_columns_abs], temp_df], axis=1)
 
-    ica_df_n3, compositions_df_n3 = _get_data(num_components=8, norm=Norm.NORM_3, isTest=is_test_run)
+    ica_df_n3, compositions_df_n3 = _get_data(
+        num_components=8, norm=Norm.NORM_3, isTest=is_test_run
+    )
     temp_df = ica_df_n3.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n3_abs = pd.concat([ica_df_n3[exclude_columns_abs], temp_df], axis=1)
@@ -240,9 +245,13 @@ def get_data(is_test_run: bool):
     return ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3
 
 
-def _get_data(num_components: int, norm: Norm, isTest: bool) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _get_data(
+    num_components: int, norm: Norm, isTest: bool
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
-    output_dir = Path(f"./data/data/jade/ica/norm{norm.value}{'-test' if isTest else ''}")
+    output_dir = Path(
+        f"./data/data/jade/ica/norm{norm.value}{'-test' if isTest else ''}"
+    )
 
     ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
     compositions_csv_loc = Path(f"{output_dir}/composition_data.csv")
@@ -397,17 +406,30 @@ def run_ica(
 
     return estimated_sources
 
+
 app = typer.Typer()
+
 
 @app.command(name="run", help="Runs train & test for ICA")
 def run():
     # Train
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(is_test_run=False)
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=False
+    )
     experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
-    
+
     # Test
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(is_test_run=True)
-    test(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, experiment.experiment_id)
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=True
+    )
+    test(
+        ica_df_n1,
+        ica_df_n3,
+        compositions_df_n1,
+        compositions_df_n3,
+        experiment.experiment_id,
+    )
+
 
 if __name__ == "__main__":
     app()
