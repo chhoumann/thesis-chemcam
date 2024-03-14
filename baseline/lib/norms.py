@@ -1,8 +1,9 @@
 import enum
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from lib.reproduction import spectral_ranges
 
 
 class Norm(enum.Enum):
@@ -67,10 +68,13 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         """
         return self
 
-    def transform(self, df, ranges: List[Tuple[float, float]]):
+    def transform(self, df, ranges: Optional[List[Tuple[float, float]]] = None):
         """
         Apply Norm 3 normalization to the DataFrame.
         """
+        if ranges is None:
+            ranges = spectral_ranges.values() # type: ignore
+
         cols = pd.to_numeric(df.columns, errors="coerce")
         wavelength_cols = cols[~cols.isna()]
 
