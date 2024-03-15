@@ -151,7 +151,7 @@ def test(
 
     mlflow.set_tracking_uri(config.mlflow_tracking_uri)
     _experiment_id = mlflow.create_experiment(f"ICA_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
-    mlflow.set_experiment(_experiment_id)
+    mlflow.set_experiment(experiment_id=_experiment_id)
     mlflow.autolog()
 
     oxide_rmses = {}
