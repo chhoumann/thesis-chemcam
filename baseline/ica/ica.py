@@ -10,6 +10,7 @@ import typer
 from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+from typing import List
 
 from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
@@ -33,7 +34,9 @@ model_configs = {
 
 def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment(f"ICA_TRAIN_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
+    _experiment_id = mlflow.create_experiment(
+        f"ICA_TRAIN_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    )
     experiment = mlflow.set_experiment(_experiment_id)
     mlflow.autolog()
 
@@ -77,7 +80,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
                     X_train = X_train**2
                     X_test = X_test**2
 
-                X_train = np.log(X_train)
+                X_train = np.log(X_train)  # This is the line that errors
                 X_test = np.log(X_test)
 
                 # turn -inf to 0
@@ -150,7 +153,9 @@ def test(
     ica_df_n3.drop(columns=["id"], inplace=True)
 
     mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment(f"ICA_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
+    _experiment_id = mlflow.create_experiment(
+        f"ICA_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    )
     mlflow.set_experiment(experiment_id=_experiment_id)
     mlflow.autolog()
 
@@ -268,6 +273,7 @@ def _get_data(
         )
         ica_df.to_csv(ica_df_csv_loc)
         compositions_df.to_csv(compositions_csv_loc)
+
         print(
             f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
         )
@@ -345,17 +351,18 @@ def create_processed_data(
             ic_wavelengths_list.append(ic_wavelengths)
             filtered_compositions_list.append(filtered_compositions_df)
 
-    ica_df = pd.concat(ic_wavelengths_list)
-    compositions_df = pd.concat(filtered_compositions_list)
-
-    # Set the index and column names for the DataFrames
-    ica_df.index.name = "target"
-    ica_df.columns.name = "wavelegths"
-
-    compositions_df.index.name = "target"
-    compositions_df.columns.name = "oxide"
+    ica_df = _merge_preprocessed_dfs(ic_wavelengths_list)
+    compositions_df = _merge_preprocessed_dfs(filtered_compositions_list)
 
     return ica_df, compositions_df
+
+
+def _merge_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
+    df = pd.concat(dfs)
+    df.index.name = "target"
+    df = df.apply(pd.to_numeric, errors="ignore")
+
+    return df
 
 
 def run_ica(
