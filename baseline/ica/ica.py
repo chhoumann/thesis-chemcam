@@ -103,13 +103,8 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
             rmse = np.sqrt(mean_squared_error(y_test, pred))
 
             oxide_rmses[oxide] = rmse
-
-            oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
-            oxide_prediction_path.mkdir(parents=True, exist_ok=True)
-
             target_predictions[oxide] = pd.Series(pred)
 
-            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred1.csv")
             mlflow.log_metric("RMSE", float(rmse))
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
@@ -118,7 +113,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     for oxide, rmse in oxide_rmses.items():
         print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
 
-    target_predictions.to_csv("./data/data/jade/ica/TRAIN_tar_pred.csv")
+    target_predictions.to_csv("./data/_preformatted_ica/TRAIN_tar_pred.csv")
 
     return experiment
 
@@ -196,13 +191,8 @@ def test(
             rmse = np.sqrt(mean_squared_error(y_test, pred))
 
             oxide_rmses[oxide] = rmse
-
-            oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
-            oxide_prediction_path.mkdir(parents=True, exist_ok=True)
-
             oxide_preds[oxide] = pred
 
-            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred1.csv")
             mlflow.log_metric("RMSE", float(rmse))
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
@@ -214,7 +204,7 @@ def test(
     for oxide, pred in oxide_preds.items():
         target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
 
-    tar_pred_path = Path("./data/data/jade/ica/tar_pred.csv")
+    tar_pred_path = Path("./data/_preformatted_ica/tar_pred.csv")
     target_predictions.to_csv(tar_pred_path)
     mlflow.log_artifact(str(tar_pred_path))
     mlflow.log_table(target_predictions, "target_predictions")
@@ -255,7 +245,7 @@ def _get_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
     output_dir = Path(
-        f"./data/data/jade/ica/norm{norm.value}{'-test' if isTest else ''}"
+        f"./data/_preformatted_ica/norm{norm.value}{'-test' if isTest else ''}"
     )
 
     ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
