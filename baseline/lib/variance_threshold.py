@@ -3,6 +3,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import pandas as pd
 from enum import Enum
 from typing import Union
+import numpy as np
 
 class VarTrim(BaseEstimator, TransformerMixin):
     """
@@ -22,18 +23,18 @@ class VarTrim(BaseEstimator, TransformerMixin):
     """
     class ThresholdLevel(Enum):
         """
-        Enumeration of predefined variance threshold level with the following options: 'LEAST', 'VERY_LOW', 'LOW', 'MODERATE_LOW', 'MODERATE', 'MODERATE_HIGH', 'HIGH', 'VERY_HIGH', 'MOST'
+        Enumeration of predefined variance threshold levels, adjusted to match the dataset's variance range, with options from 'LEAST' to 'MOST'.
         """
-        LEAST = 1e-10
-        VERY_LOW = 1e-9
-        LOW = 5e-9
-        MODERATE_LOW = 1e-8
-        MODERATE = 5e-8
-        MODERATE_HIGH = 1e-7
-        HIGH = 5e-7
-        VERY_HIGH = 1e-6
-        MOST = 5e-6
-
+        LEAST = 0.0  # Matches the 0th percentile
+        VERY_LOW = 8e-16  # Slightly above the 20th percentile
+        LOW = 2e-15  # Slightly above the 30th percentile
+        MODERATE_LOW = 4e-15  # Slightly above the 40th percentile
+        MODERATE = 7e-15  # Slightly above the 50th percentile
+        MODERATE_HIGH = 1.5e-14  # Slightly above the 60th percentile
+        HIGH = 3e-14  # Slightly above the 70th percentile
+        VERY_HIGH = 6.5e-14  # Slightly above the 80th percentile
+        MOST = 1.7e-13  # Slightly above the 90th percentile
+    
     def __init__(self, threshold: Union[ThresholdLevel, float]):
         """
         Initializes the VarTrim transformer with a specified variance threshold.
@@ -70,6 +71,9 @@ class VarTrim(BaseEstimator, TransformerMixin):
 
         data_float = data[float_columns]
 
+        #variances = np.var(data_float, axis=0)
+        #percentiles = [np.percentile(variances, p) for p in range(0, 101, 10)]
+        #print(percentiles)
         if isinstance(self.threshold, VarTrim.ThresholdLevel):
             threshold = self.threshold.value
         elif isinstance(self.threshold, float):
