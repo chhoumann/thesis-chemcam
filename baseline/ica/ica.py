@@ -80,7 +80,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
                     X_train = X_train**2
                     X_test = X_test**2
 
-                X_train = np.log(X_train)  # This is the line that errors
+                X_train = np.log(X_train)
                 X_test = np.log(X_test)
 
                 # turn -inf to 0
