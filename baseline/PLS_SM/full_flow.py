@@ -45,7 +45,7 @@ app = typer.Typer()
 
 
 @app.command(name="train", help="Train the PLS-SM models.")
-def train(outlier_removal: bool = True, additional_info: str = "", outlier_removal_constraint_iteration: int = -1):
+def train(outlier_removal: bool = True, additional_info: str = "", outlier_removal_constraint_iteration: int = -1, preprocessors = None):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
@@ -91,16 +91,17 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
             logger.debug("Fitting and transforming training data.")
-            variance_threshold = VarTrim(VarTrim.ThresholdLevel.LOW)
             
             train = scaler.fit_transform(train.copy())
-
-            train = variance_threshold.fit_transform(train)
 
             logger.debug("Transforming test data.")
 
             test = scaler.fit_transform(test.copy())
-            test = variance_threshold.transform(test)
+             
+            for preprocessor in preprocessors:
+                logger.debug(f"Applying preprocessor: {preprocessor.__class__.__name__}")
+                train = preprocessor.fit_transform(train)
+                test = preprocessor.transform(test)
 
             drop_cols = major_oxides + ["Sample Name", "ID"]
 
@@ -299,7 +300,7 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 @app.command(name="test", help="Test the PLS-SM models.")
-def test(experiment_id: str, outlier_removal: bool = True, additional_info: str = ""):
+def test(experiment_id: str, outlier_removal: bool = True, additional_info: str = "", preprocessors = None):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
     no_or = "" if outlier_removal else "NO-OR"
@@ -324,15 +325,20 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
     )
 
     Y = test_processed[major_oxides]
-    drop_cols = major_oxides + ["Sample Name", "ID"]
+    #drop_cols = major_oxides + ["Sample Name", "ID"]
 
     target_predictions = pd.DataFrame(test_processed[["Sample Name", "ID"]])
 
     n1_scaler = Norm1Scaler()
     n3_scaler = Norm3Scaler()
 
-    X_test_n1 = n1_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
-    X_test_n3 = n3_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
+    X_test_n1 = n1_scaler.fit_transform(test_processed)
+    X_test_n3 = n3_scaler.fit_transform(test_processed)
+
+    for preprocessor in preprocessors:
+        logger.debug(f"Applying preprocessor: {preprocessor.__class__.__name__}")
+        X_test_n1 = preprocessor.transform(X_test_n1)
+        X_test_n3 = preprocessor.transform(X_test_n3)
 
     save_path = Path("data/data/PLS_SM/")
     predictions_save_path = save_path / "predictions"
@@ -380,12 +386,15 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
 
 @app.command(name="full_run", help="Run the full PLS-SM pipeline.")
 def full_run(outlier_removal: bool = True, additional_info: str = "", outlier_removal_constraint_iteration: int = -1):
+    variance_threshold = VarTrim(VarTrim.ThresholdLevel.LOW)
+    
     experiment = train(
         outlier_removal=outlier_removal,
         additional_info=additional_info,
         outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
+        preprocessors=[variance_threshold]
     )
-    test(experiment.experiment_id, outlier_removal=outlier_removal, additional_info=additional_info)
+    test(experiment.experiment_id, outlier_removal=outlier_removal, additional_info=additional_info, preprocessors=[variance_threshold])
 
 
 if __name__ == "__main__":
