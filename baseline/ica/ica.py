@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 import mlflow
 import numpy as np
@@ -10,8 +10,6 @@ import typer
 from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from typing import List
-
 from ica.data_processing import ICASampleProcessor
 from ica.jade import JADE
 from lib.config import AppConfig
@@ -37,7 +35,7 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     _experiment_id = mlflow.create_experiment(
         f"ICA_TRAIN_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
     )
-    experiment = mlflow.set_experiment(_experiment_id)
+    experiment = mlflow.set_experiment(experiment_id=_experiment_id)
     mlflow.autolog()
 
     id_col = ica_df_n1["id"]
@@ -112,8 +110,6 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
 
     for oxide, rmse in oxide_rmses.items():
         print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
-
-    target_predictions.to_csv("./data/_preformatted_ica/TRAIN_tar_pred.csv")
 
     return experiment
 
@@ -204,11 +200,6 @@ def test(
     for oxide, pred in oxide_preds.items():
         target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
 
-    tar_pred_path = Path("./data/_preformatted_ica/tar_pred.csv")
-    target_predictions.to_csv(tar_pred_path)
-    mlflow.log_artifact(str(tar_pred_path))
-    mlflow.log_table(target_predictions, "target_predictions")
-
     return target_predictions
 
 
@@ -245,7 +236,7 @@ def _get_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
     output_dir = Path(
-        f"./data/_preformatted_ica/norm{norm.value}{'-test' if isTest else ''}"
+        f"{config.data_cache_dir}/_preformatted_ica/norm{norm.value}{'-test' if isTest else ''}"
     )
 
     ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
@@ -259,7 +250,7 @@ def _get_data(
         print("No preprocessed data found. Creating and saving preprocessed data...")
         output_dir.mkdir(parents=True, exist_ok=True)
         ica_df, compositions_df = create_processed_data(
-            calib_data_path, num_components=num_components, norm=norm
+            calib_data_path, num_components=num_components, norm=norm, isTest=isTest
         )
         ica_df.to_csv(ica_df_csv_loc)
         compositions_df.to_csv(compositions_csv_loc)

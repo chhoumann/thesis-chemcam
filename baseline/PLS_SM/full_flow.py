@@ -16,6 +16,7 @@ from tqdm import tqdm
 from lib import full_flow_dataloader
 
 # from config import logger
+from lib.config import AppConfig
 from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.outlier_removal import (
     calculate_leverage_residuals,
@@ -37,7 +38,8 @@ from PLS_SM.inference import predict_composition_with_blending
 simplefilter(action="ignore", category=FutureWarning)
 
 logger = logging.getLogger("train")
-mlflow.set_tracking_uri("http://localhost:5000")
+config = AppConfig()
+mlflow.set_tracking_uri(config.mlflow_tracking_uri)
 
 
 app = typer.Typer()
@@ -321,7 +323,9 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 @app.command(name="test", help="Test the PLS-SM models.")
-def test(experiment_id: str, outlier_removal: bool = True, additional_info: str = "") -> pd.DataFrame:
+def test(
+    experiment_id: str, outlier_removal: bool = True, additional_info: str = ""
+) -> pd.DataFrame:
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
     no_or = "" if outlier_removal else "NO-OR"
@@ -356,12 +360,6 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
     X_test_n1 = n1_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
     X_test_n3 = n3_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
 
-    save_path = Path("data/data/PLS_SM/")
-    predictions_save_path = save_path / "predictions"
-    tar_pred_path = predictions_save_path / "tar_pred.csv"
-
-    predictions_save_path.mkdir(parents=True, exist_ok=True)
-
     with mlflow.start_run(run_name="PLS-SM Test"):
         for oxide in tqdm(major_oxides, desc="Predicting oxides"):
             _oxide_ranges = oxide_ranges.get(oxide, None)
@@ -377,7 +375,6 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
 
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
-            pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
 
             # Check for NaNs in Y[oxide]
             nan_in_Y = Y[oxide].isna()
@@ -396,10 +393,6 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
             mlflow.log_metric(f"RMSEP_{oxide}", float(rmsep))
 
             target_predictions[oxide] = pred
-
-        target_predictions.to_csv(tar_pred_path)
-        mlflow.log_artifact(str(tar_pred_path))
-        mlflow.log_table(target_predictions, "target_predictions")
 
         return target_predictions
 
