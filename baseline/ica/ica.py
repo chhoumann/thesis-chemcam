@@ -4,8 +4,8 @@ from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
-import tqdm
 import typer
+from tqdm import tqdm
 from sklearn.decomposition import FastICA
 from ica.data_processing import load_composition_df_for_sample, preprocess, postprocess
 from ica.jade import JADE
@@ -135,7 +135,7 @@ def _create_processed_data(
     # Prepare samples for parallel processing
     sample_details_list = []
 
-    for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
+    for sample_name in tqdm(list(os.listdir(calib_data_path))):
         split_info_sample_row = test_train_split_idx[
             test_train_split_idx["sample_name"] == sample_name
         ]["train_test"]
@@ -164,6 +164,7 @@ def _create_processed_data(
             ica_estimated_sources = run_ica(
                 df, model=ica_model, num_components=num_components
             )
+
             sample_details_list.append(
                 (
                     df,
@@ -176,22 +177,26 @@ def _create_processed_data(
             )
 
     # Post process the data in parallel
-    with ThreadPoolExecutor() as executor:
-        futures = [
-            executor.submit(parallel_postprocess, detail)
-            for detail in sample_details_list
-        ]
+    print("Post processing preprocessed data...")
 
-        for future in as_completed(futures):
-            try:
+    with tqdm(total=len(sample_details_list)) as pbar:
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(parallel_postprocess, detail)
+                for detail in sample_details_list
+            ]
+
+            for future in as_completed(futures):
                 ic_wavelengths, filtered_compositions_df = future.result()
                 ic_wavelengths_list.append(ic_wavelengths)
                 filtered_compositions_list.append(filtered_compositions_df)
-            except Exception as exc:
-                print(f"Generated an exception: {exc}")
+                pbar.update(1)
 
+    print("Merging preprocessed data...")
     ica_df = _merge_preprocessed_dfs(ic_wavelengths_list)
     compositions_df = _merge_preprocessed_dfs(filtered_compositions_list)
+
+    print(f"Finished processing {len(ica_df)} samples.")
 
     return ica_df, compositions_df
 
