@@ -14,20 +14,46 @@ from lib.config import AppConfig
 from lib.norms import Norm
 from lib.utils import get_train_test_split
 
+app = typer.Typer()
 config = AppConfig()
+
+
+@app.command(name="run", help="Runs train & test for ICA")
+def run():
+    # Train
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=False
+    )
+
+    train_experiment = train(
+        ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3
+    )
+
+    # Test
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=True
+    )
+
+    return test(
+        ica_df_n1,
+        ica_df_n3,
+        compositions_df_n1,
+        compositions_df_n3,
+        train_experiment.experiment_id,
+    )
 
 
 def get_data(is_test_run: bool):
     exclude_columns_abs = ["ID", "Sample Name"]
 
-    ica_df_n1, compositions_df_n1 = _get_data(
+    ica_df_n1, compositions_df_n1 = _get_data_for_norm(
         num_components=8, norm=Norm.NORM_1, is_test_run=is_test_run
     )
     temp_df = ica_df_n1.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n1_abs = pd.concat([ica_df_n1[exclude_columns_abs], temp_df], axis=1)
 
-    ica_df_n3, compositions_df_n3 = _get_data(
+    ica_df_n3, compositions_df_n3 = _get_data_for_norm(
         num_components=8, norm=Norm.NORM_3, is_test_run=is_test_run
     )
     temp_df = ica_df_n3.drop(columns=exclude_columns_abs)
@@ -45,7 +71,7 @@ def get_data(is_test_run: bool):
     return ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3
 
 
-def _get_data(
+def _get_data_for_norm(
     num_components: int, norm: Norm, is_test_run: bool
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
@@ -62,13 +88,15 @@ def _get_data(
         compositions_df = pd.read_csv(compositions_csv_loc)
     else:
         print("No preprocessed data found. Creating and saving preprocessed data...")
+
         output_dir.mkdir(parents=True, exist_ok=True)
-        ica_df, compositions_df = create_processed_data(
+        ica_df, compositions_df = _create_processed_data(
             calib_data_path,
             num_components=num_components,
             norm=norm,
             is_test_run=is_test_run,
         )
+
         ica_df.to_csv(ica_df_csv_loc, index=False)
         compositions_df.to_csv(compositions_csv_loc, index=False)
 
@@ -79,7 +107,7 @@ def _get_data(
     return ica_df, compositions_df
 
 
-def create_processed_data(
+def _create_processed_data(
     calib_data_path: Path,
     ica_model: str = "jade",
     num_components: int = 8,
@@ -156,13 +184,6 @@ def create_processed_data(
     return ica_df, compositions_df
 
 
-def _merge_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
-    df = pd.concat(dfs)
-    df = df.apply(pd.to_numeric, errors="ignore")
-
-    return df
-
-
 def run_ica(
     df: pd.DataFrame, model: str = "jade", num_components: int = 8
 ) -> np.ndarray:
@@ -212,32 +233,11 @@ def run_ica(
     return estimated_sources
 
 
-app = typer.Typer()
+def _merge_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
+    df = pd.concat(dfs)
+    df = df.apply(pd.to_numeric, errors="ignore")
 
-
-@app.command(name="run", help="Runs train & test for ICA")
-def run():
-    # Train
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
-        is_test_run=False
-    )
-
-    train_experiment = train(
-        ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3
-    )
-
-    # Test
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
-        is_test_run=True
-    )
-
-    return test(
-        ica_df_n1,
-        ica_df_n3,
-        compositions_df_n1,
-        compositions_df_n3,
-        train_experiment.experiment_id,
-    )
+    return df
 
 
 if __name__ == "__main__":
