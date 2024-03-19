@@ -39,7 +39,9 @@ def align_predictions(pls_tar_pred, ica_tar_pred) -> pd.DataFrame:
     pls_tar_pred.set_index("Sample Name", inplace=True)
 
     return pd.merge(
-        ica_tar_pred, pls_tar_pred, left_index=True, right_index=True, how="inner"
+        ica_tar_pred, pls_tar_pred, left_index=True, 
+        right_index=True, how="inner", on=["Sample Name", "ID"],
+        suffixes=('_ICA', '_PLS_SM')
     )
 
 
