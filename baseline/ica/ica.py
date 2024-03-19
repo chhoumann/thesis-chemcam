@@ -113,8 +113,6 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     for oxide, rmse in oxide_rmses.items():
         print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
 
-    target_predictions.to_csv(f"{config.data_cache_dir}/ica_predictions.csv")
-
     return experiment
 
 
@@ -206,8 +204,6 @@ def test(
 
     for oxide, pred in oxide_preds.items():
         target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
-
-    target_predictions.to_csv(f"{config.data_cache_dir}/ica_predictions.csv")
 
     return target_predictions
 
