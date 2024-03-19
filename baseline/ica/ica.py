@@ -14,6 +14,7 @@ from lib.data_handling import CompositionData
 from lib.config import AppConfig
 from lib.norms import Norm
 from lib.utils import get_train_test_split
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 app = typer.Typer()
 config = AppConfig()
@@ -130,6 +131,10 @@ def _create_processed_data(
     missing = []
 
     desired_dataset = "test" if is_test_run else "train"
+
+    # Prepare samples for parallel processing
+    sample_details_list = []
+
     for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
         split_info_sample_row = test_train_split_idx[
             test_train_split_idx["sample_name"] == sample_name
@@ -137,16 +142,12 @@ def _create_processed_data(
 
         if split_info_sample_row.empty:
             print(
-                f"""No split info found for {
-                sample_name}. Likely has missing data or is not used in calib2015."""
+                f"No split info found for {sample_name}. Likely has missing data or is not used in calib2015."
             )
             missing.append(sample_name)
             continue
 
-        isSampleNotInSet = split_info_sample_row.values[0] != desired_dataset
-
-        if isSampleNotInSet:
-            # print(f"Skipping {sample_name}... Not in {desired_dataset} set.")
+        if split_info_sample_row.values[0] != desired_dataset:
             not_in_set.append(sample_name)
             continue
 
@@ -160,27 +161,61 @@ def _create_processed_data(
         dfs = preprocess(sample_name, calib_data_path, average_location_datasets, norm)
 
         for sample_id, df in dfs:
-            # Run ICA for each location in sample and get the estimated sources
             ica_estimated_sources = run_ica(
                 df, model=ica_model, num_components=num_components
             )
-
-            # Postprocess the data
-            ic_wavelengths, filtered_compositions_df = postprocess(
-                df, compositions_df, ica_estimated_sources, sample_id, num_components
+            sample_details_list.append(
+                (
+                    df,
+                    compositions_df,
+                    ica_estimated_sources,
+                    sample_name,
+                    sample_id,
+                    num_components,
+                )
             )
 
-            # Add the sample name and ID to the ICA DataFrame
-            ic_wavelengths["Sample Name"] = sample_name
-            ic_wavelengths["ID"] = sample_id
+    # Post process the data in parallel
+    with ThreadPoolExecutor() as executor:
+        futures = [
+            executor.submit(parallel_postprocess, detail)
+            for detail in sample_details_list
+        ]
 
-            ic_wavelengths_list.append(ic_wavelengths)
-            filtered_compositions_list.append(filtered_compositions_df)
+        for future in as_completed(futures):
+            try:
+                ic_wavelengths, filtered_compositions_df = future.result()
+                ic_wavelengths_list.append(ic_wavelengths)
+                filtered_compositions_list.append(filtered_compositions_df)
+            except Exception as exc:
+                print(f"Generated an exception: {exc}")
 
     ica_df = _merge_preprocessed_dfs(ic_wavelengths_list)
     compositions_df = _merge_preprocessed_dfs(filtered_compositions_list)
 
     return ica_df, compositions_df
+
+
+# Post processing function to be run in parallel
+def parallel_postprocess(
+    details: Tuple[str, pd.DataFrame, pd.DataFrame, np.ndarray, str, int]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    (
+        df,
+        compositions_df,
+        ica_estimated_sources,
+        sample_name,
+        sample_id,
+        num_components,
+    ) = details
+
+    ic_wavelengths, filtered_compositions_df = postprocess(
+        df, compositions_df, ica_estimated_sources, sample_id, num_components
+    )
+    ic_wavelengths["Sample Name"] = sample_name
+    ic_wavelengths["ID"] = sample_id
+
+    return ic_wavelengths, filtered_compositions_df
 
 
 def run_ica(
