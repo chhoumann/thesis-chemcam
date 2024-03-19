@@ -21,14 +21,14 @@ def get_data(is_test_run: bool):
     exclude_columns_abs = ["ID", "Sample Name"]
 
     ica_df_n1, compositions_df_n1 = _get_data(
-        num_components=8, norm=Norm.NORM_1, isTest=is_test_run
+        num_components=8, norm=Norm.NORM_1, is_test=is_test_run
     )
     temp_df = ica_df_n1.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n1_abs = pd.concat([ica_df_n1[exclude_columns_abs], temp_df], axis=1)
 
     ica_df_n3, compositions_df_n3 = _get_data(
-        num_components=8, norm=Norm.NORM_3, isTest=is_test_run
+        num_components=8, norm=Norm.NORM_3, is_test=is_test_run
     )
     temp_df = ica_df_n3.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
@@ -46,11 +46,11 @@ def get_data(is_test_run: bool):
 
 
 def _get_data(
-    num_components: int, norm: Norm, isTest: bool
+    num_components: int, norm: Norm, is_test: bool
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
     output_dir = Path(
-        f"{config.data_cache_dir}/_preformatted_ica/norm{norm.value}{'-test' if isTest else ''}"
+        f"{config.data_cache_dir}/_preformatted_ica/norm{norm.value}{'-test' if is_test else ''}"
     )
 
     ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
@@ -64,7 +64,7 @@ def _get_data(
         print("No preprocessed data found. Creating and saving preprocessed data...")
         output_dir.mkdir(parents=True, exist_ok=True)
         ica_df, compositions_df = create_processed_data(
-            calib_data_path, num_components=num_components, norm=norm, isTest=isTest
+            calib_data_path, num_components=num_components, norm=norm, is_test=is_test
         )
         ica_df.to_csv(ica_df_csv_loc, index=False)
         compositions_df.to_csv(compositions_csv_loc, index=False)
@@ -81,7 +81,7 @@ def create_processed_data(
     ica_model: str = "jade",
     num_components: int = 8,
     norm: Norm = Norm.NORM_3,
-    isTest: bool = False,
+    is_test: bool = False,
     average_location_datasets: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     composition_data_loc = config.composition_data_path
@@ -97,7 +97,7 @@ def create_processed_data(
     not_in_set = []
     missing = []
 
-    desired_dataset = "test" if isTest else "train"
+    desired_dataset = "test" if is_test else "train"
     for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
         split_info_sample_row = test_train_split_idx[
             test_train_split_idx["sample_name"] == sample_name
