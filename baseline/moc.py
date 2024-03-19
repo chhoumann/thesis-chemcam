@@ -31,7 +31,7 @@ def run_ica_pls_for_predictions_on_full_data() -> Tuple[pd.DataFrame, pd.DataFra
 
 def align_predictions(pls_tar_pred, ica_tar_pred) -> pd.DataFrame:
     logger.info("Aligning predictions")
-    ica_tar_pred["Sample Name"] = ica_tar_pred["Sample Name"].apply(
+    ica_tar_pred["Sample Name"] = ica_tar_pred["target"].apply(
         lambda x: x.split("_")[0]
     )
 
