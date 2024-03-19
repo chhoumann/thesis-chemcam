@@ -7,11 +7,9 @@ from lib.full_flow_dataloader import load_train_test_data
 from lib.config import AppConfig
 from lib.norms import Norm
 from sklearn.linear_model import LinearRegression
-from lib.data_handling import CompositionData
 from sklearn.metrics import mean_squared_error
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 from mlflow.entities import Experiment
-from train_test_split import get_all_samples
 
 model_configs = {
     "SiO2": {"law": "Log-square", "norm": Norm.NORM_1},
@@ -35,11 +33,9 @@ def train(
 ) -> Experiment:
     experiment = _setup_mlflow_experiment("TRAIN")
 
-    id_col, sample_name_col = _setup(ica_df_n1, ica_df_n3)
-
-    target_predictions = pd.DataFrame(compositions_df_n1.index)
-    target_predictions["ID"] = id_col
-    target_predictions["Sample Name"] = sample_name_col
+    target_predictions = _get_target_predictions_df(
+        ica_df_n1, ica_df_n3, compositions_df_n1.index
+    )
 
     oxide_rmses = {}
 
@@ -80,6 +76,7 @@ def train(
             rmse = np.sqrt(mean_squared_error(y_test, pred))
 
             oxide_rmses[oxide] = rmse
+            target_predictions[oxide] = pd.Series(pred)
 
             mlflow.log_metric("RMSE", float(rmse))
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
@@ -100,11 +97,7 @@ def test(
     models = _get_ica_models(experiment_id)
     _setup_mlflow_experiment("TEST")
 
-    id_col, sample_name_col = _setup(ica_df_n1, ica_df_n3)
-
-    target_predictions = pd.DataFrame()
-    target_predictions["ID"] = id_col
-    target_predictions["Sample Name"] = sample_name_col
+    target_predictions = _get_target_predictions_df(ica_df_n1, ica_df_n3)
 
     oxide_rmses = {}
     oxide_preds = {}
@@ -158,8 +151,10 @@ def _setup_mlflow_experiment(mode: str) -> Experiment:
     return experiment
 
 
-def _setup(
-    ica_df_n1: pd.DataFrame, ica_df_n3: pd.DataFrame
+def _get_target_predictions_df(
+    ica_df_n1: pd.DataFrame,
+    ica_df_n3: pd.DataFrame,
+    index: Optional[pd.Index] = None,
 ) -> Tuple[pd.Series, pd.Series]:
     id_col = ica_df_n1["ID"]
     sample_name_col = ica_df_n1["Sample Name"]
@@ -167,7 +162,11 @@ def _setup(
     ica_df_n1.drop(columns=["ID", "Sample Name"], inplace=True)
     ica_df_n3.drop(columns=["ID", "Sample Name"], inplace=True)
 
-    return id_col, sample_name_col
+    target_predictions = pd.DataFrame(index)
+    target_predictions["ID"] = id_col
+    target_predictions["Sample Name"] = sample_name_col
+
+    return target_predictions
 
 
 def _transform(df: pd.DataFrame, model_name: str) -> pd.DataFrame:
