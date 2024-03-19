@@ -3,7 +3,6 @@ from typing import Tuple, Optional, List
 
 import numpy as np
 import pandas as pd
-import time
 from ica.mad import identify_outliers_with_mad_iterative_multidim
 
 from lib.data_handling import (
