@@ -34,9 +34,8 @@ class ICASampleProcessor:
         self.compositions_df = None
         self.dfs = []
 
-    def try_load_composition_df(self, composition_data_loc: str) -> bool:
+    def try_load_composition_df(self, composition_data: CompositionData) -> bool:
         # Check if we have composition data for this sample
-        composition_data = CompositionData(composition_data_loc)
         composition_df = composition_data.get_composition_for_sample(self.sample_name)
 
         if composition_df.empty:

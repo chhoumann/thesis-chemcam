@@ -7,7 +7,7 @@ import pandas as pd
 import tqdm
 import typer
 from sklearn.decomposition import FastICA
-from ica.data_processing import ICASampleProcessor
+from ica.data_processing import ICASampleProcessor, CompositionData
 from ica.jade import JADE
 from ica.train_test import train, test
 from lib.config import AppConfig
@@ -115,7 +115,7 @@ def _create_processed_data(
     is_test_run: bool = False,
     average_location_datasets: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    composition_data_loc = config.composition_data_path
+    composition_data = CompositionData(config.composition_data_path)
 
     ic_wavelengths_list = []
     ica_df = pd.DataFrame()
@@ -151,9 +151,7 @@ def _create_processed_data(
 
         processor = ICASampleProcessor(sample_name, num_components)
 
-        if not processor.try_load_composition_df(
-            composition_data_loc=composition_data_loc
-        ):
+        if not processor.try_load_composition_df(composition_data):
             print(f"No composition data found for {sample_name}. Skipping.")
             missing.append(sample_name)
             continue

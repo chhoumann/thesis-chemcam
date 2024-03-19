@@ -65,7 +65,7 @@ def _run_experiment(
     if phase == "test" and models is None:
         raise ValueError("Models must be provided when testing.")
 
-    target_predictions = _get_target_predictions_df(ica_df_n1, ica_df_n3)
+    target_predictions = _create_target_predictions_df(ica_df_n1, ica_df_n3)
     oxide_rmses = {}
 
     for oxide, info in tqdm.tqdm(model_configs.items()):
@@ -92,17 +92,23 @@ def _run_experiment(
             X.fillna(0, inplace=True)
 
             if phase == "train":
+                # Training phase: fit a new model and log it
                 model = LinearRegression()
                 model.fit(X, y)
                 pred = model.predict(X)
                 mlflow.sklearn.log_model(model, f"ICA_{oxide}")
-            else:  # phase == "test"
+            else:
+                # Testing phase: use the provided models for predictions
                 pred = models[oxide].predict(X)
 
-            rmse = np.sqrt(mean_squared_error(y, pred))
-            oxide_rmses[oxide] = rmse
+            # Store predictions
             target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
 
+            # Calculate RMSE
+            rmse = np.sqrt(mean_squared_error(y, pred))
+            oxide_rmses[oxide] = rmse
+
+            # Log metrics and params
             mlflow.log_metric("RMSE", rmse)
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
@@ -122,7 +128,7 @@ def _setup_mlflow_experiment(mode: str) -> Experiment:
     return experiment
 
 
-def _get_target_predictions_df(
+def _create_target_predictions_df(
     ica_df_n1: pd.DataFrame,
     ica_df_n3: pd.DataFrame,
     index: Optional[pd.Index] = None,
