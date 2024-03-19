@@ -147,7 +147,10 @@ def _average_each_shot_across_locations(data):
 def _correlate_loadings(
     corrcols: list, icacols: list, df: pd.DataFrame
 ) -> Tuple[pd.DataFrame, list]:
-    corrdf = _calculate_corr_matrix(df, icacols, corrcols)
+    corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
+    # set all corrdf nans to 0 - they were set to 0 during masking, and
+    # .corr() sets values that don't vary to NaN
+    corrdf = corrdf.fillna(0)
     ids = []
 
     for ic_label in icacols:
@@ -158,31 +161,3 @@ def _correlate_loadings(
         ids.append(col + " (r=" + str(np.max(tmp)) + ")")
 
     return corrdf, ids
-
-
-def _calculate_corr_matrix(
-    df: pd.DataFrame, icacols: list, corrcols: list
-) -> pd.DataFrame:
-    # Identify columns with stddev = 0
-    stddev_zero_cols = df.columns[df.std() == 0]
-
-    # Exclude icacols, corrcols, and stddev_zero_cols for correlation calculation
-    valid_cols = df.columns.difference(stddev_zero_cols.union(icacols).union(corrcols))
-
-    # Calculate the correlation matrix for valid columns
-    valid_df = df[valid_cols]
-    corr_matrix = np.corrcoef(valid_df, rowvar=False)
-
-    # Convert the correlation matrix back to a DataFrame with column and index labels
-    corr_df = pd.DataFrame(corr_matrix, index=valid_cols, columns=valid_cols)
-
-    # Initialize a result DataFrame with zeros
-    result_df = pd.DataFrame(0, index=df.columns, columns=df.columns)
-
-    # Update the result DataFrame with the correlation values
-    result_df.update(corr_df)
-
-    # Drop the icacols and corrcols
-    result_df = result_df.drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
-
-    return result_df.fillna(0)
