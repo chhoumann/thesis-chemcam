@@ -3,7 +3,6 @@ import pandas as pd
 import mlflow
 import tqdm
 
-from lib.full_flow_dataloader import load_train_test_data
 from lib.config import AppConfig
 from lib.norms import Norm
 from sklearn.linear_model import LinearRegression
@@ -30,59 +29,12 @@ def train(
     ica_df_n3: pd.DataFrame,
     compositions_df_n1: pd.DataFrame,
     compositions_df_n3: pd.DataFrame,
-) -> Experiment:
+) -> pd.DataFrame:
     experiment = _setup_mlflow_experiment("TRAIN")
 
-    target_predictions = _get_target_predictions_df(
-        ica_df_n1, ica_df_n3, compositions_df_n1.index
+    _run_experiment(
+        ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, "train"
     )
-
-    oxide_rmses = {}
-
-    for oxide, info in tqdm.tqdm(model_configs.items()):
-        model_name = info["law"]
-        norm = info["norm"]
-
-        if model_name is None:
-            print(f"No model specified for {oxide}. Skipping...")
-            continue
-
-        ica_df = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-        compositions_df = (
-            compositions_df_n1 if norm == Norm.NORM_1 else compositions_df_n3
-        )
-
-        with mlflow.start_run(run_name=f"ICA_TRAIN_{oxide}"):
-            print(f"Training model {model_name} for {oxide}...")
-
-            X_train, X_test, y_train, y_test = (
-                ica_df,
-                ica_df,
-                compositions_df[oxide],
-                compositions_df[oxide],
-            )
-
-            # Transform the data
-            X_train = _transform(X_train, model_name)
-            X_test = _transform(X_test, model_name)
-
-            X_train.fillna(0, inplace=True)
-            X_test.fillna(0, inplace=True)
-
-            model = LinearRegression()
-            model.fit(X_train, y_train)
-
-            pred = model.predict(X_test)
-            rmse = np.sqrt(mean_squared_error(y_test, pred))
-
-            oxide_rmses[oxide] = rmse
-            target_predictions[oxide] = pd.Series(pred)
-
-            mlflow.log_metric("RMSE", float(rmse))
-            mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
-            mlflow.sklearn.log_model(model, f"ICA_{oxide}")
-
-    _print_rmses(oxide_rmses)
 
     return experiment
 
@@ -92,15 +44,29 @@ def test(
     ica_df_n3: pd.DataFrame,
     compositions_df_n1: pd.DataFrame,
     compositions_df_n3: pd.DataFrame,
-    experiment_id: str,
-) -> pd.DataFrame:
-    models = _get_ica_models(experiment_id)
+    train_experiment_id: str,  # Used to fetch the trained models
+) -> Experiment:
     _setup_mlflow_experiment("TEST")
+    models = _get_ica_models(train_experiment_id)
+
+    return _run_experiment(
+        ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, "test", models
+    )
+
+
+def _run_experiment(
+    ica_df_n1: pd.DataFrame,
+    ica_df_n3: pd.DataFrame,
+    compositions_df_n1: pd.DataFrame,
+    compositions_df_n3: pd.DataFrame,
+    phase: str,  # "train" or "test"
+    models: Optional[Dict[str, LinearRegression]] = None,
+) -> pd.DataFrame:
+    if phase == "test" and models is None:
+        raise ValueError("Models must be provided when testing.")
 
     target_predictions = _get_target_predictions_df(ica_df_n1, ica_df_n3)
-
     oxide_rmses = {}
-    oxide_preds = {}
 
     for oxide, info in tqdm.tqdm(model_configs.items()):
         model_name = info["law"]
@@ -115,27 +81,32 @@ def test(
             compositions_df_n1 if norm == Norm.NORM_1 else compositions_df_n3
         )
 
-        with mlflow.start_run(run_name=f"ICA_TEST_{oxide}"):
-            print(f"Testing model {model_name} for {oxide}...")
+        run_name_prefix = "ICA_TRAIN" if phase == "train" else "ICA_TEST"
 
-            X_test, y_test = ica_df, compositions_df[oxide]
+        with mlflow.start_run(run_name=f"{run_name_prefix}_{oxide}"):
+            print(f"{phase.capitalize()}ing model {model_name} for {oxide}...")
 
-            # Transform the data
-            X_test = _transform(X_test, model_name)
+            X = _transform(ica_df, model_name)
+            y = compositions_df[oxide]
 
-            pred = models[oxide].predict(X_test)
-            rmse = np.sqrt(mean_squared_error(y_test, pred))
+            X.fillna(0, inplace=True)
 
+            if phase == "train":
+                model = LinearRegression()
+                model.fit(X, y)
+                pred = model.predict(X)
+                mlflow.sklearn.log_model(model, f"ICA_{oxide}")
+            else:  # phase == "test"
+                pred = models[oxide].predict(X)
+
+            rmse = np.sqrt(mean_squared_error(y, pred))
             oxide_rmses[oxide] = rmse
-            oxide_preds[oxide] = pred
+            target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
 
-            mlflow.log_metric("RMSE", float(rmse))
+            mlflow.log_metric("RMSE", rmse)
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
     _print_rmses(oxide_rmses)
-
-    for oxide, pred in oxide_preds.items():
-        target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
 
     return target_predictions
 

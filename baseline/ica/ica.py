@@ -222,7 +222,9 @@ def run():
         is_test_run=False
     )
 
-    experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
+    train_experiment = train(
+        ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3
+    )
 
     # Test
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
@@ -234,7 +236,7 @@ def run():
         ica_df_n3,
         compositions_df_n1,
         compositions_df_n3,
-        experiment.experiment_id,
+        train_experiment.experiment_id,
     )
 
 
