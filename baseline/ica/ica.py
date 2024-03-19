@@ -7,9 +7,10 @@ import pandas as pd
 import tqdm
 import typer
 from sklearn.decomposition import FastICA
-from ica.data_processing import ICASampleProcessor, CompositionData
+from ica.data_processing import load_composition_df_for_sample, preprocess, postprocess
 from ica.jade import JADE
 from ica.train_test import train, test
+from lib.data_handling import CompositionData
 from lib.config import AppConfig
 from lib.norms import Norm
 from lib.utils import get_train_test_split
@@ -149,24 +150,24 @@ def _create_processed_data(
             not_in_set.append(sample_name)
             continue
 
-        processor = ICASampleProcessor(sample_name, num_components)
+        compositions_df = load_composition_df_for_sample(sample_name, composition_data)
 
-        if not processor.try_load_composition_df(composition_data):
+        if compositions_df is None:
             print(f"No composition data found for {sample_name}. Skipping.")
             missing.append(sample_name)
             continue
 
-        processor.preprocess(calib_data_path, average_location_datasets, norm)
+        dfs = preprocess(sample_name, calib_data_path, average_location_datasets, norm)
 
-        for sample_id, sample_data in processor.dfs:
+        for sample_id, df in dfs:
             # Run ICA for each location in sample and get the estimated sources
             ica_estimated_sources = run_ica(
-                sample_data, model=ica_model, num_components=num_components
+                df, model=ica_model, num_components=num_components
             )
 
             # Postprocess the data
-            ic_wavelengths, filtered_compositions_df = processor.postprocess(
-                ica_estimated_sources, sample_data, sample_id
+            ic_wavelengths, filtered_compositions_df = postprocess(
+                df, compositions_df, ica_estimated_sources, sample_id, num_components
             )
 
             # Add the sample name and ID to the ICA DataFrame
