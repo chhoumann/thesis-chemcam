@@ -106,7 +106,7 @@ def main():
 
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
     mlflow_experiment_id = mlflow.create_experiment(f"MOC_{timestamp}")
-    mlflow.set_experiment(mlflow_experiment_id)
+    mlflow.set_experiment(experiment_id=mlflow_experiment_id)
 
     with mlflow.start_run(run_name="MOC"):
         moc_predictions = make_moc_predictions(
