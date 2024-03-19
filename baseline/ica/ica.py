@@ -222,11 +222,12 @@ def run():
         is_test_run=False
     )
 
+    experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
+
     # Test
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=True
     )
-    experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
 
     return test(
         ica_df_n1,

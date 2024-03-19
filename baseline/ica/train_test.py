@@ -3,11 +3,15 @@ import pandas as pd
 import mlflow
 import tqdm
 
+from lib.full_flow_dataloader import load_train_test_data
 from lib.config import AppConfig
 from lib.norms import Norm
 from sklearn.linear_model import LinearRegression
+from lib.data_handling import CompositionData
 from sklearn.metrics import mean_squared_error
-from typing import Dict
+from typing import Dict, Tuple
+from mlflow.entities import Experiment
+from train_test_split import get_all_samples
 
 model_configs = {
     "SiO2": {"law": "Log-square", "norm": Norm.NORM_1},
@@ -23,25 +27,21 @@ model_configs = {
 config = AppConfig()
 
 
-def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
-    mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment(
-        f"ICA_TRAIN_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
-    )
-    experiment = mlflow.set_experiment(experiment_id=_experiment_id)
-    mlflow.autolog()
+def train(
+    ica_df_n1: pd.DataFrame,
+    ica_df_n3: pd.DataFrame,
+    compositions_df_n1: pd.DataFrame,
+    compositions_df_n3: pd.DataFrame,
+) -> Experiment:
+    experiment = _setup_mlflow_experiment("TRAIN")
 
-    id_col = ica_df_n1["ID"]
-    sample_name_col = ica_df_n1["Sample Name"]
-
-    ica_df_n1.drop(columns=["ID", "Sample Name"], inplace=True)
-    ica_df_n3.drop(columns=["ID", "Sample Name"], inplace=True)
-
-    oxide_rmses = {}
+    id_col, sample_name_col = _setup(ica_df_n1, ica_df_n3)
 
     target_predictions = pd.DataFrame(compositions_df_n1.index)
     target_predictions["ID"] = id_col
     target_predictions["Sample Name"] = sample_name_col
+
+    oxide_rmses = {}
 
     for oxide, info in tqdm.tqdm(model_configs.items()):
         model_name = info["law"]
@@ -51,40 +51,24 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
             print(f"No model specified for {oxide}. Skipping...")
             continue
 
+        ica_df = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
+        compositions_df = (
+            compositions_df_n1 if norm == Norm.NORM_1 else compositions_df_n3
+        )
+
         with mlflow.start_run(run_name=f"ICA_TRAIN_{oxide}"):
             print(f"Training model {model_name} for {oxide}...")
 
-            X_train = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_train = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
+            X_train, X_test, y_train, y_test = (
+                ica_df,
+                ica_df,
+                compositions_df[oxide],
+                compositions_df[oxide],
             )
 
-            X_test = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_test = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
-
-            if model_name == "Exponential" or model_name == "Log-square":
-                if model_name == "Log-square":
-                    X_train = X_train**2
-                    X_test = X_test**2
-
-                X_train = np.log(X_train)
-                X_test = np.log(X_test)
-
-                # turn -inf to 0
-                X_train[X_train == -np.inf] = 0
-                X_test[X_test == -np.inf] = 0
-            elif model_name == "Geometric":
-                X_train = np.sqrt(X_train)
-                X_test = np.sqrt(X_test)
-            elif model_name == "Parabolic":
-                X_train = X_train**2
-                X_test = X_test**2
+            # Transform the data
+            X_train = _transform(X_train, model_name)
+            X_test = _transform(X_test, model_name)
 
             X_train.fillna(0, inplace=True)
             X_test.fillna(0, inplace=True)
@@ -96,39 +80,35 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
             rmse = np.sqrt(mean_squared_error(y_test, pred))
 
             oxide_rmses[oxide] = rmse
-            target_predictions[oxide] = pd.Series(pred)
 
             mlflow.log_metric("RMSE", float(rmse))
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
-
             mlflow.sklearn.log_model(model, f"ICA_{oxide}")
 
-    for oxide, rmse in oxide_rmses.items():
-        print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
+    _print_rmses(oxide_rmses)
 
     return experiment
 
 
 def test(
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, experiment_id: str
-):
-    models = get_ica_models(experiment_id)
+    ica_df_n1: pd.DataFrame,
+    ica_df_n3: pd.DataFrame,
+    compositions_df_n1: pd.DataFrame,
+    compositions_df_n3: pd.DataFrame,
+    experiment_id: str,
+) -> pd.DataFrame:
+    models = _get_ica_models(experiment_id)
+    _setup_mlflow_experiment("TEST")
 
-    id_col = ica_df_n1["ID"]
-    sample_name_col = ica_df_n1["Sample Name"]
+    id_col, sample_name_col = _setup(ica_df_n1, ica_df_n3)
 
-    ica_df_n1.drop(columns=["ID", "Sample Name"], inplace=True)
-    ica_df_n3.drop(columns=["ID", "Sample Name"], inplace=True)
-
-    mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment(
-        f"ICA_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
-    )
-    mlflow.set_experiment(experiment_id=_experiment_id)
-    mlflow.autolog()
+    target_predictions = pd.DataFrame()
+    target_predictions["ID"] = id_col
+    target_predictions["Sample Name"] = sample_name_col
 
     oxide_rmses = {}
     oxide_preds = {}
+
     for oxide, info in tqdm.tqdm(model_configs.items()):
         model_name = info["law"]
         norm = info["norm"]
@@ -137,28 +117,18 @@ def test(
             print(f"No model specified for {oxide}. Skipping...")
             continue
 
+        ica_df = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
+        compositions_df = (
+            compositions_df_n1 if norm == Norm.NORM_1 else compositions_df_n3
+        )
+
         with mlflow.start_run(run_name=f"ICA_TEST_{oxide}"):
             print(f"Testing model {model_name} for {oxide}...")
 
-            X_test = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_test = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
+            X_test, y_test = ica_df, compositions_df[oxide]
 
-            if model_name == "Exponential" or model_name == "Log-square":
-                if model_name == "Log-square":
-                    X_test = X_test**2
-
-                X_test = np.log(X_test)
-
-                # turn -inf to 0
-                X_test[X_test == -np.inf] = 0
-            elif model_name == "Geometric":
-                X_test = np.sqrt(X_test)
-            elif model_name == "Parabolic":
-                X_test = X_test**2
+            # Transform the data
+            X_test = _transform(X_test, model_name)
 
             pred = models[oxide].predict(X_test)
             rmse = np.sqrt(mean_squared_error(y_test, pred))
@@ -169,11 +139,7 @@ def test(
             mlflow.log_metric("RMSE", float(rmse))
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
-    for oxide, rmse in oxide_rmses.items():
-        print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
-
-    target_predictions = pd.DataFrame()
-    target_predictions["ID"] = id_col
+    _print_rmses(oxide_rmses)
 
     for oxide, pred in oxide_preds.items():
         target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
@@ -181,7 +147,51 @@ def test(
     return target_predictions
 
 
-def get_ica_models(experiment_id: str) -> Dict[str, LinearRegression]:
+def _setup_mlflow_experiment(mode: str) -> Experiment:
+    mlflow.set_tracking_uri(config.mlflow_tracking_uri)
+    _experiment_id = mlflow.create_experiment(
+        f"ICA_{mode}_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}"
+    )
+    experiment = mlflow.set_experiment(experiment_id=_experiment_id)
+    mlflow.autolog()
+
+    return experiment
+
+
+def _setup(
+    ica_df_n1: pd.DataFrame, ica_df_n3: pd.DataFrame
+) -> Tuple[pd.Series, pd.Series]:
+    id_col = ica_df_n1["ID"]
+    sample_name_col = ica_df_n1["Sample Name"]
+
+    ica_df_n1.drop(columns=["ID", "Sample Name"], inplace=True)
+    ica_df_n3.drop(columns=["ID", "Sample Name"], inplace=True)
+
+    return id_col, sample_name_col
+
+
+def _transform(df: pd.DataFrame, model_name: str) -> pd.DataFrame:
+    if model_name == "Exponential" or model_name == "Log-square":
+        if model_name == "Log-square":
+            df = df**2
+
+        # turn -inf to 0
+        df = np.log(df)
+        df[df == -np.inf] = 0
+    elif model_name == "Geometric":
+        df = np.sqrt(df)
+    elif model_name == "Parabolic":
+        df = df**2
+
+    return df
+
+
+def _print_rmses(oxide_rmses: Dict[str, float]):
+    for oxide, rmse in oxide_rmses.items():
+        print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
+
+
+def _get_ica_models(experiment_id: str) -> Dict[str, LinearRegression]:
     models = {}
     runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
