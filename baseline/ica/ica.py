@@ -127,9 +127,6 @@ def _create_processed_data(
 
     test_train_split_idx = get_train_test_split()
 
-    not_in_set = []
-    missing = []
-
     desired_dataset = "test" if is_test_run else "train"
 
     # Prepare samples for parallel processing
@@ -144,18 +141,15 @@ def _create_processed_data(
             print(
                 f"No split info found for {sample_name}. Likely has missing data or is not used in calib2015."
             )
-            missing.append(sample_name)
             continue
 
         if split_info_sample_row.values[0] != desired_dataset:
-            not_in_set.append(sample_name)
             continue
 
         compositions_df = load_composition_df_for_sample(sample_name, composition_data)
 
         if compositions_df is None:
             print(f"No composition data found for {sample_name}. Skipping.")
-            missing.append(sample_name)
             continue
 
         dfs = preprocess(sample_name, calib_data_path, average_location_datasets, norm)
