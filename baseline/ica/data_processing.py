@@ -147,7 +147,6 @@ def _average_each_shot_across_locations(data):
 def _correlate_loadings(
     corrcols: list, icacols: list, df: pd.DataFrame
 ) -> Tuple[pd.DataFrame, list]:
-    t = time.time()
     corrdf = _calculate_corr_matrix(df, icacols, corrcols)
     ids = []
 
