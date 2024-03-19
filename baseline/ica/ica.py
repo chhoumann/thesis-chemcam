@@ -38,15 +38,17 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     experiment = mlflow.set_experiment(experiment_id=_experiment_id)
     mlflow.autolog()
 
-    id_col = ica_df_n1["id"]
+    id_col = ica_df_n1["ID"]
+    sample_name_col = ica_df_n1["Sample Name"]
 
-    ica_df_n1.drop(columns=["id"], inplace=True)
-    ica_df_n3.drop(columns=["id"], inplace=True)
+    ica_df_n1.drop(columns=["ID", "Sample Name"], inplace=True)
+    ica_df_n3.drop(columns=["ID", "Sample Name"], inplace=True)
 
     oxide_rmses = {}
 
     target_predictions = pd.DataFrame(compositions_df_n1.index)
-    target_predictions["id"] = id_col
+    target_predictions["ID"] = id_col
+    target_predictions["Sample Name"] = sample_name_col
 
     for oxide, info in tqdm.tqdm(model_configs.items()):
         model_name = info["law"]
@@ -111,6 +113,8 @@ def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
     for oxide, rmse in oxide_rmses.items():
         print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
 
+    target_predictions.to_csv(f"{config.data_cache_dir}/ica_predictions.csv")
+
     return experiment
 
 
@@ -139,9 +143,11 @@ def test(
 ):
     models = get_ica_models(experiment_id)
 
-    id_col = ica_df_n1["id"]
-    ica_df_n1.drop(columns=["id"], inplace=True)
-    ica_df_n3.drop(columns=["id"], inplace=True)
+    id_col = ica_df_n1["ID"]
+    sample_name_col = ica_df_n1["Sample Name"]
+
+    ica_df_n1.drop(columns=["ID", "Sample Name"], inplace=True)
+    ica_df_n3.drop(columns=["ID", "Sample Name"], inplace=True)
 
     mlflow.set_tracking_uri(config.mlflow_tracking_uri)
     _experiment_id = mlflow.create_experiment(
@@ -197,14 +203,17 @@ def test(
 
     target_predictions = pd.DataFrame()
     target_predictions["ID"] = id_col
+
     for oxide, pred in oxide_preds.items():
         target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
+
+    target_predictions.to_csv(f"{config.data_cache_dir}/ica_predictions.csv")
 
     return target_predictions
 
 
 def get_data(is_test_run: bool):
-    exclude_columns_abs = ["id"]
+    exclude_columns_abs = ["ID", "Sample Name"]
 
     ica_df_n1, compositions_df_n1 = _get_data(
         num_components=8, norm=Norm.NORM_1, isTest=is_test_run
@@ -225,7 +234,7 @@ def get_data(is_test_run: bool):
     ), "The number of rows in the two DataFrames must be equal."
 
     assert (
-        ica_df_n1_abs["id"] == ica_df_n1_abs["id"]
+        ica_df_n1_abs["ID"] == ica_df_n1_abs["ID"]
     ).all(), "The IDs of the two DataFrames must be aligned."
 
     return ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3
@@ -244,16 +253,16 @@ def _get_data(
 
     if ica_df_csv_loc.exists() and compositions_csv_loc.exists():
         print("Preprocessed data found. Loading data...")
-        ica_df = pd.read_csv(ica_df_csv_loc, index_col=0)
-        compositions_df = pd.read_csv(compositions_csv_loc, index_col=0)
+        ica_df = pd.read_csv(ica_df_csv_loc)
+        compositions_df = pd.read_csv(compositions_csv_loc)
     else:
         print("No preprocessed data found. Creating and saving preprocessed data...")
         output_dir.mkdir(parents=True, exist_ok=True)
         ica_df, compositions_df = create_processed_data(
             calib_data_path, num_components=num_components, norm=norm, isTest=isTest
         )
-        ica_df.to_csv(ica_df_csv_loc)
-        compositions_df.to_csv(compositions_csv_loc)
+        ica_df.to_csv(ica_df_csv_loc, index=False)
+        compositions_df.to_csv(compositions_csv_loc, index=False)
 
         print(
             f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
@@ -326,8 +335,9 @@ def create_processed_data(
                 ica_estimated_sources, sample_data, sample_id
             )
 
-            # Add the sample ID to the ICA DataFrame
-            ic_wavelengths["id"] = sample_id
+            # Add the sample name and ID to the ICA DataFrame
+            ic_wavelengths["Sample Name"] = sample_name
+            ic_wavelengths["ID"] = sample_id
 
             ic_wavelengths_list.append(ic_wavelengths)
             filtered_compositions_list.append(filtered_compositions_df)
@@ -340,7 +350,6 @@ def create_processed_data(
 
 def _merge_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     df = pd.concat(dfs)
-    df.index.name = "target"
     df = df.apply(pd.to_numeric, errors="ignore")
 
     return df
@@ -404,12 +413,13 @@ def run():
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=False
     )
-    experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
 
     # Test
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=True
     )
+    experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
+
     return test(
         ica_df_n1,
         ica_df_n3,

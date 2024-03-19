@@ -16,7 +16,9 @@ from lib.reproduction import masks
 
 def average_each_shot_across_locations(data):
     # Concatenate all DataFrames along the 'wave' column to calculate the mean for each shot across locations
-    all_shots = pd.concat([df.set_index("wave") for df in data.values()], axis=0, keys=range(1, 6))
+    all_shots = pd.concat(
+        [df.set_index("wave") for df in data.values()], axis=0, keys=range(1, 6)
+    )
     all_shots_mean = all_shots.groupby("wave").mean()
 
     # Reset index to include 'wave' as a column in the final DataFrame
@@ -43,29 +45,41 @@ class ICASampleProcessor:
 
         # Check if the composition data contains NaN values
         if composition_df.isnull().values.any():
-            print(f"NaN values found in composition data for {self.sample_name}. Skipping...")
+            print(
+                f"NaN values found in composition data for {self.sample_name}. Skipping..."
+            )
             return False
 
         self.composition_df = composition_df
 
         return True
 
-    def preprocess(self, calib_data_path: Path, average_locations=False, norm: Norm = Norm.NORM_1) -> None:
-        sample_data = get_preprocessed_sample_data(self.sample_name, calib_data_path, average_shots=False)
+    def preprocess(
+        self, calib_data_path: Path, average_locations=False, norm: Norm = Norm.NORM_1
+    ) -> None:
+        sample_data = get_preprocessed_sample_data(
+            self.sample_name, calib_data_path, average_shots=False
+        )
 
         dfs = []
 
         if average_locations:
-            dfs.append((self.sample_name, average_each_shot_across_locations(sample_data)))
+            dfs.append(
+                (self.sample_name, average_each_shot_across_locations(sample_data))
+            )
         else:
             for location_name, location_df in sample_data.items():
                 dfs.append((location_name, location_df))
 
         for name, data in dfs:
-            sample_id = self.sample_name if average_locations else f"{self.sample_name}_{name}"
+            sample_id = (
+                self.sample_name if average_locations else f"{self.sample_name}_{name}"
+            )
 
             # Assuming `identify_outliers_with_mad_iterative_multidim` returns indices of non-outliers.
-            non_outlier_indices, iterations = identify_outliers_with_mad_iterative_multidim(data.drop("wave", axis=1))
+            non_outlier_indices, iterations = (
+                identify_outliers_with_mad_iterative_multidim(data.drop("wave", axis=1))
+            )
 
             # Create a full boolean array with False values
             outlier_mask = np.zeros(len(data), dtype=bool)
@@ -77,7 +91,7 @@ class ICASampleProcessor:
             outlier_mask = ~outlier_mask
 
             # Create a mask for columns to apply zeroing to (all columns except 'wave').
-            columns_to_zero = data.columns != 'wave'
+            columns_to_zero = data.columns != "wave"
 
             # Set the outliers to 0
             data.loc[outlier_mask, columns_to_zero] = 0
@@ -95,7 +109,9 @@ class ICASampleProcessor:
 
             self.dfs.append((sample_id, data.transpose()))
 
-    def postprocess(self, ica_estimated_sources: np.ndarray, df: pd.DataFrame, sample_id: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def postprocess(
+        self, ica_estimated_sources: np.ndarray, df: pd.DataFrame, sample_id: str
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         columns = df.columns
 
         corrcols = [f"IC{i+1}" for i in range(self.num_components)]
@@ -111,7 +127,7 @@ class ICASampleProcessor:
         corrdf, ids = self.__correlate_loadings__(corrcols, columns, df)
 
         # Create the wavelengths matrix for each component
-        ic_wavelengths = pd.DataFrame(index=[sample_id], columns=columns)
+        ic_wavelengths = pd.DataFrame(columns=columns)
 
         for i in range(len(ids)):
             ic = ids[i].split(" ")[0]
@@ -129,7 +145,9 @@ class ICASampleProcessor:
 
     # This is a function that finds the correlation between loadings and a set of columns
     # The idea is to somewhat automate identifying which element the loading corresponds to.
-    def __correlate_loadings__(self, corrcols: list, icacols: list, df: pd.DataFrame) -> (pd.DataFrame, list):
+    def __correlate_loadings__(
+        self, corrcols: list, icacols: list, df: pd.DataFrame
+    ) -> (pd.DataFrame, list):
         corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
         # set all corrdf nans to 0 - they were set to 0 during masking, and
         # .corr() sets values that don't vary to NaN
