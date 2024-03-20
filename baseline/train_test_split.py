@@ -12,10 +12,8 @@ from lib.reproduction import folder_to_composition_sample_name, major_oxides
 
 def get_composition_for_sample(cd: pd.DataFrame, sample_name: str):
     sample_name_lower = sample_name.lower()
-    match_condition = (
-        (cd["Spectrum Name"].str.lower() == sample_name_lower)
-        | (cd["Target"].str.lower() == sample_name_lower)
-        | (cd["Sample Name"].str.lower() == sample_name_lower)
+    match_condition = (cd["Spectrum Name"].str.lower() == sample_name_lower) | (
+        cd["Sample Name"].str.lower() == sample_name_lower
     )
     composition = cd.loc[match_condition]
 

@@ -123,7 +123,9 @@ def load_data(
     return sample_data
 
 
-def load_split_data(dataset_loc: str, split_loc: Optional[str] = None, average_shots=True):
+def load_split_data(
+    dataset_loc: str, split_loc: Optional[str] = None, average_shots=True
+):
     sample_data = load_data(dataset_loc, average_shots=average_shots)
 
     train_test_split_df = get_train_test_split(split_loc)
@@ -196,7 +198,7 @@ class WavelengthMaskTransformer(BaseEstimator, TransformerMixin):
             mask_condition = (X["wave"] >= mask[0]) & (X["wave"] <= mask[1])
             for col in cols:
                 X.loc[mask_condition, col] = 0
-            
+
         return X
 
 
@@ -323,10 +325,8 @@ class CompositionData:
 
         sample_name_lower = _sample_name.lower()
         match_condition = (
-            (self.composition_data["Spectrum Name"].str.lower() == sample_name_lower)
-            | (self.composition_data["Target"].str.lower() == sample_name_lower)
-            | (self.composition_data["Sample Name"].str.lower() == sample_name_lower)
-        )
+            self.composition_data["Spectrum Name"].str.lower() == sample_name_lower
+        ) | (self.composition_data["Sample Name"].str.lower() == sample_name_lower)
         composition = self.composition_data.loc[match_condition]
 
         return composition.head(1)
