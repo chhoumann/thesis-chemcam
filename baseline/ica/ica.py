@@ -20,8 +20,8 @@ app = typer.Typer()
 config = AppConfig()
 
 
-@app.command(name="run", help="Runs train & test for ICA")
-def run():
+@app.command(name="full_run", help="Runs train & test for ICA")
+def full_run():
     # Train
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=False
@@ -31,7 +31,13 @@ def run():
         ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3
     )
 
-    # Test
+    target_predictions = test_run(train_experiment_id=train_experiment)
+
+    return target_predictions
+
+
+@app.command(name="test_run", help="Runs test for ICA")
+def test_run(train_experiment_id: str):
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=True
     )
@@ -41,7 +47,7 @@ def run():
         ica_df_n3,
         compositions_df_n1,
         compositions_df_n3,
-        train_experiment.experiment_id,
+        train_experiment_id,
     )
 
     return target_predictions

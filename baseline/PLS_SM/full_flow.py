@@ -403,16 +403,31 @@ def full_run(
     additional_info: str = "",
     outlier_removal_constraint_iteration: int = -1,
 ) -> pd.DataFrame:
+
     experiment = train(
         outlier_removal=outlier_removal,
         additional_info=additional_info,
         outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
     )
-    return test(
-        experiment.experiment_id,
+
+    target_predictions = test_run(
+        experiment.experiment_id, outlier_removal, additional_info
+    )
+
+    return target_predictions
+
+
+@app.command(name="test_run", help="Runs test PLS-SM pipeline.")
+def test_run(
+    train_experiment_id: str, outlier_removal: bool = True, additional_info: str = ""
+):
+    target_predictions = test(
+        train_experiment_id,
         outlier_removal=outlier_removal,
         additional_info=additional_info,
     )
+
+    return target_predictions
 
 
 if __name__ == "__main__":

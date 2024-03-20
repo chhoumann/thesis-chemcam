@@ -6,23 +6,33 @@ import pandas as pd
 import typer
 from sklearn.metrics import mean_squared_error
 
-from ica.ica import run as run_ica
+from ica.ica import full_run as run_ica, test_run as run_ica_test
+from PLS_SM.full_flow import full_run as run_pls, test_run as run_pls_test
+
 from lib.config import AppConfig
 from lib.data_handling import CompositionData
 from lib.reproduction import major_oxides, weighted_sum_oxide_percentages
-from PLS_SM.full_flow import full_run as run_pls
 
 logger = logging.getLogger(__name__)
 
 app = typer.Typer()
 
 
-def run_ica_pls_for_predictions_on_full_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
+def run_ica_pls_for_predictions_on_full_data(
+    pls_experiment_id: str = None, ica_experiment_id: str = None
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     logger.info("Getting predictions for PLS-SM")
-    pls_tar_pred: pd.DataFrame = run_pls()
 
+    # Run PLS-SM
+    pls_tar_pred: pd.DataFrame = (
+        run_pls() if pls_experiment_id is None else run_pls_test(pls_experiment_id)
+    )
+
+    # Run ICA
     logger.info("Getting predictions for ICA")
-    ica_tar_pred: pd.DataFrame = run_ica()
+    ica_tar_pred: pd.DataFrame = (
+        run_ica() if ica_experiment_id is None else run_ica_test(ica_experiment_id)
+    )
 
     logger.info("Finished getting predictions for PLS-SM and ICA")
 
@@ -35,8 +45,6 @@ def align_predictions(pls_tar_pred, ica_tar_pred) -> pd.DataFrame:
     return pd.merge(
         ica_tar_pred,
         pls_tar_pred,
-        left_index=True,
-        right_index=True,
         how="inner",
         on="ID",
         suffixes=("_ICA", "_PLS_SM"),
@@ -62,7 +70,6 @@ def make_moc_predictions(
             merged_df[oxide + "_ICA"] * w_ica + merged_df[oxide + "_PLS_SM"] * w_pls_sm
         )
 
-    moc_predictions["Sample Name"] = merged_df["Sample Name"]
     moc_predictions["ID"] = merged_df.index
 
     return moc_predictions
@@ -100,9 +107,12 @@ def calculate_moc_rmses(moc_predictions_and_actual: pd.DataFrame) -> Dict[str, f
 
 
 @app.command(name="run")
-def main():
+def main(pls_id: str = None, ica_id: str = None):
     logger.info("Running MOC Pipeline")
-    pls_tar_pred, ica_tar_pred = run_ica_pls_for_predictions_on_full_data()
+
+    pls_tar_pred, ica_tar_pred = run_ica_pls_for_predictions_on_full_data(
+        pls_experiment_id=pls_id, ica_experiment_id=ica_id
+    )
 
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
     mlflow_experiment_id = mlflow.create_experiment(f"MOC_{timestamp}")
