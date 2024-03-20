@@ -36,13 +36,15 @@ def run():
         is_test_run=True
     )
 
-    return test(
+    target_predictions = test(
         ica_df_n1,
         ica_df_n3,
         compositions_df_n1,
         compositions_df_n3,
         train_experiment.experiment_id,
     )
+
+    return target_predictions
 
 
 def get_data(is_test_run: bool):
