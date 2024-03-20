@@ -46,7 +46,7 @@ def align_predictions(pls_tar_pred, ica_tar_pred) -> pd.DataFrame:
         ica_tar_pred,
         pls_tar_pred,
         how="inner",
-        on="ID",
+        on=["ID", "Sample Name"],
         suffixes=("_ICA", "_PLS_SM"),
     )
 
@@ -71,6 +71,7 @@ def make_moc_predictions(
         )
 
     moc_predictions["ID"] = merged_df.index
+    moc_predictions["Sample Name"] = merged_df["Sample Name"]
 
     return moc_predictions
 

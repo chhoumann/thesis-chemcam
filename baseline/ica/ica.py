@@ -93,11 +93,14 @@ def _get_data_for_norm(
     compositions_csv_loc = Path(f"{output_dir}/composition_data.csv")
 
     if ica_df_csv_loc.exists() and compositions_csv_loc.exists():
-        print("Preprocessed data found. Loading data...")
+        print(f"Preprocessed ICA scores found for Norm {norm.value}. Loading data...")
+
         ica_df = pd.read_csv(ica_df_csv_loc)
         compositions_df = pd.read_csv(compositions_csv_loc)
     else:
-        print("No preprocessed data found. Creating and saving preprocessed data...")
+        print(
+            f"No preprocessed ICA scores found for Norm {norm.value}. Preprocessing data..."
+        )
 
         output_dir.mkdir(parents=True, exist_ok=True)
         ica_df, compositions_df = _create_processed_data(
@@ -111,7 +114,7 @@ def _get_data_for_norm(
         compositions_df.to_csv(compositions_csv_loc, index=False)
 
         print(
-            f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
+            f"Preprocessed ICA scores saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
         )
 
     return ica_df, compositions_df
