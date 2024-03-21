@@ -16,6 +16,7 @@ from tqdm import tqdm
 from lib import full_flow_dataloader
 
 # from config import logger
+from lib.config import AppConfig
 from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.outlier_removal import (
     calculate_leverage_residuals,
@@ -37,14 +38,19 @@ from PLS_SM.inference import predict_composition_with_blending
 simplefilter(action="ignore", category=FutureWarning)
 
 logger = logging.getLogger("train")
-mlflow.set_tracking_uri("http://localhost:5000")
+config = AppConfig()
+mlflow.set_tracking_uri(config.mlflow_tracking_uri)
 
 
 app = typer.Typer()
 
 
 @app.command(name="train", help="Train the PLS-SM models.")
-def train(outlier_removal: bool = True, additional_info: str = "", outlier_removal_constraint_iteration: int = -1):
+def train(
+    outlier_removal: bool = True,
+    additional_info: str = "",
+    outlier_removal_constraint_iteration: int = -1,
+):
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
@@ -81,10 +87,16 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
             n_components = training_info[oxide][compositional_range]["n_components"]
             norm = training_info[oxide][compositional_range]["normalization"]
 
-            logger.info(f"Filtering {oxide} for {compositional_range} compositional range...")
-            train = filter_data_by_compositional_range(train_processed, compositional_range, oxide, oxide_ranges)
+            logger.info(
+                f"Filtering {oxide} for {compositional_range} compositional range..."
+            )
+            train = filter_data_by_compositional_range(
+                train_processed, compositional_range, oxide, oxide_ranges
+            )
 
-            test = filter_data_by_compositional_range(test_processed, compositional_range, oxide, oxide_ranges)
+            test = filter_data_by_compositional_range(
+                test_processed, compositional_range, oxide, oxide_ranges
+            )
 
             scaler = Norm1Scaler() if norm == 1 else Norm3Scaler()
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
@@ -101,7 +113,9 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
             test = pd.DataFrame(test, columns=test_cols)
 
             with mlflow.start_run(run_name=f"{oxide}_{compositional_range}"):
-                mlflow.log_metric("paper_rmse", paper_individual_sm_rmses[compositional_range][oxide])
+                mlflow.log_metric(
+                    "paper_rmse", paper_individual_sm_rmses[compositional_range][oxide]
+                )
 
                 mlflow.log_params(
                     {
@@ -123,7 +137,9 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
 
                 pls_OR.fit(X_train_OR, y_train_OR)
 
-                current_performance = mean_squared_error(y_train_OR, pls_OR.predict(X_train_OR), squared=False)
+                current_performance = mean_squared_error(
+                    y_train_OR, pls_OR.predict(X_train_OR), squared=False
+                )
 
                 mlflow.log_metric(
                     "RMSEOR",
@@ -142,7 +158,8 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
 
                     should_calculate_constraints = (
                         outlier_removal_constraint_iteration >= 0
-                        and outlier_removal_iterations <= outlier_removal_constraint_iteration
+                        and outlier_removal_iterations
+                        <= outlier_removal_constraint_iteration
                     ) or outlier_removal_constraint_iteration < 0
 
                     if should_calculate_constraints:
@@ -173,7 +190,9 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
                         pls_OR = PLSRegression(n_components=n_components)
                         pls_OR.fit(X_train_OR, y_train_OR)
 
-                    new_performance = mean_squared_error(y_train_OR, pls_OR.predict(X_train_OR), squared=False)
+                    new_performance = mean_squared_error(
+                        y_train_OR, pls_OR.predict(X_train_OR), squared=False
+                    )
 
                     mlflow.log_metric(
                         "RMSEOR",
@@ -181,7 +200,9 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
                         step=outlier_removal_iterations,
                     )
 
-                    number_of_outliers = np.sum(outliers)  # Counting the number of True values
+                    number_of_outliers = np.sum(
+                        outliers
+                    )  # Counting the number of True values
                     mlflow.log_metric(
                         "outliers_removed",
                         float(number_of_outliers),
@@ -198,8 +219,12 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
                     current_performance = new_performance
                     best_or_model = pls_OR
 
-                mlflow.log_metric("outlier_removal_iterations", outlier_removal_iterations)
-                mlflow.sklearn.log_model(best_or_model, f"PLS_OR_{oxide}_{compositional_range}")
+                mlflow.log_metric(
+                    "outlier_removal_iterations", outlier_removal_iterations
+                )
+                mlflow.sklearn.log_model(
+                    best_or_model, f"PLS_OR_{oxide}_{compositional_range}"
+                )
 
                 # endregion
                 # region Cross-Validation
@@ -216,7 +241,7 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
                 )
 
                 fold_rmses = []
-                for i, (train_data, test_data) in enumerate(kf):
+                for i, (train_data, test_data) in enumerate(kf):  # type: ignore
                     pls_CV = PLSRegression(n_components=n_components)
                     X_train_CV = train_data.drop(columns=drop_cols).to_numpy()
                     y_train_CV = train_data[oxide].to_numpy()
@@ -237,7 +262,9 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
                 avg_rmse = np.mean(fold_rmses)
                 mlflow.log_metric("RMSECV", float(avg_rmse))
                 mlflow.log_metric("RMSECV_MIN", float(np.min(fold_rmses)))
-                mlflow.sklearn.log_model(best_CV_model, f"PLS_CV_{oxide}_{compositional_range}")
+                mlflow.sklearn.log_model(
+                    best_CV_model, f"PLS_CV_{oxide}_{compositional_range}"
+                )
                 # endregion
 
                 # region Train model on all data (outliers removed) & get RMSEP
@@ -253,7 +280,9 @@ def train(outlier_removal: bool = True, additional_info: str = "", outlier_remov
                 # y_pred = best_CV_model.predict(X_test)
                 test_rmse = mean_squared_error(y_test, y_pred, squared=False)
                 mlflow.log_metric("RMSEP", float(test_rmse))
-                mlflow.sklearn.log_model(pls_all, f"PLS_ALL_{oxide}_{compositional_range}")
+                mlflow.sklearn.log_model(
+                    pls_all, f"PLS_ALL_{oxide}_{compositional_range}"
+                )
                 # endregion
             mlflow.end_run()
 
@@ -294,7 +323,9 @@ def get_models(experiment_id: str) -> Dict[str, Dict[str, PLSRegression]]:
 
 
 @app.command(name="test", help="Test the PLS-SM models.")
-def test(experiment_id: str, outlier_removal: bool = True, additional_info: str = ""):
+def test(
+    experiment_id: str, outlier_removal: bool = True, additional_info: str = ""
+) -> pd.DataFrame:
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     timestamp = pd.Timestamp.now().strftime("%m-%d-%y_%H%M%S")
     no_or = "" if outlier_removal else "NO-OR"
@@ -329,12 +360,6 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
     X_test_n1 = n1_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
     X_test_n3 = n3_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
 
-    save_path = Path("data/data/PLS_SM/")
-    predictions_save_path = save_path / "predictions"
-    tar_pred_path = predictions_save_path / "tar_pred.csv"
-
-    predictions_save_path.mkdir(parents=True, exist_ok=True)
-
     with mlflow.start_run(run_name="PLS-SM Test"):
         for oxide in tqdm(major_oxides, desc="Predicting oxides"):
             _oxide_ranges = oxide_ranges.get(oxide, None)
@@ -343,12 +368,13 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
                 continue
 
             pred = np.array(
-                predict_composition_with_blending(oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges)
+                predict_composition_with_blending(
+                    oxide, X_test_n1, X_test_n3, models, optimized_blending_ranges
+                )
             )
 
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
-            pred_df.to_csv(predictions_save_path / f"{oxide}.csv")
 
             # Check for NaNs in Y[oxide]
             nan_in_Y = Y[oxide].isna()
@@ -368,19 +394,40 @@ def test(experiment_id: str, outlier_removal: bool = True, additional_info: str 
 
             target_predictions[oxide] = pred
 
-        target_predictions.to_csv(tar_pred_path)
-        mlflow.log_artifact(str(tar_pred_path))
-        mlflow.log_table(target_predictions, "target_predictions")
+        return target_predictions
 
 
 @app.command(name="full_run", help="Run the full PLS-SM pipeline.")
-def full_run(outlier_removal: bool = True, additional_info: str = "", outlier_removal_constraint_iteration: int = -1):
+def full_run(
+    outlier_removal: bool = True,
+    additional_info: str = "",
+    outlier_removal_constraint_iteration: int = -1,
+) -> pd.DataFrame:
+
     experiment = train(
         outlier_removal=outlier_removal,
         additional_info=additional_info,
         outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
     )
-    test(experiment.experiment_id, outlier_removal=outlier_removal, additional_info=additional_info)
+
+    target_predictions = test_run(
+        experiment.experiment_id, outlier_removal, additional_info
+    )
+
+    return target_predictions
+
+
+@app.command(name="test_run", help="Runs test PLS-SM pipeline.")
+def test_run(
+    train_experiment_id: str, outlier_removal: bool = True, additional_info: str = ""
+):
+    target_predictions = test(
+        train_experiment_id,
+        outlier_removal=outlier_removal,
+        additional_info=additional_info,
+    )
+
+    return target_predictions
 
 
 if __name__ == "__main__":
