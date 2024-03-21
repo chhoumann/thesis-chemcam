@@ -6,8 +6,8 @@ import pandas as pd
 import typer
 from sklearn.metrics import mean_squared_error
 
-from ica.ica import full_run as run_ica
-from ica.ica import test_run as run_ica_test
+from ica.main import full_run as run_ica
+from ica.main import test_run as run_ica_test
 from lib.config import AppConfig
 from lib.data_handling import CompositionData
 from lib.reproduction import major_oxides, weighted_sum_oxide_percentages
