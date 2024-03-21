@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from lib.variance_threshold import VarTrim
+from lib.variance_threshold import VarianceThresholdTrimmer
 
 
 @pytest.mark.parametrize(
@@ -41,7 +41,7 @@ def test_vartrim_variance_threshold_with_adjusted_constants(
         }
     )
 
-    transformer = VarTrim(threshold=threshold)
+    transformer = VarianceThresholdTrimmer(threshold=threshold)
     transformed_data = transformer.fit_transform(data)
 
     transformed_data = pd.DataFrame(

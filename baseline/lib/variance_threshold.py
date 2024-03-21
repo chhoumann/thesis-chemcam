@@ -2,8 +2,10 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_selection import VarianceThreshold
 
+from lib.utils import get_numeric_col_names
 
-class VarTrim(BaseEstimator, TransformerMixin):
+
+class VarianceThresholdTrimmer(BaseEstimator, TransformerMixin):
     """
     A transformer that reduces the dimensionality of data by removing features with low variance, based on a specified threshold.
 
@@ -32,7 +34,7 @@ class VarTrim(BaseEstimator, TransformerMixin):
         self.selector = None
         self.non_float_columns_ = None
 
-    def fit(self, data: pd.DataFrame):
+    def fit(self, df: pd.DataFrame):
         """
         Fits the transformer to the data by determining which features exceed the variance threshold.
 
@@ -46,26 +48,23 @@ class VarTrim(BaseEstimator, TransformerMixin):
             ValueError: If the threshold is not a ThresholdLevel or float.
         """
 
-        float_columns = data.select_dtypes(
-            include=["float64", "float32"]
-        ).columns.tolist()
+        numeric_col_names = get_numeric_col_names(df).astype(str)
 
-        non_float_columns = data.select_dtypes(
-            exclude=["float64", "float32"]
-        ).columns.tolist()
+        numeric_columns = df[numeric_col_names].columns.tolist()
+        non_numeric_columns = df.drop(columns=numeric_col_names).columns.tolist()
 
-        data_float = data[float_columns]
+        numeric_df = df[numeric_columns]
 
         self.selector = VarianceThreshold(threshold=self.threshold)
-        self.selector.fit(data_float)
-        self.features_to_keep_ = data_float.columns[
+        self.selector.fit(numeric_df)
+        self.features_to_keep_ = numeric_df.columns[
             self.selector.get_support(indices=True)
         ]
-        self.non_float_columns_ = non_float_columns
+        self.non_float_columns_ = non_numeric_columns
 
         return self
 
-    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, data: pd.DataFrame, is_test: bool = False) -> pd.DataFrame:
         """
         Transforms the data by keeping only the features that meet the variance threshold.
 

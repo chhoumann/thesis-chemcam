@@ -3,7 +3,10 @@ from typing import List, Optional, Tuple
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+
 from lib.reproduction import spectral_ranges
+from lib.utils import get_numeric_col_names
+from lib.variance_threshold import VarianceThresholdTrimmer
 
 
 class Norm(enum.Enum):
@@ -38,9 +41,7 @@ class Norm1Scaler(BaseEstimator, TransformerMixin):
         """
         Apply Norm 1 normalization to the DataFrame.
         """
-        cols = pd.to_numeric(df.columns, errors="coerce")
-        wavelength_cols = cols[~cols.isna()].astype(str)
-
+        wavelength_cols = get_numeric_col_names(df).astype(str)
         df.update(norm(df[wavelength_cols]))
 
         return df
@@ -73,18 +74,15 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         Apply Norm 3 normalization to the DataFrame.
         """
         if ranges is None:
-            ranges = spectral_ranges.values() # type: ignore
+            ranges = spectral_ranges.values()  # type: ignore
 
-        cols = pd.to_numeric(df.columns, errors="coerce")
-        wavelength_cols = cols[~cols.isna()]
+        wavelength_cols = get_numeric_col_names(df)
 
         for i, (start, end) in enumerate(ranges):
             cols_in_range = wavelength_cols[
-                (wavelength_cols >= start)
-                & (wavelength_cols <= end)
+                (wavelength_cols >= start) & (wavelength_cols <= end)
             ].astype(str)
 
             df.update(norm(df[cols_in_range]))
-            
 
         return df

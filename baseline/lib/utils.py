@@ -1,10 +1,16 @@
 from pathlib import Path
 
-
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 
 from lib.config import AppConfig
+
+
+def get_numeric_col_names(df):
+    cols = pd.to_numeric(df.columns, errors="coerce")
+    numeric_col_names = cols[~cols.isna()]
+
+    return numeric_col_names
 
 
 def custom_kfold_cross_validation(data, k: int, group_by: str, random_state=None):
@@ -80,7 +86,9 @@ def custom_train_test_split(data, group_by: str, test_size=0.2, random_state=Non
     return train_data, test_data
 
 
-def filter_data_by_compositional_range(data, compositional_range, oxide, oxide_ranges):
+def filter_data_by_compositional_range(
+    data, compositional_range, oxide, oxide_ranges
+) -> pd.DataFrame:
     """
     Filter the dataset for a given compositional range and oxide.
 
