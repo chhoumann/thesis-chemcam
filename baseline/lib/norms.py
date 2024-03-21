@@ -1,14 +1,18 @@
 import enum
+from typing import List, Optional, Tuple
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-
 from lib.reproduction import spectral_ranges
 
 
 class Norm(enum.Enum):
     NORM_1 = 1
     NORM_3 = 3
+
+
+def norm(df: pd.DataFrame) -> pd.DataFrame:
+    return df.div(df.sum(axis=1), axis=0)
 
 
 class Norm1Scaler(BaseEstimator, TransformerMixin):
@@ -32,21 +36,12 @@ class Norm1Scaler(BaseEstimator, TransformerMixin):
 
     def transform(self, df):
         """
-        Apply norm1 normalization to the DataFrame.
+        Apply Norm 1 normalization to the DataFrame.
         """
-        wavelength_columns = []
-        for col in df.columns:
-            try:
-                float(col)
-                wavelength_columns.append(col)
-            except ValueError:
-                # Ignore columns that cannot be converted to float
-                continue
+        cols = pd.to_numeric(df.columns, errors="coerce")
+        wavelength_cols = cols[~cols.isna()].astype(str)
 
-        df_float = df[wavelength_columns]
-        row_sums = df_float.sum(axis=1).sum()
-        normalized_df = df_float.div(row_sums, axis=0)
-        df.update(normalized_df)
+        df.update(norm(df[wavelength_cols]))
 
         return df
 
@@ -73,31 +68,23 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
         """
         return self
 
-    def transform(self, df):
+    def transform(self, df, ranges: Optional[List[Tuple[float, float]]] = None):
         """
-        Apply norm3 normalization to the DataFrame.
+        Apply Norm 3 normalization to the DataFrame.
         """
-        spectrometer_start_indices = []
-        columns = pd.to_numeric(df.columns, errors="coerce")
-        columns = columns[~columns.isna()]
+        if ranges is None:
+            ranges = spectral_ranges.values() # type: ignore
 
-        for spectrometer in spectral_ranges:
-            for i, col in enumerate(columns):
-                if col >= spectral_ranges[spectrometer][0]:
-                    spectrometer_start_indices.append(i)
-                    break
+        cols = pd.to_numeric(df.columns, errors="coerce")
+        wavelength_cols = cols[~cols.isna()]
 
-        for i in range(len(spectrometer_start_indices)):
-            start = spectrometer_start_indices[i]
-            end = (
-                len(columns)
-                if i == len(spectrometer_start_indices) - 1
-                else spectrometer_start_indices[i + 1]
-            )
+        for i, (start, end) in enumerate(ranges):
+            cols_in_range = wavelength_cols[
+                (wavelength_cols >= start)
+                & (wavelength_cols <= end)
+            ].astype(str)
 
-            spectrometer_df = df.iloc[:, start:end]
-            row_sums = spectrometer_df.sum(axis=1).sum()
-            normalized_df = spectrometer_df.div(row_sums, axis=0)
-            df.update(normalized_df)
+            df.update(norm(df[cols_in_range]))
+            
 
         return df

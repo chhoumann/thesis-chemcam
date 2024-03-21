@@ -1,234 +1,69 @@
 import os
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import List, Tuple
 
-import mlflow
 import numpy as np
 import pandas as pd
-import tqdm
 import typer
+from tqdm import tqdm
 from sklearn.decomposition import FastICA
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-
-from ica.data_processing import ICASampleProcessor
+from ica.data_processing import load_composition_df_for_sample, preprocess, postprocess
 from ica.jade import JADE
+from ica.train_test import train, test
+from lib.data_handling import CompositionData
 from lib.config import AppConfig
 from lib.norms import Norm
 from lib.utils import get_train_test_split
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+app = typer.Typer()
 config = AppConfig()
 
-model_configs = {
-    "SiO2": {"law": "Log-square", "norm": Norm.NORM_1},
-    "TiO2": {"law": "Geometric", "norm": Norm.NORM_3},
-    "Al2O3": {"law": "Geometric", "norm": Norm.NORM_3},
-    "FeOT": {"law": "Geometric", "norm": Norm.NORM_1},
-    "MgO": {"law": "Exponential", "norm": Norm.NORM_1},
-    "CaO": {"law": "Parabolic", "norm": Norm.NORM_1},
-    "Na2O": {"law": "Parabolic", "norm": Norm.NORM_3},
-    "K2O": {"law": "Geometric", "norm": Norm.NORM_3},
-}
+
+@app.command(name="full_run", help="Runs train & test for ICA")
+def full_run() -> pd.DataFrame:
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=False
+    )
+
+    train_experiment = train(
+        ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3
+    )
+
+    target_predictions = test_run(train_experiment_id=train_experiment.experiment_id)
+
+    return target_predictions
 
 
-def train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3):
-    mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment(f"ICA_TRAIN_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
-    experiment = mlflow.set_experiment(_experiment_id)
-    mlflow.autolog()
+@app.command(name="test_run", help="Runs test for ICA")
+def test_run(train_experiment_id: str) -> pd.DataFrame:
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
+        is_test_run=True
+    )
 
-    id_col = ica_df_n1["id"]
-
-    ica_df_n1.drop(columns=["id"], inplace=True)
-    ica_df_n3.drop(columns=["id"], inplace=True)
-
-    oxide_rmses = {}
-
-    target_predictions = pd.DataFrame(compositions_df_n1.index)
-    target_predictions["id"] = id_col
-
-    for oxide, info in tqdm.tqdm(model_configs.items()):
-        model_name = info["law"]
-        norm = info["norm"]
-
-        if model_name is None:
-            print(f"No model specified for {oxide}. Skipping...")
-            continue
-
-        with mlflow.start_run(run_name=f"ICA_TRAIN_{oxide}"):
-            print(f"Training model {model_name} for {oxide}...")
-
-            X_train = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_train = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
-
-            X_test = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_test = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
-
-            if model_name == "Exponential" or model_name == "Log-square":
-                if model_name == "Log-square":
-                    X_train = X_train**2
-                    X_test = X_test**2
-
-                X_train = np.log(X_train)
-                X_test = np.log(X_test)
-
-                # turn -inf to 0
-                X_train[X_train == -np.inf] = 0
-                X_test[X_test == -np.inf] = 0
-            elif model_name == "Geometric":
-                X_train = np.sqrt(X_train)
-                X_test = np.sqrt(X_test)
-            elif model_name == "Parabolic":
-                X_train = X_train**2
-                X_test = X_test**2
-
-            X_train.fillna(0, inplace=True)
-            X_test.fillna(0, inplace=True)
-
-            model = LinearRegression()
-            model.fit(X_train, y_train)
-
-            pred = model.predict(X_test)
-            rmse = np.sqrt(mean_squared_error(y_test, pred))
-
-            oxide_rmses[oxide] = rmse
-
-            oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
-            oxide_prediction_path.mkdir(parents=True, exist_ok=True)
-
-            target_predictions[oxide] = pd.Series(pred)
-
-            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred1.csv")
-            mlflow.log_metric("RMSE", float(rmse))
-            mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
-
-            mlflow.sklearn.log_model(model, f"ICA_{oxide}")
-
-    for oxide, rmse in oxide_rmses.items():
-        print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
-
-    target_predictions.to_csv("./data/data/jade/ica/TRAIN_tar_pred.csv")
-
-    return experiment
-
-
-def get_ica_models(experiment_id: str) -> Dict[str, LinearRegression]:
-    models = {}
-    runs = mlflow.search_runs(experiment_ids=[experiment_id])
-
-    for _, run in runs.iterrows():  # type: ignore
-        run_id = run["run_id"]
-        oxide_value = run["params.oxide"]  # Assuming 'oxide' is stored as a parameter
-
-        # Fetch the model artifact if it's a scikit-learn model
-        client = mlflow.tracking.MlflowClient()
-        artifacts = client.list_artifacts(run_id)
-        for artifact in artifacts:
-            if "model" in artifact.path.lower():
-                model_uri = f"runs:/{run_id}/{artifact.path}"
-                model = mlflow.sklearn.load_model(model_uri)
-                models[oxide_value] = model
-
-    return models
-
-
-def test(
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3, experiment_id: str
-):
-    models = get_ica_models(experiment_id)
-
-    id_col = ica_df_n1["id"]
-    ica_df_n1.drop(columns=["id"], inplace=True)
-    ica_df_n3.drop(columns=["id"], inplace=True)
-
-    mlflow.set_tracking_uri(config.mlflow_tracking_uri)
-    _experiment_id = mlflow.create_experiment(f"ICA_TEST_{pd.Timestamp.now().strftime('%m-%d-%y_%H%M%S')}")
-    mlflow.set_experiment(_experiment_id)
-    mlflow.autolog()
-
-    oxide_rmses = {}
-    oxide_preds = {}
-    for oxide, info in tqdm.tqdm(model_configs.items()):
-        model_name = info["law"]
-        norm = info["norm"]
-
-        if model_name is None:
-            print(f"No model specified for {oxide}. Skipping...")
-            continue
-
-        with mlflow.start_run(run_name=f"ICA_TEST_{oxide}"):
-            print(f"Testing model {model_name} for {oxide}...")
-
-            X_test = ica_df_n1 if norm == Norm.NORM_1 else ica_df_n3
-            y_test = (
-                compositions_df_n1[oxide]
-                if norm == Norm.NORM_1
-                else compositions_df_n3[oxide]
-            )
-
-            if model_name == "Exponential" or model_name == "Log-square":
-                if model_name == "Log-square":
-                    X_test = X_test**2
-
-                X_test = np.log(X_test)
-
-                # turn -inf to 0
-                X_test[X_test == -np.inf] = 0
-            elif model_name == "Geometric":
-                X_test = np.sqrt(X_test)
-            elif model_name == "Parabolic":
-                X_test = X_test**2
-
-            pred = models[oxide].predict(X_test)
-            rmse = np.sqrt(mean_squared_error(y_test, pred))
-
-            oxide_rmses[oxide] = rmse
-
-            oxide_prediction_path = Path("./data/data/jade/ica/predictions_new")
-            oxide_prediction_path.mkdir(parents=True, exist_ok=True)
-
-            oxide_preds[oxide] = pred
-
-            pd.Series(pred).to_csv(oxide_prediction_path / f"{oxide}_pred1.csv")
-            mlflow.log_metric("RMSE", float(rmse))
-            mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
-
-    for oxide, rmse in oxide_rmses.items():
-        print(f"RMSE for {oxide} with {model_configs[oxide]['law']} model: {rmse}")
-
-    target_predictions = pd.DataFrame()
-    target_predictions["ID"] = id_col
-    for oxide, pred in oxide_preds.items():
-        target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
-
-    tar_pred_path = Path("./data/data/jade/ica/tar_pred.csv")
-    target_predictions.to_csv(tar_pred_path)
-    mlflow.log_artifact(str(tar_pred_path))
-    mlflow.log_table(target_predictions, "target_predictions")
+    target_predictions = test(
+        ica_df_n1,
+        ica_df_n3,
+        compositions_df_n1,
+        compositions_df_n3,
+        train_experiment_id,
+    )
 
     return target_predictions
 
 
 def get_data(is_test_run: bool):
-    exclude_columns_abs = ["id"]
+    exclude_columns_abs = ["ID", "Sample Name"]
 
-    ica_df_n1, compositions_df_n1 = _get_data(
-        num_components=8, norm=Norm.NORM_1, isTest=is_test_run
+    ica_df_n1, compositions_df_n1 = _get_data_for_norm(
+        num_components=8, norm=Norm.NORM_1, is_test_run=is_test_run
     )
     temp_df = ica_df_n1.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n1_abs = pd.concat([ica_df_n1[exclude_columns_abs], temp_df], axis=1)
 
-    ica_df_n3, compositions_df_n3 = _get_data(
-        num_components=8, norm=Norm.NORM_3, isTest=is_test_run
+    ica_df_n3, compositions_df_n3 = _get_data_for_norm(
+        num_components=8, norm=Norm.NORM_3, is_test_run=is_test_run
     )
     temp_df = ica_df_n3.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
@@ -239,51 +74,60 @@ def get_data(is_test_run: bool):
     ), "The number of rows in the two DataFrames must be equal."
 
     assert (
-        ica_df_n1_abs["id"] == ica_df_n1_abs["id"]
+        ica_df_n1_abs["ID"] == ica_df_n1_abs["ID"]
     ).all(), "The IDs of the two DataFrames must be aligned."
 
     return ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3
 
 
-def _get_data(
-    num_components: int, norm: Norm, isTest: bool
+def _get_data_for_norm(
+    num_components: int, norm: Norm, is_test_run: bool
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
     output_dir = Path(
-        f"./data/data/jade/ica/norm{norm.value}{'-test' if isTest else ''}"
+        f"{config.data_cache_dir}/_preformatted_ica/norm{norm.value}{'-test' if is_test_run else ''}"
     )
 
     ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
     compositions_csv_loc = Path(f"{output_dir}/composition_data.csv")
 
     if ica_df_csv_loc.exists() and compositions_csv_loc.exists():
-        print("Preprocessed data found. Loading data...")
-        ica_df = pd.read_csv(ica_df_csv_loc, index_col=0)
-        compositions_df = pd.read_csv(compositions_csv_loc, index_col=0)
+        print(f"Preprocessed ICA scores found for Norm {norm.value}. Loading data...")
+
+        ica_df = pd.read_csv(ica_df_csv_loc)
+        compositions_df = pd.read_csv(compositions_csv_loc)
     else:
-        print("No preprocessed data found. Creating and saving preprocessed data...")
-        output_dir.mkdir(parents=True, exist_ok=True)
-        ica_df, compositions_df = create_processed_data(
-            calib_data_path, num_components=num_components, norm=norm
-        )
-        ica_df.to_csv(ica_df_csv_loc)
-        compositions_df.to_csv(compositions_csv_loc)
         print(
-            f"Preprocessed data saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
+            f"No preprocessed ICA scores found for Norm {norm.value}. Preprocessing data..."
+        )
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+        ica_df, compositions_df = _create_processed_data(
+            calib_data_path,
+            num_components=num_components,
+            norm=norm,
+            is_test_run=is_test_run,
+        )
+
+        ica_df.to_csv(ica_df_csv_loc, index=False)
+        compositions_df.to_csv(compositions_csv_loc, index=False)
+
+        print(
+            f"Preprocessed ICA scores saved to {ica_df_csv_loc} and {compositions_csv_loc}.\n"
         )
 
     return ica_df, compositions_df
 
 
-def create_processed_data(
+def _create_processed_data(
     calib_data_path: Path,
     ica_model: str = "jade",
     num_components: int = 8,
     norm: Norm = Norm.NORM_3,
-    isTest: bool = False,
+    is_test_run: bool = False,
     average_location_datasets: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    composition_data_loc = config.composition_data_path
+    composition_data = CompositionData(config.composition_data_path)
 
     ic_wavelengths_list = []
     ica_df = pd.DataFrame()
@@ -293,69 +137,93 @@ def create_processed_data(
 
     test_train_split_idx = get_train_test_split()
 
-    not_in_set = []
-    missing = []
+    desired_dataset = "test" if is_test_run else "train"
 
-    desired_dataset = "test" if isTest else "train"
-    for sample_name in tqdm.tqdm(list(os.listdir(calib_data_path))):
+    # Prepare samples for parallel processing
+    sample_details_list = []
+
+    for sample_name in tqdm(list(os.listdir(calib_data_path))):
         split_info_sample_row = test_train_split_idx[
             test_train_split_idx["sample_name"] == sample_name
         ]["train_test"]
 
         if split_info_sample_row.empty:
             print(
-                f"""No split info found for {
-                sample_name}. Likely has missing data or is not used in calib2015."""
+                f"No split info found for {sample_name}. Likely has missing data or is not used in calib2015."
             )
-            missing.append(sample_name)
             continue
 
-        isSampleNotInSet = split_info_sample_row.values[0] != desired_dataset
-
-        if isSampleNotInSet:
-            # print(f"Skipping {sample_name}... Not in {desired_dataset} set.")
-            not_in_set.append(sample_name)
+        if split_info_sample_row.values[0] != desired_dataset:
             continue
 
-        processor = ICASampleProcessor(sample_name, num_components)
+        compositions_df = load_composition_df_for_sample(sample_name, composition_data)
 
-        if not processor.try_load_composition_df(
-            composition_data_loc=composition_data_loc
-        ):
+        if compositions_df is None:
             print(f"No composition data found for {sample_name}. Skipping.")
-            missing.append(sample_name)
             continue
 
-        processor.preprocess(calib_data_path, average_location_datasets, norm)
+        dfs = preprocess(sample_name, calib_data_path, average_location_datasets, norm)
 
-        for sample_id, sample_data in processor.dfs:
-            # Run ICA for each location in sample and get the estimated sources
+        for sample_id, df in dfs:
             ica_estimated_sources = run_ica(
-                sample_data, model=ica_model, num_components=num_components
+                df, model=ica_model, num_components=num_components
             )
 
-            # Postprocess the data
-            ic_wavelengths, filtered_compositions_df = processor.postprocess(
-                ica_estimated_sources, sample_data, sample_id
+            sample_details_list.append(
+                (
+                    df,
+                    compositions_df,
+                    ica_estimated_sources,
+                    sample_name,
+                    sample_id,
+                    num_components,
+                )
             )
 
-            # Add the sample ID to the ICA DataFrame
-            ic_wavelengths["id"] = sample_id
+    # Post process the data in parallel
+    print("Post processing preprocessed data...")
 
-            ic_wavelengths_list.append(ic_wavelengths)
-            filtered_compositions_list.append(filtered_compositions_df)
+    with tqdm(total=len(sample_details_list)) as pbar:
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(_parallel_postprocess, detail)
+                for detail in sample_details_list
+            ]
 
-    ica_df = pd.concat(ic_wavelengths_list)
-    compositions_df = pd.concat(filtered_compositions_list)
+            for future in as_completed(futures):
+                ic_wavelengths, filtered_compositions_df = future.result()
+                ic_wavelengths_list.append(ic_wavelengths)
+                filtered_compositions_list.append(filtered_compositions_df)
+                pbar.update(1)
 
-    # Set the index and column names for the DataFrames
-    ica_df.index.name = "target"
-    ica_df.columns.name = "wavelegths"
+    ica_df = _concatenate_preprocessed_dfs(ic_wavelengths_list)
+    compositions_df = _concatenate_preprocessed_dfs(filtered_compositions_list)
 
-    compositions_df.index.name = "target"
-    compositions_df.columns.name = "oxide"
+    print(f"Finished processing {len(ica_df)} samples.")
 
     return ica_df, compositions_df
+
+
+# Post processing function to be run in parallel
+def _parallel_postprocess(
+    details: Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, str, str, int],
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    (
+        df,
+        compositions_df,
+        ica_estimated_sources,
+        sample_name,
+        sample_id,
+        num_components,
+    ) = details
+
+    ic_wavelengths, filtered_compositions_df = postprocess(
+        df, compositions_df, ica_estimated_sources, sample_id, num_components
+    )
+    ic_wavelengths["Sample Name"] = sample_name
+    ic_wavelengths["ID"] = sample_id
+
+    return ic_wavelengths, filtered_compositions_df
 
 
 def run_ica(
@@ -407,28 +275,11 @@ def run_ica(
     return estimated_sources
 
 
-app = typer.Typer()
+def _concatenate_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
+    df = pd.concat(dfs)
+    df = df.apply(pd.to_numeric, errors="ignore")
 
-
-@app.command(name="run", help="Runs train & test for ICA")
-def run():
-    # Train
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
-        is_test_run=False
-    )
-    experiment = train(ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3)
-
-    # Test
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
-        is_test_run=True
-    )
-    test(
-        ica_df_n1,
-        ica_df_n3,
-        compositions_df_n1,
-        compositions_df_n3,
-        experiment.experiment_id,
-    )
+    return df
 
 
 if __name__ == "__main__":

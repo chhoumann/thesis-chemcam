@@ -10,18 +10,6 @@ from lib.data_handling import CompositionData
 from lib.reproduction import folder_to_composition_sample_name, major_oxides
 
 
-def get_composition_for_sample(cd: pd.DataFrame, sample_name: str):
-    sample_name_lower = sample_name.lower()
-    match_condition = (
-        (cd["Spectrum Name"].str.lower() == sample_name_lower)
-        | (cd["Target"].str.lower() == sample_name_lower)
-        | (cd["Sample Name"].str.lower() == sample_name_lower)
-    )
-    composition = cd.loc[match_condition]
-
-    return composition.head(1)
-
-
 class CalibrationDataFilter(Enum):
     Used_2015_Calibration = "Used for 2015 calibration"
     Used_2021_Mn_Calibration = "Used for 2021 Mn calibration"
@@ -35,7 +23,7 @@ def get_all_samples(cd: CompositionData, dataset_loc: str):
 
     for sample in samples:
         sample_name = folder_to_composition_sample_name.get(sample, sample)
-        composition = get_composition_for_sample(cd.composition_data, sample_name)
+        composition = cd.get_composition_for_sample(sample_name)
 
         if composition.empty:
             continue
