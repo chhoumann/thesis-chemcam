@@ -126,4 +126,10 @@ Autoencoders could significantly enhance our ability to handle the high-dimensio
 By compressing spectral data into more manageable representations without losing critical information, we can improve model performance, especially in predicting major oxide compositions, by focusing on the most relevant features extracted from the compressed data representation.
 This aligns with our objectives of efficient dimensionality reduction and robust predictive modeling.
 
-\input{sections/multi-task-learning.tex}
+% Multi-task learning
+In their work \citet{caruana_no_1997}, presents a method called \textit{Multitask learning}, which is a method of learning machine models on several related datasets.
+The motivation for this approach stems from the assumption that utilizing multiple, albeit related, datasets can enhance a model's ability to discern patterns and shapes within the data.
+\citet{caruana_no_1997} suggests that leveraging shared representations for model training can enable the model to identify underlying attributes in other datasets, even when this new data is small.
+This is relevant for our work as one of the major challenges in analyzing LIBS calibration data for Mars is the scarcity of available data.
+This scarcity makes it difficult to construct robust models capable of comprehensively understanding the underlying patterns and physical principles within the data.
+Utilizing related LIBS data could help the models first learn the general outline, shape and patterns in the LIBS data, making it easier for it to grasp the deeper patterns in the Mars related data.

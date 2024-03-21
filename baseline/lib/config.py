@@ -9,6 +9,7 @@ _ENV_VARS = [
     "TRAIN_TEST_SPLIT_PATH",
     "CCAM_DATA_PATH",
     "CCAM_COMPOSITION_DATA_PATH",
+    "DATA_CACHE_DIR",
 ]
 
 
@@ -49,3 +50,7 @@ class AppConfig:
     @property
     def ccam_composition_data_path(self):
         return self._config["CCAM_COMPOSITION_DATA_PATH"]
+
+    @property
+    def data_cache_dir(self):
+        return self._config["DATA_CACHE_DIR"]

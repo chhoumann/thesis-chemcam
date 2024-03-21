@@ -2,8 +2,8 @@ import logging
 from pathlib import Path
 
 import pandas as pd
-from dotenv import dotenv_values
 
+from lib.config import AppConfig
 from lib.data_handling import CustomSpectralPipeline, load_split_data
 from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.reproduction import major_oxides, masks
@@ -15,19 +15,11 @@ def load_full_flow_data():
     """
     logger = logging.getLogger("train")
 
-    env = dotenv_values()
-    comp_data_loc = env.get("COMPOSITION_DATA_PATH")
-    dataset_loc = env.get("DATA_PATH")
+    config = AppConfig()
+    comp_data_loc = config.composition_data_path
+    dataset_loc = config.data_path
 
-    if not comp_data_loc:
-        print("Please set COMPOSITION_DATA_PATH in .env file")
-        exit(1)
-
-    if not dataset_loc:
-        print("Please set DATA_PATH in .env file")
-        exit(1)
-
-    preformatted_data_path = Path("./data/_preformatted_sm/")
+    preformatted_data_path = Path(f"{config.data_cache_dir}/_preformatted_sm/")
     train_path = preformatted_data_path / "train.csv"
     test_path = preformatted_data_path / "test.csv"
 
