@@ -109,11 +109,6 @@ def train(
             logger.debug("Transforming test data.")
 
             test = scaler.fit_transform(test.copy())
-             
-            for preprocessor in preprocessors:
-                logger.debug(f"Applying preprocessor: {preprocessor.__class__.__name__}")
-                train = preprocessor.fit_transform(train)
-                test = preprocessor.transform(test)
 
             drop_cols = major_oxides + ["Sample Name", "ID"]
 
@@ -356,7 +351,7 @@ def test(
     )
 
     Y = test_processed[major_oxides]
-    #drop_cols = major_oxides + ["Sample Name", "ID"]
+    drop_cols = major_oxides + ["Sample Name", "ID"]
 
     target_predictions = pd.DataFrame(test_processed[["Sample Name", "ID"]])
 
@@ -413,8 +408,7 @@ def full_run(
     experiment = train(
         outlier_removal=outlier_removal,
         additional_info=additional_info,
-        outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
-        preprocessors=[variance_threshold]
+        outlier_removal_constraint_iteration=outlier_removal_constraint_iteration
     )
 
     target_predictions = test_run(
