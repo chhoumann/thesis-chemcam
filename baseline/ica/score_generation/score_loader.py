@@ -1,68 +1,33 @@
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
-import typer
 from tqdm import tqdm
-from sklearn.decomposition import FastICA
-from ica.data_processing import load_composition_df_for_sample, preprocess, postprocess
-from ica.jade import JADE
-from ica.train_test import train, test
-from lib.data_handling import CompositionData
+
+from ica.score_generation.ica import run_ica
+from ica.score_generation.postprocess import parallel_postprocess
+from ica.score_generation.preprocess import preprocess
 from lib.config import AppConfig
+from lib.data_handling import CompositionData
 from lib.norms import Norm
 from lib.utils import get_train_test_split
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-app = typer.Typer()
 config = AppConfig()
 
 
-@app.command(name="full_run", help="Runs train & test for ICA")
-def full_run() -> pd.DataFrame:
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
-        is_test_run=False
-    )
-
-    train_experiment = train(
-        ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3
-    )
-
-    target_predictions = test_run(train_experiment_id=train_experiment.experiment_id)
-
-    return target_predictions
-
-
-@app.command(name="test_run", help="Runs test for ICA")
-def test_run(train_experiment_id: str) -> pd.DataFrame:
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
-        is_test_run=True
-    )
-
-    target_predictions = test(
-        ica_df_n1,
-        ica_df_n3,
-        compositions_df_n1,
-        compositions_df_n3,
-        train_experiment_id,
-    )
-
-    return target_predictions
-
-
-def get_data(is_test_run: bool):
+def get_scores(is_test_run: bool):
     exclude_columns_abs = ["ID", "Sample Name"]
 
-    ica_df_n1, compositions_df_n1 = _get_data_for_norm(
+    ica_df_n1, compositions_df_n1 = _get_scores_for_norm(
         num_components=8, norm=Norm.NORM_1, is_test_run=is_test_run
     )
     temp_df = ica_df_n1.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n1_abs = pd.concat([ica_df_n1[exclude_columns_abs], temp_df], axis=1)
 
-    ica_df_n3, compositions_df_n3 = _get_data_for_norm(
+    ica_df_n3, compositions_df_n3 = _get_scores_for_norm(
         num_components=8, norm=Norm.NORM_3, is_test_run=is_test_run
     )
     temp_df = ica_df_n3.drop(columns=exclude_columns_abs)
@@ -80,7 +45,7 @@ def get_data(is_test_run: bool):
     return ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3
 
 
-def _get_data_for_norm(
+def _get_scores_for_norm(
     num_components: int, norm: Norm, is_test_run: bool
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
@@ -102,7 +67,7 @@ def _get_data_for_norm(
         )
 
         output_dir.mkdir(parents=True, exist_ok=True)
-        ica_df, compositions_df = _create_processed_data(
+        ica_df, compositions_df = _compute_scores_for_norm(
             calib_data_path,
             num_components=num_components,
             norm=norm,
@@ -119,7 +84,7 @@ def _get_data_for_norm(
     return ica_df, compositions_df
 
 
-def _create_processed_data(
+def _compute_scores_for_norm(
     calib_data_path: Path,
     ica_model: str = "jade",
     num_components: int = 8,
@@ -186,7 +151,7 @@ def _create_processed_data(
     with tqdm(total=len(sample_details_list)) as pbar:
         with ThreadPoolExecutor() as executor:
             futures = [
-                executor.submit(_parallel_postprocess, detail)
+                executor.submit(parallel_postprocess, detail)
                 for detail in sample_details_list
             ]
 
@@ -204,77 +169,6 @@ def _create_processed_data(
     return ica_df, compositions_df
 
 
-# Post processing function to be run in parallel
-def _parallel_postprocess(
-    details: Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, str, str, int],
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    (
-        df,
-        compositions_df,
-        ica_estimated_sources,
-        sample_name,
-        sample_id,
-        num_components,
-    ) = details
-
-    ic_wavelengths, filtered_compositions_df = postprocess(
-        df, compositions_df, ica_estimated_sources, sample_id, num_components
-    )
-    ic_wavelengths["Sample Name"] = sample_name
-    ic_wavelengths["ID"] = sample_id
-
-    return ic_wavelengths, filtered_compositions_df
-
-
-def run_ica(
-    df: pd.DataFrame, model: str = "jade", num_components: int = 8
-) -> np.ndarray:
-    """
-    Performs Independent Component Analysis (ICA) on a given dataset using JADE or FastICA algorithms.
-
-    Parameters:
-    ----------
-    df : pd.DataFrame
-        The input dataset for ICA. The DataFrame should have rows as samples and columns as features.
-
-    model : str, optional
-        The ICA model to be used. Must be either 'jade' or 'fastica'. Defaults to 'fastica'.
-
-    num_components : int, optional
-        The number of independent components to be extracted. Defaults to 8.
-
-    Returns:
-    -------
-    np.ndarray
-        An array of the estimated independent components extracted from the input data.
-
-    Raises:
-    ------
-    ValueError
-        If an invalid model name is specified.
-
-    AssertionError
-        If the extracted signals are not independent, indicated by the correlation matrix not being
-        close to the identity matrix or the sum of squares of correlations not being close to one.
-    """
-    estimated_sources = None
-
-    if model == "jade":
-        # cols = df.columns
-        jade_model = JADE(num_components)
-        mixing_matrix = jade_model.fit(X=df)  # noqa: F841
-        estimated_sources = jade_model.transform(df)
-    elif model == "fastica":
-        fastica_model = FastICA(
-            n_components=num_components, whiten="unit-variance", max_iter=5000
-        )
-        estimated_sources = fastica_model.fit_transform(df)
-    else:
-        raise ValueError("Invalid model specified. Must be 'jade' or 'fastica'.")
-
-    return estimated_sources
-
-
 def _concatenate_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     df = pd.concat(dfs)
     df = df.apply(pd.to_numeric, errors="ignore")
@@ -282,5 +176,19 @@ def _concatenate_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     return df
 
 
-if __name__ == "__main__":
-    app()
+def load_composition_df_for_sample(
+    sample_name: str, composition_data: CompositionData
+) -> Optional[pd.DataFrame]:
+    # Check if we have composition data for this sample
+    composition_df = composition_data.get_composition_for_sample(sample_name)
+
+    if composition_df.empty:
+        print(f"No composition data found for {sample_name}. Skipping...")
+        return None
+
+    # Check if the composition data contains NaN values
+    if composition_df.isnull().values.any():
+        print(f"NaN values found in composition data for {sample_name}. Skipping...")
+        return None
+
+    return composition_df
