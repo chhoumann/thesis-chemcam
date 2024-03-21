@@ -1,9 +1,10 @@
-from sklearn.feature_selection import VarianceThreshold
-from sklearn.base import BaseEstimator, TransformerMixin
-import pandas as pd
 from enum import Enum
 from typing import Union
-import numpy as np
+
+import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_selection import VarianceThreshold
+
 
 class VarTrim(BaseEstimator, TransformerMixin):
     """
@@ -21,10 +22,12 @@ class VarTrim(BaseEstimator, TransformerMixin):
         fit: Fits the model to the data, determining which features to keep.
         transform: Transforms the data by keeping only the selected features.
     """
+
     class ThresholdLevel(Enum):
         """
         Enumeration of predefined variance threshold levels, adjusted to match the dataset's variance range, with options from 'LEAST' to 'MOST'.
         """
+
         LEAST = 0.0  # Matches the 0th percentile
         VERY_LOW = 8e-16  # Slightly above the 20th percentile
         LOW = 2e-15  # Slightly above the 30th percentile
@@ -34,7 +37,7 @@ class VarTrim(BaseEstimator, TransformerMixin):
         HIGH = 3e-14  # Slightly above the 70th percentile
         VERY_HIGH = 6.5e-14  # Slightly above the 80th percentile
         MOST = 1.7e-13  # Slightly above the 90th percentile
-    
+
     def __init__(self, threshold: Union[ThresholdLevel, float]):
         """
         Initializes the VarTrim transformer with a specified variance threshold.
@@ -46,7 +49,7 @@ class VarTrim(BaseEstimator, TransformerMixin):
         self.threshold = threshold
         self.selector = None
         self.non_float_columns_ = None
-        
+
     def fit(self, data: pd.DataFrame):
         """
         Fits the transformer to the data by determining which features exceed the variance threshold.
@@ -60,34 +63,37 @@ class VarTrim(BaseEstimator, TransformerMixin):
         Raises:
             ValueError: If the threshold is not a ThresholdLevel or float.
         """
-        
-        float_columns, non_float_columns = [], []
-        for col in data.columns:
-            try:
-                float(col)
-                float_columns.append(col)
-            except ValueError:
-                non_float_columns.append(col)
+
+        float_columns = data.select_dtypes(
+            include=["float64", "float32"]
+        ).columns.tolist()
+
+        non_float_columns = data.select_dtypes(
+            exclude=["float64", "float32"]
+        ).columns.tolist()
 
         data_float = data[float_columns]
 
-        #variances = np.var(data_float, axis=0)
-        #percentiles = [np.percentile(variances, p) for p in range(0, 101, 10)]
-        #print(percentiles)
+        # variances = np.var(data_float, axis=0)
+        # percentiles = [np.percentile(variances, p) for p in range(0, 101, 10)]
+        # print(percentiles)
         if isinstance(self.threshold, VarTrim.ThresholdLevel):
             threshold = self.threshold.value
         elif isinstance(self.threshold, float):
             threshold = self.threshold
         else:
             raise ValueError("threshold must be either a ThresholdLevel or a float.")
-        
+
         self.selector = VarianceThreshold(threshold=threshold)
         self.selector.fit(data_float)
-        self.features_to_keep_ = data_float.columns[self.selector.get_support(indices=True)]
+        self.features_to_keep_ = data_float.columns[
+            self.selector.get_support(indices=True)
+        ]
         self.non_float_columns_ = non_float_columns
+
         return self
-    
-    def transform(self, data: pd.DataFrame):
+
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Transforms the data by keeping only the features that meet the variance threshold.
 
@@ -102,7 +108,7 @@ class VarTrim(BaseEstimator, TransformerMixin):
         """
         if not isinstance(data, pd.DataFrame):
             raise ValueError("Input data must be a DataFrame.")
-        
+
         all_columns = list(self.features_to_keep_) + list(self.non_float_columns_)
 
         return data[all_columns]
