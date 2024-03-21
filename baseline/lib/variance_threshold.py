@@ -1,6 +1,3 @@
-from enum import Enum
-from typing import Union
-
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_selection import VarianceThreshold
@@ -23,30 +20,15 @@ class VarTrim(BaseEstimator, TransformerMixin):
         transform: Transforms the data by keeping only the selected features.
     """
 
-    class ThresholdLevel(Enum):
-        """
-        Enumeration of predefined variance threshold levels, adjusted to match the dataset's variance range, with options from 'LEAST' to 'MOST'.
-        """
-
-        LEAST = 0.0  # Matches the 0th percentile
-        VERY_LOW = 8e-16  # Slightly above the 20th percentile
-        LOW = 2e-15  # Slightly above the 30th percentile
-        MODERATE_LOW = 4e-15  # Slightly above the 40th percentile
-        MODERATE = 7e-15  # Slightly above the 50th percentile
-        MODERATE_HIGH = 1.5e-14  # Slightly above the 60th percentile
-        HIGH = 3e-14  # Slightly above the 70th percentile
-        VERY_HIGH = 6.5e-14  # Slightly above the 80th percentile
-        MOST = 1.7e-13  # Slightly above the 90th percentile
-
-    def __init__(self, threshold: Union[ThresholdLevel, float]):
+    def __init__(self, threshold: float):
         """
         Initializes the VarTrim transformer with a specified variance threshold.
 
         Parameters:
-            threshold (Union[ThresholdLevel, float]): The variance threshold for feature selection, which can be specified either as a float or as a member of the ThresholdLevel enum.
+            threshold (float): The variance threshold below which features will be removed.
         """
-        self.features_to_keep_ = None
         self.threshold = threshold
+        self.features_to_keep_ = None
         self.selector = None
         self.non_float_columns_ = None
 
@@ -74,17 +56,7 @@ class VarTrim(BaseEstimator, TransformerMixin):
 
         data_float = data[float_columns]
 
-        # variances = np.var(data_float, axis=0)
-        # percentiles = [np.percentile(variances, p) for p in range(0, 101, 10)]
-        # print(percentiles)
-        if isinstance(self.threshold, VarTrim.ThresholdLevel):
-            threshold = self.threshold.value
-        elif isinstance(self.threshold, float):
-            threshold = self.threshold
-        else:
-            raise ValueError("threshold must be either a ThresholdLevel or a float.")
-
-        self.selector = VarianceThreshold(threshold=threshold)
+        self.selector = VarianceThreshold(threshold=self.threshold)
         self.selector.fit(data_float)
         self.features_to_keep_ = data_float.columns[
             self.selector.get_support(indices=True)
