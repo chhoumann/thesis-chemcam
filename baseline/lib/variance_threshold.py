@@ -81,6 +81,11 @@ class VarTrim(BaseEstimator, TransformerMixin):
         if not isinstance(data, pd.DataFrame):
             raise ValueError("Input data must be a DataFrame.")
 
+        if self.features_to_keep_ is None or self.non_float_columns_ is None:
+            raise ValueError(
+                "The transformer has not been fitted. Please fit the transformer before transforming the data."
+            )
+
         all_columns = list(self.features_to_keep_) + list(self.non_float_columns_)
 
         return data[all_columns]
