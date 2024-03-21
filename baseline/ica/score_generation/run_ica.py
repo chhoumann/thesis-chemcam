@@ -39,7 +39,6 @@ def run_ica(
     estimated_sources = None
 
     if model == "jade":
-        # cols = df.columns
         jade_model = JADE(num_components)
         mixing_matrix = jade_model.fit(X=df)  # noqa: F841
         estimated_sources = jade_model.transform(df)
