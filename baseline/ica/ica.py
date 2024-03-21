@@ -21,7 +21,7 @@ config = AppConfig()
 
 
 @app.command(name="full_run", help="Runs train & test for ICA")
-def full_run():
+def full_run() -> pd.DataFrame:
     # Train
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=False
@@ -31,13 +31,13 @@ def full_run():
         ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3
     )
 
-    target_predictions = test_run(train_experiment_id=train_experiment)
+    target_predictions = test_run(train_experiment_id=train_experiment.experiment_id)
 
     return target_predictions
 
 
 @app.command(name="test_run", help="Runs test for ICA")
-def test_run(train_experiment_id: str):
+def test_run(train_experiment_id: str) -> pd.DataFrame:
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=True
     )
@@ -208,7 +208,7 @@ def _create_processed_data(
 
 # Post processing function to be run in parallel
 def parallel_postprocess(
-    details: Tuple[str, pd.DataFrame, pd.DataFrame, np.ndarray, str, int]
+    details: Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, str, str, int]
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     (
         df,

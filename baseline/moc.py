@@ -1,17 +1,18 @@
 import logging
-from typing import Dict, Mapping, Tuple
+from typing import Dict, Mapping, Optional, Tuple
 
 import mlflow
 import pandas as pd
 import typer
 from sklearn.metrics import mean_squared_error
 
-from ica.ica import full_run as run_ica, test_run as run_ica_test
-from PLS_SM.full_flow import full_run as run_pls, test_run as run_pls_test
-
+from ica.ica import full_run as run_ica
+from ica.ica import test_run as run_ica_test
 from lib.config import AppConfig
 from lib.data_handling import CompositionData
 from lib.reproduction import major_oxides, weighted_sum_oxide_percentages
+from PLS_SM.full_flow import full_run as run_pls
+from PLS_SM.full_flow import test_run as run_pls_test
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ app = typer.Typer()
 
 
 def run_ica_pls_for_predictions_on_full_data(
-    pls_experiment_id: str = None, ica_experiment_id: str = None
+    pls_experiment_id: Optional[str] = None, ica_experiment_id: Optional[str] = None
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     logger.info("Getting predictions for PLS-SM")
 
@@ -108,7 +109,7 @@ def calculate_moc_rmses(moc_predictions_and_actual: pd.DataFrame) -> Dict[str, f
 
 
 @app.command(name="run")
-def main(pls_id: str = None, ica_id: str = None):
+def main(pls_id: Optional[str] = None, ica_id: Optional[str] = None):
     logger.info("Running MOC Pipeline")
 
     pls_tar_pred, ica_tar_pred = run_ica_pls_for_predictions_on_full_data(

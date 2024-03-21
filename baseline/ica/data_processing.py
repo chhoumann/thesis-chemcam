@@ -109,7 +109,7 @@ def postprocess(
     df = pd.concat([df, df_ics], axis=1)
 
     # Correlate the loadings
-    corrdf, ids = _correlate_loadings(corrcols, columns, df)
+    corrdf, ids = _correlate_loadings(corrcols, list(columns), df)
 
     # Create the wavelengths matrix for each component
     ic_wavelengths = pd.DataFrame(columns=columns)
@@ -145,8 +145,8 @@ def _average_each_shot_across_locations(data):
 # This is a function that finds the correlation between loadings and a set of columns
 # The idea is to somewhat automate identifying which element the loading corresponds to.
 def _correlate_loadings(
-    corrcols: list, icacols: list, df: pd.DataFrame
-) -> Tuple[pd.DataFrame, list]:
+    corrcols: List, icacols: List, df: pd.DataFrame
+) -> Tuple[pd.DataFrame, List]:
     corrdf = df.corr().drop(labels=icacols, axis=1).drop(labels=corrcols, axis=0)
     # set all corrdf nans to 0 - they were set to 0 during masking, and
     # .corr() sets values that don't vary to NaN

@@ -7,7 +7,7 @@ from lib.config import AppConfig
 from lib.norms import Norm
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from typing import Dict, Tuple, Optional
+from typing import Dict, Optional
 from mlflow.entities import Experiment
 
 model_configs = {
@@ -29,7 +29,7 @@ def train(
     ica_df_n3: pd.DataFrame,
     compositions_df_n1: pd.DataFrame,
     compositions_df_n3: pd.DataFrame,
-) -> pd.DataFrame:
+) -> Experiment:
     experiment = _setup_mlflow_experiment("TRAIN")
 
     _run_experiment(
@@ -45,7 +45,7 @@ def test(
     compositions_df_n1: pd.DataFrame,
     compositions_df_n3: pd.DataFrame,
     train_experiment_id: str,  # Used to fetch the trained models
-) -> Experiment:
+) -> pd.DataFrame:
     _setup_mlflow_experiment("TEST")
     models = _get_ica_models(train_experiment_id)
 
@@ -99,7 +99,7 @@ def _run_experiment(
                 mlflow.sklearn.log_model(model, f"ICA_{oxide}")
             else:
                 # Testing phase: use the provided models for predictions
-                pred = models[oxide].predict(X)
+                pred = models[oxide].predict(X) # type: ignore
 
             # Store predictions
             target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
@@ -109,7 +109,7 @@ def _run_experiment(
             oxide_rmses[oxide] = rmse
 
             # Log metrics and params
-            mlflow.log_metric("RMSE", rmse)
+            mlflow.log_metric("RMSE", rmse.item())
             mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
 
     _print_rmses(oxide_rmses)
@@ -132,7 +132,7 @@ def _create_target_predictions_df(
     ica_df_n1: pd.DataFrame,
     ica_df_n3: pd.DataFrame,
     index: Optional[pd.Index] = None,
-) -> Tuple[pd.Series, pd.Series]:
+) -> pd.DataFrame:
     id_col = ica_df_n1["ID"]
     sample_name_col = ica_df_n1["Sample Name"]
 
@@ -152,10 +152,10 @@ def _transform(df: pd.DataFrame, model_name: str) -> pd.DataFrame:
             df = df**2
 
         # turn -inf to 0
-        df = np.log(df)
+        df = np.log(df) # type: ignore
         df[df == -np.inf] = 0
     elif model_name == "Geometric":
-        df = np.sqrt(df)
+        df = np.sqrt(df) # type: ignore
     elif model_name == "Parabolic":
         df = df**2
 
