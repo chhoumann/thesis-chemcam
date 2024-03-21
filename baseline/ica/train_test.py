@@ -1,14 +1,15 @@
+from typing import Dict, Optional
+
+import mlflow
 import numpy as np
 import pandas as pd
-import mlflow
 import tqdm
+from mlflow.entities import Experiment
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
 from lib.config import AppConfig
 from lib.norms import Norm
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-from typing import Dict, Optional
-from mlflow.entities import Experiment
 
 model_configs = {
     "SiO2": {"law": "Log-square", "norm": Norm.NORM_1},
@@ -69,10 +70,10 @@ def _run_experiment(
     oxide_rmses = {}
 
     for oxide, info in tqdm.tqdm(model_configs.items()):
-        model_name = info["law"]
+        law_name = info["law"]
         norm = info["norm"]
 
-        if model_name is None:
+        if law_name is None:
             print(f"No model specified for {oxide}. Skipping...")
             continue
 
@@ -84,9 +85,9 @@ def _run_experiment(
         run_name_prefix = "ICA_TRAIN" if phase == "train" else "ICA_TEST"
 
         with mlflow.start_run(run_name=f"{run_name_prefix}_{oxide}"):
-            print(f"{phase.capitalize()}ing model {model_name} for {oxide}...")
+            print(f"{phase.capitalize()}ing model {law_name} for {oxide}...")
 
-            X = _transform(ica_df, model_name)
+            X = _transform_to_regression_law(ica_df, law_name)
             y = compositions_df[oxide]
 
             X.fillna(0, inplace=True)
@@ -99,7 +100,7 @@ def _run_experiment(
                 mlflow.sklearn.log_model(model, f"ICA_{oxide}")
             else:
                 # Testing phase: use the provided models for predictions
-                pred = models[oxide].predict(X) # type: ignore
+                pred = models[oxide].predict(X)  # type: ignore
 
             # Store predictions
             target_predictions[oxide] = pd.Series(pred, index=target_predictions.index)
@@ -110,7 +111,7 @@ def _run_experiment(
 
             # Log metrics and params
             mlflow.log_metric("RMSE", rmse.item())
-            mlflow.log_params({"model": model_name, "oxide": oxide, "norm": norm.value})
+            mlflow.log_params({"model": law_name, "oxide": oxide, "norm": norm.value})
 
     _print_rmses(oxide_rmses)
 
@@ -146,17 +147,17 @@ def _create_target_predictions_df(
     return target_predictions
 
 
-def _transform(df: pd.DataFrame, model_name: str) -> pd.DataFrame:
-    if model_name == "Exponential" or model_name == "Log-square":
-        if model_name == "Log-square":
+def _transform_to_regression_law(df: pd.DataFrame, law_name: str) -> pd.DataFrame:
+    if law_name == "Exponential" or law_name == "Log-square":
+        if law_name == "Log-square":
             df = df**2
 
         # turn -inf to 0
-        df = np.log(df) # type: ignore
+        df = np.log(df)  # type: ignore
         df[df == -np.inf] = 0
-    elif model_name == "Geometric":
-        df = np.sqrt(df) # type: ignore
-    elif model_name == "Parabolic":
+    elif law_name == "Geometric":
+        df = np.sqrt(df)  # type: ignore
+    elif law_name == "Parabolic":
         df = df**2
 
     return df

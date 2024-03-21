@@ -22,7 +22,6 @@ config = AppConfig()
 
 @app.command(name="full_run", help="Runs train & test for ICA")
 def full_run() -> pd.DataFrame:
-    # Train
     ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_data(
         is_test_run=False
     )
@@ -187,7 +186,7 @@ def _create_processed_data(
     with tqdm(total=len(sample_details_list)) as pbar:
         with ThreadPoolExecutor() as executor:
             futures = [
-                executor.submit(parallel_postprocess, detail)
+                executor.submit(_parallel_postprocess, detail)
                 for detail in sample_details_list
             ]
 
@@ -207,7 +206,7 @@ def _create_processed_data(
 
 
 # Post processing function to be run in parallel
-def parallel_postprocess(
+def _parallel_postprocess(
     details: Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, str, str, int]
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     (
