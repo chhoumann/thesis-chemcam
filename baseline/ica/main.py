@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import typer
 
-from ica.score_generation.score_loader import load_scores
+from ica.score_generation.score_loader import get_scores
 from ica.train_test import test, train
 from lib.config import AppConfig
 
@@ -13,7 +13,7 @@ config = AppConfig()
 
 @app.command(name="full_run", help="Runs train & test for ICA")
 def full_run() -> pd.DataFrame:
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = load_scores(
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_scores(
         is_test_run=False
     )
 
@@ -28,7 +28,7 @@ def full_run() -> pd.DataFrame:
 
 @app.command(name="test_run", help="Runs test for ICA")
 def test_run(train_experiment_id: str) -> pd.DataFrame:
-    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = load_scores(
+    ica_df_n1, ica_df_n3, compositions_df_n1, compositions_df_n3 = get_scores(
         is_test_run=True
     )
 

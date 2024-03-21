@@ -17,17 +17,17 @@ from lib.utils import get_train_test_split
 config = AppConfig()
 
 
-def load_scores(is_test_run: bool):
+def get_scores(is_test_run: bool):
     exclude_columns_abs = ["ID", "Sample Name"]
 
-    ica_df_n1, compositions_df_n1 = _load_scores_for_norm(
+    ica_df_n1, compositions_df_n1 = _get_scores_for_norm(
         num_components=8, norm=Norm.NORM_1, is_test_run=is_test_run
     )
     temp_df = ica_df_n1.drop(columns=exclude_columns_abs)
     temp_df = temp_df.abs()
     ica_df_n1_abs = pd.concat([ica_df_n1[exclude_columns_abs], temp_df], axis=1)
 
-    ica_df_n3, compositions_df_n3 = _load_scores_for_norm(
+    ica_df_n3, compositions_df_n3 = _get_scores_for_norm(
         num_components=8, norm=Norm.NORM_3, is_test_run=is_test_run
     )
     temp_df = ica_df_n3.drop(columns=exclude_columns_abs)
@@ -45,7 +45,7 @@ def load_scores(is_test_run: bool):
     return ica_df_n1_abs, ica_df_n3_abs, compositions_df_n1, compositions_df_n3
 
 
-def _load_scores_for_norm(
+def _get_scores_for_norm(
     num_components: int, norm: Norm, is_test_run: bool
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     calib_data_path = Path(config.data_path)
