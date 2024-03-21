@@ -325,8 +325,10 @@ class CompositionData:
 
         sample_name_lower = _sample_name.lower()
         match_condition = (
-            self.composition_data["Spectrum Name"].str.lower() == sample_name_lower
-        ) | (self.composition_data["Sample Name"].str.lower() == sample_name_lower)
+            (self.composition_data["Spectrum Name"].str.lower() == sample_name_lower)
+            | (self.composition_data["Target"].str.lower() == sample_name_lower)
+            | (self.composition_data["Sample Name"].str.lower() == sample_name_lower)
+        )
         composition = self.composition_data.loc[match_condition]
 
         return composition.head(1)
