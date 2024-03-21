@@ -196,7 +196,6 @@ def _create_processed_data(
                 filtered_compositions_list.append(filtered_compositions_df)
                 pbar.update(1)
 
-    print("Merging preprocessed data...")
     ica_df = _concatenate_preprocessed_dfs(ic_wavelengths_list)
     compositions_df = _concatenate_preprocessed_dfs(filtered_compositions_list)
 
@@ -207,7 +206,7 @@ def _create_processed_data(
 
 # Post processing function to be run in parallel
 def _parallel_postprocess(
-    details: Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, str, str, int]
+    details: Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, str, str, int],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     (
         df,
