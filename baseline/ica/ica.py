@@ -197,8 +197,8 @@ def _create_processed_data(
                 pbar.update(1)
 
     print("Merging preprocessed data...")
-    ica_df = _merge_preprocessed_dfs(ic_wavelengths_list)
-    compositions_df = _merge_preprocessed_dfs(filtered_compositions_list)
+    ica_df = _concatenate_preprocessed_dfs(ic_wavelengths_list)
+    compositions_df = _concatenate_preprocessed_dfs(filtered_compositions_list)
 
     print(f"Finished processing {len(ica_df)} samples.")
 
@@ -276,7 +276,7 @@ def run_ica(
     return estimated_sources
 
 
-def _merge_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
+def _concatenate_preprocessed_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     df = pd.concat(dfs)
     df = df.apply(pd.to_numeric, errors="ignore")
 
