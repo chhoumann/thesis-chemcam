@@ -6,9 +6,9 @@ from typing import List, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
+from ica.score_generation.ica import run_ica
 from ica.score_generation.postprocess import parallel_postprocess
 from ica.score_generation.preprocess import preprocess
-from ica.score_generation.run_ica import run_ica
 from lib.config import AppConfig
 from lib.data_handling import CompositionData
 from lib.norms import Norm
