@@ -32,7 +32,7 @@ from lib.reproduction import (
     training_info,
 )
 from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
-from lib.variance_threshold import VarTrim
+from lib.variance_threshold import VarianceThresholdTrimmer
 from PLS_SM.inference import predict_composition_with_blending
 
 # ignore all future warnings
@@ -40,6 +40,7 @@ simplefilter(action="ignore", category=FutureWarning)
 
 logger = logging.getLogger("train")
 config = AppConfig()
+variance_threshold_trimmer = VarianceThresholdTrimmer(threshold=2e-20)
 mlflow.set_tracking_uri(config.mlflow_tracking_uri)
 
 
@@ -52,6 +53,7 @@ def train(
     additional_info: str = "",
     outlier_removal_constraint_iteration: int = -1,
 ):
+    outlier_removal = False  # Remove this line to enable outlier removal
     train_processed, test_processed = full_flow_dataloader.load_full_flow_data()
     k_folds = 4
     random_state = 42
@@ -91,6 +93,7 @@ def train(
             logger.info(
                 f"Filtering {oxide} for {compositional_range} compositional range..."
             )
+
             train = filter_data_by_compositional_range(
                 train_processed, compositional_range, oxide, oxide_ranges
             )
@@ -103,12 +106,17 @@ def train(
             logger.debug("Initializing scaler: %s", scaler.__class__.__name__)
 
             logger.debug("Fitting and transforming training data.")
-            
+
             train = scaler.fit_transform(train.copy())
 
             logger.debug("Transforming test data.")
 
             test = scaler.fit_transform(test.copy())
+
+            # Variance threshold
+            logger.debug("Applying variance threshold to training data.")
+            train = pd.DataFrame(variance_threshold_trimmer.fit_transform(train))
+            test = variance_threshold_trimmer.transform(test)
 
             drop_cols = major_oxides + ["Sample Name", "ID"]
 
@@ -136,7 +144,6 @@ def train(
                 y_train_OR = train[oxide].to_numpy()
 
                 pls_OR.fit(X_train_OR, y_train_OR)
-
 
                 current_performance = mean_squared_error(
                     y_train_OR, pls_OR.predict(X_train_OR), squared=False
@@ -229,43 +236,43 @@ def train(
 
                 # endregion
                 # region Cross-Validation
-                best_CV_model = None
-                best_CV_rmse = np.inf
+                # best_CV_model = None
+                # best_CV_rmse = np.inf
 
-                logger.info("Performing custom k-fold cross-validation.")
+                # logger.info("Performing custom k-fold cross-validation.")
 
-                kf = custom_kfold_cross_validation(
-                    train_no_outliers,
-                    k=k_folds,
-                    group_by="Sample Name",
-                    random_state=random_state,
-                )
+                # kf = custom_kfold_cross_validation(
+                #     train_no_outliers,
+                #     k=k_folds,
+                #     group_by="Sample Name",
+                #     random_state=random_state,
+                # )
 
-                fold_rmses = []
-                for i, (train_data, test_data) in enumerate(kf):  # type: ignore
-                    pls_CV = PLSRegression(n_components=n_components)
-                    X_train_CV = train_data.drop(columns=drop_cols).to_numpy()
-                    y_train_CV = train_data[oxide].to_numpy()
-                    X_test = test_data.drop(columns=drop_cols).to_numpy()
-                    y_test = test_data[oxide].to_numpy()
+                # fold_rmses = []
+                # for i, (train_data, test_data) in enumerate(kf):  # type: ignore
+                #     pls_CV = PLSRegression(n_components=n_components)
+                #     X_train_CV = train_data.drop(columns=drop_cols).to_numpy()
+                #     y_train_CV = train_data[oxide].to_numpy()
+                #     X_test = test_data.drop(columns=drop_cols).to_numpy()
+                #     y_test = test_data[oxide].to_numpy()
 
-                    pls_CV.fit(X_train_CV, y_train_CV)
-                    y_pred = pls_CV.predict(X_test)
-                    fold_rmse = mean_squared_error(y_test, y_pred, squared=False)
-                    fold_rmses.append(fold_rmse)
+                #     pls_CV.fit(X_train_CV, y_train_CV)
+                #     y_pred = pls_CV.predict(X_test)
+                #     fold_rmse = mean_squared_error(y_test, y_pred, squared=False)
+                #     fold_rmses.append(fold_rmse)
 
-                    mlflow.log_metric(f"fold_{i}_RMSE", float(fold_rmse))
+                #     mlflow.log_metric(f"fold_{i}_RMSE", float(fold_rmse))
 
-                    if float(fold_rmse) < float(best_CV_rmse):
-                        best_CV_rmse = fold_rmse
-                        best_CV_model = pls_CV
+                #     if float(fold_rmse) < float(best_CV_rmse):
+                #         best_CV_rmse = fold_rmse
+                #         best_CV_model = pls_CV
 
-                avg_rmse = np.mean(fold_rmses)
-                mlflow.log_metric("RMSECV", float(avg_rmse))
-                mlflow.log_metric("RMSECV_MIN", float(np.min(fold_rmses)))
-                mlflow.sklearn.log_model(
-                    best_CV_model, f"PLS_CV_{oxide}_{compositional_range}"
-                )
+                # avg_rmse = np.mean(fold_rmses)
+                # mlflow.log_metric("RMSECV", float(avg_rmse))
+                # mlflow.log_metric("RMSECV_MIN", float(np.min(fold_rmses)))
+                # mlflow.sklearn.log_model(
+                #     best_CV_model, f"PLS_CV_{oxide}_{compositional_range}"
+                # )
                 # endregion
 
                 # region Train model on all data (outliers removed) & get RMSEP
@@ -351,15 +358,27 @@ def test(
     )
 
     Y = test_processed[major_oxides]
-    drop_cols = major_oxides + ["Sample Name", "ID"]
+    # drop_cols = major_oxides + ["Sample Name", "ID"]
 
     target_predictions = pd.DataFrame(test_processed[["Sample Name", "ID"]])
 
     n1_scaler = Norm1Scaler()
     n3_scaler = Norm3Scaler()
 
-    X_test_n1 = n1_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
-    X_test_n3 = n3_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
+    # X_test_n1 = n1_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
+    # X_test_n3 = n3_scaler.fit_transform(test_processed.drop(drop_cols, axis=1))
+
+    X_test_n1 = n1_scaler.fit_transform(test_processed)
+    X_test_n3 = n3_scaler.fit_transform(test_processed)
+
+    # Variance threshold
+    X_test_n1 = pd.DataFrame(variance_threshold_trimmer.transform(X_test_n1, True))
+    X_test_n3 = pd.DataFrame(variance_threshold_trimmer.transform(X_test_n3, True))
+
+    # Drop columns
+    drop_cols = major_oxides + ["Sample Name", "ID"]
+    X_test_n1 = X_test_n1.drop(columns=drop_cols)
+    X_test_n3 = X_test_n3.drop(columns=drop_cols)
 
     with mlflow.start_run(run_name="PLS-SM Test"):
         for oxide in tqdm(major_oxides, desc="Predicting oxides"):
@@ -408,7 +427,7 @@ def full_run(
     experiment = train(
         outlier_removal=outlier_removal,
         additional_info=additional_info,
-        outlier_removal_constraint_iteration=outlier_removal_constraint_iteration
+        outlier_removal_constraint_iteration=outlier_removal_constraint_iteration,
     )
 
     target_predictions = test_run(

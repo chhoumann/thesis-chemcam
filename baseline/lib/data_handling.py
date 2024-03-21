@@ -133,10 +133,16 @@ def load_split_data(
     train_samples = train_test_split_df.loc[
         train_test_split_df["train_test"] == "train"
     ]["sample_name"].to_list()
+
     test_samples = train_test_split_df.loc[train_test_split_df["train_test"] == "test"][
         "sample_name"
     ].to_list()
 
+    # Filter out samples that are not in the directory
+    train_samples = [s for s in train_samples if s in sample_data]
+    test_samples = [s for s in test_samples if s in sample_data]
+
+    # Create dictionaries with only the train and test samples
     train_sample_data = {
         sample_name: sample_data[sample_name] for sample_name in train_samples
     }
