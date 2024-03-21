@@ -1,10 +1,10 @@
 from pathlib import Path
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from ica.mad import identify_outliers_with_mad_iterative_multidim
 
+from ica.mad import identify_outliers_with_mad_iterative_multidim
 from lib.data_handling import (
     CompositionData,
     WavelengthMaskTransformer,
