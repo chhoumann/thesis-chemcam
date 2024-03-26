@@ -21,7 +21,6 @@ For analyzing Martian geological samples, the \gls{chemcam} team currently uses 
 This model integrates \gls{pls} and \gls{ica} to predict the composition of major oxides.
 The \gls{pls} and \gls{ica} phases of the \gls{moc} operate in parallel, and their predictions are blended to form the final predictions.
 Though the \gls{moc} model has proven useful, it suffers from limitations in predictive accuracy and robustness.
-
 An overview of the \gls{moc} model is shown in Figure~\ref{fig:moc_pipeline}.
 
 \begin{figure}
@@ -32,30 +31,24 @@ An overview of the \gls{moc} model is shown in Figure~\ref{fig:moc_pipeline}.
 \end{figure}
 
 In \citet{p9_paper}, we presented our efforts to replicate the \gls{moc} model.
-This effort was motivated by our desire to better understand the model and its performance, and to experiment with its components in order to determine how it could be improved.
-However, as discussed in that paper, there were some differences between our replica and the original model.
-These differences were caused by missing information in the original paper, and so rather than introducing our own assumptions, we designed experiments to determine the best way to replicate the model.
+Based on the insights gained from that work, we have made several modifications to the replica in preparation for this work.
 
-Initially, our replication omitted the use of the \gls{mad} for outlier removal in the data preprocessing stage, a step included in the original model.
-To rectify this, we experimented with applying \gls{mad} at various stages in the pipeline.
-We determined that its application post-removal of the initial five shots, and prior to masking and normalization, most closely mirrored the outcomes of the original model.
-
-Furthermore, our replica only utilized a single dataset for the \gls{ica} phase, while the original model used all five datasets.
+Our replica only utilized a single dataset for the \gls{ica} phase, while the original model used all five datasets.
 This difference was due to the original paper not specifying how the five datasets were used, and so we designed an experiment to determine how to use them in a way that would most closely replicate the original model.
 We initially assumed that the datasets were aggregated and used as a single dataset.
 This approach, however, did not align with the original model's results, likely due to the loss of information from the individual datasets.
-Following this discovery, we instead used the datasets in the same way as we did in the \gls{pls1-sm} phase, which yielded results aligning more closely with the original model.
+Following this discovery, we modified the replica to instead use the datasets in the same way as in the \gls{pls1-sm} phase, which yielded results aligning more closely with the original model.
 
-Finally, our initial replica used a random train/test split for training, in contrast to the original model's manual curation to ensure representation of extreme compositions in both sets.
+Furthermore, our initial replica used a random train/test split for training, in contrast to the original model's manual curation to ensure representation of extreme compositions in both sets.
 This difference stemmed from the original authors' application of domain expertize in their dataset curation --- a process we could not directly replicate.
 Nevertheless, we found that automatically identifying extreme compositions and ensuring that they were present in both the training and testing sets brought us closer to the original model.
 We chose to pull out the $n$ largest and smallest samples by concentration range, for each oxide, and reserve them for the training set.
 Then we would do a random split on the remaining dataset, such that the final train/test split would be a $80\%/20\%$ split.
 
 With these changes, we created a more accurate replica of the \gls{moc} model, which we will use as our baseline for the rest of this paper.
-As an additional measure, we have presented these changes to one of the original authors of~\citet{cleggRecalibrationMarsScience2017}, who confirmed that they were reasonable and in line with the original model's implementation.
+We have presented these changes to one of the original authors of~\citet{cleggRecalibrationMarsScience2017}, who confirmed that they were reasonable and in line with the original model's implementation.
 
-Table~\ref{tab:replica_results_rmses} shows the \gls{rmse}s of the original models and our replicas after these changes.
+Table~\ref{tab:replica_results_rmses} shows the \gls{rmse}s of the original models and our replicas after the changes.
 Figure~\ref{fig:rmse_histograms} illustrates the distribution of these \gls{rmse}s as a grouped histogram.
 The results show that the \gls{rmse}s of our replicas exhibit similar tendencies to the original models.
 However, in some cases, our replicas have a lower \gls{rmse} than the original models, and in others, they have a higher \gls{rmse}.
