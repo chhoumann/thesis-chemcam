@@ -7,22 +7,7 @@ Furthermore, due to the high cost of data collection, datasets are often small, 
 Building upon the baseline established in~\citet{p9_paper}, our work aims to address the significant challenges inherent in predicting major oxide compositions from \gls{libs} data by improving the accuracy and robustness of these predictions.
 Here, we define accuracy as the ability of a model to predict the composition of major oxides in Martian geological samples, while robustness refers to the stability of these predictions across different samples and oxides.
 
-To evaluate the performance of these models, we will use \gls{rmse} as a proxy for accuracy, defined by the equation:
+% Placeholder
+\textit{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by developing machine learning models that improve the accuracy and robustness of these predictions. 
 
-\begin{equation}
-	RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2},
-\end{equation}
-
-where $y_i$ represents the actual values, $\hat{y}_i$ the predicted values, and $n$ the number of observations.
-We use \gls{rmse} as a measure of accuracy to quantify the difference between the predicted and actual values of the major oxides in the samples.
-
-To address robustness, we will consider the standard deviation of prediction errors across each oxide and test instance, defined as:
-
-\begin{equation}
-	\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2},
-\end{equation}
-
-where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error.
-We use the standard deviation of prediction errors to measure the variability of the prediction errors across each oxide and test instance, which provides a measure of the robustness of the model's predictions.
-
-\textit{Problem Definition:} Insert problem definition here.
+We will investigate various techniques to handle the high dimensionality, non-linearity, and small dataset size inherent in this problem, and evaluate the performance of these models using appropriate metrics, which will be discussed in detail in Section~\ref{sec:methodology}.
