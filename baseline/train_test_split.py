@@ -161,9 +161,10 @@ def create_train_test_split_with_extremes(
 if __name__ == "__main__":
     config = AppConfig()
     dataset_loc = config.data_path
+    composition_data_loc = config.composition_data_path
     save_path = config.train_test_split_path
 
-    cd = CompositionData()
+    cd = CompositionData(composition_data_loc)
 
     samples = get_all_samples(cd, dataset_loc)
     filtered_samples = filter_samples(samples, [])

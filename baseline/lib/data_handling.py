@@ -5,7 +5,6 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from tqdm import tqdm
 
-from lib.config import AppConfig, DataSource
 from lib.reproduction import folder_to_composition_sample_name
 from lib.utils import get_train_test_split
 
@@ -316,50 +315,20 @@ class CompositionData:
 
     def __init__(
         self,
-        data_source: Optional[DataSource] = None,
-        composition_data_loc: Optional[str] = None,
+        composition_data_loc: str,
     ):
-        # Check that either both are none or both are not none
-        if (data_source is None) != (composition_data_loc is None):
-            raise ValueError(
-                "Both data_source and composition_data_loc must be provided or neither."
-            )
-
-        if data_source is None and composition_data_loc is None:
-            config = AppConfig()
-
-            self.composition_data_loc = config.composition_data_path
-            self.data_source = config.data_source
-        else:
-            self.composition_data_loc = composition_data_loc
-            self.data_source = data_source
-
+        self.composition_data_loc = composition_data_loc
         self.composition_data = self._load_composition_data()
 
     def get_composition_for_sample(self, sample_name) -> pd.DataFrame:
         _sample_name = folder_to_composition_sample_name.get(sample_name, sample_name)
-
         sample_name_lower = _sample_name.lower()
 
-        if self.data_source == DataSource.PDS:
-            match_condition = (
-                (
-                    self.composition_data["Spectrum Name"].str.lower()
-                    == sample_name_lower
-                )
-                | (self.composition_data["Target"].str.lower() == sample_name_lower)
-                | (
-                    self.composition_data["Sample Name"].str.lower()
-                    == sample_name_lower
-                )
-            )
-        elif self.data_source == DataSource.CCAM:
-            match_condition = (
-                self.composition_data["Target"].str.lower() == sample_name_lower
-            )
-
-        else:
-            raise ValueError(f"Invalid data source: {self.data_source}.")
+        match_condition = (
+            self.composition_data[self.match_cols]
+            .apply(lambda x: x.str.lower() == sample_name_lower)
+            .any(axis=1)
+        )
 
         composition = self.composition_data.loc[match_condition]
 
@@ -380,13 +349,30 @@ class CompositionData:
         return sample_compositions
 
     def _load_composition_data(self) -> pd.DataFrame:
-        if self.data_source == DataSource.PDS:
-            return pd.read_csv(self.composition_data_loc)
-        elif self.data_source == DataSource.CCAM:
+        first_row = pd.read_csv(self.composition_data_loc, nrows=1)
+        first_column = first_row.columns[0]
+
+        if first_column.startswith("Target"):
+            # PDS
+            self.match_cols = ["Spectrum Name", "Sample Name", "Target"]
+            df = pd.read_csv(self.composition_data_loc)
+        elif first_column.startswith("meta"):
+            # CCAM
+            self.match_cols = ["Sample Name"]
+
             df = pd.read_csv(self.composition_data_loc, skiprows=1)
-            df.rename(columns=lambda x: x.replace("(wt%)", "").strip(), inplace=True)
+            df.rename(
+                columns=lambda x: (
+                    "Sample Name"
+                    if x.strip() == "Target"
+                    else x.replace("(wt%)", "").strip()
+                ),
+                inplace=True,
+            )
         else:
-            raise ValueError(f"Invalid data source: {self.data_source}.")
+            raise ValueError(
+                f'Unknown data source: First column "{first_column}" was not recognized.'
+            )
 
         return df
 
@@ -428,6 +414,7 @@ class CustomSpectralPipeline:
     def __init__(
         self,
         masks,
+        composition_data_loc,
         major_oxides,
         intensity_feature_name="shot_avg",
         wavelength_feature_name="wave",
@@ -439,7 +426,7 @@ class CustomSpectralPipeline:
         self.data_reshaper = SpectralDataReshaper(
             intensity_feature_name, wavelength_feature_name
         )
-        self.composition_data = CompositionData()
+        self.composition_data = CompositionData(composition_data_loc)
         self.major_oxides = major_oxides
 
     def process_sample(
@@ -470,7 +457,7 @@ class CustomSpectralPipeline:
             pd.DataFrame(reshaped_df), sample_composition, self.major_oxides
         )
 
-        final_df["Target"] = sample_name
+        final_df["Sample Name"] = sample_name
         final_df["ID"] = f"{sample_name}_{location_name}"
 
         return final_df

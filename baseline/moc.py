@@ -79,7 +79,7 @@ def make_moc_predictions(
 
 def merge_predictions_with_actual(moc_predictions: pd.DataFrame) -> pd.DataFrame:
     logger.info("Merging predictions with actual data")
-    cd = CompositionData()
+    cd = CompositionData(AppConfig().composition_data_path)
 
     merged_data = pd.DataFrame()
 
