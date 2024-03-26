@@ -20,6 +20,7 @@ def plot_spectra(
     average_shots=True,
     max_gap_threshold=10,
     fig_name="",
+    show_masked_regions=True,
 ):
     sns.set_style("white")  # Set the Seaborn style
     _data_path = Path(data_path)
@@ -66,8 +67,9 @@ def plot_spectra(
     for range_name, (start, end) in spectral_ranges.items():
         plt.axvspan(start, end, alpha=0.3, color=spectral_colors[range_name], label=range_name)
 
-    for i, (start, end) in enumerate(masks):
-        plt.axvspan(start, end, alpha=0.25, color="#0099ff", label="Mask" if i == 0 else None)
+    if show_masked_regions:
+        for i, (start, end) in enumerate(masks):
+            plt.axvspan(start, end, alpha=0.25, color="#0099ff", label="Mask" if i == 0 else None)
 
     # Labeling and title
     plt.title("Spectral Analysis of Sample: " + sample_name)
