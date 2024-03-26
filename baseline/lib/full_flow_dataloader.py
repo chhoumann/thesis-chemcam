@@ -16,7 +16,6 @@ def load_full_flow_data():
     logger = logging.getLogger("train")
 
     config = AppConfig()
-    comp_data_loc = config.composition_data_path
     dataset_loc = config.data_path
 
     preformatted_data_path = Path(f"{config.data_cache_dir}/_preformatted_sm/")
@@ -35,7 +34,6 @@ def load_full_flow_data():
         logger.info("Initializing CustomSpectralPipeline.")
         pipeline = CustomSpectralPipeline(
             masks=masks,
-            composition_data_loc=comp_data_loc,
             major_oxides=major_oxides,
         )
         logger.info("Pipeline initialized. Fitting and transforming data.")

@@ -92,7 +92,7 @@ def _compute_scores_for_norm(
     is_test_run: bool = False,
     average_location_datasets: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    composition_data = CompositionData(config.composition_data_path)
+    composition_data = CompositionData()
 
     ic_wavelengths_list = []
     ica_df = pd.DataFrame()
