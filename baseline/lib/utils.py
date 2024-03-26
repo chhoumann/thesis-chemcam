@@ -126,7 +126,7 @@ def get_train_test_split(split_loc: str | None = None) -> pd.DataFrame:
     """
     if split_loc is None:
         config = AppConfig()
-        split_loc = config.train_test_split_dir
+        split_loc = config.train_test_split_path
 
     train_test_split_path = Path(split_loc)
     if not train_test_split_path.exists():
