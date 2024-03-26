@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from pathlib import Path
 from typing import List
 
 import pandas as pd
@@ -162,7 +163,9 @@ if __name__ == "__main__":
     config = AppConfig()
     dataset_loc = config.data_path
     composition_data_loc = config.composition_data_path
-    save_path = config.train_test_split_path
+
+    save_path = Path(config.train_test_split_path)
+    save_path.parent.mkdir(exist_ok=True, parents=True)
 
     cd = CompositionData(composition_data_loc)
 

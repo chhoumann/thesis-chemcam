@@ -1,4 +1,5 @@
 import os
+from hashlib import sha3_256
 
 from dotenv import find_dotenv, load_dotenv
 
@@ -6,7 +7,7 @@ _ENV_VARS = [
     "MLFLOW_TRACKING_URI",
     "DATA_PATH",
     "COMPOSITION_DATA_PATH",
-    "TRAIN_TEST_SPLIT_PATH",
+    "TRAIN_TEST_SPLIT_DIR",
     "DATA_CACHE_DIR",
 ]
 
@@ -40,7 +41,14 @@ class AppConfig:
 
     @property
     def train_test_split_path(self):
-        return self._config[f"TRAIN_TEST_SPLIT_PATH"]
+        data_hash = self.data_hash
+        dir = self._config["TRAIN_TEST_SPLIT_DIR"]
+
+        return f"{dir}/{data_hash}.csv"
+
+    @property
+    def data_hash(self):
+        return sha3_256(self.composition_data_path.encode()).hexdigest()
 
     @property
     def data_cache_dir(self):

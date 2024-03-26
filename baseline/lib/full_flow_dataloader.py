@@ -20,10 +20,10 @@ def load_full_flow_data():
     dataset_loc = config.data_path
 
     preformatted_data_path = Path(f"{config.data_cache_dir}/_preformatted_sm/")
-    train_path = (
-        preformatted_data_path / f"train.csv"
-    )  # TODO: Add PDS/CCAM denotation to file name
-    test_path = preformatted_data_path / f"test.csv"
+
+    data_hash = config.data_hash
+    train_path = preformatted_data_path / f"train_{data_hash}.csv"
+    test_path = preformatted_data_path / f"test_{data_hash}.csv"
 
     if (
         not preformatted_data_path.exists()
