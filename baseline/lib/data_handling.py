@@ -299,10 +299,10 @@ class CompositionData:
     """
     A class for handling composition data.
 
-    Parameters:
-    - composition_data_loc (str): The file path of the composition data.
-
     Methods:
+    - __init__():
+        Initializes the CompositionData object with the composition data location from the AppConfig.
+
     - load_composition_data(composition_data_loc: str) -> pd.DataFrame:
         Loads the composition data from the specified file path.
 
@@ -313,35 +313,68 @@ class CompositionData:
         Creates a dictionary of sample compositions for the given sample names.
     """
 
-    def __init__(self, composition_data_loc: str):
-        self.composition_data = self.load_composition_data(composition_data_loc)
-
-    @staticmethod
-    def load_composition_data(composition_data_loc: str) -> pd.DataFrame:
-        return pd.read_csv(composition_data_loc)
+    def __init__(
+        self,
+        composition_data_loc: str,
+    ):
+        self.composition_data_loc = composition_data_loc
+        self.composition_data = self._load_composition_data()
 
     def get_composition_for_sample(self, sample_name) -> pd.DataFrame:
         _sample_name = folder_to_composition_sample_name.get(sample_name, sample_name)
-
         sample_name_lower = _sample_name.lower()
+
         match_condition = (
-            (self.composition_data["Spectrum Name"].str.lower() == sample_name_lower)
-            | (self.composition_data["Target"].str.lower() == sample_name_lower)
-            | (self.composition_data["Sample Name"].str.lower() == sample_name_lower)
+            self.composition_data[self.match_cols]
+            .apply(lambda x: x.str.lower() == sample_name_lower)
+            .any(axis=1)
         )
+
         composition = self.composition_data.loc[match_condition]
 
         return composition.head(1)
 
     def create_sample_compositions_dict(self, sample_names) -> dict[str, pd.DataFrame]:
         sample_compositions = {}
+
         for sample_name in sample_names:
             comp = self.get_composition_for_sample(sample_name)
+
             if comp.empty:
                 print(f"Could not find {sample_name} in labels")
                 continue
+
             sample_compositions[sample_name] = comp
+
         return sample_compositions
+
+    def _load_composition_data(self) -> pd.DataFrame:
+        first_row = pd.read_csv(self.composition_data_loc, nrows=1)
+        first_column = first_row.columns[0]
+
+        if first_column.startswith("Target"):
+            # PDS
+            self.match_cols = ["Spectrum Name", "Sample Name", "Target"]
+            df = pd.read_csv(self.composition_data_loc)
+        elif first_column.startswith("meta"):
+            # CCAM
+            self.match_cols = ["Sample Name"]
+
+            df = pd.read_csv(self.composition_data_loc, skiprows=1)
+            df.rename(
+                columns=lambda x: (
+                    "Sample Name"
+                    if x.strip() == "Target"
+                    else x.replace("(wt%)", "").strip()
+                ),
+                inplace=True,
+            )
+        else:
+            raise ValueError(
+                f'Unknown data source: First column "{first_column}" was not recognized.'
+            )
+
+        return df
 
 
 class NonNegativeTransformer(BaseEstimator, TransformerMixin):
@@ -371,7 +404,6 @@ class CustomSpectralPipeline:
 
     Args:
         masks (list): List of masks to be applied to the spectral data.
-        composition_data_loc (str): Location of the composition data.
         major_oxides (list): List of major oxides.
         intensity_feature_name (str, optional): Name of the intensity feature.
             Defaults to "shot_avg".
@@ -441,15 +473,21 @@ class CustomSpectralPipeline:
             pd.DataFrame: Transformed DataFrame.
         """
         transformed_samples = []
+
         for sample_name, sample_location_dfs in tqdm(
             sample_data.items(), desc="Transforming samples"
         ):
             for _, (location_name, sample_df) in enumerate(sample_location_dfs.items()):
-                if self.composition_data.get_composition_for_sample(sample_name).empty:
+                if self.composition_data.get_composition_for_sample(
+                    sample_name=sample_name
+                ).empty:
                     continue
+
                 transformed_df = self.process_sample(
                     sample_df, sample_name, location_name
                 )
                 transformed_samples.append(transformed_df)
+
         df_out = pd.concat(transformed_samples, ignore_index=True).rename(columns=str)
+
         return df_out

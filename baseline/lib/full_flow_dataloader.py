@@ -16,12 +16,14 @@ def load_full_flow_data():
     logger = logging.getLogger("train")
 
     config = AppConfig()
-    comp_data_loc = config.composition_data_path
+    composition_data_loc = config.composition_data_path
     dataset_loc = config.data_path
 
     preformatted_data_path = Path(f"{config.data_cache_dir}/_preformatted_sm/")
-    train_path = preformatted_data_path / "train.csv"
-    test_path = preformatted_data_path / "test.csv"
+
+    data_hash = config.data_hash
+    train_path = preformatted_data_path / f"train_{data_hash}.csv"
+    test_path = preformatted_data_path / f"test_{data_hash}.csv"
 
     if (
         not preformatted_data_path.exists()
@@ -35,7 +37,7 @@ def load_full_flow_data():
         logger.info("Initializing CustomSpectralPipeline.")
         pipeline = CustomSpectralPipeline(
             masks=masks,
-            composition_data_loc=comp_data_loc,
+            composition_data_loc=composition_data_loc,
             major_oxides=major_oxides,
         )
         logger.info("Pipeline initialized. Fitting and transforming data.")
