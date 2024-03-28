@@ -1,5 +1,6 @@
 import os
 from hashlib import sha3_256
+from pathlib import Path
 
 from dotenv import find_dotenv, load_dotenv
 
@@ -48,7 +49,7 @@ class AppConfig:
 
     @property
     def data_hash(self):
-        return sha3_256(self.composition_data_path.encode()).hexdigest()
+        return sha3_256(str(Path(self.composition_data_path)).encode()).hexdigest()
 
     @property
     def data_cache_dir(self):
