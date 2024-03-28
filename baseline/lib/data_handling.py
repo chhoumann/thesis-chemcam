@@ -242,7 +242,7 @@ class SpectralDataReshaper(BaseEstimator, TransformerMixin):
         if not isinstance(X, pd.DataFrame):
             raise ValueError("Input should be a pandas DataFrame.")
 
-        self.sample_size_ = len(X) // len(X[self.wave_feature_name].unique())
+        self.sample_size_ = len(X.columns) - 1
         return self
 
     def transform(self, X):
