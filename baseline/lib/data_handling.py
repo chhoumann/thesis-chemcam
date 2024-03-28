@@ -1,10 +1,10 @@
-import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, Optional
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline
 from tqdm import tqdm
 
 from lib.reproduction import ccs_drop_cols, folder_to_composition_sample_name
@@ -39,9 +39,7 @@ def get_dataset_frame(dataset_path):
         return pd.read_csv(dataset_path, skiprows=target - 1)
 
 
-def get_preprocessed_sample_data(
-    sample_name: str, data_path: Path, average_shots=True
-) -> Dict[str, pd.DataFrame]:
+def get_preprocessed_sample_data(sample_name: str, data_path: Path, average_shots=True) -> Dict[str, pd.DataFrame]:
     """
     Get preprocessed sample data.
 
@@ -108,9 +106,7 @@ def load_data(
 
     # Function for loading sample data in parallel
     def _load_sample_data(sample_name, data_path, average_shots):
-        return sample_name, get_preprocessed_sample_data(
-            sample_name, data_path, average_shots
-        )
+        return sample_name, get_preprocessed_sample_data(sample_name, data_path, average_shots)
 
     data_path = Path(dataset_loc).resolve(strict=True)
     sample_names = [f.name for f in data_path.iterdir() if f.is_dir()]
@@ -121,9 +117,7 @@ def load_data(
     with tqdm(total=take_amount, desc="Loading data") as pbar:
         with ThreadPoolExecutor() as executor:
             futures = [
-                executor.submit(
-                    _load_sample_data, sample_name, data_path, average_shots
-                )
+                executor.submit(_load_sample_data, sample_name, data_path, average_shots)
                 for sample_name in sample_names[:take_amount]
             ]
 
@@ -135,25 +129,15 @@ def load_data(
     return sample_data
 
 
-def load_split_data(
-    dataset_loc: str, split_loc: Optional[str] = None, average_shots=True
-):
+def load_split_data(dataset_loc: str, split_loc: Optional[str] = None, average_shots=True):
     sample_data = load_data(dataset_loc, average_shots=average_shots)
     train_test_split_df = get_train_test_split(split_loc)
 
-    train_samples = train_test_split_df.loc[
-        train_test_split_df["train_test"] == "train"
-    ]["sample_name"].to_list()
-    test_samples = train_test_split_df.loc[train_test_split_df["train_test"] == "test"][
-        "sample_name"
-    ].to_list()
+    train_samples = train_test_split_df.loc[train_test_split_df["train_test"] == "train"]["sample_name"].to_list()
+    test_samples = train_test_split_df.loc[train_test_split_df["train_test"] == "test"]["sample_name"].to_list()
 
-    train_sample_data = {
-        sample_name: sample_data[sample_name] for sample_name in train_samples
-    }
-    test_sample_data = {
-        sample_name: sample_data[sample_name] for sample_name in test_samples
-    }
+    train_sample_data = {sample_name: sample_data[sample_name] for sample_name in train_samples}
+    test_sample_data = {sample_name: sample_data[sample_name] for sample_name in test_samples}
 
     return train_sample_data, test_sample_data
 
@@ -235,8 +219,7 @@ def transform_samples(
     """
     if not isinstance(sample_data, dict):
         raise ValueError(
-            "Input should be a dictionary with keys as sample names and"
-            + " values as lists of pandas DataFrames."
+            "Input should be a dictionary with keys as sample names and" + " values as lists of pandas DataFrames."
         )
 
     transformed_data = {}
@@ -250,10 +233,8 @@ def transform_samples(
 class SpectralDataReshaper(BaseEstimator, TransformerMixin):
     def __init__(
         self,
-        intensity_feature_name: str,
         wavelength_feature_name: str,
     ):
-        self.intensity_feature_name = intensity_feature_name
         self.wave_feature_name = wavelength_feature_name
         self.sample_size_ = None
 
@@ -268,42 +249,11 @@ class SpectralDataReshaper(BaseEstimator, TransformerMixin):
         if self.sample_size_ is None:
             raise RuntimeError("Transformer must be fitted before calling transform.")
 
-        reshaped_values = X[self.intensity_feature_name].values.reshape(
-            self.sample_size_, -1
-        )
-        transformed_df = pd.DataFrame(
-            reshaped_values, columns=X[self.wave_feature_name].unique()
-        )
+        intensity_feature_names = [idx for idx in X.columns if idx != self.wave_feature_name]
+        reshaped_values = X[intensity_feature_names].values.reshape(self.sample_size_, -1)
+        transformed_df = pd.DataFrame(reshaped_values, columns=X[self.wave_feature_name].unique())
 
         return transformed_df
-
-
-def attach_major_oxides(
-    transformed_df: pd.DataFrame,
-    sample_composition: pd.DataFrame,
-    major_oxides: list[str],
-):
-    """
-    Attaches major oxides composition values to the
-    transformed dataframe based on the sample composition.
-
-    Args:
-        transformed_df (pd.DataFrame): The transformed dataframe.
-        sample_composition (pd.DataFrame): The sample composition dataframe.
-        major_oxides (list[str]): List of major oxides to attach.
-
-    Returns:
-        pd.DataFrame: The transformed dataframe with major oxides attached.
-
-    Raises:
-        ValueError: If sample_composition is empty.
-    """
-    if sample_composition.empty:
-        raise ValueError("sample_composition is empty, cannot attach major oxides")
-    oxides = sample_composition[major_oxides].iloc[0]
-    transformed_df = transformed_df.assign(**oxides)
-
-    return transformed_df
 
 
 class CompositionData:
@@ -336,9 +286,7 @@ class CompositionData:
         sample_name_lower = _sample_name.lower()
 
         match_condition = (
-            self.composition_data[self.match_cols]
-            .apply(lambda x: x.str.lower() == sample_name_lower)
-            .any(axis=1)
+            self.composition_data[self.match_cols].apply(lambda x: x.str.lower() == sample_name_lower).any(axis=1)
         )
 
         composition = self.composition_data.loc[match_condition]
@@ -390,11 +338,7 @@ class CompositionData:
 
             # Rename the columns to match PDS format
             df.rename(
-                columns=lambda x: (
-                    "Sample Name"
-                    if x.strip() == "Target"
-                    else x.replace("(wt%)", "").strip()
-                ),
+                columns=lambda x: ("Sample Name" if x.strip() == "Target" else x.replace("(wt%)", "").strip()),
                 inplace=True,
             )
 
@@ -406,9 +350,7 @@ class CompositionData:
                 if column not in self.match_cols:
                     df[column] = pd.to_numeric(df[column], errors="coerce")
         else:
-            raise ValueError(
-                f'Unknown data source: First column "{first_column}" was not recognized.'
-            )
+            raise ValueError(f'Unknown data source: First column "{first_column}" was not recognized.')
 
         return df
 
@@ -433,7 +375,7 @@ class NonNegativeTransformer(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class CustomSpectralPipeline:
+class CustomSpectralPipeline(BaseEstimator, TransformerMixin):
     """
     A custom spectral pipeline for processing spectral data.
     Custom to the PLS-SM part.
@@ -452,22 +394,21 @@ class CustomSpectralPipeline:
         masks,
         composition_data_loc,
         major_oxides,
-        intensity_feature_name="shot_avg",
-        wavelength_feature_name="wave",
     ):
-        self.mask_transformer = WavelengthMaskTransformer(masks)
-        # Negative intensities come from the preprocessing step (continuum removal?).
-        # We should not remove them, but set them to 0. (src: Oct. 30, 2023)
-        self.non_negative_transformer = NonNegativeTransformer()
-        self.data_reshaper = SpectralDataReshaper(
-            intensity_feature_name, wavelength_feature_name
+        self.pipeline = Pipeline(
+            [
+                ("mask_transformer", WavelengthMaskTransformer(masks)),
+                ("non_negative_transformer", NonNegativeTransformer()),
+                ("data_reshaper", SpectralDataReshaper(wavelength_feature_name="wave")),
+            ]
         )
+
         self.composition_data = CompositionData(composition_data_loc)
         self.major_oxides = major_oxides
 
-    def process_sample(
+    def _attach_major_oxides(
         self,
-        sample_df: pd.DataFrame,
+        transformed_df: pd.DataFrame,
         sample_name: str,
         location_name: str,
     ):
@@ -475,28 +416,25 @@ class CustomSpectralPipeline:
         Process a single sample.
 
         Args:
-            sample_df (pd.DataFrame): DataFrame containing the spectral data for the
+            transformed_df (pd.DataFrame): DataFrame containing the spectral data for the
                 sample.
             sample_name (str): Name of the sample.
 
         Returns:
             pd.DataFrame: Processed DataFrame for the sample.
         """
-        masked_df = self.mask_transformer.transform(sample_df)
-        non_negative_df = self.non_negative_transformer.transform(masked_df)
-        reshaped_df = self.data_reshaper.fit_transform(non_negative_df)
+        sample_composition = self.composition_data.get_composition_for_sample(sample_name)
 
-        sample_composition = self.composition_data.get_composition_for_sample(
-            sample_name
-        )
-        final_df = attach_major_oxides(
-            pd.DataFrame(reshaped_df), sample_composition, self.major_oxides
-        )
+        if sample_composition.empty:
+            raise ValueError("sample_composition is empty, cannot attach major oxides")
 
-        final_df["Sample Name"] = sample_name
-        final_df["ID"] = f"{sample_name}_{location_name}"
+        oxides = sample_composition[self.major_oxides].iloc[0]
+        transformed_df = transformed_df.assign(**oxides)
 
-        return final_df
+        transformed_df["Sample Name"] = sample_name
+        transformed_df["ID"] = f"{sample_name}_{location_name}"
+
+        return transformed_df
 
     def fit_transform(self, sample_data: dict[str, Dict[str, pd.DataFrame]]):
         """
@@ -510,18 +448,14 @@ class CustomSpectralPipeline:
         """
         transformed_samples = []
 
-        for sample_name, sample_location_dfs in tqdm(
-            sample_data.items(), desc="Transforming samples"
-        ):
+        for sample_name, sample_location_dfs in tqdm(sample_data.items(), desc="Transforming samples"):
             for _, (location_name, sample_df) in enumerate(sample_location_dfs.items()):
-                if self.composition_data.get_composition_for_sample(
-                    sample_name=sample_name
-                ).empty:
+                if self.composition_data.get_composition_for_sample(sample_name=sample_name).empty:
                     continue
 
-                transformed_df = self.process_sample(
-                    sample_df, sample_name, location_name
-                )
+                transformed_df = self.pipeline.fit_transform(sample_df)
+
+                transformed_df = self._attach_major_oxides(pd.DataFrame(transformed_df), sample_name, location_name)
                 transformed_samples.append(transformed_df)
 
         df_out = pd.concat(transformed_samples, ignore_index=True).rename(columns=str)
