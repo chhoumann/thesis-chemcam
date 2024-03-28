@@ -3,6 +3,8 @@ from typing import List, Tuple
 import numpy as np
 import pandas as pd
 
+from lib.reproduction import major_oxides
+
 
 # Post processing function to be run in parallel
 def parallel_postprocess(
@@ -58,8 +60,16 @@ def _postprocess_df(
 
         ic_wavelengths.loc[sample_id, wavelength] = corr
 
-    # Filter the composition data to only include the oxides and their compositions
-    filtered_composition_df = composition_df.iloc[:, 3:12]
+    # Initialize an empty list to store the indices of columns to include
+    include_indices = []
+
+    # Iterate over the columns and add the index if the column is in major_oxides
+    for i, column in enumerate(composition_df.columns):
+        if column in major_oxides:
+            include_indices.append(i)
+
+    # Use the list of indices to filter the DataFrame
+    filtered_composition_df = composition_df.iloc[:, include_indices]
     filtered_composition_df.index = pd.Index([sample_id])
 
     return ic_wavelengths, filtered_composition_df
