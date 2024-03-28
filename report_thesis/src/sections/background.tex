@@ -94,3 +94,35 @@ While the team decided to retain \gls{pls} for analyzing certain oxides, \gls{ic
 Instead, models based on \gls{gbr}, \gls{rf}, and \gls{lasso} were selected for other oxides.
 This decision reinforces our finding that \gls{ica} regression models fall short in accurately predicting the composition of major oxides in geological samples.
 Consistent with our observations, \gls{gbr} was also identified as a high-performing model in their analyses.
+
+\subsection{Data Normalization}\label{sec:data_normalization}
+The \gls{chemcam} instrument consists of three spectrometers, each producing 2048 channels.
+For data normalization, we follow the approach taken by the SuperCam team and normalize across individual spectrometers' wavelength ranges, known as Norm 3~\cite{andersonPostlandingMajorElement2022}.
+This method ensures that each spectrometer's data is normalized independently.
+
+Intuitively, Norm 3 can be understood as follows: for each sample, we consider the data from each spectrometer separately. Within each spectrometer, we divide the intensity of each channel by the sum of all channel intensities for that spectrometer. This process is repeated for all three spectrometers, resulting in normalized data that preserves the relative intensities within each spectrometer while allowing for comparisons across different samples.
+Figure~\ref{fig:spectral_plot} shows a spectral plot of the \gls{ccs} data for the \textit{ultramafic} sample, illustrating the three distinct spectral regions, each captured by one of the three spectrometers. Specifically, one spectrometer captures the \gls{uv} region, another captures the \gls{vio} region, and the third captures the \gls{vnir} region.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/spectral_plot.png}
+	\caption{Spectral plot of the \gls{ccs} data for the \textit{ultramafic} sample. The wavelengths represent the spectral channels.}
+	\label{fig:spectral_plot}
+\end{figure}
+
+Formally, Norm 3 is defined as:
+
+\begin{equation}
+	\tilde{X}_{i,j}^{(s)} = \frac{X_{i,j}^{(s)}}{\sum_{j=1}^{N} X_{i,j}^{(s)}},
+\end{equation}
+
+where:
+
+\begin{itemize}
+	\item $\tilde{X}_{i,j}^{(s)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $s$-th spectrometer.
+	\item $X_{i,j}^{(s)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $s$-th spectrometer.
+	\item $N = 2048$ is the number of channels in each spectrometer.
+	\item $s \in \{1, 2, 3\}$ is the index of the spectrometer.
+\end{itemize}
+
+This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
