@@ -1,5 +1,5 @@
 import os
-from hashlib import sha3_256
+from hashlib import md5, sha3_256
 from pathlib import Path
 
 from dotenv import find_dotenv, load_dotenv
@@ -15,6 +15,7 @@ _ENV_VARS = [
 
 class AppConfig:
     def __init__(self):
+        self._data_hash = None
         load_dotenv(find_dotenv())
         self._config = self._load_config()
 
@@ -49,7 +50,13 @@ class AppConfig:
 
     @property
     def data_hash(self):
-        return sha3_256(str(Path(self.composition_data_path)).encode()).hexdigest()
+        if self._data_hash is None:
+            with open(self.composition_data_path, "rb") as f:
+                file_contents = f.read()
+
+            self._data_hash = md5(file_contents).hexdigest()
+
+        return self._data_hash
 
     @property
     def data_cache_dir(self):
