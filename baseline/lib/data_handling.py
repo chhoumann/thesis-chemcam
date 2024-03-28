@@ -1,3 +1,5 @@
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -109,16 +111,31 @@ def load_data(
     a location on the sample.
     """
 
-    sample_data: Dict[str, Dict[str, pd.DataFrame]] = {}
+    # Function for loading sample data in parallel
+    def _load_sample_data(sample_name, data_path, average_shots):
+        return sample_name, get_preprocessed_sample_data(
+            sample_name, data_path, average_shots
+        )
+
     data_path = Path(dataset_loc).resolve(strict=True)
     sample_names = [f.name for f in data_path.iterdir() if f.is_dir()]
 
     take_amount = num_samples if num_samples else len(sample_names)
+    sample_data = {}
 
-    for _sample_name in tqdm(sample_names[:take_amount], desc="Loading data"):
-        sample_data[_sample_name] = get_preprocessed_sample_data(
-            _sample_name, data_path, average_shots
-        )
+    with tqdm(total=take_amount, desc="Loading data") as pbar:
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(
+                    _load_sample_data, sample_name, data_path, average_shots
+                )
+                for sample_name in sample_names[:take_amount]
+            ]
+
+            for future in as_completed(futures):
+                sample_name, data = future.result()
+                sample_data[sample_name] = data
+                pbar.update()
 
     return sample_data
 
@@ -127,7 +144,6 @@ def load_split_data(
     dataset_loc: str, split_loc: Optional[str] = None, average_shots=True
 ):
     sample_data = load_data(dataset_loc, average_shots=average_shots)
-
     train_test_split_df = get_train_test_split(split_loc)
 
     train_samples = train_test_split_df.loc[
