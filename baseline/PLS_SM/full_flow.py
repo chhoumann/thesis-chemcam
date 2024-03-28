@@ -375,6 +375,7 @@ def test(
 
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
+            pred_df.to_csv(f"{experiment_name}_{oxide}.csv", index=False)
 
             # Check that the dataframe has at least one row and that all major oxides are columns
             nan_in_Y = Y[oxide].isna()
@@ -388,8 +389,14 @@ def test(
                 print("NaNs in pred_df:")
                 print(pred_df[nan_in_pred_df])
 
+
+            # Remove NaNs from pred_df and Y[oxide]
+            nan_mask = pred_df.notna().squeeze()  # assuming pred_df is a single column
+            pred_df = pred_df[nan_mask]
+            Y_oxide = Y[oxide][nan_mask]
+
             # calculate RMSEP
-            rmsep = mean_squared_error(Y[oxide], pred_df, squared=False)
+            rmsep = mean_squared_error(Y_oxide, pred_df, squared=False)
             mlflow.log_metric(f"RMSEP_{oxide}", float(rmsep))
 
             target_predictions[oxide] = pred

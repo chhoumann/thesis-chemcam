@@ -2,6 +2,9 @@ import numpy as np
 
 from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.reproduction import training_info
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_weights(y_full, blend_range_min, blend_range_max):
@@ -112,8 +115,9 @@ def predict_composition_with_blending(oxide: str, X1, X3, models, ranges):
                 break
 
         if not prediction_made:
-            raise ValueError(
-                f"{i}: y_full value {y_full} for oxide {oxide} is outside defined blending ranges."
+            logger.warning(
+                f"{i}: y_full value {y_full} for oxide {oxide} is outside defined blending ranges. Appending NaN to predictions."
             )
+            predictions.append(np.nan)
 
     return predictions
