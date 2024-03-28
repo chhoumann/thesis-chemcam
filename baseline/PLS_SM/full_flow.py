@@ -375,7 +375,6 @@ def test(
 
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
-            pred_df.to_csv(f"{experiment_name}_{oxide}.csv", index=False)
 
             # Check that the dataframe has at least one row and that all major oxides are columns
             nan_in_Y = Y[oxide].isna()
