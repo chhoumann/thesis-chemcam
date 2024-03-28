@@ -361,6 +361,8 @@ class CompositionData:
             self.match_cols = ["Sample Name"]
 
             df = pd.read_csv(self.composition_data_loc, skiprows=1)
+            
+            # Rename the columns to match PDS format
             df.rename(
                 columns=lambda x: (
                     "Sample Name"
@@ -369,6 +371,13 @@ class CompositionData:
                 ),
                 inplace=True,
             )
+
+            # Clean the data
+            for column in df.columns:
+                # Replace instances of '<' followed by any number with the number itself
+                df[column] = df[column].astype(str).str.replace('<', '')
+                # Convert all numbers to floats and errors to NaN (non-numeric values become NaN)
+                df[column] = pd.to_numeric(df[column], errors='coerce')
         else:
             raise ValueError(
                 f'Unknown data source: First column "{first_column}" was not recognized.'
