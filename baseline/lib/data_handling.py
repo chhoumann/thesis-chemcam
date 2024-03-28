@@ -377,7 +377,8 @@ class CompositionData:
                 # Replace instances of '<' followed by any number with the number itself
                 df[column] = df[column].astype(str).str.replace('<', '')
                 # Convert all numbers to floats and errors to NaN (non-numeric values become NaN)
-                df[column] = pd.to_numeric(df[column], errors='coerce')
+                if column not in self.match_cols:
+                    df[column] = pd.to_numeric(df[column], errors='coerce')
         else:
             raise ValueError(
                 f'Unknown data source: First column "{first_column}" was not recognized.'
