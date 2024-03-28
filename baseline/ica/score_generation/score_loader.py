@@ -114,9 +114,7 @@ def _compute_scores_for_norm(
         ]["train_test"]
 
         if split_info_sample_row.empty:
-            print(
-                f"No split info found for {sample_name}. Likely has missing data or is not used in calib2015."
-            )
+            print(f"No split info found for {sample_name}.")
             continue
 
         if split_info_sample_row.values[0] != desired_dataset:
@@ -145,6 +143,8 @@ def _compute_scores_for_norm(
                     num_components,
                 )
             )
+
+    assert len(sample_details_list) > 0, "No samples found for processing."
 
     # Post process the data in parallel
     print("Post processing preprocessed data...")
