@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from tqdm import tqdm
 
-from lib.reproduction import folder_to_composition_sample_name
+from lib.reproduction import ccs_drop_cols, folder_to_composition_sample_name
 from lib.utils import get_train_test_split
 
 
@@ -53,8 +53,6 @@ def get_preprocessed_sample_data(
     Returns:
         list[pd.DataFrame]: A list of preprocessed sample dataframes.
     """
-    exclude_from_avg = ["wave", "mean", "median"]
-    first_five_shots = [f"shot{i}" for i in range(1, 6)]
 
     wavelengths = pd.Series(dtype="float64")
 
@@ -64,18 +62,15 @@ def get_preprocessed_sample_data(
     for i, sample_set in enumerate(sample_dataset_paths):
         df = get_dataset_frame(sample_set)
 
-        # strip whitespace from column names
-        df.columns = df.columns.str.strip()
-        # remove # from column names
-        df.columns = df.columns.str.replace("# ", "")
+        # strip whitespace from column names and remove # from column names
+        df.columns = df.columns.str.strip().str.replace("# ", "")
 
         if i == 0:
             wavelengths = df["wave"]
         else:
             assert wavelengths.equals(df["wave"])
 
-        df.drop(exclude_from_avg, axis=1, inplace=True)
-        df.drop(first_five_shots, axis=1, inplace=True)
+        df.drop(ccs_drop_cols, axis=1, inplace=True)
 
         # re-insert wavelengths to avoid averaging them
         df.insert(0, "wave", wavelengths)

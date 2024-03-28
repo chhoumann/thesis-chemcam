@@ -253,3 +253,6 @@ folder_to_composition_sample_name = {
     # "1tio2": "",
     "bir1a": "BIR-1a",
 }
+
+# Columns to drop from the raw CCS dataset
+ccs_drop_cols = ["wave", "mean", "median"] + [f"shot{i}" for i in range(1, 6)]
