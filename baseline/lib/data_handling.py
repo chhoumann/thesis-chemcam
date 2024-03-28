@@ -361,7 +361,22 @@ class CompositionData:
             self.match_cols = ["Sample Name"]
 
             df = pd.read_csv(self.composition_data_loc, skiprows=1)
-            
+
+            # Drop the columns that contain the quality of the composition data
+            drop_cols = [
+                "SiO2 Qual.",
+                "TiO2 Qual.",
+                "Al2O3 Qual.",
+                "FeOT Qual.",
+                "MnO Qual.",
+                "MgO Qual.",
+                "CaO Qual.",
+                "Na2O Qual.",
+                "K2O Qual.",
+            ]
+
+            df.drop(drop_cols, axis=1, inplace=True)
+
             # Rename the columns to match PDS format
             df.rename(
                 columns=lambda x: (
@@ -375,10 +390,10 @@ class CompositionData:
             # Clean the data
             for column in df.columns:
                 # Replace instances of '<' followed by any number with the number itself
-                df[column] = df[column].astype(str).str.replace('<', '')
+                df[column] = df[column].astype(str).str.replace("<", "")
                 # Convert all numbers to floats and errors to NaN (non-numeric values become NaN)
                 if column not in self.match_cols:
-                    df[column] = pd.to_numeric(df[column], errors='coerce')
+                    df[column] = pd.to_numeric(df[column], errors="coerce")
         else:
             raise ValueError(
                 f'Unknown data source: First column "{first_column}" was not recognized.'
