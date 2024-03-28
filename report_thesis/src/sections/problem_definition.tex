@@ -1,13 +1,29 @@
 \section{Problem Definition}\label{sec:problem_definition}
-There remains considerable uncertainty about which machine learning techniques best predict the composition of major oxides in Martian geological samples using \gls{libs} data.
-In addition, predicting major oxide compositions from \gls{libs} data presents significant computational challenges, including the high dimensionality and non-linearity of the data, compounded by multicollinearity and the phenomenon known as matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}.
-These effects can cause the intensity of emission lines from an element to vary independently of that element's concentration, introducing unknown variables that complicate the analysis.
-Furthermore, due to the high cost of data collection, datasets are often small, which further complicates the task of building accurate and robust models.
 
-Building upon the baseline established in~\citet{p9_paper}, our work aims to address the significant challenges inherent in predicting major oxide compositions from \gls{libs} data by improving the accuracy and robustness of these predictions.
-Here, we define accuracy as the ability of a model to predict the composition of major oxides in Martian geological samples, while robustness refers to the stability of these predictions across different samples and oxides.
+\subsection{Motivating Example: NASA's Mars Missions}
+The NASA Viking missions in the 1970s were the first to successfully land on Mars, aiming to determine if life existed on the planet. 
+While these missions advanced our knowledge of the Martian environment, the search for evidence of life remained inconclusive~\cite{marsnasagov_vikings}.
 
-% Placeholder
-\textit{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by developing machine learning models that improve the accuracy and robustness of these predictions. 
+Subsequent missions, such as the \gls{mer} mission in 2003 and the \gls{msl} mission in 2012, sought to investigate whether Mars ever had the conditions to support life. 
+The Curiosity rover, part of the \gls{msl} mission, is equipped with the \gls{chemcam} instrument, which uses \gls{libs} to gather spectral data from geological samples on Mars~\cite{wiensChemcam2012}.
 
-We will investigate various techniques to handle the high dimensionality, non-linearity, and small dataset size inherent in this problem, and evaluate the performance of these models using appropriate metrics, which will be discussed in detail in Section~\ref{sec:methodology}.
+\gls{libs} uses a laser to ablate surface material and generate a plasma plume, which emits light captured by spectrometers. 
+The resulting spectra consist of emission lines associated with the concentration of specific elements, serving as a multi-dimensional fingerprint of the sample's elemental composition~\cite{cleggRecalibrationMarsScience2017}.
+
+\subsection{Problem Formulation}
+Predicting major oxide compositions from \gls{libs} data presents significant computational challenges, including high dimensionality, non-linearity, multicollinearity, and the phenomenon known as matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}.
+Furthermore, the high cost of data collection often results in small datasets, complicating the task of building accurate and robust models.
+
+Let $D$ be the \gls{libs} dataset, defined in the space $\Lambda \times \mathbb{R}^m$, where $\Lambda$ represents the set of possible wavelengths and $\mathbb{R}^m$ denotes the $m$-dimensional space of intensities:
+
+\begin{equation}
+D = \{ (\lambda_1, \vec{I}_1), (\lambda_2, \vec{I}_2), \ldots, (\lambda_n, \vec{I}_n) \}    
+\end{equation}
+
+Each element $(\lambda_i, \vec{I}_i) \in \Lambda \times \mathbb{R}^{m}$ comprises the wavelength $\lambda_i$ of the $i^{th}$ measurement point and an $m$-dimensional intensity vector $\vec{I}_i = [I_{i1}, I_{i2}, \ldots, I_{im}]$.
+
+Given a set of major oxides $O$ where $k=|O|$, we aim to develop a model $M$ that learns a hypothesis function $f: \Lambda \times \mathbb{R}^m \rightarrow \mathbb{R}^k$, using the dataset $D$ as input to predict the composition of the $k$ major oxides in geological samples.
+The output of the hypothesis function is a vector $\mathbf{\hat{y}} = [\hat{y}_{1}, \hat{y}_{2}, \ldots, \hat{y}_{k}]$ where $\hat{y}_{i}$ is the predicted weight percentage of the major oxide $o_i \in O$.
+
+\textbf{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by developing machine learning models that improve the accuracy and robustness of these predictions. 
+We will investigate various techniques to handle the high dimensionality, non-linearity, and small dataset size inherent in this problem, and evaluate model performance using appropriate metrics, which will be discussed in detail in Section~\ref{sec:methodology}.
