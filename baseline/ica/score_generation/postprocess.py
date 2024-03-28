@@ -65,7 +65,7 @@ def _postprocess_df(
 
     # Iterate over the columns and add the index if the column is in major_oxides
     for i, column in enumerate(composition_df.columns):
-        if column in major_oxides:
+        if column in major_oxides or column == "Sample Name":
             include_indices.append(i)
 
     # Use the list of indices to filter the DataFrame
