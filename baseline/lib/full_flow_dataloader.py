@@ -9,7 +9,7 @@ from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.reproduction import major_oxides, masks
 
 
-def load_full_flow_data():
+def load_full_flow_data(load_cache_if_exits: bool = True, average_shots: bool = True):
     """
     Loads the data for the full flow.
     """
@@ -26,12 +26,21 @@ def load_full_flow_data():
     test_path = preformatted_data_path / f"test_{data_hash}.csv"
 
     if (
-        not preformatted_data_path.exists()
-        or not train_path.exists()
-        or not test_path.exists()
+        load_cache_if_exits
+        and preformatted_data_path.exists()
+        and train_path.exists()
+        and test_path.exists()
     ):
+        logger.info(
+            "Loading preformatted data from location: %s", preformatted_data_path
+        )
+        train_processed = pd.read_csv(train_path)
+        test_processed = pd.read_csv(test_path)
+    else:
         logger.info("Loading data from location: %s", dataset_loc)
-        train_data, test_data = load_split_data(str(dataset_loc), average_shots=True)
+        train_data, test_data = load_split_data(
+            str(dataset_loc), average_shots=average_shots
+        )
         logger.info("Data loaded successfully.")
 
         logger.info("Initializing CustomSpectralPipeline.")
@@ -49,12 +58,6 @@ def load_full_flow_data():
 
         train_processed.to_csv(train_path, index=False)
         test_processed.to_csv(test_path, index=False)
-    else:
-        logger.info(
-            "Loading preformatted data from location: %s", preformatted_data_path
-        )
-        train_processed = pd.read_csv(train_path)
-        test_processed = pd.read_csv(test_path)
 
     return train_processed, test_processed
 
