@@ -53,6 +53,10 @@ class AppConfig:
         return self._config["CCAM_MASTER_LIST_FILE_NAME"]
 
     @property
+    def ccam_master_list_file_path(self):
+        return os.path.join(self.data_path, self.ccam_master_list_file_name)
+
+    @property
     def data_hash(self):
         if self._data_hash is None:
             with open(self.composition_data_path, "rb") as f:

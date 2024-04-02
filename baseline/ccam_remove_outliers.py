@@ -1,56 +1,54 @@
-import argparse
+import enum
 import os
 import shutil
 from pathlib import Path
 
 import pandas as pd
+import typer
 
 from lib.config import AppConfig
 
+app = typer.Typer()
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument(
-        "-m",
+class Mode(enum.Enum):
+    exclude = "exclude"
+    include = "include"
+
+
+@app.command()
+def main(
+    mode: Mode = typer.Option(
+        "exclude",
         "--mode",
-        choices=["exclude", "include"],
-        default="exclude",
-        help='Mode to run the script in: "exclude" or "include". Default is "exclude".',
+        "-m",
+        help="Mode to run the script in.",
+        case_sensitive=False,
     )
-
-    return parser.parse_args()
-
-
-def main(mode: str = "exclude"):
+):
     config = AppConfig()
     data_path = config.data_path
+    master_list_file_path = config.ccam_master_list_file_path
 
-    master_list_file_name = config.ccam_master_list_file_name
-    master_list_file_path = os.path.join(data_path, master_list_file_name)
-
-    master_list_df = pd.read_csv(master_list_file_path, skiprows=1)
+    N_COMMENT_LINES = 1
+    master_list_df = pd.read_csv(master_list_file_path, skiprows=N_COMMENT_LINES)
 
     outlier_rows = master_list_df.loc[master_list_df["Outlier (Exclude)"] == 1].copy()
     outlier_rows["File"] = outlier_rows["File"].str.strip()
 
     outliers_dir = Path(config.data_cache_dir) / f"{data_path}-outliers"
 
-    if mode == "exclude":
+    if mode == Mode.exclude:
         exclude_outlier_files(data_path, outliers_dir, outlier_rows)
-    elif mode == "include":
+    elif mode == Mode.include:
         include_outlier_files(data_path, outliers_dir)
 
 
-def exclude_outlier_files(
-    data_path: str, outliers_dir: Path, outlier_rows: pd.DataFrame
-):
+def exclude_outlier_files(data_path: str, outliers_dir: Path, outlier_rows: pd.DataFrame):
     samples = [entry.name for entry in os.scandir(data_path) if entry.is_dir()]
     files_to_exclude = []
 
     for sample in samples:
         sample_path = os.path.join(data_path, sample)
-
-        # Get all files whose file extension is .csv in the directory
         csv_files = [file for file in os.listdir(sample_path) if file.endswith(".csv")]
 
         if len(csv_files) == 0:
@@ -75,8 +73,6 @@ def exclude_outlier_files(
 
         print(f"Moved {file_path.name} from {file_path.parent.name} to {new_file_path}")
 
-        files_to_include = list(outliers_dir.rglob("*.csv"))
-
 
 def include_outlier_files(data_path: str, outliers_dir: Path):
     files_to_include = list(outliers_dir.rglob("*.csv"))
@@ -87,21 +83,14 @@ def include_outlier_files(data_path: str, outliers_dir: Path):
         if not file_path.is_file():
             continue
 
-        # Calculate the relative path of the file with respect to the outliers directory
         relative_path = file_path.relative_to(outliers_dir)
-        # Construct the original file path
         original_file_path = data_path / relative_path
-        # Ensure the directory exists
         original_file_path.parent.mkdir(exist_ok=True, parents=True)
 
-        # Move file back to the original location
         shutil.move(file_path, original_file_path)
 
-        print(
-            f"Moved {file_path.name} from {file_path.parent.name} to {original_file_path}"
-        )
+        print(f"Moved {file_path.name} from {file_path.parent.name} to {original_file_path}")
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(mode=args.mode)
+    app()
