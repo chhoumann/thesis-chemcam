@@ -1,11 +1,12 @@
 import os
 from enum import Enum
+from pathlib import Path
 from typing import List
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from lib.config import AppConfig
 
+from lib.config import AppConfig
 from lib.data_handling import CompositionData
 from lib.reproduction import folder_to_composition_sample_name, major_oxides
 
@@ -160,11 +161,13 @@ def create_train_test_split_with_extremes(
 
 if __name__ == "__main__":
     config = AppConfig()
-    comp_data_loc = config.composition_data_path
     dataset_loc = config.data_path
-    save_path = config.train_test_split_path
+    composition_data_loc = config.composition_data_path
 
-    cd = CompositionData(composition_data_loc=comp_data_loc)
+    save_path = Path(config.train_test_split_path)
+    save_path.parent.mkdir(exist_ok=True, parents=True)
+
+    cd = CompositionData(composition_data_loc)
 
     samples = get_all_samples(cd, dataset_loc)
     filtered_samples = filter_samples(samples, [])
