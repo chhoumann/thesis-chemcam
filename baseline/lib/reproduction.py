@@ -8,8 +8,9 @@ masks = [
 
 spectral_ranges = {
     "UV": (240.811, 340.797),
-    "VIO": (382.138, 469.089),
-    "VNIR": (473.1842, 905.573),
+    # Original was 469.089 but some spectra go up to 469.090 for some reason
+    "VIO": (382.138, 469.090),
+    "VNIR": (473.1842, 906.573),
 }
 
 oxide_ranges = {
@@ -253,3 +254,6 @@ folder_to_composition_sample_name = {
     # "1tio2": "",
     "bir1a": "BIR-1a",
 }
+
+# Columns to drop from the raw CCS dataset
+ccs_drop_cols = ["wave", "mean", "median"] + [f"shot{i}" for i in range(1, 6)]

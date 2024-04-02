@@ -53,8 +53,9 @@ def _get_scores_for_norm(
         f"{config.data_cache_dir}/_preformatted_ica/norm{norm.value}{'-test' if is_test_run else ''}"
     )
 
-    ica_df_csv_loc = Path(f"{output_dir}/ica_data.csv")
-    compositions_csv_loc = Path(f"{output_dir}/composition_data.csv")
+    data_hash = config.data_hash
+    ica_df_csv_loc = Path(f"{output_dir}/ica_data_{data_hash}.csv")
+    compositions_csv_loc = Path(f"{output_dir}/composition_data_{data_hash}.csv")
 
     if ica_df_csv_loc.exists() and compositions_csv_loc.exists():
         print(f"Preprocessed ICA scores found for Norm {norm.value}. Loading data...")
@@ -113,9 +114,7 @@ def _compute_scores_for_norm(
         ]["train_test"]
 
         if split_info_sample_row.empty:
-            print(
-                f"No split info found for {sample_name}. Likely has missing data or is not used in calib2015."
-            )
+            print(f"No split info found for {sample_name}.")
             continue
 
         if split_info_sample_row.values[0] != desired_dataset:
@@ -144,6 +143,8 @@ def _compute_scores_for_norm(
                     num_components,
                 )
             )
+
+    assert len(sample_details_list) > 0, "No samples found for processing."
 
     # Post process the data in parallel
     print("Post processing preprocessed data...")
