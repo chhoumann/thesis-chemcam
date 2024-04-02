@@ -376,7 +376,7 @@ def test(
             # save
             pred_df = pd.DataFrame(pred, index=Y.index)
 
-            # Check that the dataframe has at least one row and that all major oxides are columns
+            # Check for NaNs in Y[oxide]
             nan_in_Y = Y[oxide].isna()
             if nan_in_Y.any():
                 print("NaNs in Y[oxide]:")
