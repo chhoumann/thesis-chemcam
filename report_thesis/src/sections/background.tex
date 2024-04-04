@@ -120,10 +120,9 @@ Formally, Norm 3 is defined as
 where
 
 \begin{itemize}
-	\item $\tilde{X}_{i,j}^{(s)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $s$-th spectrometer,
+	\item $\tilde{X}_{i,j}^{(s)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $s$-th spectrometer with $s \in \{1, 2, 3\}$,
 	\item $X_{i,j}^{(s)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $s$-th spectrometer,
 	\item $N = 2048$ is the number of channels in each spectrometer, and
-	\item $s \in \{1, 2, 3\}$ is the index of the spectrometer.
 \end{itemize}
 
 This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
