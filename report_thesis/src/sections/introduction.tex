@@ -1,26 +1,34 @@
 \section{Introduction}\label{sec:introduction}
-
-NASA has been studying the Martian environment for decades through a series of missions, each building on the knowledge gained from the previous ones.
+NASA has been studying the Martian environment for decades through a series of missions, including the Viking missions~\cite{marsnasagov_vikings}, the \gls{mer} mission~\cite{marsnasagov_observer, marsnasagov_spirit_opportunity}, and the \gls{msl} mission~\cite{marsnasagov_msl}, each building on the knowledge gained from the previous ones.
 Today, the rovers exploring Mars are equipped with sophisticated instruments for analyzing the chemical composition of Martian soil in search of past life and habitable environments.
 
-Part of this research is facilitated through interpretation of spectral data gathered  by \gls{libs} instruments.
-\gls{libs} works by firing a high-powered laser at soil samples, creating a plasma that emits light captured by spectrometers and analyzed for its elemental composition through the use of machine learning models.
-Scientists and researchers at NASA uses the spectral data to inform their understanding of Mars' geology through the identification of major oxides in the soil samples.
-To this end, various machine learning models have been developed to predict the composition of major oxides in the sample.
+Part of this research is facilitated through interpretation of spectral data gathered by \gls{libs} instruments, which fire a high-powered laser at soil samples to create a plasma.
+The emitted light is captured by spectrometers and analyzed using machine learning models to assess the presence and concentration of certain major oxides, informing NASA's understanding of Mars' geology.
+
+However, predicting major oxide compositions from \gls{libs} data presents significant computational challenges, including the high dimensionality and non-linearity of the data, compounded by multicollinearity and matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}. 
+These effects can cause the intensity of emission lines from an element to vary independently of that element's concentration, introducing unknown variables that complicate the analysis. 
+Furthermore, due to the high cost of data collection, datasets are often small, which further complicates the task of building accurate and robust models.
+
+Various machine learning models have been used to predict the composition of major oxides in the sample, including \glspl{cnn}~\cite{yang_laser-induced_2022, yangConvolutionalNeuralNetwork2022}, \gls{svr}~\cite{rezaei_dimensionality_reduction}, and hybrid models like \gls{df}-\gls{k-elm}~\cite{song_DF-K-ELM} that incorporate domain knowledge to enhance model interpretability and performance.
 However, the high dimensionality and multicollinearity of the spectral data remains a significant challenge for these models.
-A detailed study into advanced machine learning models and dimensionality reduction techniques is therefore crucial for improving predictions in these applications.
 
+Building upon the baseline established in~\citet{p9_paper}, this thesis aims to explore approaches for tackling the challenges in predicting major oxide compositions from \gls{libs} data. We develop machine learning models that seek to enhance the accuracy and robustness of these predictions.
+We define accuracy as the ability of a model to predict the composition of major oxides in Martian geological samples, while robustness refers to the stability of these predictions across different samples and oxides.
 
-In this work, we show that... \textit{results of the study will be added here after the paper is written.}
-
-Our experimental results demonstrate that... \textit{results of the experiment will be added here after the paper is written.}
+We investigate various techniques to handle the high dimensionality, non-linearity, and small dataset size inherent in this problem, and evaluate the performance of these models using appropriate metrics. 
+Through extensive experiments on \gls{libs} data, we demonstrate the superior performance of our approach compared to existing methods in terms of both prediction accuracy and computational efficiency.
 
 Our key contributions are as follows:
 \begin{itemize}
-	\item \textit{List contributions here.}
+    \item We develop a novel machine learning pipeline that effectively handles the challenges of \gls{libs} data to accurately predict major oxide compositions in Martian soil samples.
+    \item We conduct a comprehensive evaluation of various dimensionality reduction techniques and machine learning models to identify the optimal combination for this task. 
+	\item We demonstrate the superior performance of our approach compared to existing methods through extensive experiments on \gls{libs} data.
 \end{itemize}
 
-
-The remainder of this paper is organized as follows:
-\textit{Structure of the paper will be added here after the paper is written.}
-% TODO: Describe the results, experiments, contributions and structure of the paper.
+% TODO: Add remaining sections
+The remainder of this paper is organized as follows: 
+Section~\ref{sec:background} provides background on the onoging Mars exploration missions, the \gls{libs} technique, and the baseline \gls{moc} model. 
+Section~\ref{sec:problem_definition} formally defines the problem addressed in this work.
+Section~\ref{sec:methodology} describes our proposed methodology, including data preprocessing, dimensionality reduction, and machine learning models. 
+Section~\ref{sec:experiments} presents our experimental setup and results.
+Finally, Section~\ref{sec:conclusion} concludes the paper and discusses future work.

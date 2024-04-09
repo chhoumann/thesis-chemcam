@@ -8,7 +8,8 @@ masks = [
 
 spectral_ranges = {
     "UV": (240.811, 340.797),
-    "VIO": (382.138, 469.09),
+    # Original was 469.089 but some spectra go up to 469.090 for some reason
+    "VIO": (382.138, 469.090),
     "VNIR": (473.1842, 906.573),
 }
 
