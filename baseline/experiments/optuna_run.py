@@ -133,19 +133,22 @@ def combined_objective(trial):
             model = instantiate_extra_trees(trial, lambda params: mlflow.log_params(params))
         elif model_selector == "pls":
             model = instantiate_pls(trial, lambda params: mlflow.log_params(params))
+        else:
+            raise ValueError(f"Unsupported model type: {model_selector}")
 
         # Select and instantiate a preprocessor
         preprocessor_selector = trial.suggest_categorical(
             "preprocessor_type", ["robust_scaler", "standard_scaler", "min_max_scaler"]
         )
         use_power_transformer = trial.suggest_categorical("use_power_transformer", [True, False])
-
         if preprocessor_selector == "robust_scaler":
             preprocessor = instantiate_robust_scaler(trial, lambda params: mlflow.log_params(params))
         elif preprocessor_selector == "standard_scaler":
             preprocessor = instantiate_standard_scaler(trial, lambda params: mlflow.log_params(params))
         elif preprocessor_selector == "min_max_scaler":
             preprocessor = instantiate_min_max_scaler(trial, lambda params: mlflow.log_params(params))
+        else:
+            raise ValueError(f"Unsupported preprocessor type: {preprocessor_selector}")
 
         if use_power_transformer:
             power_transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
