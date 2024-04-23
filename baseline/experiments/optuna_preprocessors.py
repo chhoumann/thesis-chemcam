@@ -82,7 +82,6 @@ def instantiate_quantile_transformer(trial: Trial, logger=lambda params: None) -
         "output_distribution": trial.suggest_categorical(
             "quantile_transformer_output_distribution", ["uniform", "normal"]
         ),
-        "ignore_implicit_zeros": trial.suggest_categorical("quantile_transformer_ignore_implicit_zeros", [True, False]),
         "subsample": trial.suggest_int("quantile_transformer_subsample", 10000, 100000),
         "random_state": 42,
     }
