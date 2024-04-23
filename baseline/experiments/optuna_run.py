@@ -13,9 +13,11 @@ from optuna_models import (
 )
 from optuna_preprocessors import (
     instantiate_kernel_pca,
+    instantiate_max_abs_scaler,
     instantiate_min_max_scaler,
     instantiate_pca,
     instantiate_power_transformer,
+    instantiate_quantile_transformer,
     instantiate_robust_scaler,
     instantiate_standard_scaler,
 )
@@ -81,7 +83,7 @@ def champion_callback(study, frozen_trial):
     winner = study.user_attrs.get("winner", None)
     model_type = frozen_trial.params.get("model_type", "Unknown model type")
     scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
-    power_transformer = frozen_trial.params.get("use_power_transformer", False)
+    transformer = frozen_trial.params.get("transformer_type", "None")
     pca = frozen_trial.params.get("pca_type", "None")
 
     if study.best_value and winner != study.best_value:
@@ -90,18 +92,16 @@ def champion_callback(study, frozen_trial):
             improvement_percent = (abs(winner - study.best_value) / study.best_value) * 100
             message = (
                 f"Trial {frozen_trial.number} achieved value: {frozen_trial.value} with "
-                f"{improvement_percent: .4f}% improvement using {model_type}. "
-                f"Scaler: {scaler}, Power Transformer: {power_transformer}, PCA: {pca}"
+                f"{improvement_percent:.4f}% improvement using {model_type}. "
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
             )
-            print(message)
-            notify_discord(message)
         else:
             message = (
                 f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value} using {model_type}. "
-                f"Scaler: {scaler}, Power Transformer: {power_transformer}, PCA: {pca}"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
             )
-            print(message)
-            notify_discord(message)
+        print(message)
+        notify_discord(message)
 
 
 def notify_discord(message):
@@ -143,6 +143,8 @@ def instantiate_scaler(trial, scaler_selector, logger):
         return instantiate_standard_scaler(trial, logger)
     elif scaler_selector == "min_max_scaler":
         return instantiate_min_max_scaler(trial, logger)
+    elif scaler_selector == "max_abs_scaler":
+        return instantiate_max_abs_scaler(trial, logger)
     else:
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
@@ -155,13 +157,19 @@ def combined_objective(trial):
 
         # Preprocessor components
         scaler_selector = trial.suggest_categorical(
-            "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler"]
+            "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "max_abs_scaler"]
         )
         scaler = instantiate_scaler(trial, scaler_selector, lambda params: mlflow.log_params(params))
 
-        use_power_transformer = trial.suggest_categorical("use_power_transformer", [True, False])
-        if use_power_transformer:
-            power_transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
+        transformer_selector = trial.suggest_categorical(
+            "transformer_type", ["power_transformer", "quantile_transformer", "none"]
+        )
+        if transformer_selector == "power_transformer":
+            transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
+        elif transformer_selector == "quantile_transformer":
+            transformer = instantiate_quantile_transformer(trial, lambda params: mlflow.log_params(params))
+        else:
+            transformer = None
 
         pca_selector = trial.suggest_categorical("pca_type", ["pca", "kernel_pca", "none"])
         if pca_selector == "pca":
@@ -171,8 +179,8 @@ def combined_objective(trial):
 
         # Constructing the pipeline
         steps = [("scaler", scaler)]
-        if use_power_transformer:
-            steps.append(("power_transformer", power_transformer))
+        if transformer_selector != "none":
+            steps.append((transformer_selector, transformer))
         if pca_selector != "none":
             steps.append((pca_selector, pca))
 

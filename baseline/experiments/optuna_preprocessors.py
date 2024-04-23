@@ -1,11 +1,14 @@
 from optuna import Trial
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn.preprocessing import (
+    MaxAbsScaler,
     MinMaxScaler,
     PowerTransformer,
+    QuantileTransformer,
     RobustScaler,
     StandardScaler,
 )
+
 
 def instantiate_pca(trial: Trial, logger=lambda params: None) -> PCA:
     params = {
@@ -14,6 +17,7 @@ def instantiate_pca(trial: Trial, logger=lambda params: None) -> PCA:
     }
     logger(params)
     return PCA(**params)
+
 
 def instantiate_kernel_pca(trial: Trial, logger=lambda params: None) -> KernelPCA:
     params = {
@@ -59,6 +63,10 @@ def instantiate_min_max_scaler(trial: Trial, logger=lambda params: None) -> MinM
     return MinMaxScaler(**params)
 
 
+def instantiate_max_abs_scaler(trial: Trial, logger=lambda params: None) -> MaxAbsScaler:
+    return MaxAbsScaler()
+
+
 def instantiate_power_transformer(trial: Trial, logger=lambda params: None) -> PowerTransformer:
     params = {
         "method": "yeo-johnson",
@@ -66,3 +74,17 @@ def instantiate_power_transformer(trial: Trial, logger=lambda params: None) -> P
     }
     logger(params)
     return PowerTransformer(**params)
+
+
+def instantiate_quantile_transformer(trial: Trial, logger=lambda params: None) -> QuantileTransformer:
+    params = {
+        "n_quantiles": trial.suggest_int("quantile_transformer_n_quantiles", 100, 2000),
+        "output_distribution": trial.suggest_categorical(
+            "quantile_transformer_output_distribution", ["uniform", "normal"]
+        ),
+        "ignore_implicit_zeros": trial.suggest_categorical("quantile_transformer_ignore_implicit_zeros", [True, False]),
+        "subsample": trial.suggest_int("quantile_transformer_subsample", 10000, 100000),
+        "random_state": 42,
+    }
+    logger(params)
+    return QuantileTransformer(**params)
