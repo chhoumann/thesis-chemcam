@@ -2,7 +2,7 @@ import math
 
 import mlflow
 import optuna
-import pandas as pd
+import typer
 from optuna_models import (
     instantiate_extra_trees,
     instantiate_gbr,
@@ -16,7 +16,7 @@ from optuna_preprocessors import (
     instantiate_robust_scaler,
     instantiate_standard_scaler,
 )
-from sklearn.preprocessing import MaxAbsScaler, PowerTransformer
+from sklearn.metrics import mean_squared_error
 
 from lib import full_flow_dataloader
 from lib.config import AppConfig
@@ -96,50 +96,56 @@ def champion_callback(study, frozen_trial):
 
 
 def combined_objective(trial):
-    # Select and instantiate a model
-    model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
-    if model_selector == "gbr":
-        model = instantiate_gbr(trial)
-    elif model_selector == "svr":
-        model = instantiate_svr(trial)
-    elif model_selector == "xgboost":
-        model = instantiate_xgboost(trial)
-    elif model_selector == "extra_trees":
-        model = instantiate_extra_trees(trial)
-    elif model_selector == "pls":
-        model = instantiate_pls(trial)
+    with mlflow.start_run(nested=True):
+        # Select and instantiate a model
+        model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
+        if model_selector == "gbr":
+            model = instantiate_gbr(trial, lambda params: mlflow.log_params(params))
+        elif model_selector == "svr":
+            model = instantiate_svr(trial, lambda params: mlflow.log_params(params))
+        elif model_selector == "xgboost":
+            model = instantiate_xgboost(trial, lambda params: mlflow.log_params(params))
+        elif model_selector == "extra_trees":
+            model = instantiate_extra_trees(trial, lambda params: mlflow.log_params(params))
+        elif model_selector == "pls":
+            model = instantiate_pls(trial, lambda params: mlflow.log_params(params))
 
-    # Select and instantiate a preprocessor
-    preprocessor_selector = trial.suggest_categorical(
-        "preprocessor_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "power_transformer"]
-    )
-    if preprocessor_selector == "robust_scaler":
-        preprocessor = instantiate_robust_scaler(trial)
-    elif preprocessor_selector == "standard_scaler":
-        preprocessor = instantiate_standard_scaler(trial)
-    elif preprocessor_selector == "min_max_scaler":
-        preprocessor = instantiate_min_max_scaler(trial)
-    elif preprocessor_selector == "power_transformer":
-        preprocessor = instantiate_power_transformer(trial)
+        # Select and instantiate a preprocessor
+        preprocessor_selector = trial.suggest_categorical(
+            "preprocessor_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "power_transformer"]
+        )
+        if preprocessor_selector == "robust_scaler":
+            preprocessor = instantiate_robust_scaler(trial, lambda params: mlflow.log_params(params))
+        elif preprocessor_selector == "standard_scaler":
+            preprocessor = instantiate_standard_scaler(trial, lambda params: mlflow.log_params(params))
+        elif preprocessor_selector == "min_max_scaler":
+            preprocessor = instantiate_min_max_scaler(trial, lambda params: mlflow.log_params(params))
+        elif preprocessor_selector == "power_transformer":
+            preprocessor = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
+        mlflow.log_params({"model_type": model_selector, "preprocessor_type": preprocessor_selector})
 
-    # Preprocess the data
-    X_train_transformed = preprocessor.fit_transform(X_train)
-    X_test_transformed = preprocessor.transform(X_test)
+        # Preprocess the data
+        X_train_transformed = preprocessor.fit_transform(X_train)
+        X_test_transformed = preprocessor.transform(X_test)
 
-    # Train the model
-    model.fit(X_train_transformed, y_train)
-    preds = model.predict(X_test_transformed)
-    error = mean_squared_error(y_test, preds)
+        # Train the model
+        model.fit(X_train_transformed, y_train)
+        preds = model.predict(X_test_transformed)
+        mse = mean_squared_error(y_test, preds)
+        rmse = math.sqrt(mse)
 
-    mlflow.log_params(trial.params)
-    mlflow.log_metric("mse", float(error))
-    mlflow.log_metric("rmse", math.sqrt(error))
+        # Log metrics
+        mlflow.log_metric("mse", float(mse))
+        mlflow.log_metric("rmse", rmse)
 
-    return error
+    return rmse
 
 
-if __name__ == "__main__":
-    experiment_id = get_or_create_experiment("optuna_experiment_1")
+def main(
+    experiment_name: str = typer.Option(..., "--experiment-name", "-e", help="Name of the MLflow experiment"),
+    n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
+):
+    experiment_id = get_or_create_experiment(experiment_name)
     mlflow.set_experiment(experiment_id=experiment_id)
 
     for oxide in major_oxides:
@@ -151,7 +157,7 @@ if __name__ == "__main__":
 
             # Execute the hyperparameter optimization trials.
             # Note the addition of the `champion_callback` inclusion to control our logging
-            study.optimize(combined_objective, n_trials=500, callbacks=[champion_callback])
+            study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
 
             mlflow.log_params(study.best_params)
             mlflow.log_metric("best_mse", study.best_value)
@@ -165,3 +171,7 @@ if __name__ == "__main__":
                     "feature_set_version": 1,
                 }
             )
+
+
+if __name__ == "__main__":
+    typer.run(main)
