@@ -123,7 +123,7 @@ def notify_discord(message):
 
 def instantiate_model(trial, model_selector, logger):
     def _logger(params):
-            logger(f"{model_selector}_{k}" for k, v in params.items())
+        logger({f"{model_selector}_{k}": v for k, v in params.items()})
 
     if model_selector == "gbr":
         return instantiate_gbr(trial, lambda params: _logger(params))
@@ -141,7 +141,7 @@ def instantiate_model(trial, model_selector, logger):
 
 def instantiate_scaler(trial, scaler_selector, logger):
     def _logger(params):
-        logger(f"{scaler_selector}_{k}" for k, v in params.items())
+        logger({f"{scaler_selector}_{k}": v for k, v in params.items()})
 
     if scaler_selector == "robust_scaler":
         return instantiate_robust_scaler(trial, _logger)
