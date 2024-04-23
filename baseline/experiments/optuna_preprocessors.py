@@ -1,11 +1,29 @@
-import mlflow
 from optuna import Trial
+from sklearn.decomposition import PCA, KernelPCA
 from sklearn.preprocessing import (
     MinMaxScaler,
     PowerTransformer,
     RobustScaler,
     StandardScaler,
 )
+
+def instantiate_pca(trial: Trial, logger=lambda params: None) -> PCA:
+    params = {
+        "n_components": trial.suggest_int("pca_n_components", 1, 50),
+        "whiten": trial.suggest_categorical("pca_whiten", [True, False]),
+    }
+    logger(params)
+    return PCA(**params)
+
+def instantiate_kernel_pca(trial: Trial, logger=lambda params: None) -> KernelPCA:
+    params = {
+        "n_components": trial.suggest_int("kernel_pca_n_components", 1, 100),
+        "kernel": trial.suggest_categorical("kernel_pca_kernel", ["linear", "poly", "rbf", "sigmoid", "cosine"]),
+        "gamma": trial.suggest_float("kernel_pca_gamma", 1e-3, 1e1, log=True),
+        "degree": trial.suggest_int("kernel_pca_degree", 1, 5),
+    }
+    logger(params)
+    return KernelPCA(**params)
 
 
 def instantiate_robust_scaler(trial: Trial, logger=lambda params: None) -> RobustScaler:
