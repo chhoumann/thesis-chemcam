@@ -21,3 +21,40 @@ To assess the robustness of our models, we will consider the standard deviation 
 where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error. A lower standard deviation indicates better robustness.
 
 By using these two metrics, we aim to evaluate model performance in terms of both accuracy and robustness, which are crucial for the reliable prediction of major oxide compositions from \gls{libs} data.
+
+\subsection{Experiment}
+To determine the best model for predicting major oxide compositions from \gls{libs} data, we conducted a series of experiments using various machine learning algorithms.
+We started with a wide range of models and gradually narrowed down to the top-performing ones.
+Then, we researched these models in more detail to identify the best configuration for each oxide.
+
+The experiments were conducted using a funnel approach, where we started with a broad set of models and progressively focused on those whose performance showed the most promise using the aforementioned evaluation metrics.
+Based on the results from the litterature outlined in Section~\ref{sec:related-work}, we selected the most promising models for our experiments:
+\begin{itemize}
+    \item \gls{svr}
+    \item \gls{gbr}
+    \item \gls{xgboost}
+    \item \gls{pls} Regression
+    \item \gls{cnn}
+    \item \gls{ann}
+    \item \gls{enet}
+\end{itemize}
+
+
+
+% - Short introduction to the experiments section outlining the approach
+%     - Found a bunch of related litterature first related to LIBS, preprocessing and machine learning
+%     - Led to the decision to conduct a wide range of experiments to find the best model for our data
+% - Funnel approach
+%     - Start with a wide range of models
+%     - Narrow down to the best 4 models
+%     - Research these models in more detail
+% - For data preprocessing, examined which methods worked the best for these select models
+%     - Normalization, feature selection (variance threshold), autoencoders, etc.
+%     - Narrowed down to different transformations and normalization methods (i.e. PowerTransformer and RobustScaler)
+% - Experimented with ensemble methods
+%     - Boosting and stacking
+%     - Found that stacking was the best method
+% - Use Optuna to find the best configuration for each oxide, including:
+%     - architecture
+%     - hyperparameters
+%     - data preprocessing
