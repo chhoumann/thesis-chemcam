@@ -122,35 +122,43 @@ def notify_discord(message):
 
 
 def instantiate_model(trial, model_selector, logger):
+    def _logger(params):
+            logger(f"{model_selector}_{k}" for k, v in params.items())
+
     if model_selector == "gbr":
-        return instantiate_gbr(trial, logger)
+        return instantiate_gbr(trial, lambda params: _logger(params))
     elif model_selector == "svr":
-        return instantiate_svr(trial, logger)
+        return instantiate_svr(trial, lambda params: _logger(params))
     elif model_selector == "xgboost":
-        return instantiate_xgboost(trial, logger)
+        return instantiate_xgboost(trial, lambda params: _logger(params))
     elif model_selector == "extra_trees":
-        return instantiate_extra_trees(trial, logger)
+        return instantiate_extra_trees(trial, lambda params: _logger(params))
     elif model_selector == "pls":
-        return instantiate_pls(trial, logger)
+        return instantiate_pls(trial, lambda params: _logger(params))
     else:
         raise ValueError(f"Unsupported model type: {model_selector}")
 
 
 def instantiate_scaler(trial, scaler_selector, logger):
+    def _logger(params):
+        logger(f"{scaler_selector}_{k}" for k, v in params.items())
+
     if scaler_selector == "robust_scaler":
-        return instantiate_robust_scaler(trial, logger)
+        return instantiate_robust_scaler(trial, _logger)
     elif scaler_selector == "standard_scaler":
-        return instantiate_standard_scaler(trial, logger)
+        return instantiate_standard_scaler(trial, _logger)
     elif scaler_selector == "min_max_scaler":
-        return instantiate_min_max_scaler(trial, logger)
+        return instantiate_min_max_scaler(trial, _logger)
     elif scaler_selector == "max_abs_scaler":
-        return instantiate_max_abs_scaler(trial, logger)
+        return instantiate_max_abs_scaler(trial, _logger)
     else:
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
 
 def combined_objective(trial):
     with mlflow.start_run(nested=True):
+        mlflow.log_param("trial_number", trial.number)
+
         # Model selection
         model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
         model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
