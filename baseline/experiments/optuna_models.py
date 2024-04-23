@@ -24,6 +24,8 @@ def instantiate_svr(trial: Trial, logger=lambda params: None) -> SVR:
         "kernel": trial.suggest_categorical("svr_kernel", ["linear", "poly", "rbf", "sigmoid"]),
         "degree": trial.suggest_int("svr_degree", 1, 5),
         "gamma": trial.suggest_categorical("svr_gamma", ["scale", "auto"]),
+        "coef0": trial.suggest_float("svr_coef0", 0, 10),
+        "max_iter": 50000,
     }
     logger(params)
     return SVR(**params)
