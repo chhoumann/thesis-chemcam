@@ -18,6 +18,7 @@ from optuna_preprocessors import (
     instantiate_standard_scaler,
 )
 from sklearn.metrics import mean_squared_error
+from sklearn.pipeline import Pipeline
 
 from lib import full_flow_dataloader
 from lib.config import AppConfig
@@ -135,26 +136,38 @@ def combined_objective(trial):
 
         # Select and instantiate a preprocessor
         preprocessor_selector = trial.suggest_categorical(
-            "preprocessor_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "power_transformer"]
+            "preprocessor_type", ["robust_scaler", "standard_scaler", "min_max_scaler"]
         )
+        use_power_transformer = trial.suggest_categorical("use_power_transformer", [True, False])
+
         if preprocessor_selector == "robust_scaler":
             preprocessor = instantiate_robust_scaler(trial, lambda params: mlflow.log_params(params))
         elif preprocessor_selector == "standard_scaler":
             preprocessor = instantiate_standard_scaler(trial, lambda params: mlflow.log_params(params))
         elif preprocessor_selector == "min_max_scaler":
             preprocessor = instantiate_min_max_scaler(trial, lambda params: mlflow.log_params(params))
-        elif preprocessor_selector == "power_transformer":
-            preprocessor = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
-        mlflow.log_params({"model_type": model_selector, "preprocessor_type": preprocessor_selector})
+
+        if use_power_transformer:
+            power_transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
+            preprocessor = Pipeline([
+                ('scaler', preprocessor),
+                ('power_transformer', power_transformer)
+            ])
+
+        mlflow.log_params({
+            "model_type": model_selector, 
+            "preprocessor_type": preprocessor_selector,
+            "use_power_transformer": use_power_transformer
+        })
 
         # Preprocess the data
-        X_train_transformed = preprocessor.fit_transform(X_train)
-        X_test_transformed = preprocessor.transform(X_test)
+        X_train_transformed = preprocessor.fit_transform(X_train.copy())
+        X_test_transformed = preprocessor.transform(X_test.copy())
 
         # Train the model
-        model.fit(X_train_transformed, y_train)
+        model.fit(X_train_transformed, y_train.copy())
         preds = model.predict(X_test_transformed)
-        mse = mean_squared_error(y_test, preds)
+        mse = mean_squared_error(y_test.copy(), preds)
         rmse = math.sqrt(mse)
 
         # Log metrics
