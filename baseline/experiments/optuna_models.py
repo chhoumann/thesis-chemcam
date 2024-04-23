@@ -5,7 +5,7 @@ from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
 
-def instantiate_gbr(trial: Trial) -> GradientBoostingRegressor:
+def instantiate_gbr(trial: Trial, logger=lambda params: None) -> GradientBoostingRegressor:
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 100, 1000),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 1e0, log=True),
@@ -13,11 +13,11 @@ def instantiate_gbr(trial: Trial) -> GradientBoostingRegressor:
         "subsample": trial.suggest_float("subsample", 0.5, 1.0),
         "max_features": trial.suggest_categorical("max_features", ["sqrt", "log2"]),
     }
-
+    logger(params)
     return GradientBoostingRegressor(**params)
 
 
-def instantiate_svr(trial: Trial) -> SVR:
+def instantiate_svr(trial: Trial, logger=lambda params: None) -> SVR:
     params = {
         "C": trial.suggest_float("C", 1e-3, 1e3, log=True),
         "epsilon": trial.suggest_float("epsilon", 1e-3, 1e1, log=True),
@@ -25,11 +25,11 @@ def instantiate_svr(trial: Trial) -> SVR:
         "degree": trial.suggest_int("degree", 1, 5),
         "gamma": trial.suggest_categorical("gamma", ["scale", "auto"]),
     }
-
+    logger(params)
     return SVR(**params)
 
 
-def instantiate_xgboost(trial: Trial) -> XGBRegressor:
+def instantiate_xgboost(trial: Trial, logger=lambda params: None) -> XGBRegressor:
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 100, 1000),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 1e0, log=True),
@@ -40,11 +40,11 @@ def instantiate_xgboost(trial: Trial) -> XGBRegressor:
         "reg_alpha": trial.suggest_float("reg_alpha", 1e-3, 1e3, log=True),
         "reg_lambda": trial.suggest_float("reg_lambda", 1e-3, 1e3, log=True),
     }
-
+    logger(params)
     return XGBRegressor(**params)
 
 
-def instantiate_extra_trees(trial: Trial) -> ExtraTreesRegressor:
+def instantiate_extra_trees(trial: Trial, logger=lambda params: None) -> ExtraTreesRegressor:
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 100, 1000),
         "max_depth": trial.suggest_int("max_depth", 2, 15),
@@ -52,14 +52,13 @@ def instantiate_extra_trees(trial: Trial) -> ExtraTreesRegressor:
         "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 25),
         "max_features": trial.suggest_categorical("max_features", ["sqrt", "log2"]),
     }
-
+    logger(params)
     return ExtraTreesRegressor(**params)
 
 
-def instantiate_pls(trial: Trial) -> PLSRegression:
+def instantiate_pls(trial: Trial, logger=lambda params: None) -> PLSRegression:
     params = {
         "n_components": trial.suggest_int("n_components", 1, 30),
     }
-
+    logger(params)
     return PLSRegression(**params)
-
