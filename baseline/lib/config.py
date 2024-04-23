@@ -10,6 +10,7 @@ _ENV_VARS = [
     "TRAIN_TEST_SPLIT_DIR",
     "DATA_CACHE_DIR",
     "CCAM_MASTER_LIST_FILE_NAME",
+    "DISCORD_WEBHOOK_URL",
 ]
 
 
@@ -69,3 +70,7 @@ class AppConfig:
     @property
     def data_cache_dir(self):
         return self._config["DATA_CACHE_DIR"]
+
+    @property
+    def discord_webhook_url(self):
+        return self._config["DISCORD_WEBHOOK_URL"]

@@ -2,6 +2,7 @@ import math
 
 import mlflow
 import optuna
+import requests
 import typer
 from optuna_models import (
     instantiate_extra_trees,
@@ -26,7 +27,7 @@ mlflow.set_tracking_uri(AppConfig().mlflow_tracking_uri)
 optuna.logging.set_verbosity(optuna.logging.ERROR)
 
 drop_cols = ["ID", "Sample Name"]
-
+CURRENT_OXIDE = ""
 
 train_processed, test_processed = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
 target = major_oxides[0]
@@ -72,7 +73,7 @@ def get_or_create_experiment(experiment_name: str) -> str:
 def champion_callback(study, frozen_trial):
     """
     Logging callback that will report when a new trial iteration improves upon existing
-    best trial values.
+    best trial values, including the model type that achieved the new best value.
 
     Note: This callback is not intended for use in distributed computing systems such as Spark
     or Ray due to the micro-batch iterative implementation for distributing trials to a cluster's
@@ -82,17 +83,39 @@ def champion_callback(study, frozen_trial):
     """
 
     winner = study.user_attrs.get("winner", None)
+    model_type = frozen_trial.params.get("model_type", "Unknown model type")
 
     if study.best_value and winner != study.best_value:
         study.set_user_attr("winner", study.best_value)
         if winner:
             improvement_percent = (abs(winner - study.best_value) / study.best_value) * 100
-            print(
+            message = (
                 f"Trial {frozen_trial.number} achieved value: {frozen_trial.value} with "
-                f"{improvement_percent: .4f}% improvement"
+                f"{improvement_percent: .4f}% improvement using {model_type}"
             )
+            print(message)
+            notify_discord(message)
         else:
-            print(f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value}")
+            message = f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value} using {model_type}"
+            print(message)
+            notify_discord(message)
+
+
+def notify_discord(message):
+    """
+    Send a notification message to a Discord webhook.
+
+    Parameters:
+    - message (str): The message to send.
+    """
+    webhook_url = AppConfig().discord_webhook_url
+    if webhook_url:
+        data = {"content": f"{CURRENT_OXIDE} | {message}"}
+        response = requests.post(webhook_url, json=data)
+        if response.status_code != 204:
+            print(f"Failed to send message to Discord: {response.status_code}, {response.text}")
+    else:
+        print("Discord webhook URL is not set. Skipping notification.")
 
 
 def combined_objective(trial):
@@ -145,11 +168,13 @@ def main(
     experiment_name: str = typer.Option(..., "--experiment-name", "-e", help="Name of the MLflow experiment"),
     n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
 ):
+    global CURRENT_OXIDE
     experiment_id = get_or_create_experiment(experiment_name)
     mlflow.set_experiment(experiment_id=experiment_id)
 
     for oxide in major_oxides:
         run_name = oxide
+        CURRENT_OXIDE = oxide
         print(f"Optimizing for {oxide}")
         with mlflow.start_run(experiment_id=experiment_id, run_name=run_name, nested=True):
             # Initialize the Optuna study
