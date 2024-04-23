@@ -78,7 +78,7 @@ def instantiate_power_transformer(trial: Trial, logger=lambda params: None) -> P
 
 def instantiate_quantile_transformer(trial: Trial, logger=lambda params: None) -> QuantileTransformer:
     params = {
-        "n_quantiles": trial.suggest_int("quantile_transformer_n_quantiles", 100, 2000),
+        "n_quantiles": trial.suggest_int("quantile_transformer_n_quantiles", 100, 1000),
         "output_distribution": trial.suggest_categorical(
             "quantile_transformer_output_distribution", ["uniform", "normal"]
         ),
