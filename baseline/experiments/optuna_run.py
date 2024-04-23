@@ -162,12 +162,14 @@ def combined_objective(trial):
         # Model selection
         model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
         model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
+        mlflow.log_param("model_type", model_selector)
 
         # Preprocessor components
         scaler_selector = trial.suggest_categorical(
             "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "max_abs_scaler"]
         )
         scaler = instantiate_scaler(trial, scaler_selector, lambda params: mlflow.log_params(params))
+        mlflow.log_param("scaler_type", scaler_selector)
 
         transformer_selector = trial.suggest_categorical(
             "transformer_type", ["power_transformer", "quantile_transformer", "none"]
@@ -178,12 +180,14 @@ def combined_objective(trial):
             transformer = instantiate_quantile_transformer(trial, lambda params: mlflow.log_params(params))
         else:
             transformer = None
+        mlflow.log_param("transformer_type", transformer_selector)
 
         pca_selector = trial.suggest_categorical("pca_type", ["pca", "kernel_pca", "none"])
         if pca_selector == "pca":
             pca = instantiate_pca(trial, lambda params: mlflow.log_params(params))
         elif pca_selector == "kernel_pca":
             pca = instantiate_kernel_pca(trial, lambda params: mlflow.log_params(params))
+        mlflow.log_param("pca_type", pca_selector)
 
         # Constructing the pipeline
         steps = [("scaler", scaler)]
