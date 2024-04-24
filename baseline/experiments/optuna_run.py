@@ -156,63 +156,67 @@ def instantiate_scaler(trial, scaler_selector, logger):
 
 
 def combined_objective(trial):
-    with mlflow.start_run(nested=True):
-        mlflow.log_param("trial_number", trial.number)
+    try:
+        with mlflow.start_run(nested=True):
+            mlflow.log_param("trial_number", trial.number)
 
-        # Model selection
-        model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
-        model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
-        mlflow.log_param("model_type", model_selector)
+            # Model selection
+            model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
+            model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
+            mlflow.log_param("model_type", model_selector)
 
-        # Preprocessor components
-        scaler_selector = trial.suggest_categorical(
-            "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "max_abs_scaler"]
-        )
-        scaler = instantiate_scaler(trial, scaler_selector, lambda params: mlflow.log_params(params))
-        mlflow.log_param("scaler_type", scaler_selector)
+            # Preprocessor components
+            scaler_selector = trial.suggest_categorical(
+                "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "max_abs_scaler"]
+            )
+            scaler = instantiate_scaler(trial, scaler_selector, lambda params: mlflow.log_params(params))
+            mlflow.log_param("scaler_type", scaler_selector)
 
-        transformer_selector = trial.suggest_categorical(
-            "transformer_type", ["power_transformer", "quantile_transformer", "none"]
-        )
-        if transformer_selector == "power_transformer":
-            transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
-        elif transformer_selector == "quantile_transformer":
-            transformer = instantiate_quantile_transformer(trial, lambda params: mlflow.log_params(params))
-        else:
-            transformer = None
-        mlflow.log_param("transformer_type", transformer_selector)
+            transformer_selector = trial.suggest_categorical(
+                "transformer_type", ["power_transformer", "quantile_transformer", "none"]
+            )
+            if transformer_selector == "power_transformer":
+                transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
+            elif transformer_selector == "quantile_transformer":
+                transformer = instantiate_quantile_transformer(trial, lambda params: mlflow.log_params(params))
+            else:
+                transformer = None
+            mlflow.log_param("transformer_type", transformer_selector)
 
-        pca_selector = trial.suggest_categorical("pca_type", ["pca", "kernel_pca", "none"])
-        if pca_selector == "pca":
-            pca = instantiate_pca(trial, lambda params: mlflow.log_params(params))
-        elif pca_selector == "kernel_pca":
-            pca = instantiate_kernel_pca(trial, lambda params: mlflow.log_params(params))
-        mlflow.log_param("pca_type", pca_selector)
+            pca_selector = trial.suggest_categorical("pca_type", ["pca", "kernel_pca", "none"])
+            if pca_selector == "pca":
+                pca = instantiate_pca(trial, lambda params: mlflow.log_params(params))
+            elif pca_selector == "kernel_pca":
+                pca = instantiate_kernel_pca(trial, lambda params: mlflow.log_params(params))
+            mlflow.log_param("pca_type", pca_selector)
 
-        # Constructing the pipeline
-        steps = [("scaler", scaler)]
-        if transformer_selector != "none":
-            steps.append((transformer_selector, transformer))
-        if pca_selector != "none":
-            steps.append((pca_selector, pca))
+            # Constructing the pipeline
+            steps = [("scaler", scaler)]
+            if transformer_selector != "none":
+                steps.append((transformer_selector, transformer))
+            if pca_selector != "none":
+                steps.append((pca_selector, pca))
 
-        preprocessor = Pipeline(steps)
+            preprocessor = Pipeline(steps)
 
-        # Data transformation
-        X_train_transformed = preprocessor.fit_transform(X_train.copy())
-        X_test_transformed = preprocessor.transform(X_test.copy())
+            # Data transformation
+            X_train_transformed = preprocessor.fit_transform(X_train.copy())
+            X_test_transformed = preprocessor.transform(X_test.copy())
 
-        # Model training and evaluation
-        model.fit(X_train_transformed, y_train.copy())
-        preds = model.predict(X_test_transformed)
-        mse = mean_squared_error(y_test.copy(), preds)
-        rmse = math.sqrt(mse)
+            # Model training and evaluation
+            model.fit(X_train_transformed, y_train.copy())
+            preds = model.predict(X_test_transformed)
+            mse = mean_squared_error(y_test.copy(), preds)
+            rmse = math.sqrt(mse)
 
-        # Log metrics
-        mlflow.log_metric("mse", float(mse))
-        mlflow.log_metric("rmse", rmse)
+            # Log metrics
+            mlflow.log_metric("mse", float(mse))
+            mlflow.log_metric("rmse", rmse)
 
-    return rmse
+        return rmse
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return float('inf')  # Return a large number to indicate failure
 
 
 def main(
