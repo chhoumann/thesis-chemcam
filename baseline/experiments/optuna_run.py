@@ -216,7 +216,7 @@ def combined_objective(trial):
         return rmse
     except Exception as e:
         print(f"An error occurred: {e}")
-        return float('inf')  # Return a large number to indicate failure
+        return float("inf")  # Return a large number to indicate failure
 
 
 def main(
