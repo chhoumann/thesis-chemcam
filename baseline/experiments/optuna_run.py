@@ -2,7 +2,10 @@ import math
 
 import mlflow
 import optuna
+from optuna.samplers import TPESampler
+from optuna.pruners import HyperbandPruner
 import requests
+from sklearn import model_selection
 import typer
 from optuna_models import (
     instantiate_extra_trees,
@@ -12,8 +15,12 @@ from optuna_models import (
     instantiate_xgboost,
 )
 from optuna_preprocessors import (
+    instantiate_kernel_pca,
+    instantiate_max_abs_scaler,
     instantiate_min_max_scaler,
+    instantiate_pca,
     instantiate_power_transformer,
+    instantiate_quantile_transformer,
     instantiate_robust_scaler,
     instantiate_standard_scaler,
 )
@@ -29,6 +36,7 @@ optuna.logging.set_verbosity(optuna.logging.ERROR)
 
 drop_cols = ["ID", "Sample Name"]
 CURRENT_OXIDE = ""
+CURRENT_MODEL=""
 
 train_processed, test_processed = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
 target = major_oxides[0]
@@ -74,35 +82,33 @@ def get_or_create_experiment(experiment_name: str) -> str:
 def champion_callback(study, frozen_trial):
     """
     Logging callback that will report when a new trial iteration improves upon existing
-    best trial values, including the model type that achieved the new best value.
-
-    Note: This callback is not intended for use in distributed computing systems such as Spark
-    or Ray due to the micro-batch iterative implementation for distributing trials to a cluster's
-    workers or agents.
-    The race conditions with file system state management for distributed trials will render
-    inconsistent values with this callback.
+    best trial values, including the model type and other details that achieved the new best value.
     """
-
     winner = study.user_attrs.get("winner", None)
-    model_type = frozen_trial.params.get("model_type", "Unknown model type")
+    model_type = frozen_trial.params.get("model_type", CURRENT_MODEL)
+    scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
+    transformer = frozen_trial.params.get("transformer_type", "None")
+    pca = frozen_trial.params.get("pca_type", "None")
 
     if study.best_value and winner != study.best_value:
         study.set_user_attr("winner", study.best_value)
         if winner:
             improvement_percent = (abs(winner - study.best_value) / study.best_value) * 100
             message = (
-                f"Trial {frozen_trial.number} achieved value: {frozen_trial.value} with "
-                f"{improvement_percent: .4f}% improvement using {model_type}"
+                f"Trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} with "
+                f"{improvement_percent:.4f}% improvement using {model_type}. "
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
             )
-            print(message)
-            notify_discord(message)
         else:
-            message = f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value} using {model_type}"
-            print(message)
-            notify_discord(message)
+            message = (
+                f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} using {model_type}. "
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
+            )
+        print(message)
+        notify_discord(message)
 
 
-def notify_discord(message):
+def notify_discord(message: str, shouldPrefixOxide: bool = True):
     """
     Send a notification message to a Discord webhook.
 
@@ -111,107 +117,154 @@ def notify_discord(message):
     """
     webhook_url = AppConfig().discord_webhook_url
     if webhook_url:
-        data = {"content": f"{CURRENT_OXIDE} | {message}"}
+        data = {"content": f"{CURRENT_OXIDE} | {message}" if shouldPrefixOxide else message}
         response = requests.post(webhook_url, json=data)
         if response.status_code != 204:
             print(f"Failed to send message to Discord: {response.status_code}, {response.text}")
     else:
         print("Discord webhook URL is not set. Skipping notification.")
 
+def instantiate_model(trial, model_selector, logger):
+    def _logger(params):
+        logger({f"{model_selector}_{k}": v for k, v in params.items()})
+
+    if model_selector == "gbr":
+        return instantiate_gbr(trial, lambda params: _logger(params))
+    elif model_selector == "svr":
+        return instantiate_svr(trial, lambda params: _logger(params))
+    elif model_selector == "xgboost":
+        return instantiate_xgboost(trial, lambda params: _logger(params))
+    elif model_selector == "extra_trees":
+        return instantiate_extra_trees(trial, lambda params: _logger(params))
+    elif model_selector == "pls":
+        return instantiate_pls(trial, lambda params: _logger(params))
+    else:
+        raise ValueError(f"Unsupported model type: {model_selector}")
+
+
+def instantiate_scaler(trial, scaler_selector, logger):
+    def _logger(params):
+        logger({f"{scaler_selector}_{k}": v for k, v in params.items()})
+
+    if scaler_selector == "robust_scaler":
+        return instantiate_robust_scaler(trial, _logger)
+    elif scaler_selector == "standard_scaler":
+        return instantiate_standard_scaler(trial, _logger)
+    elif scaler_selector == "min_max_scaler":
+        return instantiate_min_max_scaler(trial, _logger)
+    elif scaler_selector == "max_abs_scaler":
+        return instantiate_max_abs_scaler(trial, _logger)
+    else:
+        raise ValueError(f"Unsupported scaler type: {scaler_selector}")
+
 
 def combined_objective(trial):
-    with mlflow.start_run(nested=True):
-        # Select and instantiate a model
-        model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
-        if model_selector == "gbr":
-            model = instantiate_gbr(trial, lambda params: mlflow.log_params(params))
-        elif model_selector == "svr":
-            model = instantiate_svr(trial, lambda params: mlflow.log_params(params))
-        elif model_selector == "xgboost":
-            model = instantiate_xgboost(trial, lambda params: mlflow.log_params(params))
-        elif model_selector == "extra_trees":
-            model = instantiate_extra_trees(trial, lambda params: mlflow.log_params(params))
-        elif model_selector == "pls":
-            model = instantiate_pls(trial, lambda params: mlflow.log_params(params))
-        else:
-            raise ValueError(f"Unsupported model type: {model_selector}")
+    try:
+        with mlflow.start_run(nested=True):
+            mlflow.log_param("trial_number", trial.number)
 
-        # Select and instantiate a preprocessor
-        preprocessor_selector = trial.suggest_categorical(
-            "preprocessor_type", ["robust_scaler", "standard_scaler", "min_max_scaler"]
-        )
-        use_power_transformer = trial.suggest_categorical("use_power_transformer", [True, False])
-        if preprocessor_selector == "robust_scaler":
-            preprocessor = instantiate_robust_scaler(trial, lambda params: mlflow.log_params(params))
-        elif preprocessor_selector == "standard_scaler":
-            preprocessor = instantiate_standard_scaler(trial, lambda params: mlflow.log_params(params))
-        elif preprocessor_selector == "min_max_scaler":
-            preprocessor = instantiate_min_max_scaler(trial, lambda params: mlflow.log_params(params))
-        else:
-            raise ValueError(f"Unsupported preprocessor type: {preprocessor_selector}")
+            # Model selection
+            # model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
+            model_selector = CURRENT_MODEL
+            model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
+            mlflow.log_param("model_type", model_selector)
 
-        if use_power_transformer:
-            power_transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
-            preprocessor = Pipeline([
-                ('scaler', preprocessor),
-                ('power_transformer', power_transformer)
-            ])
+            # Preprocessor components
+            scaler_selector = trial.suggest_categorical(
+                "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "max_abs_scaler"]
+            )
+            scaler = instantiate_scaler(trial, scaler_selector, lambda params: mlflow.log_params(params))
+            mlflow.log_param("scaler_type", scaler_selector)
 
-        mlflow.log_params({
-            "model_type": model_selector, 
-            "preprocessor_type": preprocessor_selector,
-            "use_power_transformer": use_power_transformer
-        })
+            transformer_selector = trial.suggest_categorical(
+                "transformer_type", ["power_transformer", "quantile_transformer", "none"]
+            )
+            if transformer_selector == "power_transformer":
+                transformer = instantiate_power_transformer(trial, lambda params: mlflow.log_params(params))
+            elif transformer_selector == "quantile_transformer":
+                transformer = instantiate_quantile_transformer(trial, lambda params: mlflow.log_params(params))
+            else:
+                transformer = None
+            mlflow.log_param("transformer_type", transformer_selector)
 
-        # Preprocess the data
-        X_train_transformed = preprocessor.fit_transform(X_train.copy())
-        X_test_transformed = preprocessor.transform(X_test.copy())
+            pca_selector = trial.suggest_categorical("pca_type", ["pca", "kernel_pca", "none"])
+            if pca_selector == "pca":
+                pca = instantiate_pca(trial, lambda params: mlflow.log_params(params))
+            elif pca_selector == "kernel_pca":
+                pca = instantiate_kernel_pca(trial, lambda params: mlflow.log_params(params))
+            mlflow.log_param("pca_type", pca_selector)
 
-        # Train the model
-        model.fit(X_train_transformed, y_train.copy())
-        preds = model.predict(X_test_transformed)
-        mse = mean_squared_error(y_test.copy(), preds)
-        rmse = math.sqrt(mse)
+            # Constructing the pipeline
+            steps = [("scaler", scaler)]
+            if transformer_selector != "none":
+                steps.append((transformer_selector, transformer))
+            if pca_selector != "none":
+                steps.append((pca_selector, pca))
 
-        # Log metrics
-        mlflow.log_metric("mse", float(mse))
-        mlflow.log_metric("rmse", rmse)
+            preprocessor = Pipeline(steps)
 
-    return rmse
+            # Data transformation
+            X_train_transformed = preprocessor.fit_transform(X_train.copy())
+            X_test_transformed = preprocessor.transform(X_test.copy())
 
+            # Model training and evaluation
+            model.fit(X_train_transformed, y_train.copy())
+            preds = model.predict(X_test_transformed)
+            mse = mean_squared_error(y_test.copy(), preds)
+            rmse = math.sqrt(mse)
+
+            # Log metrics
+            mlflow.log_metric("mse", float(mse))
+            mlflow.log_metric("rmse", rmse)
+
+        return rmse
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return float("inf")  # Return a large number to indicate failure
+
+models = ["gbr", "svr", "xgboost", "extra_trees", "pls"]
 
 def main(
     experiment_name: str = typer.Option(..., "--experiment-name", "-e", help="Name of the MLflow experiment"),
     n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
 ):
-    global CURRENT_OXIDE
+    global CURRENT_OXIDE, CURRENT_MODEL
     experiment_id = get_or_create_experiment(experiment_name)
     mlflow.set_experiment(experiment_id=experiment_id)
+
+    sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
+    pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
 
     for oxide in major_oxides:
         run_name = oxide
         CURRENT_OXIDE = oxide
         print(f"Optimizing for {oxide}")
+        notify_discord(f"# Optimizing for {oxide}", False)
         with mlflow.start_run(experiment_id=experiment_id, run_name=run_name, nested=True):
-            # Initialize the Optuna study
-            study = optuna.create_study(direction="minimize")
+            for model in models:
+                print(f"Optimizing for {model}")
+                notify_discord(f"## Optimizing {model}", False)
+                with mlflow.start_run(experiment_id=experiment_id, run_name=model, nested=True):
+                    CURRENT_MODEL = model
+                    # Initialize the Optuna study
+                    study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner)
 
-            # Execute the hyperparameter optimization trials.
-            # Note the addition of the `champion_callback` inclusion to control our logging
-            study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
+                    # Execute the hyperparameter optimization trials.
+                    # Note the addition of the `champion_callback` inclusion to control our logging
+                    study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
 
-            mlflow.log_params(study.best_params)
-            mlflow.log_metric("best_mse", study.best_value)
-            mlflow.log_metric("best_rmse", math.sqrt(study.best_value))
+                    mlflow.log_params(study.best_params)
+                    mlflow.log_metric("best_mse", study.best_value)
+                    mlflow.log_metric("best_rmse", math.sqrt(study.best_value))
 
-            # Log tags
-            mlflow.set_tags(
-                tags={
-                    "project": "AutoML Experiments",
-                    "optimizer_engine": "optuna",
-                    "feature_set_version": 1,
-                }
-            )
+                    # Log tags
+                    mlflow.set_tags(
+                        tags={
+                            "project": "AutoML Experiments",
+                            "optimizer_engine": "optuna",
+                            "feature_set_version": 1,
+                        }
+                    )
 
 
 if __name__ == "__main__":
