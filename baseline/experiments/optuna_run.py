@@ -2,7 +2,10 @@ import math
 
 import mlflow
 import optuna
+from optuna.samplers import TPESampler
+from optuna.pruners import HyperbandPruner
 import requests
+from sklearn import model_selection
 import typer
 from optuna_models import (
     instantiate_extra_trees,
@@ -33,6 +36,7 @@ optuna.logging.set_verbosity(optuna.logging.ERROR)
 
 drop_cols = ["ID", "Sample Name"]
 CURRENT_OXIDE = ""
+CURRENT_MODEL=""
 
 train_processed, test_processed = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
 target = major_oxides[0]
@@ -81,7 +85,7 @@ def champion_callback(study, frozen_trial):
     best trial values, including the model type and other details that achieved the new best value.
     """
     winner = study.user_attrs.get("winner", None)
-    model_type = frozen_trial.params.get("model_type", "Unknown model type")
+    model_type = frozen_trial.params.get("model_type", CURRENT_MODEL)
     scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
     transformer = frozen_trial.params.get("transformer_type", "None")
     pca = frozen_trial.params.get("pca_type", "None")
@@ -91,20 +95,20 @@ def champion_callback(study, frozen_trial):
         if winner:
             improvement_percent = (abs(winner - study.best_value) / study.best_value) * 100
             message = (
-                f"Trial {frozen_trial.number} achieved value: {frozen_trial.value} with "
+                f"Trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} with "
                 f"{improvement_percent:.4f}% improvement using {model_type}. "
                 f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
             )
         else:
             message = (
-                f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value} using {model_type}. "
+                f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} using {model_type}. "
                 f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
             )
         print(message)
         notify_discord(message)
 
 
-def notify_discord(message):
+def notify_discord(message: str, shouldPrefixOxide: bool = True):
     """
     Send a notification message to a Discord webhook.
 
@@ -113,13 +117,12 @@ def notify_discord(message):
     """
     webhook_url = AppConfig().discord_webhook_url
     if webhook_url:
-        data = {"content": f"{CURRENT_OXIDE} | {message}"}
+        data = {"content": f"{CURRENT_OXIDE} | {message}" if shouldPrefixOxide else message}
         response = requests.post(webhook_url, json=data)
         if response.status_code != 204:
             print(f"Failed to send message to Discord: {response.status_code}, {response.text}")
     else:
         print("Discord webhook URL is not set. Skipping notification.")
-
 
 def instantiate_model(trial, model_selector, logger):
     def _logger(params):
@@ -161,7 +164,8 @@ def combined_objective(trial):
             mlflow.log_param("trial_number", trial.number)
 
             # Model selection
-            model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
+            # model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
+            model_selector = CURRENT_MODEL
             model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
             mlflow.log_param("model_type", model_selector)
 
@@ -218,39 +222,49 @@ def combined_objective(trial):
         print(f"An error occurred: {e}")
         return float("inf")  # Return a large number to indicate failure
 
+models = ["gbr", "svr", "xgboost", "extra_trees", "pls"]
 
 def main(
     experiment_name: str = typer.Option(..., "--experiment-name", "-e", help="Name of the MLflow experiment"),
     n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
 ):
-    global CURRENT_OXIDE
+    global CURRENT_OXIDE, CURRENT_MODEL
     experiment_id = get_or_create_experiment(experiment_name)
     mlflow.set_experiment(experiment_id=experiment_id)
+
+    sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
+    pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
 
     for oxide in major_oxides:
         run_name = oxide
         CURRENT_OXIDE = oxide
         print(f"Optimizing for {oxide}")
+        notify_discord(f"# Optimizing for {oxide}", False)
         with mlflow.start_run(experiment_id=experiment_id, run_name=run_name, nested=True):
-            # Initialize the Optuna study
-            study = optuna.create_study(direction="minimize")
+            for model in models:
+                print(f"Optimizing for {model}")
+                notify_discord(f"## Optimizing {model}", False)
+                with mlflow.start_run(experiment_id=experiment_id, run_name=model, nested=True):
+                    CURRENT_MODEL = model
+                    # Initialize the Optuna study
+                    study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner)
 
-            # Execute the hyperparameter optimization trials.
-            # Note the addition of the `champion_callback` inclusion to control our logging
-            study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
+                    # Execute the hyperparameter optimization trials.
+                    # Note the addition of the `champion_callback` inclusion to control our logging
+                    study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
 
-            mlflow.log_params(study.best_params)
-            mlflow.log_metric("best_mse", study.best_value)
-            mlflow.log_metric("best_rmse", math.sqrt(study.best_value))
+                    mlflow.log_params(study.best_params)
+                    mlflow.log_metric("best_mse", study.best_value)
+                    mlflow.log_metric("best_rmse", math.sqrt(study.best_value))
 
-            # Log tags
-            mlflow.set_tags(
-                tags={
-                    "project": "AutoML Experiments",
-                    "optimizer_engine": "optuna",
-                    "feature_set_version": 1,
-                }
-            )
+                    # Log tags
+                    mlflow.set_tags(
+                        tags={
+                            "project": "AutoML Experiments",
+                            "optimizer_engine": "optuna",
+                            "feature_set_version": 1,
+                        }
+                    )
 
 
 if __name__ == "__main__":
