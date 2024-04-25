@@ -1,5 +1,28 @@
 \section{Methodology}\label{sec:methodology}
-\textit{We will write an introduction to the methodology section here, as well as add more subsections in the future. Below is the first subsection describing the data normalization process and the reasons for choosing to only do Norm 3. Please let us know if the explanation and mathematical notation is clear.}
+To address the objectives of this study described in the problem definition in Section~\ref{sec:problem_definition}, we adopted an experimental approach.
+The initial phase of the project was dedicated to identifying the current state of the art in machine learning methodologies and reviewing recent literature specifically on LIBS data analysis, as outlined in Section~\ref{sec:related-work}.
+% Here, we should mention what the literature review told us about preprocessing and feature selection, which guided our experiments with these steps.
+
+Based on our findings, we tested various methodologies on our data.
+This allowed us to identify and focus on the models that performed best and were most relevant to our specific dataset.
+
+Drawing from the related literature and initial experimentation, we selected the following models for further investigation: \gls{svr}, \gls{gbr}, \gls{pls}, \gls{xgboost}, \gls{ngboost}, \gls{etr}, \gls{enet}, and \gls{sgd}.
+This selection was partly guided by conventional criteria and partly by exploratory intuition, aiming to discover potentially innovative applications and performances within our specific dataset.
+
+All models demonstrated robust performance; however, \gls{gbr}, \gls{svr}, \gls{xgboost}, \gls{etr}, and \gls{pls} consistently excelled across all oxides.
+Notably, we observed model-specific strengths for certain oxides—\gls{svr} was particularly effective for \ce{SiO2}, while \gls{gbr} excelled with \ce{FeO_T}.
+This differential performance prompted us to explore architectural frameworks that could systematically capitalize on the strengths of each model for specific oxides.
+Consequently, we concluded that a stacking ensemble method would optimize outcomes for our dataset.
+This approach is analogous to the methodologies employed in the original MOC pipeline, which also tailored predictions for each oxide by blending outputs from the PLS-SM and ICA phases, variably weighting the influence of the ICA predictions depending on the oxide.
+However, unlike the MOC model, which required manual determination of the model weightings for each oxide, our stacking approach utilizes a meta learner.
+This meta learner learns optimal parameter settings, ensuring that the model integration is not only more efficient but also dynamically adapted to our dataset's characteristics and does not require domain-specific knowledge.
+This represents a more sophisticated method, as it automates critical decisions and enhances predictive accuracy through learned rather than preset integrations.
+
+In this section, we first describe our evaluation metrics and the rationale behind their selection.
+We use these metrics to assess the performance of our models in predicting major oxide compositions from LIBS data.
+We then present the architecture of the developed pipeline, which utilizes the proposed stacking ensemble method.
+As part of this discussion, we provide a detailed explanation of the five models that we selected for the ensemble as well as the specific preprocessing steps that we applied to our data.
+Finally, we discuss the results and their implications for the field of LIBS data analysis.
 
 \subsection{Evaluation Metrics}
 To evaluate the performance of our models in predicting major oxide compositions from \gls{libs} data, we will use two key metrics: \gls{rmse} and standard deviation of prediction errors.
@@ -22,22 +45,29 @@ where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error. A lower standard 
 
 By using these two metrics, we aim to evaluate model performance in terms of both accuracy and robustness, which are crucial for the reliable prediction of major oxide compositions from \gls{libs} data.
 
-\subsection{Experiments}
-To address the objectives of this study described in the problem definition in Section~\ref{sec:problem_definition}, we adopted an experimental approach.
-The initial phase of the project was dedicated to identifying the current state of the art in machine learning methodologies and reviewing recent literature specifically on LIBS data analysis, as outlined in Section~\ref{sec:related-work}.
-Based on our findings, we tested various methodologies on our data.
-This allowed us to identify and focus on the models that performed best and were most relevant to our specific dataset.
+\subsubsection{Stacking Ensemble Method}
+% Explain the stacking ensemble method
+% Explain the way we implemented + the final model architecture/pipeline
 
-Drawing from the related literature and initial experimentation, we selected the following models for further investigation: \gls{svr}, \gls{gbr}, \gls{pls}, \gls{xgboost}, \gls{ngboost}, \gls{etr}, \gls{enet}, and \gls{sgd}.
-This selection was partly guided by conventional criteria and partly by exploratory intuition, aiming to discover potentially innovative applications and performances within our specific dataset.
+\subsubsection{GBR} % maybe put these in the background section instead for the five models, however that might come out of the blue??
+% Explain GBR mathematically (similar to that one book, but not as detailed)
+% Explain why it may perform well on our data
 
-All models demonstrated robust performance; however, \gls{gbr}, \gls{svr}, \gls{xgboost}, \gls{etr}, and \gls{pls} consistently excelled across all oxides.
-Notably, we observed model-specific strengths for certain oxides—\gls{svr} was particularly effective for \ce{SiO2}, while \gls{gbr} excelled with \ce{FeO_T}.
-This differential performance prompted us to explore architectural frameworks that could systematically capitalize on the strengths of each model for specific oxides.
-Consequently, we concluded that a stacking ensemble method would optimize outcomes for our dataset.
-This approach is analogous to the methodologies employed in the original MOC pipeline, which also tailored predictions for each oxide by blending outputs from the PLS-SM and ICA phases, variably weighting the influence of the ICA predictions depending on the oxide.
-However, unlike the MOC model, which required manual determination of the model weightings for each oxide, our stacking approach utilizes a meta learner.
-This meta learner learns optimal parameter settings, ensuring that the model integration is not only more efficient but also dynamically adapted to our dataset's characteristics and does not require domain-specific knowledge.
-This represents a more sophisticated method, as it automates critical decisions and enhances predictive accuracy through learned rather than preset integrations.
+\subsubsection{SVR}
+% Explain SVR mathematically (similar to that one book, but not as detailed)
+% Explain why it may perform well on our data
 
-In this section, we present the experiments conducted, the results obtained, and the architecture of the final model, which utilizes the proposed stacking ensemble method.
+\subsubsection{XGBoost}
+% Explain XGBoost mathematically (similar to that one book, but not as detailed)
+% Explain why it may perform well on our data
+
+\subsubsection{ETR}
+% Explain ETR mathematically (similar to that one book, but not as detailed)
+% Explain why it may perform well on our data
+
+\subsubsection{PLS}
+% Explain PLS mathematically (similar to that one book, but not as detailed)
+% Explain why it may perform well on our data
+
+\subsubsection{Results}
+% Present the results of the experiments and discuss them
