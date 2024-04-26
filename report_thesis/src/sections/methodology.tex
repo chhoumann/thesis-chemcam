@@ -1,7 +1,7 @@
 \section{Methodology}\label{sec:methodology}
 To address the objectives of this study described in the problem definition in Section~\ref{sec:problem_definition}, we adopted an experimental approach.
 The initial phase of the project was dedicated to identifying the current state of the art in machine learning methodologies and reviewing recent literature specifically on LIBS data analysis, as outlined in Section~\ref{sec:related-work}.
-% Here, we should mention what the literature review told us about preprocessing and feature selection, which guided our experiments with these steps.
+% Here, we should mention what the literature review told us about preprocessing and feature selection, which guided our experiments with these steps, and the explorative approach to the preprocessing and feature selection steps.
 
 Based on our findings, we tested various methodologies on our data.
 This allowed us to identify and focus on the models that performed best and were most relevant to our specific dataset.
@@ -49,6 +49,27 @@ By using these two metrics, we aim to evaluate model performance in terms of bot
 % Explain the stacking ensemble method
 % Explain the way we implemented + the final model architecture/pipeline
 
+\subsubsection{PCA, PCR \& PLS}
+\gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
+Mathematically, \gls{pca} involves the eigen decomposition of the covariance matrix of the data, $\mathbf{X}^T \mathbf{X}$.
+First, the data is centered by subtracting the mean of each variable.
+The eigenvectors and eigenvalues of the covariance matrix are then computed.
+The eigenvectors represent the directions of maximum variance, and the eigenvalues indicate the amount of variance captured in each of those directions.
+These eigenvectors are ordered by their corresponding eigenvalues in descending order, which helps in identifying which components capture the most variance.
+In the context of dimensionality reduction, only the top $n$ components are retained.
+These are considered enough to capture the most significant aspects of the data.
+Then, the original data points can be projected onto the space defined by these top $n$ components.
+This step transforms the high-dimensional data into a lower-dimensional space by retaining only the dimensions that contain the most significant variance.
+A property of the principal components is that they are uncorrelated, which means that calculating the covariance matrix of each pair of components results in a diagonal matrix where the off-diagonal elements are zero.
+
+\gls{pcr} extends \gls{pca} in the context of regression analysis.
+\gls{pcr} involves performing \gls{pca} on the features $\mathbf{X}$ and then using the principal components with the highest variances as features in a linear regression model.
+This approach can be beneficial when the original features are highly correlated, as the principal components are orthogonal to each other, reducing multicollinearity.
+If $\mathbf{X}$ is decomposed into $\mathbf{TP}^T + \mathbf{E}$ where $\mathbf{T}$ are the scores and $\mathbf{P}$ are the loadings, \gls{pcr} uses $\mathbf{T}$ to predict the target $\mathbf{y}$ as $\mathbf{y} = \mathbf{Tb} + \mathbf{e}$.
+
+% Explain PLS mathematically (similar to that one book, but not as detailed)
+% Explain why it may perform well on our data
+
 \subsubsection{GBR} % maybe put these in the background section instead for the five models, however that might come out of the blue??
 % Explain GBR mathematically (similar to that one book, but not as detailed)
 % Explain why it may perform well on our data
@@ -63,10 +84,6 @@ By using these two metrics, we aim to evaluate model performance in terms of bot
 
 \subsubsection{ETR}
 % Explain ETR mathematically (similar to that one book, but not as detailed)
-% Explain why it may perform well on our data
-
-\subsubsection{PLS}
-% Explain PLS mathematically (similar to that one book, but not as detailed)
 % Explain why it may perform well on our data
 
 \subsubsection{Results}
