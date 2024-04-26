@@ -13,7 +13,7 @@ The process of elemental quantification using \gls{libs} data is constrained by 
 
 These constraints necessitate the development of advanced computational models that can effectively account for and mitigate these complexities to improve the accuracy and reliability of chemical composition analysis using \gls{libs} data.
 
-The input to our computational models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths. This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}. The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
+The input to our computational models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths. This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}. The wavelength intensities are quantified in units of \\photon/shot/mm\textsuperscript{2}/sr/nm.
 
 We have:
 
@@ -44,41 +44,16 @@ Our evaluation involves a combination of methodologies. Initially, the model is 
 
 \textbf{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by enhancing computational methods to improve accuracy and robustness. We propose to develop computational models capable of effectively accounting for and mitigating the complexities inherent in \gls{libs} data. Our models will take as input a matrix in the form of $E$, as well as ground truth data in the form of $A$, to construct a mapping function $\mathcal{F} : \mathbb{R}^N \rightarrow \mathbb{R}^O$, mapping processed LIBS signals to estimated oxide concentrations. Success will be evaluated primarily through the \gls{rmse} metric, comparing the predictive accuracy of our models against existing benchmarks and baseline models established in prior research.
 
-
 \subsection{Motivating Example: NASA's Mars Missions}
-The NASA Viking missions in the 1970s were the first to successfully land on Mars, aiming to determine if life existed on the planet. 
-While these missions advanced our knowledge of the Martian environment, the search for evidence of life remained inconclusive~\cite{marsnasagov_vikings}.
+NASA's exploration of Mars, beginning with the Viking missions in the 1970s, has progressively deepened our understanding of Mars\cite{marsnasagov_vikings}. The \gls{msl} mission, which landed the Curiosity rover in Gale Crater in 2012, represents a pivotal step in this journey. Curiosity is equipped with the \gls{chemcam} instrument, a tool that uses \gls{libs} to analyze the chemical composition of Martian rocks and soils directly and non-invasively\cite{chemcamNasaWebsite}.
 
-Subsequent missions, such as the \gls{mer} mission in 2003 and the \gls{msl} mission in 2012, sought to investigate whether Mars ever had the conditions to support life. 
-The Curiosity rover, part of the \gls{msl} mission, is equipped with the \gls{chemcam} instrument, which uses \gls{libs} to gather spectral data from geological samples on Mars~\cite{wiensChemcam2012}.
+\gls{libs} is particularly suitable for the Martian environment because of its ability to perform rapid chemical analyses remotely, creating a plasma that can be spectrally analyzed to determine the elemental composition of the vaporized material. This capability is crucial because it allows scientists to quickly and efficiently assess the geochemistry of multiple sites without physically moving the rover, thus conservatively managing the rover's limited energy and resources. The mission's focus has been on assessing past habitability, and the data gathered by \gls{chemcam} has been instrumental in identifying environments that could have supported life\cite{chemcamNasaWebsite,curiosityNasaWebsite}.
 
-\gls{libs} uses a laser to ablate surface material and generate a plasma plume, which emits light captured by spectrometers. 
-The resulting spectra consist of emission lines associated with the concentration of specific elements, serving as a multi-dimensional fingerprint of the sample's elemental composition~\cite{cleggRecalibrationMarsScience2017}.
-
-\subsection{Motivating Example: NASA's Mars Missions}
-
-The quest for understanding Mars' geological and potential biological history has been significantly advanced by NASA's Mars missions, particularly through the deployment of sophisticated instrumentation such as the \gls{chemcam} on the Curiosity rover. This instrument, which employs \gls{libs}, has been pivotal in analyzing Martian soil and rock samples to determine their chemical compositions. The \gls{libs} technique involves ablating surface material with a laser to generate a plasma plume whose emitted light is captured and analyzed to identify the elemental composition of the sample\cite{cleggRecalibrationMarsScience2017}.
-
-\textbf{Sample Input:} The input for our computational models includes LIBS spectral data captured by the Curiosity rover. This data comprises intensity readings across various wavelengths, representing different mineral compositions in Martian soil samples, such as iron, magnesium, and silicon oxides.
-
-\textbf{Sample Output:} The output from our models includes detailed quantifications of these oxides in weight percentages, providing insights into the geological history and current state of Martian soil.
-
-\textbf{Explanation:} The process involves several computational steps: initially, the spectral data undergoes preprocessing to clean and calibrate it, as detailed in \citet{wiensChemcam2012}. Post-preprocessing, we employ machine learning models, specifically a recreated version of the Multivariate Oxide Composition (MOC) pipeline \cite{cleggRecalibrationMarsScience2017}, to predict the composition of major oxides. This pipeline, enhanced in our study \cite{p9_paper}, includes steps such as feature extraction and the application of regression techniques, aiming to overcome challenges like data multicollinearity and matrix effects, thus improving the predictive accuracy of elemental quantifications.
-
-This example underscores the practical application of our computational advancements in a real-world setting, providing a clear connection between theoretical development and practical implementation in planetary science.
-
-
-
-
-\subsection{Motivating Example: NASA's Mars Missions}
-
-NASA's exploration of Mars, beginning with the Viking missions in the 1970s, has progressively deepened our understanding of Mars. The Mars Science Laboratory (MSL) mission, which landed the Curiosity rover in Gale Crater in 2012, represents a pivotal step in this journey. Curiosity is equipped with the \gls{chemcam} instrument, a tool that uses \gls{libs} to analyze the chemical composition of Martian rocks and soils directly and non-invasively.
-\gls{libs} is uniquely suited for the harsh Martian environment due to its ability to remotely zap rocks and soils up to 7 meters away, creating a plasma that can be spectrally analyzed to determine the elemental composition of the vaporized material. This capability is crucial because it allows scientists to quickly and efficiently assess the geochemistry of multiple sites without physically moving the rover, thus conservatively managing the rover's limited energy and resources. The mission's focus has been on assessing past habitability, and the data gathered by \gls{chemcam} has been instrumental in identifying environments that could have supported life.
-
-Computationally, the task of quantifying the oxides in Martian rock and soil samples begins with the \gls{libs} spectral data collected by Curiosity. This data comprises high-dimensional spectra with thousands of potential features, each corresponding to a specific element's emission lines. The computational challenge lies in accurately interpreting these complex data sets to deduce the concentrations of various elements, especially major oxides like iron, magnesium, and silicon, which are crucial for understanding Martian geology.
-
+The task of quantifying the oxides in Martian rock and soil samples begins with the \gls{libs} spectral data collected by Curiosity. This data comprises high-dimensional spectra with thousands of potential features, each corresponding to a specific element's emission lines. The computational challenge lies in accurately interpreting these complex data sets to deduce the concentrations of various elements, especially major oxides like iron, magnesium, and silicon, which are crucial for understanding Martian geology.
 Computational models take these spectral readings as input and process them through several stages of analysis. Initially, the data undergoes preprocessing to correct for any instrumental effects and to calibrate the raw spectra. This step ensures that the readings are accurate and can be reliably used for quantitative analysis. The cleaned data is then fed into machine learning models, which have been trained to correlate specific spectral signatures with known concentrations of elements, based on a database of Earth-based and synthetic Martian analogues.
+The output of this process is a detailed quantitative analysis of the soil or rock sample's chemical composition, expressed in weight percentages of each detected oxide\cite{wiensPreflightCalibrationInitial2013, cleggRecalibrationMarsScience2017}.
+This task was undertaken by \citet{cleggRecalibrationMarsScience2017}, who created a pipeline for predicting the concentration of oxides in Martian soil samples, referred to as \gls{moc}.
 
-The output of this process is a detailed quantitative analysis of the soil or rock sample's chemical composition, expressed in weight percentages of each detected oxide. This output not only informs about the current state of Martian geology but also provides insights into the planet's past environmental conditions.
+More recently, in 2022, the Perseverance rover landed on Mars, equipped with advanced instruments designed to continue the exploration and analysis of the Martian surface. This rover also uses a \gls{libs} instrument, called SuperCam. This instrument is the successor to \gls{chemcam}, and shows the continued success of the \gls{libs} technique in the Martian environment. The Perseverance mission led to continued research in the realm of quantification based on \gls{libs} data\cite{andersonPostlandingMajorElement2022}, showing it continues to be an important area of research.
 
-The use of \gls{libs} on the Curiosity rover within the MSL mission shows how computational advancements can enhance our understanding of extraterrestrial geology. By effectively quantifying chemical compositions from \gls{libs} data, we can infer the historical climatic conditions of Mars, offering clues to its past habitability. This example vividly demonstrates the synergy between technological innovation and computational science, driving forward our exploration and understanding of Mars.
+The use of \gls{libs} on the Curiosity rover within the MSL mission shows how computational advancements can enhance our understanding of extraterrestrial geology. By effectively quantifying chemical compositions from \gls{libs} data, we can infer the historical climatic conditions of Mars, offering clues to its past habitability.
