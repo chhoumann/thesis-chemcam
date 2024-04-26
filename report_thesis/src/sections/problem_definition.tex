@@ -1,4 +1,50 @@
 \section{Problem Definition}\label{sec:problem_definition}
+The primary objective of this research is to enhance computational methods for the accurate and robust quantification of chemical compositions using \gls{libs} data.
+This enhancement seeks to improve the adaptability and precision of \gls{libs} across various environmental contexts, including terrestrial and planetary geological samples.
+
+Quantifying chemical compositions from \gls{libs} spectral data poses significant challenges due to the high dimensionality of the data and the complex physical and chemical interactions involved. The interpretation of \gls{libs} data is complicated by factors such as multicollinearity among spectral features and matrix effects, which can obscure the relationships between the observed spectra and the actual chemical compositions.
+
+The process of elemental quantification using \gls{libs} data is constrained by several factors:
+\begin{itemize}
+    \item \textbf{Data Dimensionality and Collinearity:} High dimensionality of spectral data coupled with multicollinearity, where multiple spectral features may exhibit strong correlations, complicates the modeling and analysis\cite{andersonImprovedAccuracyQuantitative2017}.
+    \item \textbf{Matrix Effects:} Variations in the matrix, where different background materials can alter the emission intensities, pose significant challenges in accurately quantifying elemental concentrations\cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
+    \item \textbf{Data Quality and Availability:} The limited availability of high-quality calibration data, particularly in non-terrestrial settings, restricts the scope of training robust predictive models\cite{p9_paper}.
+\end{itemize}
+
+These constraints necessitate the development of advanced computational models that can effectively account for and mitigate these complexities to improve the accuracy and reliability of chemical composition analysis using \gls{libs} data.
+
+The input to our computational models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths. This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}. The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
+
+We have:
+
+\begin{itemize}
+    \item \textbf{Matrix $A_{t \times o}$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$.
+    \item \textbf{Matrix $B_{w \times s}$}: A Boolean matrix that links wavelengths $w$ to spectrometers $s$, indicating whether a specific wavelength is detected by a spectrometer.
+    \item \textbf{Matrix $C_{t \times l \times s \times w}$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$.
+    \item \textbf{Matrix $D_{t \times l \times w}$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
+    \[
+    D[t, l, w] = \frac{1}{|S|} \sum_{s \in S} C[t, l, s, w].
+    \]
+    \item \textbf{Matrix $E_{t \times l \times w}$}: Processes $D$ by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+\end{itemize}
+
+The outputs of our models are the quantified chemical compositions of geological samples. These are primarily the concentrations of major elements, represented in weight percentage. While trace elements are also present, our current analysis does not quantify these.
+Our goal is to construct a mapping function $\mathcal{F} : \mathbb{R}^N \rightarrow \mathbb{R}^O$, where $N$ represents the dimensionality of the processed LIBS signals, and $O$ represents the number of target oxides. This function maps a processed LIBS signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^O$ of estimated oxide concentrations:
+\[
+\mathbf{v} = \mathcal{F}(\mathbf{x}).
+\]
+
+The primary metric used to evaluate the performance of our computational models is the \gls{rmse}. \gls{rmse} is calculated using the formula:
+\[
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
+\]
+where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. This measure quantifies the average magnitude of the prediction error across all predicted values, providing a clear indication of model accuracy in quantifying chemical compositions.
+
+Our evaluation involves a combination of methodologies. Initially, the model is validated using a train/test split, where it is trained on a subset of data and tested on a separate subset to assess its predictive performance. Further, we compare the performance of our models against a baseline model previously established in our research \cite{p9_paper}, as well as against chemical analysis methods and other computational models documented in existing literature. This comprehensive comparison helps to underscore the improvements and benefits our approach offers over traditional methods and prior computational approaches.
+
+
+
+
 
 \subsection{Motivating Example: NASA's Mars Missions}
 The NASA Viking missions in the 1970s were the first to successfully land on Mars, aiming to determine if life existed on the planet. 
@@ -17,7 +63,28 @@ The resulting spectra consist of emission lines associated with the concentratio
 
 Our problem definition builds upon the definitions provided in \citet{p9_paper}.
 
-% TODO: Write data definitions here; define problem formally.
+In our thesis, we do quantification of chemical compositions of Martian geological samples using Laser-Induced Breakdown Spectroscopy (LIBS) spectral data.
+This involves a series of matrices that store and process the chemical and spectral data:
+
+\begin{itemize}
+    \item Matrix \(A_{t \times o}\) denotes the chemical concentrations in weight percent for oxides \(o\) across targets \(t\).
+    \item Matrix \(B_{w \times s}\), a Boolean matrix, links wavelengths \(w\) to spectrometers \(s\), indicating whether a wavelength is detected by a specific spectrometer.
+    \item Matrix \(C_{t \times l \times s \times w}\) holds the raw spectral intensity data, where each entry represents the intensity recorded for a target \(t\) at location \(l\), for shot \(s\), at wavelength \(w\).
+    \item Matrix \(D_{t \times l \times w}\) is derived from \(C\) by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
+    \[
+    D[t, l, w] = \frac{1}{|S|} \sum_{s \in S} C[t, l, s, w].
+    \]
+    \item Matrix \(E_{t \times l \times w}\) processes \(D\) by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+\end{itemize}
+
+Our goal is to construct a mapping \(\mathcal{F} : \mathbb{R}^N \rightarrow \mathbb{R}^C\) where \(N\) is the dimensionality of the processed LIBS signals, and \(C\) represents the number of target oxides. This function maps a processed LIBS signal vector \(\mathbf{x} \in \mathbb{R}^N\) to a vector \(\mathbf{v} \in \mathbb{R}^C\) of estimated oxide concentrations:
+$$
+\mathbf{v} = \mathcal{F}(\mathbf{x}).
+$$
+
+The intrinsic challenges of LIBS data—its high dimensionality, non-linearity, and substantial matrix effects—complicate the direct quantification of oxide concentrations. To address these challenges, our methodology encompasses effective data dimensionality reduction and preprocessing to improve signal clarity and focus. We also explore and evaluate various machine learning models, including Support Vector Regression (SVR), Gradient Boosting Regression (GBR), and others, to find the most effective approach for predicting chemical compositions.
+
+**Problem Definition:** This thesis seeks to develop and refine computational methods for predicting the chemical compositions of Martian geological samples from LIBS spectral data. The focus is on creating robust models capable of handling high-dimensional data, incorporating sophisticated preprocessing techniques to manage non-linearity and matrix effects, and evaluating different machine learning algorithms to enhance the accuracy and robustness of the predictions. This concise problem statement encapsulates our research objectives and sets a clear path for our experimental investigations.
 
 \textbf{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by developing machine learning models that improve the accuracy and robustness of these predictions. 
 We will investigate various techniques to handle the high dimensionality, non-linearity, and small dataset size inherent in this problem, and evaluate model performance using appropriate metrics, which will be discussed in detail in Section~\ref{sec:methodology}.
