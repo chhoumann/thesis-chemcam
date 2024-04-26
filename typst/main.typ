@@ -1,14 +1,16 @@
-#import "@preview/charged-ieee:0.1.0": ieee
+#import "ieee/lib.typ": ieee
+// #import "@preview/unequivocal-ams:0.1.0": ams-article, theorem, proof
 #import "@preview/glossarium:0.3.0": make-glossary, print-glossary, gls, glspl 
 #import "@preview/whalogen:0.1.0": ce
 #show: make-glossary
 
-#set page(margin: 1.75in)
+#set page(margin: 1.75in, columns: 1)
 #set par(leading: 0.55em, first-line-indent: 1.8em, justify: true)
 #set text(font: "New Computer Modern")
 #show raw: set text(font: "New Computer Modern Mono")
 #show par: set block(spacing: 0.55em)
 #show heading: set block(above: 1.4em, below: 1em)
+
 
 #show: ieee.with(
   title: [Title],
@@ -38,7 +40,6 @@
       email: "ihostr16@student.aau.dk"
     )
   ),
-  index-terms: (),
   bibliography: bibliography("refs.bib"),
 )
 
@@ -256,7 +257,7 @@ By compressing spectral data into more manageable representations without losing
 This aligns with our objectives of efficient dimensionality reduction and robust predictive modeling.
 
 // Multi-task learning
-In their work #cite(<caruana_no_1997>, form: "prose"), presents a method called _Multitask learning_, which is a method of learning machine models on several related datasets.
+In their work, #cite(<caruana_no_1997>, form: "prose"), presents a method called _Multitask learning_, which is a method of learning machine models on several related datasets.
 The motivation for this approach stems from the assumption that utilizing multiple, albeit related, datasets can enhance a model's ability to discern patterns and shapes within the data.
 #cite(<caruana_no_1997>, form: "prose") suggests that leveraging shared representations for model training can enable the model to identify underlying attributes in other datasets, even when this new data is small.
 This is relevant for our work as one of the major challenges in analyzing LIBS calibration data for Mars is the scarcity of available data.
@@ -264,9 +265,140 @@ This scarcity makes it difficult to construct robust models capable of comprehen
 Utilizing related LIBS data could help the models first learn the general outline, shape and patterns in the LIBS data, making it easier for it to grasp the deeper patterns in the Mars related data.
 
 
-= Background <background>
-
 = Problem Definition <problem_definition>
+
+== Motivating Example: NASA's Mars Missions
+The NASA Viking missions in the 1970s were the first to successfully land on Mars, aiming to determine if life existed on the planet. 
+While these missions advanced our knowledge of the Martian environment, the search for evidence of life remained inconclusive@marsnasagov_vikings.
+
+Subsequent missions, such as the #gls("mer") mission in 2003 and the #gls("msl") mission in 2012, sought to investigate whether Mars ever had the conditions to support life. 
+The Curiosity rover, part of the #gls("msl") mission, is equipped with the #gls("chemcam") instrument, which uses #gls("libs") to gather spectral data from geological samples on Mars@wiensChemcam2012.
+
+#gls("libs") uses a laser to ablate surface material and generate a plasma plume, which emits light captured by spectrometers. 
+The resulting spectra consist of emission lines associated with the concentration of specific elements, serving as a multi-dimensional fingerprint of the sample's elemental composition@cleggRecalibrationMarsScience2017.
+
+== Problem Formulation
+
+Our problem definition builds upon the definitions provided in #cite(<p9_paper>, form: "prose").
+
+In our thesis, we do quantification of chemical compositions of Martian geological samples using Laser-Induced Breakdown Spectroscopy (LIBS) spectral data. This involves a series of matrices that store and process the chemical and spectral data:
+
+- *Matrix $A_(t times o)$* denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$.
+- *Matrix $B_(w times s)$*, a Boolean matrix, links wavelengths $w$ to spectrometers $s$, indicating whether a wavelength is detected by a specific spectrometer.
+- *Matrix $C_(t times l times s times w)$* holds the raw spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$.
+- *Matrix $D_(t times l times w)$* is derived from $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength: $D[t, l, w] = 1/(|S|) sum_(s in S) C[t, l, s, w]$.
+- *Matrix $E_(t times l times w)$* processes $D$ by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+
+Our goal is to construct a mapping $cal(F) : RR^N -> RR^C$ where $N$ is the dimensionality of the processed LIBS signals, and $C$ represents the number of target oxides. This function maps a processed LIBS signal vector $bold(x) in RR^N$ to a vector $bold(v) in RR^C$ of estimated oxide concentrations:
+$bold(v) = cal(F)(bold(x))$.
+
+The intrinsic challenges of LIBS data—its high dimensionality, non-linearity, and substantial matrix effects—complicate the direct quantification of oxide concentrations. To address these challenges, our methodology encompasses effective data dimensionality reduction and preprocessing to improve signal clarity and focus. We also explore and evaluate various machine learning models, including @svr, @gbr, and others, to find the most effective approach for predicting chemical compositions.
+
+*Problem Definition:* This thesis seeks to develop and refine computational methods for predicting the chemical compositions of Martian geological samples from LIBS spectral data. The focus is on creating robust models capable of handling high-dimensional data, incorporating sophisticated preprocessing techniques to manage non-linearity and matrix effects, and evaluating different machine learning algorithms to enhance the accuracy and robustness of the predictions. This concise problem statement encapsulates our research objectives and sets a clear path for our experimental investigations.
+
+*Problem Definition:* This thesis aims to address the challenges in predicting major oxide compositions from @libs data by developing machine learning models that improve the accuracy and robustness of these predictions. 
+We will investigate various techniques to handle the high dimensionality, non-linearity, and small dataset size inherent in this problem, and evaluate model performance using appropriate metrics, which will be discussed in detail in @methodology.
+
+
+= Background <background>
+The NASA Viking missions in the 1970s were the first to successfully land on Mars, aiming to determine if life existed on the planet.
+One experiment suggested the presence of life, but the results were ambiguous and inconclusive, and NASA was unable to repeat the experiment.
+Nevertheless, these missions were deemed a monumental success and advanced our knowledge of the Martian environment@marsnasagov_vikings.
+
+Leveraging the knowledge gained from the Viking missions, NASA launched the @mer mission in 2003 to investigate whether Mars ever had the conditions to support life as we know it.
+The mission landed two rovers, Spirit and Opportunity, on Mars in January 2004, and they quickly discovered clear evidence that water once flowed on Mars.
+However, since water alone is not enough to support life, the next objective was to search for organic material as well@marsnasagov_observer@marsnasagov_spirit_opportunity.
+
+The Curiosity rover landed on Mars in August 2012 inside Gale Crater as part of the @msl mission with this very purpose.
+Thanks to its sophisticated equipment, Curiosity was able to find evidence of past habitable environments on Mars based on chemical and mineral findings early in its mission@marsnasagov_msl.
+
+One of the instruments aboard the rover is the @chemcam instrument, which is a remote-sensing laser instrument used to gather @libs data from geological samples on Mars.
+@libs is a technique that enables rapid analysis by using a laser to ablate and remove surface contaminants to expose the underlying material and generate a plasma plume from the now-exposed sample material@wiensChemcam2012.
+This plasma plume emits light that is captured through three distinct spectrometers to collect a series of spectral readings.
+These spectra consist of emission lines that can be associated with the concentration of a specific element, and their intensity reflects the concentration of that element in the sample.
+Consequently, a spectra serves as a complex, multi-dimensional fingerprint of the elemental composition of the examined geological samples@cleggRecalibrationMarsScience2017.
+
+== Baseline & Replica <baseline_replica>
+For analyzing Martian geological samples, the @chemcam team currently uses the @moc model@cleggRecalibrationMarsScience2017.
+This model integrates @pls and @ica to predict the composition of major oxides.
+The @pls and @ica phases of the @moc operate in parallel, and their predictions are blended to form the final predictions.
+Though the @moc model has proven useful, it suffers from limitations in predictive accuracy and robustness.
+An overview of the @moc model is shown in Figure~\ref{fig:moc_pipeline}.
+
+#figure(
+  image("images/moc_pipeline.svg", width: 80%),
+  caption: [Overview of the @moc model.],
+  placement: top
+) <moc_pipeline>
+
+
+In \citet{p9_paper}, we presented our efforts to replicate the @moc model.
+Based on the insights gained from that work, we have made several modifications to the replica in preparation for this work.
+
+Our replica only utilized a single dataset for the @ica phase, while the original model used all five datasets.
+This difference was due to the original paper not specifying how the five datasets were used, and so we designed an experiment to determine how to use them in a way that would most closely replicate the original model.
+We initially assumed that the datasets were aggregated and used as a single dataset.
+This approach, however, did not align with the original model's results, likely due to the loss of information from the individual datasets.
+Following this discovery, we modified the replica to instead use the datasets in the same way as in the @pls1-sm phase, which yielded results aligning more closely with the original model.
+
+Furthermore, our initial replica used a random train/test split for training, in contrast to the original model's manual curation to ensure representation of extreme compositions in both sets.
+This difference stemmed from the original authors' application of domain expertize in their dataset curation --- a process we could not directly replicate.
+Nevertheless, we found that automatically identifying extreme compositions and ensuring that they were present in both the training and testing sets brought us closer to the original model.
+We chose to pull out the $n$ largest and smallest samples by concentration range, for each oxide, and reserve them for the training set.
+Then we would do a random split on the remaining dataset, such that the final train/test split would be a $(80%)/(20%)$ split.
+
+With these changes, we created a more accurate replica of the @moc model, which we will use as our baseline for the rest of this paper.
+We have presented these changes to one of the original authors of #cite(<cleggRecalibrationMarsScience2017>, form: "prose"), who confirmed that they were reasonable and in line with the original model's implementation.
+
+Table~\ref{tab:replica_results_rmses} shows the #glspl("rmse") of the original models and our replicas after the changes.
+Figure~\ref{fig:rmse_histograms} illustrates the distribution of these #glspl("rmse") as a grouped histogram.
+The results show that the #glspl("rmse") of our replicas exhibit similar tendencies to the original models.
+However, in some cases, our replicas have a lower #glspl("rmse") than the original models, and in others, they have a higher #glspl("rmse").
+These differences are due to a number of factors.
+
+
+#import table: cell, header
+#let fdata = csv("replica-baseline.csv")
+#let f = table(
+  columns: 7,
+  stroke: 0.5pt,
+
+  cell(rowspan: 2)[],cell(colspan: 3, align: center)[*Original*],cell(colspan: 3, align: center)[*Replica*],
+  [PLS1-SM], [ICA], [MOC],  [PLS1-SM],  [ICA],  [MOC],
+  ..for (i, row) in fdata.enumerate() {
+      if i > 0 {
+        let smallest = row.slice(1).sorted().at(0)
+        row.enumerate().map(c => {
+          let (j, e) = c
+          if j == 0 {
+            cell[$#ce(e)$]
+          } else {
+            if e == smallest {
+              cell[*#e*]
+            } else {
+              cell[#e]
+            }
+          }
+        })
+      }
+    }
+)
+
+#f
+
+
+Firstly, the original models were trained with datasets from 1600mm and 3000mm standoff distances@cleggRecalibrationMarsScience2017, while we only had access to the 1600mm dataset for our replicas.
+Additionally, we automated the outlier removal for the PLS1-SM phase, unlike the original manual process.
+As mentioned, the original authors manually curated their training and test sets, ensuring a broad elemental range, while we implemented an automatic process for our replicas due to lack of domain expertise.
+Differences might also stem from varied implementation specifics, such as programming languages and libraries used.
+
+
+
+// #figure(
+//   caption: [RMSEs of the original and our replicas of the PLS1-SM, ICA, and MOC models.],
+//   label: <replica_results_rmses>
+// )
+
 
 = Methodology <methodology>
 
