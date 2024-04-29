@@ -197,7 +197,9 @@ def combined_objective(trial, oxide, model):
 
             # Drop all oxides except for the current oxide
             drop_cols.extend([oxide for oxide in major_oxides if oxide != oxide])
-            train_processed, test_processed = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
+            train_processed, test_processed = full_flow_dataloader.load_full_flow_data(
+                load_cache_if_exits=True, average_shots=True
+            )
 
             train_processed = train_processed.drop(columns=drop_cols)
             test_processed = test_processed.drop(columns=drop_cols)
@@ -249,7 +251,7 @@ def main(
         notify_discord(f"# Optimizing for {oxide}", False)
         experiment_id = get_or_create_experiment(f"Optuna {oxide}")
         mlflow.set_experiment(experiment_id=experiment_id)
-        
+
         for model in models:
             print(f"Optimizing for {model}")
             notify_discord(f"## Optimizing {model}", False)
@@ -261,7 +263,11 @@ def main(
 
                 # Execute the hyperparameter optimization trials.
                 # Note the addition of the `champion_callback` inclusion to control our logging
-                study.optimize(lambda trial: combined_objective(trial, oxide, model), n_trials=n_trials, callbacks=[champion_callback])
+                study.optimize(
+                    lambda trial: combined_objective(trial, oxide, model),
+                    n_trials=n_trials,
+                    callbacks=[champion_callback],
+                )
 
                 mlflow.log_params(study.best_params)
                 mlflow.log_metric("best_mse", study.best_value)
