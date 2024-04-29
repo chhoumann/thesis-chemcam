@@ -87,12 +87,12 @@ def champion_callback(study, frozen_trial):
             message = (
                 f"Trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} with "
                 f"{improvement_percent:.4f}% improvement using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev}"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev:.4f}"
             )
         else:
             message = (
                 f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev}"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev:.4f}"
             )
         print(message)
         notify_discord(message)
@@ -247,12 +247,12 @@ def main(
         CURRENT_OXIDE = oxide
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}", False)
+        experiment_id = get_or_create_experiment(f"Optuna {oxide}")
+        mlflow.set_experiment(experiment_id=experiment_id)
+        
         for model in models:
             print(f"Optimizing for {model}")
             notify_discord(f"## Optimizing {model}", False)
-
-            experiment_id = get_or_create_experiment(f"Optuna {oxide} - {model}")
-            mlflow.set_experiment(experiment_id=experiment_id)
 
             with mlflow.start_run(experiment_id=experiment_id, run_name=model):
                 CURRENT_MODEL = model
