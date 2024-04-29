@@ -3,3 +3,5 @@ baseline/venv
 baseline/chemcam_baseline.egg-info
 baseline/.env
 baseline/build/*
+baseline/kenv
+baseline/experiments/logs.log
