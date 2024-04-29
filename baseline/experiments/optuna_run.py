@@ -1,11 +1,11 @@
 import math
 
+import numpy as np
 import mlflow
 import optuna
 from optuna.samplers import TPESampler
 from optuna.pruners import HyperbandPruner
 import requests
-from sklearn import model_selection
 import typer
 from optuna_models import (
     instantiate_extra_trees,
@@ -18,6 +18,7 @@ from optuna_preprocessors import (
     instantiate_kernel_pca,
     instantiate_max_abs_scaler,
     instantiate_min_max_scaler,
+    instantiate_norm3_scaler,
     instantiate_pca,
     instantiate_power_transformer,
     instantiate_quantile_transformer,
@@ -89,20 +90,22 @@ def champion_callback(study, frozen_trial):
     scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
     transformer = frozen_trial.params.get("transformer_type", "None")
     pca = frozen_trial.params.get("pca_type", "None")
+    std_dev = frozen_trial.user_attrs.get("std_dev", "N/A")  # Ensure this attribute is set during the trial
 
     if study.best_value and winner != study.best_value:
         study.set_user_attr("winner", study.best_value)
+        study.set_user_attr("best_std_dev", std_dev)  # Store the best std_dev
         if winner:
             improvement_percent = (abs(winner - study.best_value) / study.best_value) * 100
             message = (
                 f"Trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} with "
                 f"{improvement_percent:.4f}% improvement using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev}"
             )
         else:
             message = (
                 f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev}"
             )
         print(message)
         notify_discord(message)
@@ -154,6 +157,8 @@ def instantiate_scaler(trial, scaler_selector, logger):
         return instantiate_min_max_scaler(trial, _logger)
     elif scaler_selector == "max_abs_scaler":
         return instantiate_max_abs_scaler(trial, _logger)
+    elif scaler_selector == "norm3_scaler":
+        return instantiate_norm3_scaler(trial, _logger)
     else:
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
@@ -171,7 +176,7 @@ def combined_objective(trial):
 
             # Preprocessor components
             scaler_selector = trial.suggest_categorical(
-                "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "max_abs_scaler"]
+                "scaler_type", ["robust_scaler", "standard_scaler", "min_max_scaler", "max_abs_scaler", "norm3_scaler"]
             )
             scaler = instantiate_scaler(trial, scaler_selector, lambda params: mlflow.log_params(params))
             mlflow.log_param("scaler_type", scaler_selector)
@@ -212,10 +217,14 @@ def combined_objective(trial):
             preds = model.predict(X_test_transformed)
             mse = mean_squared_error(y_test.copy(), preds)
             rmse = math.sqrt(mse)
+            std_dev = np.std(y_test.copy() - preds)
+
+            trial.set_user_attr("std_dev", float(std_dev))
 
             # Log metrics
             mlflow.log_metric("mse", float(mse))
             mlflow.log_metric("rmse", rmse)
+            mlflow.log_metric("std_dev", float(std_dev))
 
         return rmse
     except Exception as e:
@@ -225,46 +234,46 @@ def combined_objective(trial):
 models = ["gbr", "svr", "xgboost", "extra_trees", "pls"]
 
 def main(
-    experiment_name: str = typer.Option(..., "--experiment-name", "-e", help="Name of the MLflow experiment"),
     n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
 ):
     global CURRENT_OXIDE, CURRENT_MODEL
-    experiment_id = get_or_create_experiment(experiment_name)
-    mlflow.set_experiment(experiment_id=experiment_id)
 
     sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
 
     for oxide in major_oxides:
-        run_name = oxide
         CURRENT_OXIDE = oxide
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}", False)
-        with mlflow.start_run(experiment_id=experiment_id, run_name=run_name, nested=True):
-            for model in models:
-                print(f"Optimizing for {model}")
-                notify_discord(f"## Optimizing {model}", False)
-                with mlflow.start_run(experiment_id=experiment_id, run_name=model, nested=True):
-                    CURRENT_MODEL = model
-                    # Initialize the Optuna study
-                    study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner)
+        for model in models:
+            print(f"Optimizing for {model}")
+            notify_discord(f"## Optimizing {model}", False)
 
-                    # Execute the hyperparameter optimization trials.
-                    # Note the addition of the `champion_callback` inclusion to control our logging
-                    study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
+            experiment_id = get_or_create_experiment(f"Optuna {oxide} - {model}")
+            mlflow.set_experiment(experiment_id=experiment_id)
 
-                    mlflow.log_params(study.best_params)
-                    mlflow.log_metric("best_mse", study.best_value)
-                    mlflow.log_metric("best_rmse", math.sqrt(study.best_value))
+            with mlflow.start_run(experiment_id=experiment_id, run_name=model):
+                CURRENT_MODEL = model
+                # Initialize the Optuna study
+                study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner)
 
-                    # Log tags
-                    mlflow.set_tags(
-                        tags={
-                            "project": "AutoML Experiments",
-                            "optimizer_engine": "optuna",
-                            "feature_set_version": 1,
-                        }
-                    )
+                # Execute the hyperparameter optimization trials.
+                # Note the addition of the `champion_callback` inclusion to control our logging
+                study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
+
+                mlflow.log_params(study.best_params)
+                mlflow.log_metric("best_mse", study.best_value)
+                mlflow.log_metric("best_rmse", math.sqrt(study.best_value))
+                mlflow.log_metric("best_std_dev", study.user_attrs.get("std_dev", 0))
+
+                # Log tags
+                mlflow.set_tags(
+                    tags={
+                        "project": "AutoML Experiments",
+                        "optimizer_engine": "optuna",
+                        "feature_set_version": 1,
+                    }
+                )
 
 
 if __name__ == "__main__":
