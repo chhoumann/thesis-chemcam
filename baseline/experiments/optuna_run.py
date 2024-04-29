@@ -1,12 +1,12 @@
 import math
 
-import numpy as np
 import mlflow
+import numpy as np
 import optuna
-from optuna.samplers import TPESampler
-from optuna.pruners import HyperbandPruner
 import requests
 import typer
+from optuna.pruners import HyperbandPruner
+from optuna.samplers import TPESampler
 from optuna_models import (
     instantiate_extra_trees,
     instantiate_gbr,
@@ -37,20 +37,7 @@ optuna.logging.set_verbosity(optuna.logging.ERROR)
 
 drop_cols = ["ID", "Sample Name"]
 CURRENT_OXIDE = ""
-CURRENT_MODEL=""
-
-train_processed, test_processed = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
-target = major_oxides[0]
-
-drop_cols.extend([oxide for oxide in major_oxides if oxide != target])
-train_processed = train_processed.drop(columns=drop_cols)
-test_processed = test_processed.drop(columns=drop_cols)
-
-X_train = train_processed.drop(columns=[target])
-y_train = train_processed[target]
-
-X_test = test_processed.drop(columns=[target])
-y_test = test_processed[target]
+CURRENT_MODEL = ""
 
 
 # https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/hyperparameter-tuning-with-child-runs.html
@@ -100,12 +87,12 @@ def champion_callback(study, frozen_trial):
             message = (
                 f"Trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} with "
                 f"{improvement_percent:.4f}% improvement using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev}"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev:.4f}"
             )
         else:
             message = (
                 f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev}"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev:.4f}"
             )
         print(message)
         notify_discord(message)
@@ -126,6 +113,7 @@ def notify_discord(message: str, shouldPrefixOxide: bool = True):
             print(f"Failed to send message to Discord: {response.status_code}, {response.text}")
     else:
         print("Discord webhook URL is not set. Skipping notification.")
+
 
 def instantiate_model(trial, model_selector, logger):
     def _logger(params):
@@ -163,16 +151,15 @@ def instantiate_scaler(trial, scaler_selector, logger):
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
 
-def combined_objective(trial):
+def combined_objective(trial, oxide, model):
     try:
         with mlflow.start_run(nested=True):
             mlflow.log_param("trial_number", trial.number)
 
             # Model selection
             # model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
-            model_selector = CURRENT_MODEL
-            model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
-            mlflow.log_param("model_type", model_selector)
+            model = instantiate_model(trial, model, lambda params: mlflow.log_params(params))
+            mlflow.log_param("model_type", model)
 
             # Preprocessor components
             scaler_selector = trial.suggest_categorical(
@@ -208,16 +195,29 @@ def combined_objective(trial):
 
             preprocessor = Pipeline(steps)
 
+            # Drop all oxides except for the current oxide
+            drop_cols.extend([oxide for oxide in major_oxides if oxide != oxide])
+            train_processed, test_processed = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
+
+            train_processed = train_processed.drop(columns=drop_cols)
+            test_processed = test_processed.drop(columns=drop_cols)
+
+            X_train = train_processed.drop(columns=[oxide])
+            y_train = train_processed[oxide]
+
+            X_test = test_processed.drop(columns=[oxide])
+            y_test = test_processed[oxide]
+
             # Data transformation
-            X_train_transformed = preprocessor.fit_transform(X_train.copy())
-            X_test_transformed = preprocessor.transform(X_test.copy())
+            X_train_transformed = preprocessor.fit_transform(X_train)
+            X_test_transformed = preprocessor.transform(X_test)
 
             # Model training and evaluation
-            model.fit(X_train_transformed, y_train.copy())
+            model.fit(X_train_transformed, y_train)
             preds = model.predict(X_test_transformed)
-            mse = mean_squared_error(y_test.copy(), preds)
+            mse = mean_squared_error(y_test, preds)
             rmse = math.sqrt(mse)
-            std_dev = np.std(y_test.copy() - preds)
+            std_dev = np.std(y_test - preds)
 
             trial.set_user_attr("std_dev", float(std_dev))
 
@@ -231,7 +231,9 @@ def combined_objective(trial):
         print(f"An error occurred: {e}")
         return float("inf")  # Return a large number to indicate failure
 
+
 models = ["gbr", "svr", "xgboost", "extra_trees", "pls"]
+
 
 def main(
     n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
@@ -245,12 +247,12 @@ def main(
         CURRENT_OXIDE = oxide
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}", False)
+        experiment_id = get_or_create_experiment(f"Optuna {oxide}")
+        mlflow.set_experiment(experiment_id=experiment_id)
+        
         for model in models:
             print(f"Optimizing for {model}")
             notify_discord(f"## Optimizing {model}", False)
-
-            experiment_id = get_or_create_experiment(f"Optuna {oxide} - {model}")
-            mlflow.set_experiment(experiment_id=experiment_id)
 
             with mlflow.start_run(experiment_id=experiment_id, run_name=model):
                 CURRENT_MODEL = model
@@ -259,7 +261,7 @@ def main(
 
                 # Execute the hyperparameter optimization trials.
                 # Note the addition of the `champion_callback` inclusion to control our logging
-                study.optimize(combined_objective, n_trials=n_trials, callbacks=[champion_callback])
+                study.optimize(lambda trial: combined_objective(trial, oxide, model), n_trials=n_trials, callbacks=[champion_callback])
 
                 mlflow.log_params(study.best_params)
                 mlflow.log_metric("best_mse", study.best_value)
