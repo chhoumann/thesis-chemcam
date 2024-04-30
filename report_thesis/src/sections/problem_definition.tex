@@ -18,14 +18,14 @@ The input to our computational models consists of \gls{libs} spectral data, whic
 We have:
 
 \begin{itemize}
-    \item \textbf{Matrix $A_{t \times o}$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$.
-    \item \textbf{Matrix $B_{w \times s}$}: A Boolean matrix that links wavelengths $w$ to spectrometers $s$, indicating whether a specific wavelength is detected by a spectrometer.
-    \item \textbf{Matrix $C_{t \times l \times s \times w}$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$.
-    \item \textbf{Matrix $D_{t \times l \times w}$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
+    \item \textbf{Matrix $A[t, o]$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$.
+    \item \textbf{Matrix $B[w, s]$}: A Boolean matrix that links wavelengths $w$ to spectrometers $s$, indicating whether a specific wavelength is detected by a spectrometer.
+    \item \textbf{Matrix $C[t, l, s, w]$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$.
+    \item \textbf{Matrix $D[t, l, w]$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
     \[
     D[t, l, w] = \frac{1}{|S|} \sum_{s \in S} C[t, l, s, w].
     \]
-    \item \textbf{Matrix $E_{t \times l \times w}$}: The result of $D$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+    \item \textbf{Matrix $E[t, l, w]$}: The result of $D$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
 \end{itemize}
 
 The outputs of our models are the quantified chemical compositions of geological samples. These are primarily the concentrations of major elements, represented in weight percentage. While trace elements are also present, our current analysis does not quantify these.
