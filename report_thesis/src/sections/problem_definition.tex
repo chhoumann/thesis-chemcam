@@ -29,7 +29,7 @@ We have:
 \end{itemize}
 
 The outputs of our models are the quantified chemical compositions of geological samples. These are primarily the concentrations of major elements, represented in weight percentage. While trace elements are also present, our current analysis does not quantify these.
-Our goal is to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^O$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $O$ represents the number of target oxides. This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^O$ of estimated oxide concentrations:
+Our goal is to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^O$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $O$ represents the number of target oxides. This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^O$ of estimated oxide concentrations. The vector $\mathbf{x}$ is derived from matrix $E$, representing processed spectral data:
 \[
 \mathbf{v} = \mathcal{F}(\mathbf{x}).
 \]
