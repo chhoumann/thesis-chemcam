@@ -1,14 +1,23 @@
 \section{Methodology}\label{sec:methodology}
-In this section, we outline the methodology used in this study to address the challenges identified in the problem definition. Our objective was to identify the most promising machine learning models and preprocessing techniques proposed in the literature, outlined in Section~\ref{sec:related-work}, for predicting major oxide compositions from LIBS data. Then, using this knowledge, develop a pipeline that utilizes the strengths of these models and preprocessing techniques to improve prediction accuracy and robustness of the predictions.
-We first present a description of the datasets used and how it was prepared. Then the preprocessing and model selection process is described followed by the experimental setup and the evaluation metrics employed. Finally, we describe our validation testing procedures and how the final model evaluations were conducted to ensure unbiased results.
+In this section, we outline the methodology used in this study to address the challenges identified in the problem definition. Our objective was to identify the most promising machine learning models and preprocessing techniques proposed in the literature, outlined in Section~\ref{sec:related-work}, for predicting major oxide compositions from LIBS data. 
+Then, using this knowledge, develop a pipeline that utilizes the strengths of these models and preprocessing techniques to improve prediction accuracy and robustness of the predictions.
+We first present a description of the datasets used, how it was prepared and how it was split for model training. Then the preprocessing and model selection process is described followed by the experimental setup and the evaluation metrics employed. Finally, we describe our validation testing procedures and how the final model evaluations were conducted to ensure unbiased results.
 
 \subsection{Data Prepraration}
 Similarly to our previous work \cite{p9}, we used the publicly available \gls{ccs} data. 
 CCS refers to LIBS data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis. 
 The full description of this preprocessing can be found in \citet{wiensPreFlight3}.
 
-While the CCS data is in a more suitable form for quantitative analysis, it still requires further preprocessing to be useful. Specifically, the data will still have noise at the boundaries of the spectrometer ranges, which have to be masked out. The data will also contain negative values, which are not physically meaningful and have to be set to zero. 
-For a more detailed description of the data and the preprocessing steps, we refer the reader to \citet{p9}, since the data preparation is the same for this project.
+While the CCS data is in a more suitable form for quantitative analysis, it still requires further preprocessing to be useful. Specifically, the data will still have noise at the boundaries of the spectrometer ranges, which have to be masked out. The data will also contain negative values, which are not physically meaningful and have to be set to zero.
+For a more detailed description of the data and the preprocessing steps, we refer the reader to \citet{p9}, since the data preparation follows the same procedures detailed in that work.
+
+Once preprocessed, the data was conventionally split into training and testing sets. 
+However, as detailed in \citet{p9} and \cite{cleggRecalibrationMarsScience2017}, care has to be taken in order to ensure that the training set is constructed such that it has sufficient samples containing extreme values.
+To incorporate these extreme values, the training set was constructed by including the two highest and two lowest extreme samples from each oxide category.
+Following the inclusion of extreme samples, we adjusted the size of the test split to accommodate the reduced pool of normal samples. 
+This adjustment was calculated by determining the number of extreme samples, subtracting this from the total sample count, and recalculating the test size proportionally. 
+This ensures that the proportion of the test set remains appropriate relative to the now smaller dataset. 
+Subsequently, we conducted the train-test split, where the normal samples --- those not categorized as extreme --- were divided according to the newly adjusted test size, with the extreme samples included to ensure exposure to varied data points.
 
 \subsection{Model and Preprocessing Selection}
 For the initial investigative experiments we selected a range of models for further exploration, namely Support Vector Regression (SVR), Gradient Boosting Regression (GBR), Partial Least Squares Regression (PLS), eXtreme Gradient Boosting (XGBoost), Natural Gradient Boosting (NGBoost), Extra Trees Regression (ETR), Elastic Net (ENet), and Stochastic Gradient Descent (SGD). 
@@ -65,100 +74,4 @@ By using these two metrics, we aim to evaluate model performance in terms of bot
 \subsection{Validation and Testing Procedures}
 
 
-
-\subsubsection{Stacking Ensemble Method}
-
-% Explain the stacking ensemble method
-% Explain the way we implemented + the final model architecture/pipeline
-
-\subsubsection{PCA, PCR \& PLS}
-\gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
-Mathematically, \gls{pca} involves the eigen decomposition of the covariance matrix of the data, $\mathbf{X}^T \mathbf{X}$.
-First, the data is centered by subtracting the mean of each variable.
-The eigenvectors and eigenvalues of the covariance matrix are then computed.
-The eigenvectors represent the directions of maximum variance, and the eigenvalues indicate the amount of variance captured in each of those directions.
-These eigenvectors are ordered by their corresponding eigenvalues in descending order, which helps in identifying which components capture the most variance.
-In the context of dimensionality reduction, only the top $n$ components are retained.
-These are considered enough to capture the most significant aspects of the data.
-Then, the original data points can be projected onto the space defined by these top $n$ components.
-This step transforms the high-dimensional data into a lower-dimensional space by retaining only the dimensions that contain the most significant variance.
-A property of the principal components is that they are uncorrelated, which means that calculating the covariance matrix of each pair of components results in a diagonal matrix where the off-diagonal elements are zero.
-
-\gls{pcr} extends \gls{pca} in the context of regression analysis.
-\gls{pcr} involves performing \gls{pca} on the features $\mathbf{X}$ and then using the principal components with the highest variances as features in a linear regression model.
-This approach can be beneficial when the original features are highly correlated, as the principal components are orthogonal to each other, reducing multicollinearity.
-If $\mathbf{X}$ is decomposed into $\mathbf{TP}^T + \mathbf{E}$ where $\mathbf{T}$ are the scores and $\mathbf{P}$ are the loadings, \gls{pcr} uses $\mathbf{T}$ to predict the target $\mathbf{y}$ as $\mathbf{y} = \mathbf{Tb} + \mathbf{e}$.
-
-However, one drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones. 
-This assumption does not always hold, which is what \gls{pls} aims to address.
-\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target. 
-It does so by placing the highest weight on that most strongly correlated with the target using the coefficients derived from the covariance between the target and the features:
-$$
-    Z = \sum_{j=1}^{p} \phi_j X_j 
-$$
-Where $Z$ is the component, $X_j$ is the $j$-th feature, and $\phi_j$ is the weight of the $j$-th feature and $\phi_j$ is derived using the following equation:
-
-$$
-    \phi_j = \frac{cov(X_j, Y)}{var(X_j)}
-$$
-
-To refine the model iteratively, PLS uses the residuals from the previous components to calculate the next component. The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components:
-
-$$
-    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{X}_{j, m-1}
-$$
-
-The components are then used to predict the target variable by fitting a linear model via least squares regression.
-
-% Explain PLS mathematically (similar to that one book, but not as detailed)
-% Explain why it may perform well on our data
-
-\subsubsection{GBR} % maybe put these in the background section instead for the five models, however that might come out of the blue??
-% Explain GBR mathematically (similar to that one book, but not as detailed)
-% Explain why it may perform well on our data
-
-\subsubsection{SVR}
-% Explain SVR mathematically (similar to that one book, but not as detailed)
-% Explain why it may perform well on our data
-
-\subsubsection{XGBoost}
-% Explain XGBoost mathematically (similar to that one book, but not as detailed)
-% Explain why it may perform well on our data
-
-\subsubsection{ETR}
-% Explain ETR mathematically (similar to that one book, but not as detailed)
-% Explain why it may perform well on our data
-
-\subsubsection{Results}
-% Present the results of the experiments and discuss them
-
-
-%1. Introduction to Methodology: Begin with an overview that explains the purpose of your methodology section. Briefly describe the goals of your experiments, such as testing different machine learning models to determine which yields the best results in your specific field.
-% 
-%2. Description of Datasets:
-%Data Sources: Describe where your data comes from, ensuring you cover any ethical considerations, permissions, and data integrity.
-%Data Preparation: Detail the steps you took to prepare the data for analysis. This includes cleaning, normalizing, feature extraction, and any other preprocessing methods.
-%Data Splitting: Explain how you divided the data (e.g., training, validation, test sets). Mention the rationale behind your choice of split ratios.
-%
-%3. Model Selection:
-%Literature Review: Summarize the existing models and architectures from the literature that influenced your choices. Explain why these models are relevant to your field and your specific problem.
-%Experimented Models: List the models you have chosen to test. Include variations in architectures or configurations if applicable.
-%
-%4. Experimental Setup:
-%Software and Hardware: Specify the software (including version numbers) and hardware used in the experiments to allow for reproducibility.
-%Configuration Details: For each model, describe the configuration settings such as learning rate, number of layers, number of neurons per layer, activation functions, etc. and refer to apppendix for actual values
-%Training Process: Describe how each model was trained. Include details on the number of epochs, batch size, optimization techniques, and any regularization methods used.
-%
-%5. Evaluation Metrics:
-%Criteria for Evaluation: Describe the metrics used to evaluate the models. Common metrics might include accuracy, precision, recall, F1 score, ROC-AUC, etc., depending on your specific application.
-%Rationale: Explain why these metrics are suitable for assessing model performance in your context.
-%
-%6. Validation and Testing Procedures:
-%Validation Technique: Explain how you validated the models (e.g., cross-validation, hold-out validation).
-%Testing: Detail the testing process and how the final model evaluations were conducted to ensure unbiased results.
-%
-%7. Challenges and Limitations:
-%Encountered Issues: Discuss any challenges you faced during the experimental process, such as model convergence issues or data imbalances.
-%Limitations of the Approach: Acknowledge any limitations in your methodology, such as potential biases in the data or overfitting in the models.
-%
-%8. Summary: Conclude the methodology section by summarizing the key points made and briefly stating how this setup helps achieve the objectives stated at the beginning.
+\subsubsection{Summary}
