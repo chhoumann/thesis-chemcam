@@ -1,7 +1,10 @@
 \section{Methodology}\label{sec:methodology}
-To address the objectives of this study described in the problem definition in Section~\ref{sec:problem_definition}, we adopted an experimental approach.
-The initial phase of the project was dedicated to identifying the current state of the art in machine learning methodologies and reviewing recent literature specifically on LIBS data analysis, as outlined in Section~\ref{sec:related-work}.
-% Here, we should mention what the literature review told us about preprocessing and feature selection, which guided our experiments with these steps, and the explorative approach to the preprocessing and feature selection steps.
+In this section, we outline the methodology used in this study to address the challenges identified in the problem definition. Our objective was to identify the most promising machine learning models and preprocessing techniques proposed in the literature, outlined in Section~\ref{sec:related-work}, for predicting major oxide compositions from LIBS data. Then, using this knowledge, develop a pipeline that utilizes the strengths of these models and preprocessing techniques to improve prediction accuracy and robustness of the predictions.
+We first present a description of the datasets used and how it was prepared. Then the preprocessing and model selection process is described followed by the experimental setup and the evaluation metrics employed. Finally, we describe our validation testing procedures and how the final model evaluations were conducted to ensure unbiased results.
+
+\subsection{Description of Datasets}
+
+\subsection{Model Selection}
 
 Based on our findings, we tested various methodologies on our data.
 This allowed us to identify and focus on the models that performed best and were most relevant to our specific dataset.
@@ -18,11 +21,7 @@ However, unlike the MOC model, which required manual determination of the model 
 This meta learner learns optimal parameter settings, ensuring that the model integration is not only more efficient but also dynamically adapted to our dataset's characteristics and does not require domain-specific knowledge.
 This represents a more sophisticated method, as it automates critical decisions and enhances predictive accuracy through learned rather than preset integrations.
 
-In this section, we first describe our evaluation metrics and the rationale behind their selection.
-We use these metrics to assess the performance of our models in predicting major oxide compositions from LIBS data.
-We then present the architecture of the developed pipeline, which utilizes the proposed stacking ensemble method.
-As part of this discussion, we provide a detailed explanation of the five models that we selected for the ensemble as well as the specific preprocessing steps that we applied to our data.
-Finally, we discuss the results and their implications for the field of LIBS data analysis.
+\subsection{Experimental Setup}
 
 \subsection{Evaluation Metrics}
 To evaluate the performance of our models in predicting major oxide compositions from \gls{libs} data, we will use two key metrics: \gls{rmse} and standard deviation of prediction errors.
@@ -45,7 +44,10 @@ where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error. A lower standard 
 
 By using these two metrics, we aim to evaluate model performance in terms of both accuracy and robustness, which are crucial for the reliable prediction of major oxide compositions from \gls{libs} data.
 
+\subsection{Validation and Testing Procedures}
+
 \subsubsection{Stacking Ensemble Method}
+
 % Explain the stacking ensemble method
 % Explain the way we implemented + the final model architecture/pipeline
 
@@ -109,3 +111,34 @@ The components are then used to predict the target variable by fitting a linear 
 
 \subsubsection{Results}
 % Present the results of the experiments and discuss them
+
+
+%1. Introduction to Methodology: Begin with an overview that explains the purpose of your methodology section. Briefly describe the goals of your experiments, such as testing different machine learning models to determine which yields the best results in your specific field.
+% 
+%2. Description of Datasets:
+%Data Sources: Describe where your data comes from, ensuring you cover any ethical considerations, permissions, and data integrity.
+%Data Preparation: Detail the steps you took to prepare the data for analysis. This includes cleaning, normalizing, feature extraction, and any other preprocessing methods.
+%Data Splitting: Explain how you divided the data (e.g., training, validation, test sets). Mention the rationale behind your choice of split ratios.
+%
+%3. Model Selection:
+%Literature Review: Summarize the existing models and architectures from the literature that influenced your choices. Explain why these models are relevant to your field and your specific problem.
+%Experimented Models: List the models you have chosen to test. Include variations in architectures or configurations if applicable.
+%
+%4. Experimental Setup:
+%Software and Hardware: Specify the software (including version numbers) and hardware used in the experiments to allow for reproducibility.
+%Configuration Details: For each model, describe the configuration settings such as learning rate, number of layers, number of neurons per layer, activation functions, etc. and refer to apppendix for actual values
+%Training Process: Describe how each model was trained. Include details on the number of epochs, batch size, optimization techniques, and any regularization methods used.
+%
+%5. Evaluation Metrics:
+%Criteria for Evaluation: Describe the metrics used to evaluate the models. Common metrics might include accuracy, precision, recall, F1 score, ROC-AUC, etc., depending on your specific application.
+%Rationale: Explain why these metrics are suitable for assessing model performance in your context.
+%
+%6. Validation and Testing Procedures:
+%Validation Technique: Explain how you validated the models (e.g., cross-validation, hold-out validation).
+%Testing: Detail the testing process and how the final model evaluations were conducted to ensure unbiased results.
+%
+%7. Challenges and Limitations:
+%Encountered Issues: Discuss any challenges you faced during the experimental process, such as model convergence issues or data imbalances.
+%Limitations of the Approach: Acknowledge any limitations in your methodology, such as potential biases in the data or overfitting in the models.
+%
+%8. Summary: Conclude the methodology section by summarizing the key points made and briefly stating how this setup helps achieve the objectives stated at the beginning.
