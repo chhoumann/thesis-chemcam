@@ -4,15 +4,15 @@ Then, using this knowledge, develop a pipeline that utilizes the strengths of th
 We first present a description of the datasets used, how it was prepared and how it was split for model training. Then the preprocessing and model selection process is described followed by the experimental setup and the evaluation metrics employed. Finally, we describe our validation testing procedures and how the final model evaluations were conducted to ensure unbiased results.
 
 \subsection{Data Prepraration}
-Similarly to our previous work \cite{p9}, we used the publicly available \gls{ccs} data. 
+Similarly to our previous work \cite{p9_paper}, we used the publicly available \gls{ccs} data. 
 CCS refers to LIBS data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis. 
 The full description of this preprocessing can be found in \citet{wiensPreFlight3}.
 
 While the CCS data is in a more suitable form for quantitative analysis, it still requires further preprocessing to be useful. Specifically, the data will still have noise at the boundaries of the spectrometer ranges, which have to be masked out. The data will also contain negative values, which are not physically meaningful and have to be set to zero.
-For a more detailed description of the data and the preprocessing steps, we refer the reader to \citet{p9}, since the data preparation follows the same procedures detailed in that work.
+For a more detailed description of the data and the preprocessing steps, we refer the reader to \citet{p9_paper}, since the data preparation follows the same procedures detailed in that work.
 
 Once preprocessed, the data was conventionally split into training and testing sets. 
-However, as detailed in \citet{p9} and \cite{cleggRecalibrationMarsScience2017}, care has to be taken in order to ensure that the training set is constructed such that it has sufficient samples containing extreme values.
+However, as detailed in \citet{p9_paper} and \cite{cleggRecalibrationMarsScience2017}, care has to be taken in order to ensure that the training set is constructed such that it has sufficient samples containing extreme values.
 To incorporate these extreme values, the training set was constructed by including the two highest and two lowest extreme samples from each oxide category.
 Following the inclusion of extreme samples, we adjusted the size of the test split to accommodate the reduced pool of normal samples. 
 This adjustment was calculated by determining the number of extreme samples, subtracting this from the total sample count, and recalculating the test size proportionally. 
@@ -38,10 +38,8 @@ Inspired by these ideas, we explored the possibility of improving model performa
 For this purpose, we considered the following preprocessing techniques: Min-Max Scaling, Standard Scaling, Robust Scaling, MaxAbs Scaling, Quantile Transformer and Power Transformer. 
 Additionally, we also considered dimensionality reduction techniques such as PCA and KernelPCA.
 Through experimentation, we identified which preprocessing techniques were most effective for each model and oxide. 
-
 Realizing the potential of this, we decided to further investigate how the predictive accuracy and robustness could be improved by combining the strengths of these models and preprocessing techniques.
-From our investigation, we identified that the stacking ensemble method would be the most suitable and novel approach for our problem.
-Consequently, we concluded that a stacking ensemble method would optimize outcomes for our dataset. 
+From our investigation, we determined that the stacking ensemble method seemed very promising and novel in the LIBS analysis field, leading us to select it as the primary method for our study.
 
 Stacking ensemble is analogous to the methodologies employed in the original MOC pipeline, which also tailored predictions for each oxide by blending outputs from the PLS-SM and ICA phases, variably weighting the influence of the ICA predictions depending on the oxide.
 Unlike the MOC model, which required manual determination of the model weightings for each oxide, our method utilizes a meta learner to learn optimal parameter settings. 
