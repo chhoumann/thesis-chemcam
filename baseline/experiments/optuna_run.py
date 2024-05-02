@@ -94,38 +94,47 @@ def champion_callback(study, frozen_trial, oxide, model):
     Logging callback that will report when a new trial iteration improves upon existing
     best trial values, including the model type and other details that achieved the new best value.
     """
-    winner = study.user_attrs.get("winner", None)
-    model_type = frozen_trial.params.get("model_type", model)
-    scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
-    transformer = frozen_trial.params.get("transformer_type", "None")
-    pca = frozen_trial.params.get("pca_type", "None")
-    std_dev = frozen_trial.user_attrs.get("std_dev", float("inf"))
-    rmse_cv = frozen_trial.user_attrs.get("rmse_cv", float("inf"))
-    std_dev_cv = frozen_trial.user_attrs.get("std_dev_cv", float("inf"))
-    rmse_cv_folds = frozen_trial.user_attrs.get("rmse_cv_folds", {})
-    std_dev_cv_folds = frozen_trial.user_attrs.get("std_dev_cv_folds", {})
+    if study.best_trials:
+        # Find the best trial with the least average of values
+        best_trial = min(study.best_trials, key=lambda t: sum(t.values) / len(t.values))
+        winner = study.user_attrs.get("winner", None)
+        model_type = frozen_trial.params.get("model_type", model)
+        scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
+        transformer = frozen_trial.params.get("transformer_type", "None")
+        pca = frozen_trial.params.get("pca_type", "None")
+        std_dev = frozen_trial.user_attrs.get("std_dev", float("inf"))
+        rmse_cv = frozen_trial.user_attrs.get("rmse_cv", float("inf"))
+        std_dev_cv = frozen_trial.user_attrs.get("std_dev_cv", float("inf"))
+        rmse_cv_folds = frozen_trial.user_attrs.get("rmse_cv_folds", {})
+        std_dev_cv_folds = frozen_trial.user_attrs.get("std_dev_cv_folds", {})
+        rmsep = frozen_trial.user_attrs.get("rmse", float("inf"))
 
-    if study.best_value and winner != study.best_value:
-        study.set_user_attr("winner", study.best_value)
-        study.set_user_attr("best_std_dev", std_dev)  # Store the best std_dev
-        if winner:
-            improvement_percent = (abs(winner - study.best_value) / study.best_value) * 100
-            message = (
-                f"{oxide} | Trial {frozen_trial.number} achieved value: `{frozen_trial.value:.4f}` with "
-                f"{improvement_percent:.4f}% improvement using {model_type}.\n"
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: `{std_dev:.4f}`, \n"
+        if best_trial.values and winner != best_trial.values:
+            study.set_user_attr("winner", best_trial.values)
+            study.set_user_attr("best_std_dev", std_dev)  # Store the best std_dev
+            cmn = (
+                f"Scaler: `{scaler}`, Transformer: `{transformer}`, PCA: `{pca}`, Std Dev (Test): `{std_dev:.4f}`, RMSEP: `{rmsep:.4f}`, \n"
                 f"Cross-Validation Metrics: RMSE CV: `{rmse_cv:.4f}`, Std Dev CV: `{std_dev_cv:.4f}`, \n"
                 f"RMSE CV Folds: {rmse_cv_folds}\nStd Dev CV Folds: {std_dev_cv_folds}"
             )
-        else:
-            message = (
-                f"{oxide} | Initial trial {frozen_trial.number} achieved value: `{frozen_trial.value:.4f}` using {model_type}.\n"
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: `{std_dev:.4f}`, \n"
-                f"Cross-Validation Metrics: RMSE CV: `{rmse_cv:.4f}`, Std Dev CV: `{std_dev_cv:.4f}`, \n"
-                f"RMSE CV Folds: {rmse_cv_folds}\nStd Dev CV Folds: {std_dev_cv_folds}"
-            )
-        print(message)
-        notify_discord(message)
+            if winner:
+                improvement_percent = (
+                    abs(sum(winner) / len(winner) - sum(best_trial.values) / len(best_trial.values))
+                    / (sum(best_trial.values) / len(best_trial.values))
+                ) * 100
+                message = (
+                    f"{oxide} | Trial {frozen_trial.number} achieved avg RMSE_CV/STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` with "
+                    f"{improvement_percent:.4f}% improvement using {model_type}.\n"
+                    f"{cmn}"
+                )
+            else:
+                message = (
+                    f"{oxide} | Initial trial {frozen_trial.number} achieved avg RMSE_CV/STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` using {model_type}.\n"
+                    f"{cmn}"
+                )
+                
+            print(message)
+            notify_discord(message)
 
 
 def notify_discord(message: str):
@@ -247,15 +256,11 @@ def combined_objective(trial, oxide, model):
 
             rmse_cv = np.mean(cv_fold_metrics[0])
             std_dev_cv = np.mean(cv_fold_metrics[1])
-            rmse_cv_folds = {f"rmse_cv_{i}": rmse for i, (rmse, _) in enumerate(cv_fold_metrics)}
-            std_dev_cv_folds = {f"std_dev_cv_{i}": std_dev for i, (_, std_dev) in enumerate(cv_fold_metrics)}
+            rmse_cv_folds = {f"rmse_cv_{i+1}": rmse for i, (rmse, _) in enumerate(cv_fold_metrics)}
+            std_dev_cv_folds = {f"std_dev_cv_{i+1}": std_dev for i, (_, std_dev) in enumerate(cv_fold_metrics)}
 
-            for i, (rmse, std_dev) in enumerate(cv_fold_metrics):
-                mlflow.log_metric("rmse_cv", rmse, step=i)
-                mlflow.log_metric("std_dev_cv", std_dev, step=i)
-
-            mlflow.log_metric("rmse_cv_avg", float(rmse_cv))
-            mlflow.log_metric("std_dev_cv_avg", float(std_dev_cv))
+            mlflow.log_metric("rmse_cv", float(rmse_cv))
+            mlflow.log_metric("std_dev_cv", float(std_dev_cv))
             mlflow.log_metrics(rmse_cv_folds)
             mlflow.log_metrics(std_dev_cv_folds)
 
@@ -279,7 +284,7 @@ def combined_objective(trial, oxide, model):
             # Log metrics
             mlflow.log_metrics({"mse": float(mse), "rmse": rmse, "std_dev": float(std_dev)})
 
-        return rmse
+        return float(rmse_cv), float(std_dev_cv)
     except Exception as e:
         import traceback
 
@@ -310,7 +315,7 @@ def main(
 
             with mlflow.start_run(experiment_id=experiment_id, run_name=model):
                 # Initialize the Optuna study
-                study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner)
+                study = optuna.create_study(directions=["minimize", "minimize"], sampler=sampler, pruner=pruner)
 
                 # Execute the hyperparameter optimization trials.
                 # Note the addition of the `champion_callback` inclusion to control our logging

@@ -65,7 +65,7 @@ class FitPredictProtocol(Protocol):
 
 
 def perform_cross_validation(
-    kf: BaseCrossValidator,
+    kf: CustomKFoldCrossValidator,
     data: pd.DataFrame,
     model: FitPredictProtocol,
     preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
