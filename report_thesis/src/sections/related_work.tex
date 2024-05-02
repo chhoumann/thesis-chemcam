@@ -133,3 +133,11 @@ The motivation for this approach stems from the assumption that utilizing multip
 This is relevant for our work as one of the major challenges in analyzing LIBS calibration data for Mars is the scarcity of available data.
 This scarcity makes it difficult to construct robust models capable of comprehensively understanding the underlying patterns and physical principles within the data.
 Utilizing related LIBS data could help the models first learn the general outline, shape and patterns in the LIBS data, making it easier for it to grasp the deeper patterns in the Mars related data.
+
+\citet{mulenga_stacking_2021} introduce novel techniques for improving the preprocessing of microbiome data. 
+The authors present a unique approach that involves stacking and chaining multiple normalization methods to optimize the preprocessing pipeline for deep learning applications in colorectal cancer detection. 
+Their stacking method combines the outputs of various normalization techniques to artificially expand the training dataset, whereas the chaining method applies these techniques sequentially to incrementally adjust data towards a normal distribution.
+The effectiveness of these methods was evaluated using area under the curve (AUC) metrics, with results showing significant improvements in model performance, achieving AUC values between 0.857 and 0.987. 
+This suggests that careful selection and combination of preprocessing methods can substantially enhance the predictive accuracy and robustness of models dealing with complex, high-dimensional data.
+This approach is interesting to our study as it offers a potential pathway to address similar challenges in LIBS data analysis, such as high dimensionality and multicollinearity, which significantly affect the accuracy of predicting major oxide compositions. 
+Integrating a tailored stacking and chaining normalization framework into our preprocessing strategy could improve the robustness and accuracy of our models, aligning with our objectives to enhance the prediction capabilities of major oxides from LIBS data. 
