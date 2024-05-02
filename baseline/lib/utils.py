@@ -1,7 +1,9 @@
 from pathlib import Path
+from typing import Callable, List, Protocol, Tuple, runtime_checkable
 
+import numpy as np
 import pandas as pd
-from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import BaseCrossValidator, KFold, train_test_split
 
 from lib.config import AppConfig
 
@@ -42,7 +44,61 @@ def custom_kfold_cross_validation(data, k: int, group_by: str, random_state=None
         yield train_data, test_data
 
 
-def custom_train_test_split(data, group_by: str, test_size=0.2, random_state=None):
+class CustomKFoldCrossValidator(BaseCrossValidator):
+    def __init__(self, k: int, group_by: str, random_state=None):
+        self.k = k
+        self.group_by = group_by
+        self.random_state = random_state
+
+    def split(self, data, y=None, groups=None):
+        return custom_kfold_cross_validation(data, self.k, self.group_by, self.random_state)
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        return self.k
+
+
+@runtime_checkable
+class FitPredictProtocol(Protocol):
+    def fit(self, X, y) -> None: ...
+
+    def predict(self, X) -> np.ndarray: ...
+
+
+def perform_cross_validation(
+    kf: BaseCrossValidator,
+    data: pd.DataFrame,
+    model: FitPredictProtocol,
+    preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
+    metric_fns: List[Callable[[np.ndarray, np.ndarray], float]],
+) -> List[List[float]]:
+    """
+    Perform cross-validation using a custom preprocessing function and multiple metric functions.
+
+    Parameters:
+    - kf: The KFold or similar cross-validator object.
+    - data: The dataset to be used.
+    - model: The regression model to be trained.
+    - preprocess_fn: A function that takes train and test data DataFrames and returns
+                     the tuples (X_train, y_train) and (X_test, y_test).
+    - metric_fns: Tuple of functions to compute the metrics, each takes two arguments: y_true and y_pred.
+
+    Returns:
+    - List[List[float]]: A list of lists, each sublist contains computed metrics for each fold.
+    """
+    all_fold_metrics: List[List[float]] = []
+    for i, (train_data, test_data) in enumerate(kf.split(data)):
+        X_train, y_train, X_test, y_test = preprocess_fn(train_data, test_data)
+
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+
+        fold_metrics = [metric_fn(y_test, y_pred) for metric_fn in metric_fns]
+        all_fold_metrics.append(fold_metrics)
+
+    return all_fold_metrics
+
+
+def custom_train_test_split(data, group_by: str, test_size=0.2, random_state=None) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Custom train-test split function that splits the data based on
     a specified grouping variable.
@@ -69,9 +125,7 @@ def custom_train_test_split(data, group_by: str, test_size=0.2, random_state=Non
     grouped = data.groupby(group_by)
     groups_keys = list(grouped.groups.keys())
 
-    train_keys, test_keys = train_test_split(
-        groups_keys, test_size=test_size, random_state=random_state
-    )
+    train_keys, test_keys = train_test_split(groups_keys, test_size=test_size, random_state=random_state)
 
     train_data = pd.concat([grouped.get_group(key) for key in train_keys])
     test_data = pd.concat([grouped.get_group(key) for key in test_keys])
@@ -103,9 +157,7 @@ def filter_data_by_compositional_range(data, compositional_range, oxide, oxide_r
 
     # Check if empty now
     if filtered_data.empty:
-        print(
-            f"WARNING: No data found for {compositional_range} {oxide} ({lower_bound}-{upper_bound})"
-        )
+        print(f"WARNING: No data found for {compositional_range} {oxide} ({lower_bound}-{upper_bound})")
 
     return filtered_data
 

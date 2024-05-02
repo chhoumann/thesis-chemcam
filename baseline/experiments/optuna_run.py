@@ -1,4 +1,5 @@
 import math
+from typing import List
 
 import mlflow
 import numpy as np
@@ -31,13 +32,34 @@ from sklearn.pipeline import Pipeline
 from lib import full_flow_dataloader
 from lib.config import AppConfig
 from lib.reproduction import major_oxides
+from lib.utils import CustomKFoldCrossValidator, perform_cross_validation
 
 mlflow.set_tracking_uri(AppConfig().mlflow_tracking_uri)
 optuna.logging.set_verbosity(optuna.logging.ERROR)
 
-drop_cols = ["ID", "Sample Name"]
-CURRENT_OXIDE = ""
-CURRENT_MODEL = ""
+
+def get_preprocess_fn(preprocessor, target_col: str, drop_cols: List[str]):
+    def preprocess_fn(train, test):
+        X_train = train.drop(columns=drop_cols)
+        y_train = train[target_col]
+
+        X_test = test.drop(columns=drop_cols)
+        y_test = test[target_col]
+
+        X_train_transformed = preprocessor.fit_transform(X_train)
+        X_test_transformed = preprocessor.transform(X_test)
+
+        return X_train_transformed, y_train, X_test_transformed, y_test
+
+    return preprocess_fn
+
+
+def rmse_metric(y_true, y_pred):
+    return float(np.sqrt(mean_squared_error(y_true, y_pred)))
+
+
+def std_dev_metric(y_true, y_pred):
+    return float(np.std(y_true - y_pred))
 
 
 # https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/hyperparameter-tuning-with-child-runs.html
@@ -67,17 +89,21 @@ def get_or_create_experiment(experiment_name: str) -> str:
 
 
 # https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/hyperparameter-tuning-with-child-runs.html
-def champion_callback(study, frozen_trial):
+def champion_callback(study, frozen_trial, oxide, model):
     """
     Logging callback that will report when a new trial iteration improves upon existing
     best trial values, including the model type and other details that achieved the new best value.
     """
     winner = study.user_attrs.get("winner", None)
-    model_type = frozen_trial.params.get("model_type", CURRENT_MODEL)
+    model_type = frozen_trial.params.get("model_type", model)
     scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
     transformer = frozen_trial.params.get("transformer_type", "None")
     pca = frozen_trial.params.get("pca_type", "None")
     std_dev = frozen_trial.user_attrs.get("std_dev", float("inf"))
+    rmse_cv = frozen_trial.user_attrs.get("rmse_cv", float("inf"))
+    std_dev_cv = frozen_trial.user_attrs.get("std_dev_cv", float("inf"))
+    rmse_cv_folds = frozen_trial.user_attrs.get("rmse_cv_folds", {})
+    std_dev_cv_folds = frozen_trial.user_attrs.get("std_dev_cv_folds", {})
 
     if study.best_value and winner != study.best_value:
         study.set_user_attr("winner", study.best_value)
@@ -85,20 +111,24 @@ def champion_callback(study, frozen_trial):
         if winner:
             improvement_percent = (abs(winner - study.best_value) / study.best_value) * 100
             message = (
-                f"Trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} with "
-                f"{improvement_percent:.4f}% improvement using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev:.4f}"
+                f"{oxide} | Trial {frozen_trial.number} achieved value: `{frozen_trial.value:.4f}` with "
+                f"{improvement_percent:.4f}% improvement using {model_type}.\n"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: `{std_dev:.4f}`, \n"
+                f"Cross-Validation Metrics: RMSE CV: `{rmse_cv:.4f}`, Std Dev CV: `{std_dev_cv:.4f}`, \n"
+                f"RMSE CV Folds: {rmse_cv_folds}\nStd Dev CV Folds: {std_dev_cv_folds}"
             )
         else:
             message = (
-                f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value:.4f} using {model_type}. "
-                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: {std_dev:.4f}"
+                f"{oxide} | Initial trial {frozen_trial.number} achieved value: `{frozen_trial.value:.4f}` using {model_type}.\n"
+                f"Scaler: {scaler}, Transformer: {transformer}, PCA: {pca}, Std Dev: `{std_dev:.4f}`, \n"
+                f"Cross-Validation Metrics: RMSE CV: `{rmse_cv:.4f}`, Std Dev CV: `{std_dev_cv:.4f}`, \n"
+                f"RMSE CV Folds: {rmse_cv_folds}\nStd Dev CV Folds: {std_dev_cv_folds}"
             )
         print(message)
         notify_discord(message)
 
 
-def notify_discord(message: str, shouldPrefixOxide: bool = True):
+def notify_discord(message: str):
     """
     Send a notification message to a Discord webhook.
 
@@ -107,10 +137,12 @@ def notify_discord(message: str, shouldPrefixOxide: bool = True):
     """
     webhook_url = AppConfig().discord_webhook_url
     if webhook_url:
-        data = {"content": f"{CURRENT_OXIDE} | {message}" if shouldPrefixOxide else message}
-        response = requests.post(webhook_url, json=data)
-        if response.status_code != 204:
-            print(f"Failed to send message to Discord: {response.status_code}, {response.text}")
+        try:
+            response = requests.post(webhook_url, json={"content": message})
+            if response.status_code != 204:
+                print(f"Failed to send message to Discord: {response.status_code}, {response.text}")
+        except Exception as e:
+            print(f"Failed to send message to Discord: {e}")
     else:
         print("Discord webhook URL is not set. Skipping notification.")
 
@@ -189,48 +221,70 @@ def combined_objective(trial, oxide, model):
             # Constructing the pipeline
             steps = [("scaler", scaler)]
             if transformer_selector != "none":
-                steps.append((transformer_selector, transformer))
+                steps.append((transformer_selector, transformer))  # type: ignore
             if pca_selector != "none":
-                steps.append((pca_selector, pca))
+                steps.append((pca_selector, pca))  # type: ignore
 
             preprocessor = Pipeline(steps)
 
             # Drop all oxides except for the current oxide
+            drop_cols = ["ID", "Sample Name"]
             drop_cols.extend([oxide for oxide in major_oxides if oxide != oxide])
-            train_processed, test_processed = full_flow_dataloader.load_full_flow_data(
+            train_full, test_full = full_flow_dataloader.load_full_flow_data(
                 load_cache_if_exits=True, average_shots=True
             )
 
-            train_processed = train_processed.drop(columns=drop_cols)
-            test_processed = test_processed.drop(columns=drop_cols)
+            kf = CustomKFoldCrossValidator(k=5, group_by="Sample Name", random_state=42)
+            preprocess_fn = get_preprocess_fn(preprocessor, oxide, drop_cols=drop_cols)
 
-            X_train = train_processed.drop(columns=[oxide])
-            y_train = train_processed[oxide]
+            cv_fold_metrics = perform_cross_validation(
+                data=train_full,
+                model=model,  # type: ignore
+                preprocess_fn=preprocess_fn,
+                metric_fns=[rmse_metric, std_dev_metric],
+                kf=kf,
+            )
 
-            X_test = test_processed.drop(columns=[oxide])
-            y_test = test_processed[oxide]
+            rmse_cv = np.mean(cv_fold_metrics[0])
+            std_dev_cv = np.mean(cv_fold_metrics[1])
+            rmse_cv_folds = {f"rmse_cv_{i}": rmse for i, (rmse, _) in enumerate(cv_fold_metrics)}
+            std_dev_cv_folds = {f"std_dev_cv_{i}": std_dev for i, (_, std_dev) in enumerate(cv_fold_metrics)}
 
-            # Data transformation
-            X_train_transformed = preprocessor.fit_transform(X_train)
-            X_test_transformed = preprocessor.transform(X_test)
+            for i, (rmse, std_dev) in enumerate(cv_fold_metrics):
+                mlflow.log_metric("rmse_cv", rmse, step=i)
+                mlflow.log_metric("std_dev_cv", std_dev, step=i)
+
+            mlflow.log_metric("rmse_cv_avg", float(rmse_cv))
+            mlflow.log_metric("std_dev_cv_avg", float(std_dev_cv))
+            mlflow.log_metrics(rmse_cv_folds)
+            mlflow.log_metrics(std_dev_cv_folds)
+
+            X_train, y_train, X_test, y_test = preprocess_fn(train_full, test_full)
 
             # Model training and evaluation
-            model.fit(X_train_transformed, y_train)
-            preds = model.predict(X_test_transformed)
+            model.fit(X_train, y_train)
+            preds = model.predict(X_test)
             mse = mean_squared_error(y_test, preds)
             rmse = math.sqrt(mse)
             std_dev = np.std(y_test - preds)
 
             trial.set_user_attr("std_dev", float(std_dev))
+            trial.set_user_attr("mse", float(mse))
+            trial.set_user_attr("rmse", rmse)
+            trial.set_user_attr("rmse_cv", float(rmse_cv))
+            trial.set_user_attr("std_dev_cv", float(std_dev_cv))
+            trial.set_user_attr("rmse_cv_folds", rmse_cv_folds)
+            trial.set_user_attr("std_dev_cv_folds", std_dev_cv_folds)
 
             # Log metrics
-            mlflow.log_metric("mse", float(mse))
-            mlflow.log_metric("rmse", rmse)
-            mlflow.log_metric("std_dev", float(std_dev))
+            mlflow.log_metrics({"mse": float(mse), "rmse": rmse, "std_dev": float(std_dev)})
 
         return rmse
     except Exception as e:
+        import traceback
+
         print(f"An error occurred: {e}")
+        traceback.print_exc()
         return float("inf")  # Return a large number to indicate failure
 
 
@@ -240,24 +294,21 @@ models = ["gbr", "svr", "xgboost", "extra_trees", "pls"]
 def main(
     n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
 ):
-    global CURRENT_OXIDE, CURRENT_MODEL
 
     sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
 
     for oxide in major_oxides:
-        CURRENT_OXIDE = oxide
         print(f"Optimizing for {oxide}")
-        notify_discord(f"# Optimizing for {oxide}", False)
+        notify_discord(f"# Optimizing for {oxide}")
         experiment_id = get_or_create_experiment(f"Optuna {oxide}")
         mlflow.set_experiment(experiment_id=experiment_id)
 
         for model in models:
-            print(f"Optimizing for {model}")
-            notify_discord(f"## Optimizing {model}", False)
+            print(f"Optimizing {model}")
+            notify_discord(f"## Optimizing {model}")
 
             with mlflow.start_run(experiment_id=experiment_id, run_name=model):
-                CURRENT_MODEL = model
                 # Initialize the Optuna study
                 study = optuna.create_study(direction="minimize", sampler=sampler, pruner=pruner)
 
@@ -266,7 +317,9 @@ def main(
                 study.optimize(
                     lambda trial: combined_objective(trial, oxide, model),
                     n_trials=n_trials,
-                    callbacks=[champion_callback],
+                    callbacks=[
+                        lambda study, frozen_trial: champion_callback(study, frozen_trial, oxide, model),
+                    ],
                 )
 
                 mlflow.log_params(study.best_params)
