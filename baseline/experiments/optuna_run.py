@@ -1,4 +1,5 @@
 import math
+from datetime import datetime
 from typing import List
 
 import mlflow
@@ -301,11 +302,13 @@ def main(
 
     sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
+    current_date = datetime.now().strftime("%Y-%m-%d")
 
     for oxide in major_oxides:
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}")
-        experiment_id = get_or_create_experiment(f"Optuna {oxide}")
+
+        experiment_id = get_or_create_experiment(f"Optuna {oxide} {current_date}")
         mlflow.set_experiment(experiment_id=experiment_id)
 
         for model in models:
