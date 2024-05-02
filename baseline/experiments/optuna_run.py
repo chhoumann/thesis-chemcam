@@ -111,7 +111,6 @@ def champion_callback(study, frozen_trial, oxide, model):
 
         if best_trial.values and winner != best_trial.values:
             study.set_user_attr("winner", best_trial.values)
-            study.set_user_attr("best_std_dev", std_dev)  # Store the best std_dev
             cmn = (
                 f"Scaler: `{scaler}`, Transformer: `{transformer}`, PCA: `{pca}`, Std Dev (Test): `{std_dev:.4f}`, RMSEP: `{rmsep:.4f}`, \n"
                 f"Cross-Validation Metrics: RMSE CV: `{rmse_cv:.4f}`, Std Dev CV: `{std_dev_cv:.4f}`, \n"
@@ -132,7 +131,7 @@ def champion_callback(study, frozen_trial, oxide, model):
                     f"{oxide} | Initial trial {frozen_trial.number} achieved avg RMSE_CV/STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` using {model_type}.\n"
                     f"{cmn}"
                 )
-                
+
             print(message)
             notify_discord(message)
 
@@ -328,9 +327,6 @@ def main(
                 )
 
                 mlflow.log_params(study.best_params)
-                mlflow.log_metric("best_mse", study.best_value)
-                mlflow.log_metric("best_rmse", math.sqrt(study.best_value))
-                mlflow.log_metric("best_std_dev", study.user_attrs.get("std_dev", 0))
 
                 # Log tags
                 mlflow.set_tags(
