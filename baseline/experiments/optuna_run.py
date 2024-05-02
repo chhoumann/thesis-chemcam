@@ -109,13 +109,15 @@ def champion_callback(study, frozen_trial, oxide, model):
         rmse_cv_folds = frozen_trial.user_attrs.get("rmse_cv_folds", {})
         std_dev_cv_folds = frozen_trial.user_attrs.get("std_dev_cv_folds", {})
         rmsep = frozen_trial.user_attrs.get("rmse", float("inf"))
+        run_id = frozen_trial.user_attrs.get("run_id", None)
 
         if best_trial.values and winner != best_trial.values:
             study.set_user_attr("winner", best_trial.values)
             cmn = (
                 f"Scaler: `{scaler}`, Transformer: `{transformer}`, PCA: `{pca}`, Std Dev (Test): `{std_dev:.4f}`, RMSEP: `{rmsep:.4f}`, \n"
                 f"Cross-Validation Metrics: RMSE CV: `{rmse_cv:.4f}`, Std Dev CV: `{std_dev_cv:.4f}`, \n"
-                f"RMSE CV Folds: {rmse_cv_folds}\nStd Dev CV Folds: {std_dev_cv_folds}"
+                f"RMSE CV Folds: {rmse_cv_folds}\nStd Dev CV Folds: {std_dev_cv_folds}\n"
+                f"MLflow Run ID: `{run_id}`"
             )
             if winner:
                 improvement_percent = (
@@ -194,7 +196,7 @@ def instantiate_scaler(trial, scaler_selector, logger):
 
 def combined_objective(trial, oxide, model):
     try:
-        with mlflow.start_run(nested=True):
+        with mlflow.start_run(nested=True) as run:
             mlflow.log_param("trial_number", trial.number)
 
             # Model selection
@@ -280,6 +282,7 @@ def combined_objective(trial, oxide, model):
             trial.set_user_attr("std_dev_cv", float(std_dev_cv))
             trial.set_user_attr("rmse_cv_folds", rmse_cv_folds)
             trial.set_user_attr("std_dev_cv_folds", std_dev_cv_folds)
+            trial.set_user_attr("run_id", run.info.run_id)
 
             # Log metrics
             mlflow.log_metrics({"mse": float(mse), "rmse": rmse, "std_dev": float(std_dev)})
