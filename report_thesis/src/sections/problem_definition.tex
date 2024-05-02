@@ -40,6 +40,14 @@ The primary metric used to evaluate the performance of our computational models 
 \]
 where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. This measure quantifies the average magnitude of the prediction error across all predicted values, providing a clear indication of model accuracy in quantifying chemical compositions.
 
+Additionally, we will evaluate the robustness of our models using the standard deviation of prediction errors, defined as:
+\[
+\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
+\]
+where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error. This metric assesses the variability of the prediction errors, offering insights into the consistency and reliability of the model's performance. A lower standard deviation indicates a more robust model.
+
+Success will be evaluated primarily through these metrics, comparing the predictive accuracy and robustness of our models against existing benchmarks and baseline models established in prior research.
+
 \textbf{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by enhancing computational methods to improve accuracy and robustness. We propose to develop computational models capable of effectively accounting for and mitigating the complexities inherent in \gls{libs} data. Our models will take as input a matrix in the form of $E$, as well as ground truth data in the form of $A$, to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^O$, mapping processed \gls{libs} signals to estimated oxide concentrations. Success will be evaluated primarily through the \gls{rmse} metric, comparing the predictive accuracy of our models against existing benchmarks and baseline models established in prior research.
 
 \subsection{Motivating Example: NASA's Mars Missions}
