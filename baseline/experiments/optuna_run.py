@@ -77,7 +77,7 @@ def champion_callback(study, frozen_trial):
     scaler = frozen_trial.params.get("scaler_type", "Unknown scaler")
     transformer = frozen_trial.params.get("transformer_type", "None")
     pca = frozen_trial.params.get("pca_type", "None")
-    std_dev = frozen_trial.user_attrs.get("std_dev", "N/A")  # Ensure this attribute is set during the trial
+    std_dev = frozen_trial.user_attrs.get("std_dev", float("inf"))
 
     if study.best_value and winner != study.best_value:
         study.set_user_attr("winner", study.best_value)
