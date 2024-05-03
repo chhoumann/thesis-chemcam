@@ -1,4 +1,5 @@
 from pathlib import Path
+import random
 from typing import Callable, List, Protocol, Tuple, runtime_checkable
 
 import numpy as np
@@ -33,6 +34,10 @@ def custom_kfold_cross_validation(data, k: int, group_by: str, random_state=None
 
     grouped = data.groupby(group_by)
     groups_keys = list(grouped.groups.keys())
+
+    if random_state is not None:
+        random.seed(random_state)
+    random.shuffle(groups_keys)
 
     for train_keys_idx, test_keys_idx in kf.split(groups_keys):
         train_keys = [groups_keys[idx] for idx in train_keys_idx]

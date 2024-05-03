@@ -40,6 +40,23 @@ optuna.logging.set_verbosity(optuna.logging.ERROR)
 
 
 def get_preprocess_fn(preprocessor, target_col: str, drop_cols: List[str]):
+    """
+    Creates a preprocessing function configured with a specific preprocessor, target column, and columns to drop.
+
+    This function is designed to be used in a machine learning pipeline where data needs to be preprocessed
+    before being fed into a model. It handles the fitting and transformation of training data and the
+    transformation of test data using the provided preprocessor.
+
+    Parameters:
+    - preprocessor: The preprocessor instance (e.g., a Scikit-learn transformer object).
+    - target_col (str): The name of the target column in the dataframe.
+    - drop_cols (List[str]): List of column names to be dropped from the dataframe.
+
+    Returns:
+    - preprocess_fn: A function that takes training and testing dataframes, drops specified columns,
+                     separates the target column, and applies the preprocessor to the feature columns.
+    """
+    assert target_col in drop_cols, "Target column should be included in the drop columns"
     def preprocess_fn(train, test):
         X_train = train.drop(columns=drop_cols)
         y_train = train[target_col]
@@ -227,20 +244,23 @@ def combined_objective(trial, oxide, model):
                 pca = instantiate_pca(trial, lambda params: mlflow.log_params(params))
             elif pca_selector == "kernel_pca":
                 pca = instantiate_kernel_pca(trial, lambda params: mlflow.log_params(params))
+            else:
+                pca = None
             mlflow.log_param("pca_type", pca_selector)
 
             # Constructing the pipeline
-            steps = [("scaler", scaler)]
-            if transformer_selector != "none":
-                steps.append((transformer_selector, transformer))  # type: ignore
-            if pca_selector != "none":
-                steps.append((pca_selector, pca))  # type: ignore
+            steps = []
+            steps.append(("scaler", scaler))
+
+            if transformer_selector != "none" and transformer is not None:
+                steps.append((transformer_selector, transformer))
+            if pca_selector != "none" and pca is not None:
+                steps.append((pca_selector, pca))
 
             preprocessor = Pipeline(steps)
 
             # Drop all oxides except for the current oxide
-            drop_cols = ["ID", "Sample Name"]
-            drop_cols.extend([oxide for oxide in major_oxides if oxide != oxide])
+            drop_cols = ["ID", "Sample Name"] + major_oxides
             train_full, test_full = full_flow_dataloader.load_full_flow_data(
                 load_cache_if_exits=True, average_shots=True
             )
