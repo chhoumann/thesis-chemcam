@@ -1,6 +1,5 @@
 import math
 from datetime import datetime
-from typing import List
 
 import mlflow
 import numpy as np
@@ -32,53 +31,13 @@ from sklearn.pipeline import Pipeline
 
 from lib import full_flow_dataloader
 from lib.config import AppConfig
+from lib.cross_validation import CustomKFoldCrossValidator, perform_cross_validation
+from lib.get_preprocess_fn import get_preprocess_fn
+from lib.metrics import rmse_metric, std_dev_metric
 from lib.reproduction import major_oxides
-from lib.utils import CustomKFoldCrossValidator, perform_cross_validation
 
 mlflow.set_tracking_uri(AppConfig().mlflow_tracking_uri)
 optuna.logging.set_verbosity(optuna.logging.ERROR)
-
-
-def get_preprocess_fn(preprocessor, target_col: str, drop_cols: List[str]):
-    """
-    Creates a preprocessing function configured with a specific preprocessor, target column, and columns to drop.
-
-    This function is designed to be used in a machine learning pipeline where data needs to be preprocessed
-    before being fed into a model. It handles the fitting and transformation of training data and the
-    transformation of test data using the provided preprocessor.
-
-    Parameters:
-    - preprocessor: The preprocessor instance (e.g., a Scikit-learn transformer object).
-    - target_col (str): The name of the target column in the dataframe.
-    - drop_cols (List[str]): List of column names to be dropped from the dataframe.
-
-    Returns:
-    - preprocess_fn: A function that takes training and testing dataframes, drops specified columns,
-                     separates the target column, and applies the preprocessor to the feature columns.
-    """
-    assert target_col in drop_cols, "Target column should be included in the drop columns"
-
-    def preprocess_fn(train, test):
-        X_train = train.drop(columns=drop_cols)
-        y_train = train[target_col]
-
-        X_test = test.drop(columns=drop_cols)
-        y_test = test[target_col]
-
-        X_train_transformed = preprocessor.fit_transform(X_train)
-        X_test_transformed = preprocessor.transform(X_test)
-
-        return X_train_transformed, y_train, X_test_transformed, y_test
-
-    return preprocess_fn
-
-
-def rmse_metric(y_true, y_pred):
-    return float(np.sqrt(mean_squared_error(y_true, y_pred)))
-
-
-def std_dev_metric(y_true, y_pred):
-    return float(np.std(y_true - y_pred))
 
 
 # https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/hyperparameter-tuning-with-child-runs.html
