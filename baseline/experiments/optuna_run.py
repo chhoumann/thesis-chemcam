@@ -227,14 +227,18 @@ def combined_objective(trial, oxide, model):
                 pca = instantiate_pca(trial, lambda params: mlflow.log_params(params))
             elif pca_selector == "kernel_pca":
                 pca = instantiate_kernel_pca(trial, lambda params: mlflow.log_params(params))
+            else:
+                pca = None
             mlflow.log_param("pca_type", pca_selector)
 
             # Constructing the pipeline
-            steps = [("scaler", scaler)]
-            if transformer_selector != "none":
-                steps.append((transformer_selector, transformer))  # type: ignore
-            if pca_selector != "none":
-                steps.append((pca_selector, pca))  # type: ignore
+            steps = []
+            steps.append(("scaler", scaler))
+
+            if transformer_selector != "none" and transformer is not None:
+                steps.append((transformer_selector, transformer))
+            if pca_selector != "none" and pca is not None:
+                steps.append((pca_selector, pca))
 
             preprocessor = Pipeline(steps)
 
