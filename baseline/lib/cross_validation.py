@@ -60,17 +60,10 @@ class CustomKFoldCrossValidator(BaseCrossValidator):
         return self.k
 
 
-@runtime_checkable
-class FitPredictProtocol(Protocol):
-    def fit(self, X, y) -> None: ...
-
-    def predict(self, X) -> np.ndarray: ...
-
-
 def perform_cross_validation(
     kf: CustomKFoldCrossValidator,
     data: pd.DataFrame,
-    model: FitPredictProtocol,
+    model,
     preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
     metric_fns: List[Callable[[np.ndarray, np.ndarray], float]],
 ) -> List[List[float]]:
@@ -88,7 +81,11 @@ def perform_cross_validation(
     Returns:
     - List[List[float]]: A list of lists, each sublist contains computed metrics for each fold.
     """
+    if not hasattr(model, "fit") or not hasattr(model, "predict"):
+        raise ValueError("Model must have 'fit' and 'predict' methods.")
+
     all_fold_metrics: List[List[float]] = []
+
     for i, (train_data, test_data) in enumerate(kf.split(data)):
         X_train, y_train, X_test, y_test = preprocess_fn(train_data, test_data)
 
