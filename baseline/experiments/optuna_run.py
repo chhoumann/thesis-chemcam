@@ -57,6 +57,7 @@ def get_preprocess_fn(preprocessor, target_col: str, drop_cols: List[str]):
                      separates the target column, and applies the preprocessor to the feature columns.
     """
     assert target_col in drop_cols, "Target column should be included in the drop columns"
+
     def preprocess_fn(train, test):
         X_train = train.drop(columns=drop_cols)
         y_train = train[target_col]
@@ -349,17 +350,6 @@ def main(
                     callbacks=[
                         lambda study, frozen_trial: champion_callback(study, frozen_trial, oxide, model),
                     ],
-                )
-
-                mlflow.log_params(study.best_params)
-
-                # Log tags
-                mlflow.set_tags(
-                    tags={
-                        "project": "AutoML Experiments",
-                        "optimizer_engine": "optuna",
-                        "feature_set_version": 1,
-                    }
                 )
 
 
