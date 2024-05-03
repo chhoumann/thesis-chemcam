@@ -1,5 +1,6 @@
 import random
-from typing import Callable, List, Protocol, runtime_checkable
+from dataclasses import dataclass
+from typing import Callable, Dict, List, Protocol, runtime_checkable
 
 import numpy as np
 import pandas as pd
@@ -98,3 +99,37 @@ def perform_cross_validation(
         all_fold_metrics.append(fold_metrics)
 
     return all_fold_metrics
+
+
+@dataclass
+class CrossValidationMetrics:
+    rmse_cv: float
+    std_dev_cv: float
+    rmse_cv_folds: Dict[str, float]
+    std_dev_cv_folds: Dict[str, float]
+
+    def __init__(self, all_fold_metrics: List[List[float]]):
+        # Calculate mean RMSE and Standard Deviation across all folds
+        self.rmse_cv = np.mean([rmse for rmse, _ in all_fold_metrics])
+        self.std_dev_cv = np.mean([std_dev for _, std_dev in all_fold_metrics])
+        # Extract RMSE and Standard Deviation metrics for each fold
+        self.rmse_cv_folds = {f"rmse_cv_{i+1}": rmse for i, (rmse, _) in enumerate(all_fold_metrics)}
+        self.std_dev_cv_folds = {f"std_dev_cv_{i+1}": std_dev for i, (_, std_dev) in enumerate(all_fold_metrics)}
+
+    def as_dict(self):
+        return {
+            "rmse_cv": self.rmse_cv,
+            "std_dev_cv": self.std_dev_cv,
+            **self.rmse_cv_folds,
+            **self.std_dev_cv_folds,
+        }
+
+
+def get_cross_validation_metrics(all_fold_metrics: List[List[float]]):
+    """
+    Log the cross-validation metrics using MLflow and a custom logging callback.
+
+    Parameters:
+    - all_fold_metrics: A list of lists, each sublist contains computed metrics for each fold.
+    """
+    return CrossValidationMetrics(all_fold_metrics)

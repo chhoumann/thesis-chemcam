@@ -31,7 +31,11 @@ from sklearn.pipeline import Pipeline
 
 from lib import full_flow_dataloader
 from lib.config import AppConfig
-from lib.cross_validation import CustomKFoldCrossValidator, perform_cross_validation
+from lib.cross_validation import (
+    CustomKFoldCrossValidator,
+    get_cross_validation_metrics,
+    perform_cross_validation,
+)
 from lib.get_preprocess_fn import get_preprocess_fn
 from lib.metrics import rmse_metric, std_dev_metric
 from lib.reproduction import major_oxides
@@ -236,15 +240,8 @@ def combined_objective(trial, oxide, model):
                 kf=kf,
             )
 
-            rmse_cv = np.mean(cv_fold_metrics[0])
-            std_dev_cv = np.mean(cv_fold_metrics[1])
-            rmse_cv_folds = {f"rmse_cv_{i+1}": rmse for i, (rmse, _) in enumerate(cv_fold_metrics)}
-            std_dev_cv_folds = {f"std_dev_cv_{i+1}": std_dev for i, (_, std_dev) in enumerate(cv_fold_metrics)}
-
-            mlflow.log_metric("rmse_cv", float(rmse_cv))
-            mlflow.log_metric("std_dev_cv", float(std_dev_cv))
-            mlflow.log_metrics(rmse_cv_folds)
-            mlflow.log_metrics(std_dev_cv_folds)
+            cv_metrics = get_cross_validation_metrics(cv_fold_metrics)
+            mlflow.log_metrics(cv_metrics.as_dict())
 
             X_train, y_train, X_test, y_test = preprocess_fn(train_full, test_full)
 
@@ -258,16 +255,16 @@ def combined_objective(trial, oxide, model):
             trial.set_user_attr("std_dev", float(std_dev))
             trial.set_user_attr("mse", float(mse))
             trial.set_user_attr("rmse", rmse)
-            trial.set_user_attr("rmse_cv", float(rmse_cv))
-            trial.set_user_attr("std_dev_cv", float(std_dev_cv))
-            trial.set_user_attr("rmse_cv_folds", rmse_cv_folds)
-            trial.set_user_attr("std_dev_cv_folds", std_dev_cv_folds)
+            trial.set_user_attr("rmse_cv", float(cv_metrics.rmse_cv))
+            trial.set_user_attr("std_dev_cv", float(cv_metrics.std_dev_cv))
+            trial.set_user_attr("rmse_cv_folds", cv_metrics.rmse_cv_folds)
+            trial.set_user_attr("std_dev_cv_folds", cv_metrics.std_dev_cv_folds)
             trial.set_user_attr("run_id", run.info.run_id)
 
             # Log metrics
             mlflow.log_metrics({"mse": float(mse), "rmse": rmse, "std_dev": float(std_dev)})
 
-        return float(rmse_cv), float(std_dev_cv)
+        return float(cv_metrics.rmse_cv), float(cv_metrics.std_dev_cv)
     except Exception as e:
         import traceback
 
