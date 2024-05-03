@@ -240,8 +240,8 @@ def combined_objective(trial, oxide, model):
                 kf=kf,
             )
 
-            metrics = get_cross_validation_metrics(cv_fold_metrics)
-            mlflow.log_metrics(metrics.as_dict())
+            cv_metrics = get_cross_validation_metrics(cv_fold_metrics)
+            mlflow.log_metrics(cv_metrics.as_dict())
 
             X_train, y_train, X_test, y_test = preprocess_fn(train_full, test_full)
 
@@ -255,16 +255,16 @@ def combined_objective(trial, oxide, model):
             trial.set_user_attr("std_dev", float(std_dev))
             trial.set_user_attr("mse", float(mse))
             trial.set_user_attr("rmse", rmse)
-            trial.set_user_attr("rmse_cv", float(metrics.rmse_cv))
-            trial.set_user_attr("std_dev_cv", float(metrics.std_dev_cv))
-            trial.set_user_attr("rmse_cv_folds", metrics.rmse_cv_folds)
-            trial.set_user_attr("std_dev_cv_folds", metrics.std_dev_cv_folds)
+            trial.set_user_attr("rmse_cv", float(cv_metrics.rmse_cv))
+            trial.set_user_attr("std_dev_cv", float(cv_metrics.std_dev_cv))
+            trial.set_user_attr("rmse_cv_folds", cv_metrics.rmse_cv_folds)
+            trial.set_user_attr("std_dev_cv_folds", cv_metrics.std_dev_cv_folds)
             trial.set_user_attr("run_id", run.info.run_id)
 
             # Log metrics
             mlflow.log_metrics({"mse": float(mse), "rmse": rmse, "std_dev": float(std_dev)})
 
-        return float(metrics.rmse_cv), float(metrics.std_dev_cv)
+        return float(cv_metrics.rmse_cv), float(cv_metrics.std_dev_cv)
     except Exception as e:
         import traceback
 
