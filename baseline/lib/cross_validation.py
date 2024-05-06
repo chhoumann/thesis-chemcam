@@ -1,6 +1,6 @@
 import random
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Protocol, runtime_checkable
+from typing import Callable, Dict, List
 
 import numpy as np
 import pandas as pd
