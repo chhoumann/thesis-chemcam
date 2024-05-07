@@ -17,6 +17,7 @@ from lib import full_flow_dataloader
 
 # from config import logger
 from lib.config import AppConfig
+from lib.cross_validation import custom_kfold_cross_validation
 from lib.norms import Norm1Scaler, Norm3Scaler
 from lib.outlier_removal import (
     calculate_leverage_residuals,
@@ -31,7 +32,7 @@ from lib.reproduction import (
     paper_individual_sm_rmses,
     training_info,
 )
-from lib.utils import custom_kfold_cross_validation, filter_data_by_compositional_range
+from lib.utils import filter_data_by_compositional_range
 from PLS_SM.inference import predict_composition_with_blending
 
 # ignore all future warnings
