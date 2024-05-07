@@ -11,11 +11,15 @@ Such effects can cause the intensity of emission lines from an element to vary i
 Furthermore, the high cost of data collection often results in small datasets, exacerbating the difficulty of building accurate and robust models.
 
 Various machine learning models and methodologies have been specifically designed to mitigate the challenges associated with predicting major oxide compositions from \gls{libs} data. 
-For instance, \citet{andersonPostlandingMajorElement2022} applied an array of regression models including \gls{ols}, \gls{pls}, and \gls{gbr}, and even blended models to optimize the accuracy across different oxides. 
-This reflects a tailored approach where different models are selectively used based on their performance with specific spectral characteristics and distances. 
+% try to generalize on the examples and then just cite all the papers referenced right next to each other
+Notably, \citet{andersonPostlandingMajorElement2022} applied an array of regression models including \gls{ols}, \gls{pls}, and \gls{gbr}, and even blended models to optimize the accuracy across different oxides. 
+This reflects a tailored approach where different models are selectively used based on their performance with specific spectral characteristics and distances.
+
 Furthermore, dimensionality reduction techniques such as \gls{pca} and feature selection algorithms have been employed to manage high dimensionality and multicollinearity, significantly enhancing model efficiency and interpretability~\cite{rezaei_dimensionality_reduction}.
 
 Hybrid models like \gls{df}-\gls{k-elm} have also been introduced to incorporate physical principles directly into the machine learning framework, improving both the accuracy and interpretability of predictions by handling residuals that traditional models fail to explain~\cite{song_DF-K-ELM}. 
+---
+
 Despite these advancements, the prediction of major oxide compositions remains an open problem primarily due to the complex and nonlinear nature of \gls{libs} data, compounded by the variability introduced by different measurement conditions and the inherently small datasets typically available for these analyses. 
 The effectiveness of the mitigation strategies can be highly context-dependent, with no single model consistently outperforming others across all scenarios. 
 This situation emphasizes the necessity for ongoing research to develop more adaptive, robust machine learning approaches that can effectively handle the diverse challenges presented by \gls{libs} data.
@@ -32,9 +36,11 @@ Through extensive experiments on \gls{libs} data, we systematically assessed and
 
 Our key contributions are as follows:
 \begin{itemize}
-    \item We have developed a new machine learning pipeline that integrates unique preprocessing and optimization techniques tailored for \textsc{libs} data on Martian soil, offering a valuable enhancement to existing analytical methods in the field.
+    \item We develop a novel machine learning pipeline that effectively handles the challenges of LIBS data to accurately predict major oxide compositions in Martian soil samples.
+    \item Experimenter skal inkluderes i listen over bidrag
+    \item We have developed a novel optimization approach and tool for tuning and evaluating machine learning models along with preprocessing techniques, providing a systematic and efficient method for selecting the best configuration.
     \item Our investigations provides a methodological framework that advances the approach to model selection and tuning for high-dimensional, multicollinear geochemical data analysis.
-    \item By outperforming existing methods, our approach has established new benchmarks for accuracy and robustness in \textsc{libs} data analysis, providing a new standard for future research.
+    \item By outperforming existing methods, our approach has established new benchmarks for accuracy and robustness in \gls{libs} data analysis, providing a new standard for future research.
 \end{itemize}
 
 
