@@ -175,15 +175,15 @@ def instantiate_scaler(trial, scaler_selector, logger):
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
 
-def combined_objective(trial, oxide, model):
+def combined_objective(trial, oxide, model_selector):
     try:
         with mlflow.start_run(nested=True) as run:
             mlflow.log_param("trial_number", trial.number)
 
             # Model selection
             # model_selector = trial.suggest_categorical("model_type", ["gbr", "svr", "xgboost", "extra_trees", "pls"])
-            model = instantiate_model(trial, model, lambda params: mlflow.log_params(params))
-            mlflow.log_param("model_type", model)
+            model = instantiate_model(trial, model_selector, lambda params: mlflow.log_params(params))
+            mlflow.log_param("model_type", model_selector)
 
             # Preprocessor components
             scaler_selector = trial.suggest_categorical(
