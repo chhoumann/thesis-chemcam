@@ -1,19 +1,17 @@
 \section{Problem Definition}\label{sec:problem_definition}
 The primary objective of this research is to enhance computational methods for the accurate and robust quantification of chemical compositions using \gls{libs} data.
-This enhancement seeks to improve the adaptability and precision of \gls{libs} across various environmental contexts, including terrestrial and planetary geological samples.
-
-Quantifying chemical compositions from \gls{libs} spectral data poses significant challenges due to the high dimensionality of the data and the complex physical and chemical interactions involved. The interpretation of \gls{libs} data is particularly complicated by factors such as multicollinearity among spectral features and matrix effects, which can obscure the relationships between the observed spectra and the actual chemical compositions.
-
-The process of elemental quantification using \gls{libs} data is constrained by several factors:
+Quantifying chemical compositions from \gls{libs} spectral data poses significant challenges:
 \begin{itemize}
     \item \textbf{Data Dimensionality and Collinearity:} High dimensionality of spectral data coupled with multicollinearity, where multiple spectral features may exhibit strong correlations, complicates the modeling and analysis\cite{andersonImprovedAccuracyQuantitative2017}.
     \item \textbf{Matrix Effects:} This term refers to any effect that can cause variations in the intensity of emission lines of an element independent of the concentration of that element. Different background materials can alter the emission intensities and pose significant challenges in accurately quantifying elemental concentrations. The spectra are complex due to the interaction of multiple physical processes including the coupling process between the laser photons and the target, self-absorption of optical emission lines within the plasma, recombination of elements into molecules, and collisional interactions in the plasma\cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
     \item \textbf{Data Availability:} Due to the high cost of data collection, datasets are often small, which may limit the generalizability of the models\cite{p9_paper}.
 \end{itemize}
 
-These constraints necessitate the development of advanced computational models that can effectively account for and mitigate these complexities to improve the accuracy and reliability of chemical composition analysis using \gls{libs} data.
+The complexities presented by these challenges require the creation of advanced computational models designed to address and alleviate such issues, thereby enhancing the accuracy and reliability of chemical composition analysis with \gls{libs} data.
 
-The input to our computational models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths. This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}. The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
+The input to such models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths.
+This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}.
+The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
 
 Formally, we have:
 
