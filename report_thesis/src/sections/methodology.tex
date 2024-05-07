@@ -1,23 +1,2 @@
 \section{Methodology}\label{sec:methodology}
-\textit{We will write an introduction to the methodology section here, as well as add more subsections in the future. Below is the first subsection describing the data normalization process and the reasons for choosing to only do Norm 3. Please let us know if the explanation and mathematical notation is clear.}
-
-\subsection{Evaluation Metrics}
-To evaluate the performance of our models in predicting major oxide compositions from \gls{libs} data, we will use two key metrics: \gls{rmse} and standard deviation of prediction errors.
-
-\gls{rmse} will be used as a measure of accuracy, quantifying the difference between the predicted and actual values of the major oxides in the samples. It is defined by the equation:
-
-\begin{equation}
-    RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2},
-\end{equation}
-
-where $y_i$ represents the actual values, $\hat{y}_i$ the predicted values, and $n$ the number of observations. A lower RMSE indicates better accuracy.
-
-To assess the robustness of our models, we will consider the standard deviation of prediction errors across each oxide and test instance. This metric measures the variability of the prediction errors and provides insight into the consistency of the model's performance. It is defined as:
-
-\begin{equation}
-    \sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2},
-\end{equation}
-
-where $e_i = y_i - \hat{y}_i$ and $\bar{e}$ is the mean error. A lower standard deviation indicates better robustness.
-
-By using these two metrics, we aim to evaluate model performance in terms of both accuracy and robustness, which are crucial for the reliable prediction of major oxide compositions from \gls{libs} data.
+\textit{We will write an introduction to the methodology section here, as well as add more subsections in the future.}
