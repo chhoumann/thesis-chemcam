@@ -1,23 +1,70 @@
 \section{Problem Definition}\label{sec:problem_definition}
+The primary objective of this research is to enhance computational methods for the accurate and robust quantification of chemical compositions using \gls{libs} data.
+As previously introduced, quantifying chemical compositions from \gls{libs} spectral data poses significant challenges, including high dimensionality and multicollinearity of the data, as well as matrix effects.
+Here, we further examine these challenges:
+\begin{itemize}
+    \item \textbf{Data Dimensionality and Collinearity:} The high dimensionality of spectral data, coupled with multicollinearity—where multiple spectral features may exhibit strong correlations—complicates the modeling and analysis\cite{andersonImprovedAccuracyQuantitative2017}.
+    \item \textbf{Matrix Effects:} As noted in the introduction, matrix effects refer to any effect that can cause variations in the intensity of emission lines of an element independent of the concentration of that element. The presence of different background elements can alter the emission intensities and pose significant challenges in accurately quantifying elemental concentrations. The spectra are complex due to the interaction of multiple physical processes including the coupling process between the laser photons and the target, self-absorption of optical emission lines within the plasma, recombination of elements into molecules, and collisional interactions in the plasma\cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
+    \item \textbf{Data Availability:} As highlighted earlier, due to the high cost of data collection, datasets are often small, which can limit the generalizability and robustness of the models\cite{p9_paper}.
+\end{itemize}
+
+The complexities presented by these challenges require the creation of advanced computational models designed to address and alleviate such issues, thereby enhancing the accuracy and reliability of chemical composition analysis with \gls{libs} data.
+
+The input to such models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths.
+This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}.
+The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
+
+Formally, we have:
+
+\begin{itemize}
+    \item \textbf{Matrix $A[t, o]$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$. Here, $t$ represents the index for targets (samples or locations being analyzed) and $o$ denotes the index for oxides (different chemical compounds being quantified).
+    \item \textbf{Matrix $B[w, s]$}: A Boolean matrix that links wavelengths $w$ to spectrometers $s$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $s$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
+    \item \textbf{Matrix $C[t, l, s, w]$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the target where the measurement is taken.
+    \item \textbf{Matrix $D[t, l, w]$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
+    \[
+    D[t, l, w] = \frac{1}{|S|} \sum_{s \in S} C[t, l, s, w].
+    \]
+    \item \textbf{Matrix $E[t, l, w]$}: The result of $D$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+\end{itemize}
+
+The model outputs are the quantified chemical compositions of geological samples. These are primarily the concentrations of major elements, represented in weight percentage. While background elements are also present, our current analysis does not quantify these.
+Our goal is to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^O$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $O$ represents the number of target oxides. This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^O$ of estimated oxide concentrations. The vector $\mathbf{x}$ is derived from matrix $E$, representing processed spectral data:
+\[
+\mathbf{v} = \mathcal{F}(\mathbf{x}).
+\]
+
+As mentioned, our goals are to achieve improved accuracy and robustness.
+We define accuracy as the ability of a model to predict the composition of major oxides in Martian geological samples, while robustness refers to the stability of these predictions across different samples and oxides.
+
+The metric we use to evaluate the accuracy of our models is the \gls{rmse}. \gls{rmse} is calculated using the formula:
+\[
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
+\]
+where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. This measure quantifies the average magnitude of the prediction error across all predicted values, providing a clear indication of model accuracy in quantifying chemical compositions.
+
+We evaluate the robustness of our models using the standard deviation of prediction errors, defined as:
+\[
+\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
+\]
+where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
+This sample standard deviation is used because it provides an unbiased estimate of the variability in prediction errors, crucial for assessing how well the model can be expected to perform on new, unseen data.
+Correcting the variance calculation by using \( n-1 \) instead of \( n \) compensates for the tendency of smaller samples (specific datasets of \gls{libs} spectral data) to underestimate the variability of the entire population (all possible \gls{libs} data), bringing the sample standard deviation closer to the true standard deviation of the entire population.
+A lower standard deviation indicates a more robust model across different samples.
+
+Success will be evaluated primarily through these metrics, comparing the predictive accuracy and robustness of our models against existing benchmarks and baseline models established in prior research.
+
+\textbf{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by enhancing computational methods to improve accuracy and robustness. We propose to develop computational models capable of effectively accounting for and mitigating the complexities inherent in \gls{libs} data. Our models will take as input a matrix in the form of $E$, as well as ground truth data in the form of $A$, to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^O$, mapping processed \gls{libs} signals to estimated oxide concentrations.
 
 \subsection{Motivating Example: NASA's Mars Missions}
-The NASA Viking missions in the 1970s were the first to successfully land on Mars, aiming to determine if life existed on the planet. 
-While these missions advanced our knowledge of the Martian environment, the search for evidence of life remained inconclusive~\cite{marsnasagov_vikings}.
+NASA's exploration of Mars, beginning with the Viking missions in the 1970s, has progressively deepened our understanding of Mars\cite{marsnasagov_vikings}. The \gls{msl} mission, which landed the Curiosity rover in Gale Crater in 2012, represents a pivotal step in this journey. Curiosity is equipped with the \gls{chemcam} instrument, a tool that uses \gls{libs} to analyze the chemical composition of Martian rocks and soils directly and non-invasively\cite{chemcamNasaWebsite}.
 
-Subsequent missions, such as the \gls{mer} mission in 2003 and the \gls{msl} mission in 2012, sought to investigate whether Mars ever had the conditions to support life. 
-The Curiosity rover, part of the \gls{msl} mission, is equipped with the \gls{chemcam} instrument, which uses \gls{libs} to gather spectral data from geological samples on Mars~\cite{wiensChemcam2012}.
+\gls{libs} is particularly suitable for the Martian environment because of its ability to perform rapid chemical analyzes remotely, creating a plasma that can be spectrally analyzed to determine the elemental composition of the vaporized material. This capability is crucial because it allows scientists to quickly and efficiently assess the geochemistry of multiple sites without physically moving the rover, thus conservatively managing the rover's limited energy and resources. The mission's focus has been on assessing past habitability, and the data gathered by \gls{chemcam} has been instrumental in identifying environments that could have supported life\cite{chemcamNasaWebsite,curiosityNasaWebsite}.
 
-\gls{libs} uses a laser to ablate surface material and generate a plasma plume, which emits light captured by spectrometers. 
-The resulting spectra consist of emission lines associated with the concentration of specific elements, serving as a multi-dimensional fingerprint of the sample's elemental composition~\cite{cleggRecalibrationMarsScience2017}.
+As mentioned, the task of quantifying the oxides in Martian rock and soil samples begins with the \gls{libs} spectral data collected by Curiosity. This data comprises high-dimensional spectra with thousands of potential features, each corresponding to a specific element's emission lines. The computational challenge lies in accurately interpreting these complex data sets to deduce the concentrations of various elements, especially major oxides like iron, magnesium, and silicon, which are crucial for understanding Martian geology.
+Initially, the data undergoes preprocessing to correct for any instrumental effects and to calibrate the raw spectra. This step ensures that the readings are accurate and can be reliably used for quantitative analysis. 
+Following preprocessing to correct instrumental effects and calibrate spectra, the cleaned data is input into machine learning models. These models, trained on databases of Earth-based and synthetic Martian analogs, output quantitative analyses of chemical compositions in weight percentages of the target oxides\cite{wiensPreflightCalibrationInitial2013, cleggRecalibrationMarsScience2017}.
+\citet{cleggRecalibrationMarsScience2017} undertook this task and created a pipeline for predicting the concentration of oxides in Martian soil samples, referred to as \gls{moc}.
 
-\subsection{Problem Formulation}
-% repeats intro
-% Predicting major oxide compositions from \gls{libs} data presents significant computational challenges, including high dimensionality, non-linearity, multicollinearity, and the phenomenon known as matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}.
-% Furthermore, the high cost of data collection often results in small datasets, complicating the task of building accurate and robust models.
+More recently, in 2022, the Perseverance rover landed on Mars, equipped with advanced instruments designed to continue the exploration and analysis of the Martian surface. This rover also uses a \gls{libs} instrument, called SuperCam. This instrument is the successor to \gls{chemcam} and shows the continued success of the \gls{libs} technique in the Martian environment. The Perseverance mission highlighted the ongoing research effort in developing elemental quantification models using \gls{libs} data\cite{andersonPostlandingMajorElement2022}, demonstrating its continued importance as a research field.
 
-Our problem definition builds upon the definitions provided in \citet{p9_paper}.
-
-% TODO: Write data definitions here; define problem formally.
-
-\textbf{Problem Definition:} This thesis aims to address the challenges in predicting major oxide compositions from \gls{libs} data by developing machine learning models that improve the accuracy and robustness of these predictions. 
-We will investigate various techniques to handle the high dimensionality, non-linearity, and small dataset size inherent in this problem, and evaluate model performance using appropriate metrics, which will be discussed in detail in Section~\ref{sec:methodology}.
+The use of \gls{libs} on the Curiosity rover within the MSL mission shows how computational advancements can enhance our understanding of extraterrestrial geology. By effectively quantifying chemical compositions from \gls{libs} data, we can infer the historical climatic conditions of Mars, offering clues to its past habitability.
