@@ -5,29 +5,26 @@ Today, the rovers exploring Mars are equipped with sophisticated instruments for
 Part of this research is facilitated through interpretation of spectral data gathered by \gls{libs} instruments, which fire a high-powered laser at soil samples to create a plasma.
 The emitted light is captured by spectrometers and analyzed using machine learning models to assess the presence and concentration of certain major oxides, informing NASA's understanding of Mars' geology.
 
-However, predicting major oxide compositions from \gls{libs} data still presents significant computational challenges. 
-These include the high dimensionality and non-linearity of the data, compounded by issues of multicollinearity and matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}. 
-Such effects can cause the intensity of emission lines from an element to vary independently of that element's concentration, introducing unknown variables that complicate the analysis. 
+However, predicting major oxide compositions from \gls{libs} data still presents significant computational challenges.
+These include the high dimensionality and non-linearity of the data, compounded by issues of multicollinearity and matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}.
+Such effects can cause the intensity of emission lines from an element to vary independently of that element's concentration, introducing unknown variables that complicate the analysis.
 Furthermore, the high cost of data collection often results in small datasets, exacerbating the difficulty of building accurate and robust models.
 
-Various machine learning models and methodologies have been specifically designed to mitigate the challenges associated with predicting major oxide compositions from \gls{libs} data. 
-For instance, \citet{andersonPostlandingMajorElement2022} applied an array of regression models including \gls{ols}, \gls{pls}, and \gls{gbr}, and even blended models to optimize the accuracy across different oxides. 
-This reflects a tailored approach where different models are selectively used based on their performance with specific spectral characteristics and distances. 
-Furthermore, dimensionality reduction techniques such as \gls{pca} and feature selection algorithms have been employed to manage high dimensionality and multicollinearity, significantly enhancing model efficiency and interpretability~\cite{rezaei_dimensionality_reduction}.
+Previous work has aimed to improve the prediction of major oxide compositions from LIBS data.
+Regression techniques and dimensionality reduction with feature selection have been used to enhance the accuracy and interpretability of these models.
+Tailored approaches have also been developed, where different models are selected based on their performance with specific spectral characteristics and distances~cite{rezaei_dimensionality_reduction, andersonPostlandingMajorElement2022}.
+Moreover, models incorporating physical principles have demonstrated improved accuracy by handling residuals that traditional models fail to explain~\cite{song_DF-K-ELM}.
+However, predicting oxide compositions remains challenging due to the complex, nonlinear nature of LIBS data.
+This underscores the need for continued research into more adaptive and robust machine learning strategies to tackle these issues effectively.
 
-Hybrid models like \gls{df}-\gls{k-elm} have also been introduced to incorporate physical principles directly into the machine learning framework, improving both the accuracy and interpretability of predictions by handling residuals that traditional models fail to explain~\cite{song_DF-K-ELM}. 
-Despite these advancements, the prediction of major oxide compositions remains an open problem primarily due to the complex and nonlinear nature of \gls{libs} data, compounded by the variability introduced by different measurement conditions and the inherently small datasets typically available for these analyses. 
-The effectiveness of the mitigation strategies can be highly context-dependent, with no single model consistently outperforming others across all scenarios. 
-This situation emphasizes the necessity for ongoing research to develop more adaptive, robust machine learning approaches that can effectively handle the diverse challenges presented by \gls{libs} data.
-
-In response to these persistent challenges, this thesis builds upon the baseline established in~\citet{p9_paper}, and aims to develop and refine machine learning models designed to enhance the accuracy and robustness of predicting major oxide compositions from \gls{libs} data. 
+In response to these persistent challenges, this thesis builds upon the baseline established in~\citet{p9_paper}, and aims to develop and refine machine learning models designed to enhance the accuracy and robustness of predicting major oxide compositions from \gls{libs} data.
 We define accuracy as the ability of a model to predict the composition of major oxides in Martian geological samples, while robustness refers to the stability of these predictions across different samples and oxides.
 
-To achieve these objectives, this research systematically explores a range of promising machine learning models and preprocessing techniques, identified through an extensive literature review and guided by a curiosity to explore unconventional approaches. 
-Specifically, we implemented an experimental framework using an automated hyperparameter optimization tool to determine the most effective combinations of preprocessing methods and models for each major oxide analyzed. 
+To achieve these objectives, this research systematically explores a range of promising machine learning models and preprocessing techniques, identified through an extensive literature review and guided by a curiosity to explore unconventional approaches.
+Specifically, we implemented an experimental framework using an automated hyperparameter optimization tool to determine the most effective combinations of preprocessing methods and models for each major oxide analyzed.
 We began by evaluating various preprocessing techniques to understand their impact on model performance, selecting those that demonstrated the highest impact on improving the performance of each model.
-Following the preprocessing, the most promising models underwent an optimization process, allowing us to precisely tune both model configurations and their respective hyperparameters on a per-oxide basis, ensuring optimal performance tailored to the specific data characteristics of each oxide. 
-Once the best configurations were identified, a stacking ensemble method was employed to create a meta learner for each oxide, significantly enhancing prediction accuracy and robustness beyond the capabilities of individual models. 
+Following the preprocessing, the most promising models underwent an optimization process, allowing us to precisely tune both model configurations and their respective hyperparameters on a per-oxide basis, ensuring optimal performance tailored to the specific data characteristics of each oxide.
+Once the best configurations were identified, a stacking ensemble method was employed to create a meta learner for each oxide, significantly enhancing prediction accuracy and robustness beyond the capabilities of individual models.
 Through extensive experiments on \gls{libs} data, we systematically assessed and demonstrated the superior performance of our approach compared to existing methods, focusing on significant improvements in prediction accuracy and robustness.
 
 Our key contributions are as follows:
@@ -39,9 +36,9 @@ Our key contributions are as follows:
 
 
 % TODO: Add remaining sections
-The remainder of this paper is organized as follows: 
-Section~\ref{sec:background} provides background on the onoging Mars exploration missions, the \gls{libs} technique, and the baseline \gls{moc} model. 
+The remainder of this paper is organized as follows:
+Section~\ref{sec:background} provides background on the onoging Mars exploration missions, the \gls{libs} technique, and the baseline \gls{moc} model.
 Section~\ref{sec:problem_definition} formally defines the problem addressed in this work.
-Section~\ref{sec:methodology} describes our proposed methodology, including data preprocessing, dimensionality reduction, and machine learning models. 
+Section~\ref{sec:methodology} describes our proposed methodology, including data preprocessing, dimensionality reduction, and machine learning models.
 Section~\ref{sec:experiments} presents our experimental setup and results.
 Finally, Section~\ref{sec:conclusion} concludes the paper and discusses future work.
