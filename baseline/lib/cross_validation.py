@@ -6,6 +6,45 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import BaseCrossValidator, KFold
 
+def grouped_train_test_split(data, test_size: float, group_by: str, random_state=None):
+    """
+    Perform a simple train/test split on the given data.
+
+    Parameters:
+    - data: The input data to be split into train and test sets.
+    - test_size: The proportion of the dataset to include in the test split.
+    - group_by: The column name to group the data by.
+    - random_state: The random seed for shuffling the data.
+
+    Returns:
+    - train_data: The training set.
+    - test_data: The testing set.
+
+    Usage:
+        ```python
+        train_data, test_data = simple_train_test_split(
+            final_df, test_size=0.2, group_by='category'
+        )
+        # Apply training and validation using train_data and test_data
+        ```
+    """
+    grouped = data.groupby(group_by)
+    groups_keys = list(grouped.groups.keys())
+
+    if random_state is not None:
+        random.seed(random_state)
+    random.shuffle(groups_keys)
+
+    split_idx = int((1 - test_size) * len(groups_keys))
+    train_keys = groups_keys[:split_idx]
+    test_keys = groups_keys[split_idx:]
+
+    train_data = pd.concat([grouped.get_group(key) for key in train_keys])
+    test_data = pd.concat([grouped.get_group(key) for key in test_keys])
+
+    return train_data, test_data
+
+
 
 def custom_kfold_cross_validation(data, k: int, group_by: str, random_state=None):
     """
