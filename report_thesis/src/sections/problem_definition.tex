@@ -17,9 +17,9 @@ The wavelength intensities are quantified in units of photon/shot/mm\textsupersc
 Formally, we have:
 
 \begin{itemize}
-    \item \textbf{Matrix $A[t, o]$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$.
-    \item \textbf{Matrix $B[w, s]$}: A Boolean matrix that links wavelengths $w$ to spectrometers $s$, indicating whether a specific wavelength is detected by a spectrometer.
-    \item \textbf{Matrix $C[t, l, s, w]$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$.
+    \item \textbf{Matrix $A[t, o]$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$. Here, $t$ represents the index for targets (samples or locations being analyzed) and $o$ denotes the index for oxides (different chemical compounds being quantified).
+    \item \textbf{Matrix $B[w, s]$}: A Boolean matrix that links wavelengths $w$ to spectrometers $s$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $s$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
+    \item \textbf{Matrix $C[t, l, s, w]$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the target where the measurement is taken.
     \item \textbf{Matrix $D[t, l, w]$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
     \[
     D[t, l, w] = \frac{1}{|S|} \sum_{s \in S} C[t, l, s, w].
