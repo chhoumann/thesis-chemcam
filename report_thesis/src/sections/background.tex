@@ -181,57 +181,27 @@ If $\mathbf{X}$ is decomposed into $\mathbf{TP}^T + \mathbf{E}$ where $\mathbf{T
 
 However, one drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
 This assumption does not always hold, which is what \gls{pls} aims to address.
-\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
-It does so by placing the highest weight on that most strongly correlated with the target using the coefficients derived from the covariance between the target and the features:
-$$
-    Z = \sum_{j=1}^{p} \phi_j X_j
-$$
-Where $Z$ is the component, $X_j$ is the $j$-th feature, and $\phi_j$ is the weight of the $j$-th feature and $\phi_j$ is derived using the following equation:
+
+\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.m
+These components, $Z$, are linear combinations of the original features, $X_j$, weighted by coefficients, $\phi_j$, which are specifically calculated to reflect this covariance.
+The formula for each component is expressed as:
 
 $$
-    \phi_j = \frac{cov(X_j, Y)}{var(X_j)}
+    Z = \sum_{j=1}^{p} \phi_j X_j,
 $$
 
-To refine the model iteratively, PLS uses the residuals from the previous components to calculate the next component. The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components:
+where $Z$ represents the component, $X_j$ is the $j$-th feature, and $\phi_j$ is the weight for the $j$-th feature.
+The weights, $\phi_j$, are determined by the formula:
 
 $$
-    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{X}_{j, m-1}
+    \phi_j = \frac{\text{cov}(X_j, Y)}{\text{var}(X_j)}.
+$$
+
+To refine the model iteratively, PLS uses the residuals from the previous components to calculate the next component.
+The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components:
+
+$$
+    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{X}_{j, m-1}.
 $$
 
 The components are then used to predict the target variable by fitting a linear model via least squares regression.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\subsection{Overview of Core Models}
-In this section, we provide an overview and definitions of the core models used in this work.
-These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
-In this overview, we focus on Principal Component Analysis (PCA) and Partial Least Squares (PLS), as these techniques are instrumental in the pipeline. We will also introduce Kernel PCA, a variant of PCA used in our methodology. The relevance of each model to our final pipeline is clarified, ensuring their definitions and mathematical formulations are appropriately detailed.
-
-\subsubsection{PCA, Kernel PCA \& PLS}
-\gls{pca} is a statistical procedure that utilizes an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called \textit{principal components}. The process starts by centering the data for each attribute. The covariance matrix, $\mathbf{X}^T \mathbf{X}$, is then formed, and its eigen decomposition is computed to obtain the eigenvectors and eigenvalues. The principal components are the directions in which the data variably reduces the most, indicated by the eigenvectors of the covariance matrix. The eigenvalues denote the amount of variance carried in each principal direction. Typically, only the first few principal components are kept, those that capture most of the variance, thus reducing the dimensionality of the data while retaining its most significant features.
-
-\gls{kernel-pca} extends PCA for nonlinear dimension reduction through the use of kernels. By mapping the original data into a higher-dimensional space, Kernel PCA makes it possible to perform the linear separations required for traditional PCA in this new space.
-
-\gls{pls}, like PCA, is also a dimension reduction technique but focuses on maximizing the covariance between the response variables and the predictors rather than just the variance among the predictors. PLS constructs new predictor variables, known as latent variables, which are optimal linear combinations of the original predictor variables with respect to the covariance with the response variable. This is done iteratively, with each new component being chosen to maximize the remaining covariance after removing the effects of the previous components.
-
-To avoid confusion, it is important to distinguish between variables that are correlated and those that are related. Correlation refers to a specific statistical relationship involving linear correspondence between variables. In contrast, variables can be related in broader ways that do not necessarily involve linear correlation. In the context of PLS, we focus on maximizing linear correlations (covariance) to construct the latent variables.
-
-\subsubsection{Relevance and Inclusion of Models}
-In our final pipeline, we utilize PCA and Kernel PCA for their efficiency in reducing dimensionality and PLS for its ability to construct predictive models with these reduced dimensions. Detailed mathematical formulations and further explanations of each model's role in our pipeline are provided in subsequent sections as they become relevant.
