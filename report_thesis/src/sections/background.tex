@@ -128,20 +128,50 @@ where
 This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
 
 \subsection{Overview of Core Models}
-In this section, we provide an overview and definitions of the core models used in this work. These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}. 
-Additionally, if a model is related to a concept or an approach that has been utilized in the final pipeline, such as \gls{pca}, \gls{pcr} and \gls{pls}, we will include brief definitions of these whereever relevant.
+In this section, we provide an overview and definitions of the core models used in this work.
+These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
 
-\subsubsection{PCA, PCR \& PLS}
+\subsubsection{PLS}
+First, we provide an overview of \gls{pls}.
+To understand \gls{pls}, it is essential to first understand \gls{pca} and \gls{pcr}.
+
 \gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
-Mathematically, \gls{pca} involves the eigen decomposition of the covariance matrix of the data, $\mathbf{X}^T \mathbf{X}$.
-First, the data is centered by subtracting the mean of each variable.
-The eigenvectors and eigenvalues of the covariance matrix are then computed.
-The eigenvectors represent the directions of maximum variance, and the eigenvalues indicate the amount of variance captured in each of those directions.
-These eigenvectors are ordered by their corresponding eigenvalues in descending order, which helps in identifying which components capture the most variance.
-In the context of dimensionality reduction, only the top $n$ components are retained.
-These are considered enough to capture the most significant aspects of the data.
-Then, the original data points can be projected onto the space defined by these top $n$ components.
-This step transforms the high-dimensional data into a lower-dimensional space by retaining only the dimensions that contain the most significant variance.
+First, the data matrix $\mathbf{X}$ is centered by subtracting the mean of each variable to ensure that the data is centered at the origin:
+
+$$
+\mathbf{\bar{X}} = \mathbf{X} - \mathbf{\mu},
+$$
+
+where $\mathbf{\bar{X}}$ is the centered data matrix and $\mathbf{\mu}$ is the mean of each variable.
+
+The covariance matrix of the centered data is then computed:
+
+$$
+\mathbf{C} = \frac{1}{n-1} \mathbf{\bar{X}}^T \mathbf{\bar{X}},
+$$
+
+where $n$ is the number of samples.
+
+Then, the covariance matrix $C$ is decomposed into its eigenvectors $\mathbf{V}$ and eigenvalues $\mathbf{D}$:
+
+$$
+\mathbf{C} = \mathbf{V} \mathbf{D} \mathbf{V}^T,
+$$
+
+where $\mathbf{V}$ is the matrix of eigenvectors and $\mathbf{D}$ is the diagonal matrix of eigenvalues.
+
+The eigenvectors are then ranked by the magnitude of their corresponding eigenvalues in descending order.
+The eigenvectors with the highest eigenvalues are the principal components that capture the most variance in the data.
+Usually, only the top $n$ principal components are retained to reduce the dimensionality of the data, as they are assumed to capture the most significant aspects of the data due to their high variance.
+
+Finally, the original data points are projected onto the space defined by the top $n$ principal components, which transforms $X$ into a lower-dimensional representation:
+
+$$
+\mathbf{X}_{\text{reduced}} = \mathbf{\bar{X}} \mathbf{V}_n,
+$$
+
+where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
+
 A property of the principal components is that they are uncorrelated, which means that calculating the covariance matrix of each pair of components results in a diagonal matrix where the off-diagonal elements are zero.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
@@ -149,12 +179,12 @@ A property of the principal components is that they are uncorrelated, which mean
 This approach can be beneficial when the original features are highly correlated, as the principal components are orthogonal to each other, reducing multicollinearity.
 If $\mathbf{X}$ is decomposed into $\mathbf{TP}^T + \mathbf{E}$ where $\mathbf{T}$ are the scores and $\mathbf{P}$ are the loadings, \gls{pcr} uses $\mathbf{T}$ to predict the target $\mathbf{y}$ as $\mathbf{y} = \mathbf{Tb} + \mathbf{e}$.
 
-However, one drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones. 
+However, one drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
 This assumption does not always hold, which is what \gls{pls} aims to address.
-\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target. 
+\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
 It does so by placing the highest weight on that most strongly correlated with the target using the coefficients derived from the covariance between the target and the features:
 $$
-    Z = \sum_{j=1}^{p} \phi_j X_j 
+    Z = \sum_{j=1}^{p} \phi_j X_j
 $$
 Where $Z$ is the component, $X_j$ is the $j$-th feature, and $\phi_j$ is the weight of the $j$-th feature and $\phi_j$ is derived using the following equation:
 
@@ -169,3 +199,39 @@ $$
 $$
 
 The components are then used to predict the target variable by fitting a linear model via least squares regression.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Overview of Core Models}
+In this section, we provide an overview and definitions of the core models used in this work.
+These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
+In this overview, we focus on Principal Component Analysis (PCA) and Partial Least Squares (PLS), as these techniques are instrumental in the pipeline. We will also introduce Kernel PCA, a variant of PCA used in our methodology. The relevance of each model to our final pipeline is clarified, ensuring their definitions and mathematical formulations are appropriately detailed.
+
+\subsubsection{PCA, Kernel PCA \& PLS}
+\gls{pca} is a statistical procedure that utilizes an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called \textit{principal components}. The process starts by centering the data for each attribute. The covariance matrix, $\mathbf{X}^T \mathbf{X}$, is then formed, and its eigen decomposition is computed to obtain the eigenvectors and eigenvalues. The principal components are the directions in which the data variably reduces the most, indicated by the eigenvectors of the covariance matrix. The eigenvalues denote the amount of variance carried in each principal direction. Typically, only the first few principal components are kept, those that capture most of the variance, thus reducing the dimensionality of the data while retaining its most significant features.
+
+\gls{kernel-pca} extends PCA for nonlinear dimension reduction through the use of kernels. By mapping the original data into a higher-dimensional space, Kernel PCA makes it possible to perform the linear separations required for traditional PCA in this new space.
+
+\gls{pls}, like PCA, is also a dimension reduction technique but focuses on maximizing the covariance between the response variables and the predictors rather than just the variance among the predictors. PLS constructs new predictor variables, known as latent variables, which are optimal linear combinations of the original predictor variables with respect to the covariance with the response variable. This is done iteratively, with each new component being chosen to maximize the remaining covariance after removing the effects of the previous components.
+
+To avoid confusion, it is important to distinguish between variables that are correlated and those that are related. Correlation refers to a specific statistical relationship involving linear correspondence between variables. In contrast, variables can be related in broader ways that do not necessarily involve linear correlation. In the context of PLS, we focus on maximizing linear correlations (covariance) to construct the latent variables.
+
+\subsubsection{Relevance and Inclusion of Models}
+In our final pipeline, we utilize PCA and Kernel PCA for their efficiency in reducing dimensionality and PLS for its ability to construct predictive models with these reduced dimensions. Detailed mathematical formulations and further explanations of each model's role in our pipeline are provided in subsequent sections as they become relevant.
