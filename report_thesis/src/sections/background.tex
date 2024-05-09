@@ -171,8 +171,6 @@ $$
 
 where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
 
-A property of the principal components is that they are uncorrelated, which means that calculating the covariance matrix of each pair of components results in a diagonal matrix where the off-diagonal elements are zero.
-
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
 \gls{pcr} involves performing \gls{pca} on the features $\mathbf{X}$ and then using the principal components with the highest variances as features in a linear regression model.
 This approach can be beneficial when the original features are highly correlated, as the principal components are orthogonal to each other, reducing multicollinearity.
