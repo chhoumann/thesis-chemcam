@@ -157,11 +157,18 @@ $$
 \mathbf{C} = \mathbf{V} \mathbf{D} \mathbf{V}^T,
 $$
 
-where $\mathbf{V}$ is the matrix of eigenvectors and $\mathbf{D}$ is the diagonal matrix of eigenvalues.
+where $\mathbf{V}$, containing the eigenvectors of $\mathbf{C}$, are the principal component loadings.
+These loadings represent the directions of maximum variance in $\mathbf{X}$.
+$\mathbf{D}$, a diagonal matrix, contains the eigenvalues, which quantify the variance captured by each loading.
 
-The eigenvectors are then ranked by the magnitude of their corresponding eigenvalues in descending order.
-The eigenvectors with the highest eigenvalues are the principal components that capture the most variance in the data.
-Usually, only the top $n$ principal components are retained to reduce the dimensionality of the data, as they are assumed to capture the most significant aspects of the data due to their high variance.
+These components are the scores $\mathbf{T}$, calculated as follows:
+
+$$
+\mathbf{T} = \mathbf{\bar{X}} \mathbf{V}_n,
+$$
+
+where $\mathbf{V}_n$ includes only the top $n$ eigenvectors.
+The scores $\mathbf{T}$ are the new, uncorrelated features that reduce the dimensionality of the original data, capturing the most significant patterns and trends.
 
 Finally, the original data points are projected onto the space defined by the top $n$ principal components, which transforms $X$ into a lower-dimensional representation:
 
@@ -172,9 +179,23 @@ $$
 where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-\gls{pcr} involves performing \gls{pca} on the features $\mathbf{X}$ and then using the principal components with the highest variances as features in a linear regression model.
-This approach can be beneficial when the original features are highly correlated, as the principal components are orthogonal to each other, reducing multicollinearity.
-If $\mathbf{X}$ is decomposed into $\mathbf{TP}^T + \mathbf{E}$ where $\mathbf{T}$ are the scores and $\mathbf{P}$ are the loadings, \gls{pcr} uses $\mathbf{T}$ to predict the target $\mathbf{y}$ as $\mathbf{y} = \mathbf{Tb} + \mathbf{e}$.
+First, \gls{pca} is applied to the dataset $\mathbf{X}$, transforming it into a set of uncorrelated variables, the principal components.
+These components, represented by scores $\mathbf{T}$, are derived from the eigenvectors $\mathbf{V}_n$ with the highest variances.
+
+In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
+
+$$
+\mathbf{X} = \mathbf{TV}^T + \mathbf{E},
+$$
+
+where $\mathbf{T}$ represents the scores, and $\mathbf{V}$ represents the loadings.
+\gls{pcr} utilizes these scores $\mathbf{T}$ in a linear regression model to predict the target variable $\mathbf{y}$:
+
+$$
+\mathbf{y} = \mathbf{Tb} + \mathbf{e},
+$$
+
+where $\mathbf{b}$ are the regression coefficients correlating $\mathbf{T}$ to $\mathbf{y}$, and $\mathbf{e}$ is the vector of residuals, capturing the prediction errors.
 
 However, one drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
 This assumption does not always hold, which is what \gls{pls} aims to address.
