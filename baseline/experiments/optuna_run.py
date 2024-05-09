@@ -1,5 +1,6 @@
 import math
 from datetime import datetime
+from typing import List
 
 import mlflow
 import numpy as np
@@ -276,14 +277,24 @@ def combined_objective(trial, oxide, model_selector):
 models = ["gbr", "svr", "extra_trees", "pls", "xgboost"]
 
 
+def validate_oxides(ctx: typer.Context, param: typer.CallbackParam, value: List[str]) -> List[str]:
+    for oxide in value:
+        if oxide not in major_oxides:
+            raise typer.BadParameter(f"{oxide} is not a valid oxide. Choose from {major_oxides}")
+    return value
+
+
 def main(
     n_trials: int = typer.Option(200, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
+    selected_oxides: List[str] = typer.Option(
+        major_oxides, "--oxides", "-o", help="List of oxides to optimize", callback=validate_oxides
+    ),
 ):
     sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    for oxide in major_oxides:
+    for oxide in selected_oxides:
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}")
 
