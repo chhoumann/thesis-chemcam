@@ -7,4 +7,4 @@ def rmse_metric(y_true, y_pred):
 
 
 def std_dev_metric(y_true, y_pred):
-    return float(np.std(y_true - y_pred))
+    return float(np.std(y_true - y_pred, ddof=1))
