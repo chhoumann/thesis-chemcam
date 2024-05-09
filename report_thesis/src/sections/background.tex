@@ -128,7 +128,7 @@ where
 This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
 
 \subsection{Overview of Core Models}
-In this section, we provide an overview and definitions of the core models used in this work.
+In this section, we provide an overview and definitions of \gls{pls}, primarily based on the methodologies described by \citet{James2023AnIS}.
 These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
 
 \subsubsection{PLS}
@@ -222,4 +222,4 @@ $$
     Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{X}_{j, m-1}.
 $$
 
-The components are then used to predict the target variable by fitting a linear model via least squares regression.\cite{James2023AnIS}
+The components are then used to predict the target variable by fitting a linear model via least squares regression.
