@@ -273,11 +273,11 @@ def combined_objective(trial, oxide, model_selector):
         return float("inf")  # Return a large number to indicate failure
 
 
-models = ["gbr", "svr", "xgboost", "extra_trees", "pls"]
+models = ["gbr", "svr", "extra_trees", "pls", "xgboost"]
 
 
 def main(
-    n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
+    n_trials: int = typer.Option(200, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
 ):
     sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
