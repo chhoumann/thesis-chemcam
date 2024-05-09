@@ -290,6 +290,31 @@ def main(
         major_oxides, "--oxides", "-o", help="List of oxides to optimize", callback=validate_oxides
     ),
 ):
+    """
+    Executes hyperparameter optimization for specified oxides using Optuna with MLflow tracking.
+
+    This function sets up and runs an Optuna optimization study for different machine learning models
+    on specified oxide datasets. Each oxide and model combination is optimized separately with a given
+    number of trials. The function logs the optimization process and results to MLflow and optionally
+    sends notifications via Discord.
+
+    Parameters:
+    - n_trials (int): The number of trials to run for the hyperparameter optimization. Each trial
+                      tests a set of parameters on the specified model and oxide.
+    - selected_oxides (List[str]): A list of oxide names for which the optimization will be performed.
+                                   The oxides should be among the predefined valid oxides, and the
+                                   function will validate this list.
+
+    The function uses Typer for CLI argument parsing, allowing the number of trials and the list of
+    oxides to be specified at runtime. It supports dynamic adjustment of the experimental setup and
+    integrates with MLflow for experiment tracking and management.
+
+    Example CLI Usage:
+    - Run optimization for 100 trials on SiO2 and Al2O3:
+      `python optuna_run.py --n-trials 100 --oxides SiO2 --oxides Al2O3`
+    - Run optimization with default settings (200 trials on all predefined oxides):
+      `python optuna_run.py`
+    """
     sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
