@@ -107,13 +107,13 @@ def champion_callback(study, frozen_trial, oxide, model):
                     / (sum(best_trial.values) / len(best_trial.values))
                 ) * 100
                 message = (
-                    f"{oxide} | Trial {frozen_trial.number} achieved avg RMSE_CV/STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` with "
+                    f"{oxide} | Trial {frozen_trial.number} achieved avg of RMSE_CV and STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` with "
                     f"{improvement_percent:.4f}% improvement using {model_type}.\n"
                     f"{cmn}"
                 )
             else:
                 message = (
-                    f"{oxide} | Initial trial {frozen_trial.number} achieved avg RMSE_CV/STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` using {model_type}.\n"
+                    f"{oxide} | Initial trial {frozen_trial.number} achieved avg of RMSE_CV and STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` using {model_type}.\n"
                     f"{cmn}"
                 )
 
@@ -250,8 +250,8 @@ def combined_objective(trial, oxide, model_selector):
             model.fit(X_train, y_train)
             preds = model.predict(X_test)
             mse = mean_squared_error(y_test, preds)
-            rmse = math.sqrt(mse)
-            std_dev = np.std(y_test - preds)
+            rmse = rmse_metric(y_test, preds)
+            std_dev = std_dev_metric(y_test, preds)
 
             trial.set_user_attr("std_dev", float(std_dev))
             trial.set_user_attr("mse", float(mse))
