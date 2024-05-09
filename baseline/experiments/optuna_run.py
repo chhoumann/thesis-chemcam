@@ -1,9 +1,7 @@
-import math
 from datetime import datetime
 from typing import List
 
 import mlflow
-import numpy as np
 import optuna
 import requests
 import typer
