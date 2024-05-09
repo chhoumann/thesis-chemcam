@@ -8,6 +8,7 @@ from sklearn.preprocessing import (
     RobustScaler,
     StandardScaler,
 )
+from lib.norms import Norm1Scaler, Norm3Scaler
 
 
 def instantiate_pca(trial: Trial, logger=lambda params: None) -> PCA:
@@ -87,3 +88,12 @@ def instantiate_quantile_transformer(trial: Trial, logger=lambda params: None) -
     }
     logger(params)
     return QuantileTransformer(**params)
+
+
+def instantiate_norm3_scaler(trial: Trial, logger=lambda params: None) -> Norm3Scaler:
+    return Norm3Scaler()
+
+
+def instantiate_norm1_scaler(trial: Trial, logger=lambda params: None) -> Norm1Scaler:
+    return Norm1Scaler()
+
