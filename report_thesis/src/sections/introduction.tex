@@ -21,7 +21,7 @@ This thesis aims to improve upon previous work in the field of \gls{libs} data a
 Our goal is to develop a machine learning pipeline that is tailored to the unique characteristics of \gls{libs} data, with the goal of achieving higher prediction accuracy and robustness.
 
 To achieve these objectives, we build upon the baseline established in~\citet{p9_paper} and systematically explore a range of promising machine learning models and preprocessing techniques, identified through an extensive literature review and guided by a curiosity to explore unconventional approaches.
-Specifically, we implemented an experimental framework using an automated hyperparameter optimization tool to determine the most effective combinations of preprocessing methods and models for each major oxide analyzed.
+Specifically, we designed and implemented a framework for experimental analysis using an automated hyperparameter optimization tool to determine the most effective combinations of preprocessing methods and models for each regression target.
 We began by identifying the most promising models from the literature, after which we evaluated various preprocessing techniques to understand their impact on model performance, selecting those that demonstrated the highest impact on improving the performance of each model.
 Following preprocessing, we optimized the chosen models through hyperparameter tuning to ensure optimal performance tailored to the specific data characteristics of each oxide.
 Once the best hyperparameters were identified, a stacking ensemble method was employed to create a meta learner for each oxide, significantly enhancing prediction accuracy and robustness beyond the capabilities of individual models.
