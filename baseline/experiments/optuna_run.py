@@ -269,7 +269,7 @@ def combined_objective(trial, oxide, model_selector):
 
         print(f"An error occurred: {e}")
         traceback.print_exc()
-        return float("inf")  # Return a large number to indicate failure
+        return float("inf"), float("inf")  # Return a large number to indicate failure
 
 
 models = ["gbr", "svr", "extra_trees", "pls", "xgboost"]
