@@ -1,0 +1,104 @@
+\subsection{Validation and Testing Procedures}
+This section describes the validation and testing procedures that each of our experiments adhere to.
+While we use conventional techniques like holdout sets and k-fold cross validation, \gls{libs} impose additional challenges to the process.
+
+One of the primary challenges lies in ensuring there is no data leakage.
+Therefore, we group shots on a given location for a target.
+As per matrix A in Section~\ref{sec:problem_definition}, we know that each target only has one ground truth concentration value per oxide.
+Since the emitted light intensities varies slightly for each location that is shot at on the target, we essentially have $l$ (locations per target) entries for the same ground truth value.
+This means that if we randomly split the dataset, some locations from a target would end up in the testing set, while others in the training set.
+This would result in data leakage, as the testing set would no longer be representative of the overall dataset.
+
+% TODO: We'll be rewriting part of this due to rewriting our approach to splitting. We'll emulate the method employed by Anderson et al. completely, meaning we'll do this:
+% > "To assess the performance of the PLS model, we use k-fold cross validation [55] and a separate test-set. We divided the full set of laboratory data into five folds, four of which are used for cross validation and are combined as the final training set. The fifth fold is withheld and used as a test set to validate the final model. Folds were defined separately for each element, after removal of outliers. To ensure that each fold represented the full elemental compositional variation, the samples were sorted based on the major element of interest, and samples were then assigned sequentially to each fold. In some cases, the database contains only a small number of targets with very high or very low compositions for a given element. These extreme targets can have a strong influence on the model and enable it to handle a wider range of compositions, so they are forced to be in the training folds rather than the test set. Unless otherwise specified, the results presented are the test set results."
+
+
+\subsubsection{Dataset Partitioning}
+To ensure a rigorous evaluation of the models, we first split the dataset into training and testing subsets.
+As described in Section~\ref{sec:baseline_replica}, we adopted an automated approach to identify and distribute extreme compositions evenly across both subsets.
+This method was devised to replicate the dataset splitting methodology employed by \citet{andersonImprovedAccuracyQuantitative2017}, as we have described in \citet{p9_paper}.
+The process of dataset partitioning involves several key steps aimed at ensuring that extreme values are appropriately represented, which is critical given the skewness that such values can introduce into the training process:
+
+\begin{enumerate}
+    \item \textbf{Identification of Extremes:} For each oxide in the dataset, the samples are sorted by concentration. The extremes, defined as the $n$ highest and lowest values, are identified for inclusion in the training set.
+    \item \textbf{Separation of Extremes:} These extreme samples are first segregated to ensure they are not included in the subsequent random partitioning. This step guarantees that the training set contains critical outliers which are often informative for model robustness.
+    \item \textbf{Random Partitioning:} The remainder of the dataset, excluding the previously segregated extremes, undergoes a random split. The splitting process adheres to a predefined ratio, typically set at 80\%/20\% for training and testing, respectively.
+    \item \textbf{Reintegration of Extremes:} The identified extremes are reintegrated into the training subset. This methodological step ensures that the training data encompasses a comprehensive range of the data's variability, particularly the tail-end characteristics that are crucial for robust model performance.
+    \item \textbf{Adjustment of Test Size:} Given the inclusion of extremes in the training set, the proportion of the dataset allocated for testing is adjusted accordingly. This adjustment ensures that the overall ratio of training to testing remains as intended, despite the prior allocation of extreme samples to the training set.
+\end{enumerate}
+
+This approach not only aids in achieving a balanced dataset but also in maintaining the integrity of the testing process by avoiding any potential leakage of information between the training and testing datasets.
+
+% Need to discuss our reasoning behind selecting n=2 for separating extreme values. Should be backed by data analysis ideally.
+
+As previously discussed, we have opted for an 80\%/20\% division between the training and testing datasets.
+This ratio is strategically chosen to maximize the training set's capacity for effective model learning while ensuring the testing set is sufficiently representative to provide an accurate assessment of the model's performance on new, unseen data.
+Expanding the testing set beyond this proportion is not recommended.
+As detailed in Section~\ref{sec:problem_definition}, one of the primary constraints we face is the limited availability of data.
+Allocating too much data to the testing set could compromise the comprehensiveness of the training set, potentially undermining the model's ability to generalize from a robust learning process.
+
+
+\subsubsection{Cross-Validation Strategy}
+In this project, we implement a robust mechanism to prevent our model from merely tuning to peculiarities of a specific dataset segment.
+Traditional approaches, where models are validated against a singular test set, might inadvertently result in models that perform well on that set but poorly generalize to new data.
+To overcome this, we utilize a k-fold cross-validation strategy, which is particularly designed to enhance model generalizability across various unseen data scenarios.
+
+Our strategy adopts a group-based variant of k-fold cross-validation to address potential data leakage, which can occur when closely related data points are scattered across both training and testing sets.
+This can mislead the evaluation of the model's performance.
+To mitigate this, our method ensures that all measurements related to a single entity (as defined by a grouping attribute) are contained entirely within either the training set or the testing set, but not both.
+
+% What is a group?
+
+The custom cross-validation method is delineated in Algorithm \ref{alg:custom_k_fold}: 
+
+\begin{algorithm}[H]
+\caption{Custom K-Fold Cross-Validation}
+\label{alg:custom_k_fold}
+\begin{algorithmic}[1]
+\Require Dataset $D$, Number of folds $k$, Grouping attribute \textit{group\_by}, Random seed \textit{random\_state}
+\Ensure Sequence of training and testing datasets for each fold
+
+\State Group $D$ by \textit{group\_by} into $G$ \label{line:group}
+\State Extract unique keys from $G$ into \textit{keys} \label{line:extract_keys}
+\State Shuffle \textit{keys} using \textit{random\_state} \label{line:shuffle}
+\State Split \textit{keys} into $k$ folds using K-Fold technique \label{line:split}
+\For{$i = 1$ to $k$}
+    \State Select the $i$-th fold as test keys, and the rest as train keys \label{line:select_keys}
+    \State Concatenate groups corresponding to train keys to form \textit{train\_data} \label{line:concatenate_train}
+    \State Concatenate groups corresponding to test keys to form \textit{test\_data} \label{line:concatenate_test}
+    \State Yield $(\textit{train\_data}, \textit{test\_data})$ \label{line:yield}
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+Initially, the dataset \(D\) is grouped by a specified attribute, resulting in groups \(G\) as described in line \ref{line:group}.
+Unique group identifiers are extracted into \(keys\) (line \ref{line:extract_keys}), which are then shuffled (line \ref{line:shuffle}) to ensure randomness, utilizing a provided random seed \textit{random\_state}.
+
+These keys are divided into \(k\) folds (line \ref{line:split}), and for each iteration from 1 to \(k\), one fold is selected as the test set, with the remaining serving as the training set (line \ref{line:select_keys}).
+Corresponding data for each set of keys is then aggregated to form the training data (\textit{train\_data}) and the testing data (\textit{test\_data}), respectively, as indicated in lines \ref{line:concatenate_train} and \ref{line:concatenate_test}.
+This ensures that all data from any single group is exclusively included in either the training or the testing set, thus mitigating the risk of data leakage.
+
+This custom cross-validation strategy is crucial for ensuring that our evaluations are as realistic as possible, providing a reliable estimate of how the model will perform on truly independent data.
+Through this method, we enhance the likelihood that our model's effectiveness is genuine and not a result of overfitting to the idiosyncrasies of the test data.
+
+
+\subsubsection{Evaluation Metrics}
+As mentioned in Section~\ref{sec:problem_definition}, the performance of the models was quantitatively assessed using the \gls{rmse} and the standard deviation of the residuals.
+These metrics are calculated for each fold and averaged across all folds to provide comprehensive indicators of model accuracy and variability.
+In addition, we also compute the metrics for the test set to provide a measure of the model's performance on unseen data.
+Therefore, we have the following metrics for each experiment:
+\begin{enumerate}
+    \item \textbf{Fold-specific RMSE and Standard Deviation:} For each of the $k$ folds, we calculate both the RMSE and standard deviation, denoted as \texttt{rmse\_cv\_n} and \texttt{std\_dev\_cv\_n}, where \texttt{n} ranges from 1 to $k$.
+    \item \textbf{Average RMSE and Standard Deviation:} The overall cross-validation RMSE (\texttt{rmse\_cv}) and standard deviation (\texttt{std\_dev\_cv}) are computed as the mean of the fold-specific values.
+    \item \textbf{Test Set RMSE and Standard Deviation:} The RMSE and standard deviation are also computed for the test set, denoted as \texttt{rmsep} and \texttt{std\_dev}, to provide a measure of the model's performance on unseen data.
+\end{enumerate}
+
+\subsubsection{Conclusion}
+The implementation of a tailored validation and testing framework in this study ensures that the models developed are both accurate and generalizable.
+By integrating custom k-fold cross-validation and carefully selecting performance metrics, the methodology effectively addresses potential issues of data leakage and overfitting.
+These measures reinforce the reliability of the model evaluations and support the overarching goal of enhancing the accuracy and robustness of chemical composition analysis using \gls{libs} data.
+
+% - Is it excessive to use both holdout and cross validation?
+% - What are we missing here?
+% - What is self-evident to us, but not to the reader?
+
