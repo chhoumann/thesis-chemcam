@@ -19,6 +19,15 @@ Consequently, a spectra serves as a complex, multi-dimensional fingerprint of th
 \subsection{Baseline \& Replica}
 For analyzing Martian geological samples, the \gls{chemcam} team currently uses the \gls{moc} model~\cite{cleggRecalibrationMarsScience2017}.
 This model integrates \gls{pls} and \gls{ica} to predict the composition of major oxides.
+
+As shown in figure \ref{fig:moc_pipeline}, the input to the \gls{moc} model is \gls{ccs} data.
+This spectral data is collected on Earth in a laboratory setting simulating the Martian environment.
+For each sample, five \gls{ccs} datasets are collected by shooting 50 times at the sample from different locations.
+As a result, the total feature count per sample amounts to 6144 (2048 channels per spectrometer $\times$ 3 spectrometers).
+Consequently, the \gls{ccs} data for each sample forms a substantial high-dimensional matrix with dimensions $50 \times 6144$.
+Complementing the data is a matrix of the corresponding major oxide concentrations for each sample, which serves as the target variable for the model.
+For more details, refer to Section 5 in \citet{p9_paper}.
+
 The \gls{pls} and \gls{ica} phases of the \gls{moc} operate in parallel, and their predictions are blended to form the final predictions.
 Though the \gls{moc} model has proven useful, it suffers from limitations in predictive accuracy and robustness.
 An overview of the \gls{moc} model is shown in Figure~\ref{fig:moc_pipeline}.
