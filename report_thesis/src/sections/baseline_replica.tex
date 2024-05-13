@@ -9,6 +9,7 @@ Both the \gls{chemcam} and laboratory instrument consist of three spectrometers,
 These spectrometers are used to capture the \gls{uv}, \gls{vio}, and \gls{vnir} regions of the spectrum.
 For each sample, five \gls{ccs} datasets are collected by shooting 50 times at the sample from different locations.
 Consequently, the \gls{ccs} data for each sample forms a substantial high-dimensional matrix with dimensions $50 \times 6144$.
+An entry in this matrix represents the intensity of a specific wavelength in nanometers.
 Complementing the data is a matrix of the corresponding major oxide concentrations for each sample, which serves as the target variable for the model.
 For more details, refer to Section 5 in \citet{p9_paper}.
 
