@@ -134,10 +134,7 @@ This is relevant for our work as one of the major challenges in analyzing LIBS c
 This scarcity makes it difficult to construct robust models capable of comprehensively understanding the underlying patterns and physical principles within the data.
 Utilizing related LIBS data could help the models first learn the general outline, shape and patterns in the LIBS data, making it easier for it to grasp the deeper patterns in the Mars related data.
 
-\citet{mulenga_stacking_2021} introduce novel techniques for improving the preprocessing of microbiome data. 
-The authors present a unique approach that involves stacking and chaining multiple normalization methods to optimize the preprocessing pipeline for deep learning applications in colorectal cancer detection. 
-Their stacking method combines the outputs of various normalization techniques to artificially expand the training dataset, whereas the chaining method applies these techniques sequentially to incrementally adjust data towards a normal distribution.
-The effectiveness of these methods was evaluated using area under the curve (AUC) metrics, with results showing significant improvements in model performance, achieving AUC values between 0.857 and 0.987. 
-This suggests that careful selection and combination of preprocessing methods can substantially enhance the predictive accuracy and robustness of models dealing with complex, high-dimensional data.
-This approach is interesting to our study as it offers a potential pathway to address similar challenges in LIBS data analysis, such as high dimensionality and multicollinearity, which significantly affect the accuracy of predicting major oxide compositions. 
-Integrating a tailored stacking and chaining normalization framework into our preprocessing strategy could improve the robustness and accuracy of our models, aligning with our objectives to enhance the prediction capabilities of major oxides from LIBS data. 
+\citet{Huang2015AnEA} conducted a systematic analysis of data preprocessing techniques for machine learning-based software cost estimation. 
+Their study emphasizes the significant influence of tailored data preprocessing strategies on the prediction accuracy of models. Evaluating methods such as feature selection, case selection, scaling, and missing data treatments, they demonstrate that the effectiveness of these techniques varies markedly across different datasets and machine learning algorithms. 
+Their findings highlight the necessity of customizing preprocessing approaches to the specific characteristics of each dataset and model.
+This is relevant to our work, as it emphasizes the need to consider the preprocessing techniques and model selection as interdependent components that can significantly impact the predictive performance of machine learning models. 
