@@ -1,10 +1,11 @@
 import random
 from dataclasses import dataclass
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Union
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import BaseCrossValidator, KFold
+from sklearn.model_selection import BaseCrossValidator, KFold, StratifiedGroupKFold
+
 
 def grouped_train_test_split(data, test_size: float, group_by: str, random_state=None):
     """
@@ -43,7 +44,6 @@ def grouped_train_test_split(data, test_size: float, group_by: str, random_state
     test_data = pd.concat([grouped.get_group(key) for key in test_keys])
 
     return train_data, test_data
-
 
 
 def custom_kfold_cross_validation(data, k: int, group_by: str, random_state=None):
@@ -99,8 +99,99 @@ class CustomKFoldCrossValidator(BaseCrossValidator):
         return self.k
 
 
+def stratified_group_kfold_split(
+    data: pd.DataFrame, group_by: str, target: str, num_bins: int = 5, n_splits: int = 5, random_state: int = 42
+):
+    """
+    Perform a Stratified Group K-Fold split on the given data.
+
+    Parameters:
+    - data: The dataset to be used.
+    - group_by: The column name to group by.
+    - target: The target column name for stratification.
+    - num_bins: The number of bins for stratification.
+    - n_splits: The number of splits for cross-validation.
+    - random_state: The random state for reproducibility.
+
+    Returns:
+    - List of tuples containing train and test indices for each fold.
+    """
+    # Step 1: Extract unique sample names and their target values
+    unique_samples = data.drop_duplicates(subset=[group_by])[[group_by, target]]
+
+    # Bin the target values into quantiles
+    unique_samples[f"{target}_bin"] = pd.qcut(unique_samples[target], q=num_bins, labels=False, duplicates="drop")
+
+    # Step 2: Stratified Group K-Fold Split
+    sgkf = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+
+    # Create empty lists to store train and test indices for each fold
+    folds_custom = []
+
+    X = unique_samples[group_by]
+    y = unique_samples[f"{target}_bin"]
+    groups = unique_samples[group_by]
+
+    for train_idx, test_idx in sgkf.split(X, y, groups):  # type: ignore
+        train_samples = unique_samples.iloc[train_idx][group_by]
+        test_samples = unique_samples.iloc[test_idx][group_by]
+
+        # Ensure no overlap between train and test samples
+        assert not set(train_samples).intersection(set(test_samples)), "Overlap detected between train and test samples"
+
+        train_mask = data[group_by].isin(train_samples)
+        test_mask = data[group_by].isin(test_samples)
+
+        # Ensure no overlap between train and test masks
+        overlap = data[train_mask & test_mask]
+        if not overlap.empty:
+            print("Overlap detected between train and test masks:", overlap)
+        assert overlap.empty, "Overlap detected between train and test masks"
+
+        train_idx_full = data[train_mask]#.index
+        test_idx_full = data[test_mask]#.index
+
+        folds_custom.append((train_idx_full, test_idx_full))
+
+    return folds_custom
+
+
+class StratifiedGroupKFoldSplit:
+    def __init__(self, group_by: str, target: str, n_splits: int = 5, shuffle=True, random_state: int = 42):
+        self.n_splits = n_splits
+        self.shuffle = shuffle
+        self.random_state = random_state
+        self.group_by = group_by
+        self.target = target
+
+    def split(self, data):
+        """
+        Perform stratified group k-fold split.
+
+        Parameters:
+        - data: The dataset to be used.
+        - group_by: The column name to group by.
+        - target: The target column name for stratification.
+        - num_bins: The number of bins for stratification.
+
+        Returns:
+        - List of tuples containing train and test indices for each fold.
+        """
+        return stratified_group_kfold_split(
+            data,
+            self.group_by,
+            self.target,
+            num_bins=self.n_splits,
+            n_splits=self.n_splits,
+            random_state=self.random_state,
+        )
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        return self.n_splits
+
+
 def perform_cross_validation(
-    kf: CustomKFoldCrossValidator,
+    kf: Union[CustomKFoldCrossValidator, StratifiedGroupKFoldSplit],
     data: pd.DataFrame,
     model,
     preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
