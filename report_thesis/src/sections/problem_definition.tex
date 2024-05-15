@@ -1,37 +1,48 @@
 \section{Problem Definition}\label{sec:problem_definition}
 The primary objective of this research is to enhance computational methods for the accurate and robust quantification of chemical compositions using \gls{libs} data.
-As previously introduced, quantifying chemical compositions from \gls{libs} spectral data poses significant challenges, including high dimensionality and multicollinearity of the data, as well as matrix effects.
-Here, we further examine these challenges:
-\begin{itemize}
-    \item \textbf{Data Dimensionality and Collinearity:} The high dimensionality of spectral data, coupled with multicollinearity—where multiple spectral features may exhibit strong correlations—complicates the modeling and analysis\cite{andersonImprovedAccuracyQuantitative2017}.
-    \item \textbf{Matrix Effects:} As noted in the introduction, matrix effects refer to any effect that can cause variations in the intensity of emission lines of an element independent of the concentration of that element. The presence of different background elements can alter the emission intensities and pose significant challenges in accurately quantifying elemental concentrations. The spectra are complex due to the interaction of multiple physical processes including the coupling process between the laser photons and the target, self-absorption of optical emission lines within the plasma, recombination of elements into molecules, and collisional interactions in the plasma\cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
-    \item \textbf{Data Availability:} As highlighted earlier, due to the high cost of data collection, datasets are often small, which can limit the generalizability and robustness of the models\cite{p9_paper}.
-\end{itemize}
 
-The complexities presented by these challenges require the creation of advanced computational models designed to address and alleviate such issues, thereby enhancing the accuracy and reliability of chemical composition analysis with \gls{libs} data.
-
-The input to such models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths.
-This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}.
-The wavelength intensities are quantified in units of \\ photon/shot/mm\textsuperscript{2}/sr/nm.
+The input to such models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths. This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}. The wavelength intensities are quantified in units of \\ photon/shot/mm\textsuperscript{2}/sr/nm.
 
 Formally, we have:
-
-\begin{itemize}
-    \item \textbf{Matrix $A[\chi, o]$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across samples $\chi$. Here, $\chi$ represents the index for samples and $o$ denotes the index for oxides (different chemical compounds being quantified).
-    \item \textbf{Matrix $B[w, \gamma]$}: A Boolean matrix that links wavelengths $w$ to spectrometers $\gamma$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $\gamma$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
-    \item \textbf{Matrix $C[\chi, l, s, w]$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a sample $\chi$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the sample where the measurement is taken.
-    \item \textbf{Matrix $D[\chi, l, w]$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
+\begin{itemize}[topsep=0pt]
+    \item \textbf{Concentration Matrix} $\;\mathbf{C[\chi, o]}$: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across samples $\chi$. Here, $\chi$ represents the index for samples and $o$ denotes the index for oxides (different chemical compounds being quantified).
+    \item \textbf{Spectrometer Matrix} $\;\mathbf{S[w, \gamma]}$: A Boolean matrix that links wavelengths $w$ to spectrometers $\gamma$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $\gamma$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
+    \item \textbf{Intensity Matrix} $\;\mathbf{I[\chi, l, s, w]}$: Holds the spectral intensity data, where each entry represents the intensity recorded for a sample $\chi$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the sample where the measurement is taken.
+    \item \textbf{Averaged Intensity Matrix} $\;\mathbf{A[\chi, l, w]}$: Derived from matrix $\mathbf{I}$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
     \[
-    D[\chi, l, w] = \frac{1}{|S|} \sum_{s \in S} C[\chi, l, s, w].
+    A[\chi, l, w] = \frac{1}{|S|} \sum_{s \in S} I[\chi, l, s, w].
     \]
-    \item \textbf{Matrix $E[\chi, l, w]$}: The result of $D$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+    \item \textbf{Masked Intensity Matrix} $\;\mathbf{M[\chi, l, w]}$: The result of $\mathbf{A}$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
 \end{itemize}
 
-The model outputs are the quantified chemical compositions of geological samples. These are primarily the concentrations of major elements, represented in weight percentage. While background elements are also present, our current analysis does not quantify these.
-Our goal is to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^O$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $O$ represents the number of target oxides. This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^O$ of estimated oxide concentrations. The vector $\mathbf{x}$ is derived from matrix $E$, representing processed spectral data:
+The model outputs are the quantified chemical compositions of geological samples. 
+These are primarily the concentrations of major elements, represented in weight percentage. 
+While background elements are also present, our current analysis does not quantify these. 
+Our goal is to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{|o|}$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $|o|$ denotes the number of target oxides in the Concentration Matrix $\mathbf{C[\chi, o]}$.
+This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^{|o|}$ of estimated oxide concentrations. The vector $\mathbf{x}$ is derived from matrix $\mathbf{M}$, representing processed spectral data:
 \[
 \mathbf{v} = \mathcal{F}(\mathbf{x}).
 \]
+
+As previously introduced, quantifying chemical compositions from \gls{libs} spectral data poses significant challenges, including high dimensionality and multicollinearity of the data, as well as matrix effects. Here, we further examine these challenges:
+
+\begin{itemize}
+    \item \textbf{Data Dimensionality and Collinearity:} The high dimensionality of spectral data, coupled with multicollinearity—where multiple spectral features exhibit strong correlations—complicates the modeling and analysis. 
+    This challenge arises both in the Intensity Matrix $\mathbf{I[\chi, l, s, w]}$ and consequently the Averaged Intensity Matrix $\mathbf{A[\chi, l, w]}$, where the high number of wavelengths leads to a large number of dimensions, and the intensity readings across these wavelengths often display high correlations.
+    For instance, emission lines from the same element can overlap, causing their intensity readings at different wavelengths to be interdependent\cite{andersonImprovedAccuracyQuantitative2017}. 
+    This interdependency complicates the extraction of independent spectral features necessary for accurate quantitative analysis.
+
+    \item \textbf{Matrix Effects:} As noted in the introduction, matrix effects refer to any effect that can cause variations in the intensity of emission lines of an element independent of the concentration of that element. 
+    These effects are caused by the complex interplay of various physical processes within the plasma generated by the LIBS technique. The presence of different background elements can significantly alter the emission intensities by affecting these processes.
+    This also affects both the Intensity Matrix $\mathbf{I[\chi, l, s, w]}$ and the Averaged Intensity Matrix $\mathbf{A[\chi, l, w]}$, where the recorded intensities are influenced by the interaction of multiple physical processes, such as the coupling process between the laser photons and the target, self-absorption of optical emission lines within the plasma or collisional interactions in the plasma.
+    Collectively, these interactions can cause variation in the recorded intensities, posing significant challenges in accurately quantifying elemental concentrations~\cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
+    
+    \item \textbf{Data Availability:} Due to the high cost of data collection, datasets are often small. 
+    This cost affects the availability of samples $\chi$ in the Concentration Matrix $\mathbf{C[\chi, o]}$, limiting the number of samples available for evaluation, which is also true for the Intensity Matrix $\mathbf{I[\chi, l, s, w]}$ and in turn the Averaged Intensity Matrix $\mathbf{A[\chi, l, w]}$. 
+    Consequently, the generalizability and robustness of the models can be limited~\cite{p9_paper}.
+\end{itemize}
+
+The complexities presented by these challenges require the creation of advanced computational models designed to address and alleviate such issues, thereby enhancing the accuracy and reliability of chemical composition analysis with \gls{libs} data.
 
 As mentioned, our goals are to achieve improved accuracy and robustness.
 We define accuracy as the ability of a model to predict the composition of major oxides in Martian geological samples, while robustness refers to the stability of these predictions across different samples and oxides.
