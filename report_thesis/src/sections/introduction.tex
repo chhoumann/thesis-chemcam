@@ -3,7 +3,7 @@ NASA has been studying the Martian environment for decades through a series of m
 Today, the rovers exploring Mars are equipped with sophisticated instruments for analyzing the chemical composition of Martian soil in search of past life and habitable environments.
 
 Part of this research is facilitated through interpretation of spectral data gathered by \gls{libs} instruments, which fire a high-powered laser at soil samples to create a plasma.
-The emitted light is captured by spectrometers and analyzed using machine learning models to assess the presence and concentration of certain major oxides, informing NASA's understanding of Mars' geology.
+The emitted light is captured by spectrometers and analyzed using machine learning models to assess the presence and concentration of certain major oxides, informing NASA's understanding of Mars' geology~\cite{cleggRecalibrationMarsScience2017}.
 
 However, predicting major oxide compositions from \gls{libs} data still presents significant computational challenges.
 These include the high dimensionality and non-linearity of the data, compounded by issues of multicollinearity and matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}.
@@ -20,11 +20,15 @@ This underscores the need for continued research into more adaptive and robust m
 This thesis aims to improve upon previous work in the field of \gls{libs} data analysis.
 Our goal is to develop a machine learning pipeline that is tailored to the unique characteristics of \gls{libs} data, with the goal of achieving higher prediction accuracy and robustness.
 
-To achieve these objectives, we build upon the baseline established in~\citet{p9_paper} and systematically explore a range of promising machine learning models and preprocessing techniques, identified through an extensive literature review and guided by a curiosity to explore unconventional approaches.
-Specifically, we designed and implemented a framework for experimental analysis using an automated hyperparameter optimization tool to determine the most effective combinations of preprocessing methods and models for each regression target.
+To achieve these objectives, we build upon the baseline established in~\cite{p9_paper} and systematically explore nine different machine learning models. 
+These models were identified and selected through a combination of extensive literature review and curiosity to explore unconventional approaches.
+The nine models fall into three categories: Ensemble learning models, Regression models, and neural network models. 
+In addition to model exploration, we also investigate a selection of preprocessing techniques: normalization, scaling, dimensionality reduction and data transformation.
+Specifically, we designed and implemented a framework for experimental analysis using the automated hyperparameter optimization framework Optuna~\cite{optuna} to determine the most effective combinations of preprocessing methods and models for each regression target.
 We began by identifying the most promising models from the literature, after which we evaluated various preprocessing techniques to understand their impact on model performance, selecting those that demonstrated the highest impact on improving the performance of each model.
 Following preprocessing, we optimized the chosen models through hyperparameter tuning to ensure optimal performance tailored to the specific data characteristics of each oxide.
 Once the best hyperparameters were identified, a stacking ensemble method was employed to create a meta learner for each oxide, significantly enhancing prediction accuracy and robustness beyond the capabilities of individual models.
+% TODO: Superior performance needs to be replaced with actual numbers
 Through extensive experiments on \gls{libs} data, we systematically assessed and demonstrated the superior performance of our approach compared to existing methods, focusing on significant improvements in prediction accuracy and robustness.
 
 Our key contributions are as follows:
