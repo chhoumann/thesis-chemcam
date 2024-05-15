@@ -114,14 +114,14 @@ Norm 3 can be understood as follows: for each sample, we consider the data from 
 Formally, Norm 3 is defined as
 
 \begin{equation}
-	\tilde{X}_{i,j}^{(s)} = \frac{X_{i,j}^{(s)}}{\sum_{j=1}^{N} X_{i,j}^{(s)}},
+	\tilde{X}_{i,j}^{(\gamma)} = \frac{X_{i,j}^{(\gamma)}}{\sum_{j=1}^{N} X_{i,j}^{(\gamma)}},
 \end{equation}
 
 where
 
 \begin{itemize}
-	\item $\tilde{X}_{i,j}^{(s)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $s$-th spectrometer with $s \in \{1, 2, 3\}$,
-	\item $X_{i,j}^{(s)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $s$-th spectrometer,
+	\item $\tilde{X}_{i,j}^{(\gamma)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer with $\gamma \in \{1, 2, 3\}$,
+	\item $X_{i,j}^{(\gamma)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer,
 	\item $N = 2048$ is the number of channels in each spectrometer, and
 \end{itemize}
 
@@ -200,7 +200,7 @@ where $\mathbf{b}$ are the regression coefficients correlating $\mathbf{T}$ to $
 However, one drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
 This assumption does not always hold, which is what \gls{pls} aims to address.
 
-\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.m
+\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
 These components, $Z$, are linear combinations of the original features, $X_j$, weighted by coefficients, $\phi_j$, which are specifically calculated to reflect this covariance.
 The formula for each component is expressed as:
 
