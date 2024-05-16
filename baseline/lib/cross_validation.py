@@ -1,10 +1,48 @@
 import random
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import BaseCrossValidator, KFold, StratifiedGroupKFold
+
+
+def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in_train=True):
+    # Sort the data by the target column
+    unique_samples = (
+        data.drop_duplicates(subset=[group_by])[[group_by, target]].sort_values(by=target).reset_index(drop=True)
+    )
+
+    # Assign fold numbers sequentially
+    unique_samples["fold"] = np.arange(len(unique_samples)) % n_splits
+
+    if ensure_extremes_in_train:
+        # Identify extreme values (e.g., top and bottom 5%)
+        quantiles = unique_samples[target].quantile([0.05, 0.95])
+        extremes = unique_samples[
+            (unique_samples[target] <= quantiles[0.05]) | (unique_samples[target] >= quantiles[0.95])
+        ]
+
+        # Set extreme values to training folds (0 to n_splits-2)
+        unique_samples.loc[extremes.index, "fold"] = np.random.randint(0, n_splits - 1, len(extremes))
+
+    # Merge fold assignments back to the original data
+    data = data.merge(unique_samples[[group_by, "fold"]], on=group_by, how="left")
+    return data
+
+
+def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, random_state=None):
+    # Sort and assign folds
+    data = sort_and_assign_folds(data, group_by, target, n_splits=k)
+
+    # Perform cross-validation
+    folds_custom = []
+    for i in range(k):
+        train_data = data[data["fold"] != i]
+        test_data = data[data["fold"] == i]
+        folds_custom.append((train_data, test_data))
+
+    return folds_custom
 
 
 def grouped_train_test_split(data, test_size: float, group_by: str, random_state=None):
@@ -148,8 +186,8 @@ def stratified_group_kfold_split(
             print("Overlap detected between train and test masks:", overlap)
         assert overlap.empty, "Overlap detected between train and test masks"
 
-        train_idx_full = data[train_mask]#.index
-        test_idx_full = data[test_mask]#.index
+        train_idx_full = data[train_mask]  # .index
+        test_idx_full = data[test_mask]  # .index
 
         folds_custom.append((train_idx_full, test_idx_full))
 
@@ -191,8 +229,7 @@ class StratifiedGroupKFoldSplit:
 
 
 def perform_cross_validation(
-    kf: Union[CustomKFoldCrossValidator, StratifiedGroupKFoldSplit],
-    data: pd.DataFrame,
+    folds: List[Tuple[pd.DataFrame, pd.DataFrame]],
     model,
     preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
     metric_fns: List[Callable[[np.ndarray, np.ndarray], float]],
@@ -213,19 +250,28 @@ def perform_cross_validation(
     """
     if not hasattr(model, "fit") or not hasattr(model, "predict"):
         raise ValueError("Model must have 'fit' and 'predict' methods.")
+    from joblib import Parallel, delayed
 
-    all_fold_metrics: List[List[float]] = []
-
-    for i, (train_data, test_data) in enumerate(kf.split(data)):
+    def process_fold(i, train_data, test_data) -> List[float]:
         print(f"Running fold {i+1} with size: {len(train_data)} train and {len(test_data)} test")
 
         X_train, y_train, X_test, y_test = preprocess_fn(train_data, test_data)
+
+        # Ensure arrays are writable
+        X_train = np.array(X_train, copy=True)
+        y_train = np.array(y_train, copy=True)
+        X_test = np.array(X_test, copy=True)
+        y_test = np.array(y_test, copy=True)
 
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
 
         fold_metrics = [metric_fn(y_test, y_pred) for metric_fn in metric_fns]
-        all_fold_metrics.append(fold_metrics)
+        return fold_metrics
+
+    all_fold_metrics: List[List[float]] = Parallel(n_jobs=-1)(
+        delayed(process_fold)(i, train_data, test_data) for i, (train_data, test_data) in enumerate(folds)
+    )
 
     return all_fold_metrics
 
@@ -255,10 +301,54 @@ class CrossValidationMetrics:
 
 
 def get_cross_validation_metrics(all_fold_metrics: List[List[float]]):
+    """Get the cross-validation metrics for a list of fold metrics.
+
+    Args:
+        all_fold_metrics (List[List[float]]): A list of lists, each sublist contains computed metrics for each fold.
+
+    Returns:
+        CrossValidationMetrics: An object containing the averaged cross-validation metrics.
     """
-    Log the cross-validation metrics using MLflow and a custom logging callback.
+    return CrossValidationMetrics(all_fold_metrics)
+
+
+def perform_repeated_cross_validation(
+    get_kf: Callable[..., Union[CustomKFoldCrossValidator, StratifiedGroupKFoldSplit]],
+    data: pd.DataFrame,
+    model,
+    preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
+    metric_fns: List[Callable[[np.ndarray, np.ndarray], float]],
+    n_repeats: int = 5,
+    random_state: int = 42,
+) -> CrossValidationMetrics:
+    """
+    Perform repeated cross-validation with different random seeds.
 
     Parameters:
     - all_fold_metrics: A list of lists, each sublist contains computed metrics for each fold.
+    - kf_class: The KFold or similar cross-validator class.
+    - data: The dataset to be used.
+    - model: The regression model to be trained.
+    - preprocess_fn: A function that takes train and test data DataFrames and returns
+                     the tuples (X_train, y_train) and (X_test, y_test).
+    - metric_fns: List of functions to compute the metrics, each takes two arguments: y_true and y_pred.
+    - n_repeats: Number of times to repeat the cross-validation.
+    - random_state: The random seed for reproducibility.
+
+    Returns:
+        CrossValidationMetrics: An object containing the averaged cross-validation metrics.
     """
-    return CrossValidationMetrics(all_fold_metrics)
+    all_metrics = []
+
+    for i in range(n_repeats):
+        new_kf_class = get_kf(random_state=random_state + i)
+        fold_metrics = perform_cross_validation(
+            kf=new_kf_class,
+            data=data,
+            model=model,
+            preprocess_fn=preprocess_fn,
+            metric_fns=metric_fns,
+        )
+        all_metrics.extend(fold_metrics)
+
+    return CrossValidationMetrics(all_metrics)
