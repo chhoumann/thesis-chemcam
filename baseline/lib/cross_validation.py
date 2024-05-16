@@ -217,6 +217,8 @@ def perform_cross_validation(
     all_fold_metrics: List[List[float]] = []
 
     for i, (train_data, test_data) in enumerate(kf.split(data)):
+        print(f"Running fold {i+1} with size: {len(train_data)} train and {len(test_data)} test")
+
         X_train, y_train, X_test, y_test = preprocess_fn(train_data, test_data)
 
         model.fit(X_train, y_train)

@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List
 
+
+import pandas as pd
 import mlflow
 import optuna
 import requests
@@ -31,7 +33,7 @@ from sklearn.pipeline import Pipeline
 from lib import full_flow_dataloader
 from lib.config import AppConfig
 from lib.cross_validation import (
-    CustomKFoldCrossValidator,
+    StratifiedGroupKFoldSplit,
     get_cross_validation_metrics,
     perform_cross_validation,
 )
@@ -174,6 +176,19 @@ def instantiate_scaler(trial, scaler_selector, logger):
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
 
+def foo(target: str):
+    train_full, test_full = full_flow_dataloader.load_full_flow_data(
+        load_cache_if_exits=True, average_shots=True
+    )
+
+    full_data = pd.concat([train_full, test_full], axis=0)
+
+    kf = StratifiedGroupKFoldSplit(n_splits=5, group_by="Sample Name", random_state=42, target=target)
+    train, test = kf.split(full_data)[0]
+
+    return train, test
+
+
 def combined_objective(trial, oxide, model_selector):
     try:
         with mlflow.start_run(nested=True) as run:
@@ -224,15 +239,20 @@ def combined_objective(trial, oxide, model_selector):
 
             # Drop all oxides except for the current oxide
             drop_cols = ["ID", "Sample Name"] + major_oxides
-            train_full, test_full = full_flow_dataloader.load_full_flow_data(
-                load_cache_if_exits=True, average_shots=True
-            )
+            # train_full, test_full = full_flow_dataloader.load_full_flow_data(
+            #     load_cache_if_exits=True, average_shots=True
+            # )
+            train, test = foo(oxide)
 
-            kf = CustomKFoldCrossValidator(k=5, group_by="Sample Name", random_state=42)
+            # Log the size of the train and test set to mlflow
+            mlflow.log_param("train_size", len(train))
+            mlflow.log_param("test_size", len(test))
+
+            kf = StratifiedGroupKFoldSplit(n_splits=5, group_by="Sample Name", random_state=42, target=oxide)
             preprocess_fn = get_preprocess_fn(preprocessor, oxide, drop_cols=drop_cols)
 
             cv_fold_metrics = perform_cross_validation(
-                data=train_full,
+                data=train,
                 model=model,  # type: ignore
                 preprocess_fn=preprocess_fn,
                 metric_fns=[rmse_metric, std_dev_metric],
@@ -242,7 +262,7 @@ def combined_objective(trial, oxide, model_selector):
             cv_metrics = get_cross_validation_metrics(cv_fold_metrics)
             mlflow.log_metrics(cv_metrics.as_dict())
 
-            X_train, y_train, X_test, y_test = preprocess_fn(train_full, test_full)
+            X_train, y_train, X_test, y_test = preprocess_fn(train, test)
 
             # Model training and evaluation
             model.fit(X_train, y_train)
