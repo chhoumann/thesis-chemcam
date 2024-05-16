@@ -4,15 +4,29 @@ The primary objective of this research is to enhance computational methods for t
 The input to such models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths. This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}. The wavelength intensities are quantified in units of \\ photon/shot/mm\textsuperscript{2}/sr/nm.
 
 Formally, we have:
+\newcounter{listitem}
 \begin{itemize}[topsep=0pt]
+    \refstepcounter{listitem}
     \item \textbf{Concentration Matrix} $\;\mathbf{C[\chi, o]}$: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across samples $\chi$. Here, $\chi$ represents the index for samples and $o$ denotes the index for oxides (different chemical compounds being quantified).
+    \label{matrix:concentration}
+
+    \refstepcounter{listitem}
     \item \textbf{Spectrometer Matrix} $\;\mathbf{S[w, \gamma]}$: A Boolean matrix that links wavelengths $w$ to spectrometers $\gamma$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $\gamma$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
+    \label{matrix:spectrometer}
+
+    \refstepcounter{listitem}
     \item \textbf{Intensity Matrix} $\;\mathbf{I[\chi, l, s, w]}$: Holds the spectral intensity data, where each entry represents the intensity recorded for a sample $\chi$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the sample where the measurement is taken.
+    \label{matrix:intensity}
+
+    \refstepcounter{listitem}
     \item \textbf{Averaged Intensity Matrix} $\;\mathbf{A[\chi, l, w]}$: Derived from matrix $\mathbf{I}$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
     \[
     A[\chi, l, w] = \frac{1}{|S|} \sum_{s \in S} I[\chi, l, s, w].
     \]
-    \item \textbf{Masked Intensity Matrix} $\;\mathbf{M[\chi, l, w]}$: The result of $\mathbf{A}$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+    \label{matrix:averaged_intensity}
+
+    \refstepcounter{listitem}
+    \item \textbf{Masked Intensity Matrix} $\;\mathbf{M[\chi, l, w]}$: The result of $\mathbf{A}$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.\label{matrix:masked_intensity}
 \end{itemize}
 
 The model outputs are the quantified chemical compositions of geological samples. 
