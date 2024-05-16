@@ -333,7 +333,8 @@ def main(
     - Run optimization with default settings (200 trials on all predefined oxides):
       `python optuna_run.py`
     """
-    sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
+    n_startup_trials = int(0.25 * n_trials)  # Reserve 25% of trials for exploration
+    sampler = TPESampler(n_startup_trials=n_startup_trials, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
 
