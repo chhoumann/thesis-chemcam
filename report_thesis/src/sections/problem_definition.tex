@@ -7,33 +7,30 @@ Formally, we have:
 \newcounter{listitem}
 \begin{itemize}[topsep=0pt]
     \refstepcounter{listitem}
-    \item \textbf{Concentration Matrix} $\;\mathbf{C[\chi, o]}$: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across samples $\chi$. Here, $\chi$ represents the index for samples and $o$ denotes the index for oxides (different chemical compounds being quantified).
+    \item \textbf{Concentration Matrix} $\;\mathbf{C}[\chi, o]$: This matrix denotes the chemical concentrations in weight percent for oxides indexed by $o$ across samples indexed by $\chi$. Here, $\chi$ represents the index for samples and $o$ denotes the index for oxides (different chemical compounds being quantified).
     \label{matrix:concentration}
 
     \refstepcounter{listitem}
-    \item \textbf{Spectrometer Matrix} $\;\mathbf{S[w, \gamma]}$: A Boolean matrix that links wavelengths $w$ to spectrometers $\gamma$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $\gamma$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
-    \label{matrix:spectrometer}
-
-    \refstepcounter{listitem}
-    \item \textbf{Intensity Matrix} $\;\mathbf{I[\chi, l, s, w]}$: Holds the spectral intensity data, where each entry represents the intensity recorded for a sample $\chi$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the sample where the measurement is taken.
+    \item \textbf{Intensity Matrix} $\;\mathbf{I}[\chi, l, s, \lambda]$: Holds the spectral intensity data, where each entry represents the intensity recorded for a sample $\chi$ at location $l$, for shot $s$, at wavelength $\lambda$. $l$ indicates the location on the sample where the measurement is taken, and $\lambda$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers).
     \label{matrix:intensity}
 
     \refstepcounter{listitem}
-    \item \textbf{Averaged Intensity Matrix} $\;\mathbf{A[\chi, l, w]}$: Derived from matrix $\mathbf{I}$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
+    \item \textbf{Averaged Intensity Matrix} $\;\mathbf{A}[\chi, l, \lambda]$: Derived from matrix $\mathbf{I}$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
     \[
-    A[\chi, l, w] = \frac{1}{|S|} \sum_{s \in S} I[\chi, l, s, w].
+    A[\chi, l, \lambda] = \frac{1}{|S|} \sum_{s \in S} I[\chi, l, s, \lambda].
     \]
     \label{matrix:averaged_intensity}
 
     \refstepcounter{listitem}
-    \item \textbf{Masked Intensity Matrix} $\;\mathbf{M[\chi, l, w]}$: The result of $\mathbf{A}$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.\label{matrix:masked_intensity}
+    \item \textbf{Masked Intensity Matrix} $\;\mathbf{M}[\chi, l, \lambda]$: The result of $\mathbf{A}$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+    \label{matrix:masked_intensity}
 \end{itemize}
 
 The model outputs are the quantified chemical compositions of geological samples. 
 These are primarily the concentrations of major elements, represented in weight percentage. 
 While background elements are also present, our current analysis does not quantify these. 
-Our goal is to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{|o|}$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $|o|$ denotes the number of target oxides in the Concentration Matrix $\mathbf{C[\chi, o]}$.
-This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^{|o|}$ of estimated oxide concentrations. The vector $\mathbf{x}$ is derived from matrix $\mathbf{M}$, representing processed spectral data:
+Our goal is to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $n_o$ denotes the number of target oxides in the Concentration Matrix $\mathbf{C}[\chi, o]$.
+This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^{n_o}$ of estimated oxide concentrations. The vector $\mathbf{x}$ is derived from matrix $\mathbf{M}$, representing processed spectral data:
 \[
 \mathbf{v} = \mathcal{F}(\mathbf{x}).
 \]
