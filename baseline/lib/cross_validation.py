@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import BaseCrossValidator, KFold, StratifiedGroupKFold
 
+from lib.outlier_removal import global_local_outlier_removal
+from lib.reproduction import major_oxides
+
 
 def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in_train=True):
     # Sort the data by the target column
@@ -32,17 +35,42 @@ def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in
 
 
 def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, random_state=None):
+    """
+    Perform custom k-fold cross-validation with outlier removal.
+
+    Parameters:
+    - data: The input data to be split into train and test sets.
+    - k: The number of folds for cross-validation.
+    - group_by: The column name to group the data by.
+    - target: The target column name for sorting and assigning folds.
+    - random_state: The random seed for reproducibility.
+
+    Returns:
+    - folds_custom: List of tuples containing train and validation sets for each fold.
+    - test_data: The test set.
+    """
     # Sort and assign folds
     data = sort_and_assign_folds(data, group_by, target, n_splits=k)
 
-    # Perform cross-validation
-    folds_custom = []
-    for i in range(k):
-        train_data = data[data["fold"] != i]
-        test_data = data[data["fold"] == i]
-        folds_custom.append((train_data, test_data))
+    # Identify the test fold (the one with the highest fold number)
+    test_fold_number = k - 1
+    test_data = data[data["fold"] == test_fold_number]
 
-    return folds_custom
+    train_data = data[data["fold"] != test_fold_number]
+    outlier_mask = global_local_outlier_removal(train_data, drop_cols=["Sample Name", "ID", "fold"] + major_oxides)
+    train_data = train_data[~outlier_mask]
+
+    # Perform cross-validation excluding the test fold
+    folds_custom = []
+    for i in range(k - 1):
+        validation_data = train_data[train_data["fold"] == i]
+        folds_custom.append((train_data[train_data["fold"] != i], validation_data))
+
+    # Remove the 'fold' column from all folds and test data
+    folds_custom = [(train.drop(columns=["fold"]), val.drop(columns=["fold"])) for train, val in folds_custom]
+    test_data = test_data.drop(columns=["fold"])
+
+    return folds_custom, test_data
 
 
 def grouped_train_test_split(data, test_size: float, group_by: str, random_state=None):
