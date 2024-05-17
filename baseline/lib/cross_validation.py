@@ -29,6 +29,17 @@ def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in
         # Set extreme values to training folds (0 to n_splits-2)
         unique_samples.loc[extremes.index, "fold"] = np.random.randint(0, n_splits - 1, len(extremes))
 
+    # Ensure no overlap in samples between folds
+    for fold in range(n_splits):
+        fold_samples = unique_samples[unique_samples["fold"] == fold][group_by]
+        for other_fold in range(fold + 1, n_splits):
+            other_fold_samples = unique_samples[unique_samples["fold"] == other_fold][group_by]
+            overlap = set(fold_samples).intersection(set(other_fold_samples))
+            if overlap:
+                raise ValueError(f"Overlap detected between fold {fold} and fold {other_fold}: {overlap}")
+
+    print(f"No overlap between folds detected ({len(overlap)} samples)")
+
     # Merge fold assignments back to the original data
     data = data.merge(unique_samples[[group_by, "fold"]], on=group_by, how="left")
     return data
@@ -258,7 +269,7 @@ def perform_cross_validation(
     model,
     preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
     metric_fns: List[Callable[[np.ndarray, np.ndarray], float]],
-    n_jobs: int = 3
+    n_jobs: int = 3,
 ) -> List[List[float]]:
     """
     Perform cross-validation using a custom preprocessing function and multiple metric functions.
@@ -295,7 +306,7 @@ def perform_cross_validation(
         fold_metrics = [metric_fn(y_test, y_pred) for metric_fn in metric_fns]
         return fold_metrics
 
-    all_fold_metrics: List[List[float]] = Parallel(n_jobs=n_jobs)( # type:ignore
+    all_fold_metrics: List[List[float]] = Parallel(n_jobs=n_jobs)(  # type:ignore
         delayed(process_fold)(i, train_data, test_data) for i, (train_data, test_data) in enumerate(folds)
     )
 
