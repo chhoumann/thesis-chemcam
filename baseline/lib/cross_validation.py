@@ -56,15 +56,12 @@ def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, 
     test_fold_number = k - 1
     test_data = data[data["fold"] == test_fold_number]
 
-    train_data = data[data["fold"] != test_fold_number]
-    outlier_mask = global_local_outlier_removal(train_data, drop_cols=["Sample Name", "ID", "fold"] + major_oxides)
-    train_data = train_data[~outlier_mask]
-
     # Perform cross-validation excluding the test fold
     folds_custom = []
     for i in range(k - 1):
-        validation_data = train_data[train_data["fold"] == i]
-        folds_custom.append((train_data[train_data["fold"] != i], validation_data))
+        train_data = data[data["fold"] != i]
+        validation_data = data[data["fold"] == i]
+        folds_custom.append((train_data, validation_data))
 
     # Remove the 'fold' column from all folds and test data
     folds_custom = [(train.drop(columns=["fold"]), val.drop(columns=["fold"])) for train, val in folds_custom]
@@ -261,6 +258,7 @@ def perform_cross_validation(
     model,
     preprocess_fn: Callable[[pd.DataFrame, pd.DataFrame], tuple],
     metric_fns: List[Callable[[np.ndarray, np.ndarray], float]],
+    n_jobs: int = 3
 ) -> List[List[float]]:
     """
     Perform cross-validation using a custom preprocessing function and multiple metric functions.
@@ -297,7 +295,7 @@ def perform_cross_validation(
         fold_metrics = [metric_fn(y_test, y_pred) for metric_fn in metric_fns]
         return fold_metrics
 
-    all_fold_metrics: List[List[float]] = Parallel(n_jobs=-1)(
+    all_fold_metrics: List[List[float]] = Parallel(n_jobs=n_jobs)( # type:ignore
         delayed(process_fold)(i, train_data, test_data) for i, (train_data, test_data) in enumerate(folds)
     )
 
