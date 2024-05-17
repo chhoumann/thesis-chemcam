@@ -179,10 +179,9 @@ def get_data(target: str):
     train_full, test_full = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
     full_data = pd.concat([train_full, test_full], axis=0)
 
-    folds, test = custom_kfold_cross_validation_new(
+    folds, train, test = custom_kfold_cross_validation_new(
         data=full_data, k=5, group_by="Sample Name", target=target, random_state=42
     )
-    train = pd.concat([folds[0][0], folds[0][1]])
 
     return folds, train, test
 

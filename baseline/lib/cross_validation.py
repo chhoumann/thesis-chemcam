@@ -38,8 +38,6 @@ def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in
             if overlap:
                 raise ValueError(f"Overlap detected between fold {fold} and fold {other_fold}: {overlap}")
 
-    print(f"No overlap between folds detected ({len(overlap)} samples)")
-
     # Merge fold assignments back to the original data
     data = data.merge(unique_samples[[group_by, "fold"]], on=group_by, how="left")
     return data
@@ -67,18 +65,22 @@ def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, 
     test_fold_number = k - 1
     test_data = data[data["fold"] == test_fold_number]
 
+    # Create the training set by excluding the test fold
+    train_data = data[data["fold"] != test_fold_number]
+
     # Perform cross-validation excluding the test fold
     folds_custom = []
     for i in range(k - 1):
-        train_data = data[data["fold"] != i]
-        validation_data = data[data["fold"] == i]
-        folds_custom.append((train_data, validation_data))
+        train_val_data = data[data["fold"] != i]
+        test_val_data = data[data["fold"] == i]
+        folds_custom.append((train_val_data, test_val_data))
 
-    # Remove the 'fold' column from all folds and test data
+    # Remove the 'fold' column from all folds, train data, and test data
     folds_custom = [(train.drop(columns=["fold"]), val.drop(columns=["fold"])) for train, val in folds_custom]
+    train_data = train_data.drop(columns=["fold"])
     test_data = test_data.drop(columns=["fold"])
 
-    return folds_custom, test_data
+    return folds_custom, train_data, test_data
 
 
 def grouped_train_test_split(data, test_size: float, group_by: str, random_state=None):
