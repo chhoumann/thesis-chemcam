@@ -8,21 +8,6 @@ import requests
 import typer
 from optuna.pruners import HyperbandPruner
 from optuna.samplers import TPESampler
-from sklearn.metrics import mean_squared_error
-from sklearn.pipeline import Pipeline
-
-from lib import full_flow_dataloader
-from lib.config import AppConfig
-from lib.cross_validation import (
-    StratifiedGroupKFoldSplit,
-    custom_kfold_cross_validation_new,
-    get_cross_validation_metrics,
-    perform_cross_validation,
-)
-from lib.get_preprocess_fn import get_preprocess_fn
-from lib.metrics import rmse_metric, std_dev_metric
-from lib.reproduction import major_oxides
-
 from optuna_models import (
     instantiate_extra_trees,
     instantiate_gbr,
@@ -41,6 +26,19 @@ from optuna_preprocessors import (
     instantiate_robust_scaler,
     instantiate_standard_scaler,
 )
+from sklearn.metrics import mean_squared_error
+from sklearn.pipeline import Pipeline
+
+from lib import full_flow_dataloader
+from lib.config import AppConfig
+from lib.cross_validation import (
+    custom_kfold_cross_validation_new,
+    get_cross_validation_metrics,
+    perform_cross_validation,
+)
+from lib.get_preprocess_fn import get_preprocess_fn
+from lib.metrics import rmse_metric, std_dev_metric
+from lib.reproduction import major_oxides
 
 mlflow.set_tracking_uri(AppConfig().mlflow_tracking_uri)
 optuna.logging.set_verbosity(optuna.logging.ERROR)
@@ -177,15 +175,16 @@ def instantiate_scaler(trial, scaler_selector, logger):
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
 
-def foo(target: str):
+def get_data(target: str):
     train_full, test_full = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
-
     full_data = pd.concat([train_full, test_full], axis=0)
 
-    kf = StratifiedGroupKFoldSplit(n_splits=5, group_by="Sample Name", random_state=42, target=target)
-    train, test = kf.split(full_data)[0]
+    folds, test = custom_kfold_cross_validation_new(
+        data=full_data, k=5, group_by="Sample Name", target=target, random_state=42
+    )
+    train = pd.concat([folds[0][0], folds[0][1]])
 
-    return train, test
+    return folds, train, test
 
 
 def combined_objective(trial, oxide, model_selector):
@@ -236,19 +235,7 @@ def combined_objective(trial, oxide, model_selector):
 
             preprocessor = Pipeline(steps)
 
-            # Drop all oxides except for the current oxide
-            drop_cols = ["ID", "Sample Name"] + major_oxides
-            train_full, test_full = full_flow_dataloader.load_full_flow_data(
-                load_cache_if_exits=True, average_shots=True
-            )
-            full_data = pd.concat([train_full, test_full], axis=0)
-
-            # stratified_kf = StratifiedGroupKFoldSplit(n_splits=5, group_by="Sample Name", random_state=42, target=oxide)
-            # folds = stratified_kf.split(full_data)
-            folds, test = custom_kfold_cross_validation_new(
-                data=full_data, k=5, group_by="Sample Name", target=oxide, random_state=42
-            )
-            train = pd.concat([folds[0][0], folds[0][1]])
+            folds, train, test = get_data(oxide)
 
             # Log the size of the train and test set to mlflow
             mlflow.log_param("train_size", len(train))
@@ -258,6 +245,7 @@ def combined_objective(trial, oxide, model_selector):
                 mlflow.log_param(f"fold_{i+1}_train_size", len(train_fold))
                 mlflow.log_param(f"fold_{i+1}_val_size", len(val_fold))
 
+            drop_cols = ["ID", "Sample Name"] + major_oxides
             preprocess_fn = get_preprocess_fn(preprocessor, oxide, drop_cols=drop_cols)
 
             cv_fold_metrics = perform_cross_validation(
