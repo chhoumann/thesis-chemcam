@@ -243,24 +243,26 @@ def combined_objective(trial, oxide, model_selector):
                 load_cache_if_exits=True, average_shots=True
             )
             full_data = pd.concat([train_full, test_full], axis=0)
-            # train, test = foo(oxide)
 
             # stratified_kf = StratifiedGroupKFoldSplit(n_splits=5, group_by="Sample Name", random_state=42, target=oxide)
             # folds = stratified_kf.split(full_data)
-            folds = custom_kfold_cross_validation_new(
+            folds, test = custom_kfold_cross_validation_new(
                 data=full_data, k=5, group_by="Sample Name", target=oxide, random_state=42
             )
-            train, test = folds[0]
-            cv_folds = folds[1:]
+            train = pd.concat([folds[0][0], folds[0][1]])
 
             # Log the size of the train and test set to mlflow
             mlflow.log_param("train_size", len(train))
             mlflow.log_param("test_size", len(test))
+            # Log the size of each fold to mlflow
+            for i, (train_fold, val_fold) in enumerate(folds):
+                mlflow.log_param(f"fold_{i+1}_train_size", len(train_fold))
+                mlflow.log_param(f"fold_{i+1}_val_size", len(val_fold))
 
             preprocess_fn = get_preprocess_fn(preprocessor, oxide, drop_cols=drop_cols)
 
             cv_fold_metrics = perform_cross_validation(
-                folds=cv_folds,
+                folds=folds,
                 model=model,  # type: ignore
                 preprocess_fn=preprocess_fn,
                 metric_fns=[rmse_metric, std_dev_metric],
