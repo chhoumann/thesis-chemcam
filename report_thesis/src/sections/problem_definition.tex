@@ -28,7 +28,6 @@ Formally, the problem can be described as follows:
     \label{matrix:masked_intensity}
 \end{itemize}
 
-The model outputs are the quantified chemical compositions of geological samples, primarily the concentrations of major elements, represented in weight percentage.
 The task involves constructing a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $n_o$ denotes the number of target oxides in the Concentration Matrix $\mathbf{C}[\chi, o]$.
 This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^{n_o}$ of estimated oxide concentrations.
 The vector $\mathbf{x}$ is derived from matrix $\mathbf{M}$, representing processed spectral data:
