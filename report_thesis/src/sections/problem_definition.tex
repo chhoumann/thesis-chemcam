@@ -1,11 +1,21 @@
 \section{Problem Definition}\label{sec:problem_definition}
-The primary objective of this research is to accurately and robustly quantify the chemical compositions of Martian geological samples using \gls{libs} spectral data.
-This task involves significant challenges, including the high dimensionality of spectral data, multicollinearity, matrix effects, and limited data availability.
+The objective of this research is to develop and validate a computational methodology to enhance the accuracy and robustness of predicting major oxide compositions from \gls{libs} data.
+Such quantification of elements in soil samples from \gls{libs} data presents several significant challenges, including the high dimensionality of spectral data, multicollinearity, matrix effects, and limited data availability.
 
+A fundamental premise of this research posits that by effectively addressing these challenges, the accuracy and robustness of predicting elemental concentrations from \gls{libs} data can be significantly enhanced. This assumption is supported by several key studies in the field.
+For instance, \citet{andersonPostlandingMajorElement2022} demonstrated that preprocessing, normalization, and the use of advanced machine learning models significantly improved the prediction accuracy of major oxides from \gls{libs} data collected by the SuperCam instrument on the Mars 2020 Perseverance rover. Their work highlights the importance of selecting appropriate models and preprocessing techniques to handle high-dimensional spectral data effectively.
+Similarly, \citet{song_DF-K-ELM} showed that incorporating domain knowledge into machine learning models enhances both the interpretability and performance of \gls{libs} quantification. By addressing challenges such as high dimensionality and multicollinearity, their approach improved the accuracy and generalizability of the models across different tasks.
+The effectiveness of dimensionality reduction techniques in improving model performance was highlighted by \citet{rezaei_dimensionality_reduction}, who demonstrated that methods like \gls{pca} can manage noise and computational inefficiency in high-dimensional \gls{libs} data. This supports the notion that reducing data dimensionality can lead to more stable and accurate predictions.
+Furthermore, \citet{jeonEffectsFeatureEngineering2024} emphasized the importance of feature engineering in enhancing model robustness, particularly under varying measurement conditions. This is crucial for extraterrestrial applications where consistent and reliable predictions are necessary despite the challenges posed by the environment.
+Lastly, \citet{sunMachineLearningTransfer2021} demonstrated the efficacy of transfer learning in overcoming matrix effects and improving model robustness for rock classification on Mars. Their findings suggest that similar improvements can be achieved in oxide quantification by leveraging knowledge from related domains.
+These studies collectively provide a strong foundation for our assumption that addressing the identified challenges will lead to significant improvements in the accuracy and robustness of predicting elemental concentrations from \gls{libs} data.
+
+\subsection{Quantification based on \gls{libs} data}
 \gls{libs} spectral data provides intensity readings across a spectrum of wavelengths in the form of Clean, Calibrated Spectra \cite{andersonImprovedAccuracyQuantitative2017}, as described by \citet{wiensPreflightCalibrationInitial2013}.
 The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
 
-Formally, the problem can be described as follows:
+The formal definition of the problem is as follows.
+In a \gls{libs} dataset, we have:
 \newcounter{listitem}
 \begin{itemize}[topsep=0pt]
     \refstepcounter{listitem}
@@ -22,21 +32,43 @@ Formally, the problem can be described as follows:
     A[\chi, l, \lambda] = \frac{1}{|S|} \sum_{s \in S} I[\chi, l, s, \lambda].
     \]
     \label{matrix:averaged_intensity}
-
-    \refstepcounter{listitem}
-    \item \textbf{Masked Intensity Matrix} $\;\mathbf{M}[\chi, l, \lambda]$: The result of $\mathbf{A}$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
-    \label{matrix:masked_intensity}
 \end{itemize}
 
-The task involves constructing a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, where $N$ represents the dimensionality of the processed \gls{libs} signals and $n_o$ denotes the number of target oxides in the Concentration Matrix $\mathbf{C}[\chi, o]$.
-This function maps a processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^{n_o}$ of estimated oxide concentrations.
-The vector $\mathbf{x}$ is derived from matrix $\mathbf{M}$, representing processed spectral data:
+The primary input to our computational models is the processed \gls{libs} spectral data.
+Formally, we have:
+\begin{itemize}
+    \item \textbf{Masked Intensity Matrix} $\mathbf{M}[\chi, l, \lambda]$: This matrix represents the spectral intensity data after applying wavelength-specific masks to the Averaged Intensity Matrix $\mathbf{A}$. It serves as the main input to the models.
+    \item \textbf{Feature Vectors} $\mathbf{x} \in \mathbb{R}^N$: These vectors are extracted from the Masked Intensity Matrix $\mathbf{M}$ and represent the processed \gls{libs} signals. Each feature vector corresponds to a sample and contains $N$ dimensions, where $N$ is the number of relevant spectral features.
+\end{itemize}
+
+The outputs of the computational models are the predicted concentrations of major oxides in the samples.
+These outputs are represented as vectors of estimated oxide concentrations:
+
+\begin{itemize}
+    \item \textbf{Estimated Concentration Vectors} $\mathbf{v} \in \mathbb{R}^{n_o}$: Each vector $\mathbf{v}$ contains the predicted concentrations for $n_o$ target oxides. These predictions are derived from the mapping function $\mathcal{F}$ applied to the feature vectors $\mathbf{x}$.
+\end{itemize}
+
+The task of \gls{libs}-based quantification involves training the mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$ to accurately predict the oxide concentrations from the processed \gls{libs} signals.
+To evaluate the performance of these models, we will use the \gls{rmse} to measure accuracy and the sample standard deviation of prediction errors to assess robustness.
+We define accuracy as the ability of a model to predict the composition of major oxides in geological samples, while robustness refers to the stability of these predictions across samples.
+
+The metric used to evaluate the accuracy of the models is the Root Mean Squared Error (RMSE):
 \[
-\mathbf{v} = \mathcal{F}(\mathbf{x}).
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
 \]
+where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. This measure quantifies the average magnitude of the prediction error across all predicted values.
+
+Robustness is evaluated using the sample standard deviation of prediction errors:
+\[
+\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
+\]
+where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
+A lower standard deviation indicates a more robust model across different samples.
 
 \subsection{Challenges}
-Quantifying chemical compositions from \gls{libs} spectral data poses significant challenges:
+As mentioned, quantifying chemical compositions from \gls{libs} spectral data involves several significant challenges that must be addressed to ensure accurate and robust predictions.
+Several of the following challenges can be addressed through known methodologies, such as sample preprocessing, ensuring the repeatability of observations, and selecting calibration samples that are matrix-matched to specific targets of interest\cite{andersonPostlandingMajorElement2022}.
+However, these strategies are not feasible for the extraterrestrial applications relevant to this research.
 
 \subsubsection{Data Dimensionality}
 The large number of dimensions, as seen by having many wavelengths $\lambda$ in the Intensity Matrix $\mathbf{I}[\chi, l, s, \lambda]$, leads to problems such as noise, computational inefficiency, and instability in model predictions.
@@ -52,29 +84,24 @@ The large number of dimensions, as seen by having many wavelengths $\lambda$ in 
 The overlapping nature of emission lines from different elements results in high correlation between intensity readings at different wavelengths, making it difficult to extract independent spectral features necessary for accurate quantitative analysis \cite{andersonImprovedAccuracyQuantitative2017}.
 
 \subsubsection{Matrix Effects}
-Matrix effects refer to variations in the intensity of emission lines of an element independent of its concentration, arising from the complex interplay of various physical processes within the plasma generated by the \gls{libs} technique. These effects can significantly alter emission intensities, complicating the extraction of accurate and independent spectral features. This makes it challenging to precisely map the processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^{n_o}$ of estimated oxide concentrations, impacting the reliability of the predicted chemical compositions \cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
+Matrix effects refer to variations in the intensity of emission lines of an element independent of its concentration, arising from the complex interplay of various physical processes within the plasma generated by the \gls{libs} technique. These effects can significantly alter emission intensities, complicating the extraction of accurate and independent spectral features. This makes it challenging to precisely map the processed \gls{libs} signal vector $\mathbf{x} \in \mathbb{R}^N$ to a vector $\mathbf{v} \in \mathbb{R}^{n_o}$ of estimated oxide concentrations \cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
+Matrix effects, along with other physical processes, can induce nonlinearity in the mapping function, thereby increasing the complexity of the task\cite{liuRecentAdvancesMachine2024}.
 
 \subsubsection{Data Availability}
 Due to the high cost of data collection, datasets are often small. This limits the number of samples available for evaluation, affecting the generalizability and robustness of the models \cite{p9_paper}.
 
-Addressing these challenges requires the development of advanced computational models designed to improve the accuracy and robustness of chemical composition analysis with \gls{libs} data. 
-
 \subsection{Proposed Approach}
-Accuracy in this context is defined as the ability of a model to predict the composition of major oxides in Martian geological samples, while robustness refers to the stability of these predictions across different samples and oxides.
-The metric used to evaluate the accuracy of the models is the Root Mean Squared Error (RMSE):
-\[
-\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
-\]
-where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. This measure quantifies the average magnitude of the prediction error across all predicted values.
+To address the challenges in predicting major oxide compositions from \gls{libs} data, we propose the development of advanced computational models capable of effectively handling the multifaceted challenges arising from the high dimensionality of spectral data, multicollinearity, matrix effects, and limited data availability.
+These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies. 
 
-Robustness is evaluated using the sample standard deviation of prediction errors:
-\[
-\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
-\]
-where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error. A lower standard deviation indicates a more robust model across different samples.
+Our proposed approach aims to address these challenges by leveraging state-of-the-art machine learning models, dimensionality reduction techniques, and feature engineering.
+By preprocessing the spectral data, we can enhance the signal quality and reduce noise.
+The development of robust models that can generalize well across different samples and conditions is crucial, particularly for extraterrestrial applications where data collection is constrained.
 
-\textbf{Proposed Approach:} To address the challenges in predicting major oxide compositions from \gls{libs} data, we propose to develop computational models capable of effectively accounting for and mitigating the complexities inherent in \gls{libs} data.
-Our models will take as input a matrix in the form of $E$, as well as ground truth data in the form of $A$, to construct a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_{o}}$, mapping processed \gls{libs} signals to estimated oxide concentrations.
+The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness.
+These metrics will provide a comprehensive assessment of the models' performance in predicting the concentrations of major oxides in geological samples.
+
+Ultimately, this research aims to contribute to the field of planetary science by improving the reliability and accuracy of \gls{libs}-based quantification methods, thereby enhancing our understanding of Martian geology and its potential for past habitability.
 
 \subsection{Motivating Example: NASA's Mars Missions}
 NASA's exploration of Mars, beginning with the Viking missions in the 1970s, has progressively deepened our understanding of Mars \cite{marsnasagov_vikings}.
