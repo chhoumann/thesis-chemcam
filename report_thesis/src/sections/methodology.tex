@@ -8,9 +8,16 @@ Similarly to our previous work \cite{p9_paper}, we used the publicly available \
 \gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis. 
 The full description of this preprocessing can be found in \citet{wiensPreFlight3}.
 
-While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing. Specifically, the data are still noisy at the spectrometer edges, and this noise has to be masked out. The data also contains negative values, which are not physically meaningful and need to be zeroed out.
-For a more detailed description of the data and the preprocessing steps, we refer the reader to \citet{p9_paper}, as data preparation follows the same procedure detailed in that work.
+While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing.
+Specifically, the data are still noisy at the spectrometer edges. These edges are defined as the boundaries of each of the three spectrometers, who collectively cover the \gls{uv}, \gls{vio}, and \gls{vnir} light spectrum.
+These noisy edges are in the following ranges: 240.811 — 246.635, 338.457 — 340.797, 382.138 — 387.859, 473.184 — 492.427, and 849 — 905.574 nm .
+In addition to being noisy regions, they also do not contain diagnostic peaks related to the major oxides. 
+Therefore, they are masked out to improve the accuracy and reliability of the quantitative analysis\citet{cleggRecalibrationMarsScience2017}.
 
+Additionally, as a result of the aforementioned preprossing applied to the raw \gls{libs} data, negative values are present in the \gls{ccs} data.
+These negative values are not physically meaningful, since you cannot have negative light intensity. Since they are assumed to be calculation errors, these values are set to zero rather than entirely removed, as they are still considered valuable information.
+
+% TODO: We are only using PLS part of the pipeline and we are doing crossvalidation. Therefore below section needs to be rewritten.
 Once preprocessed, the data was conventionally split into training and testing sets. 
 As detailed in \citet{p9_paper} and \citet{cleggRecalibrationMarsScience2017}, it is essential to include samples with extreme element compositions in the training set to ensure the model can generalize effectively.
 To incorporate these extreme values, the training set was constructed to include the two highest and two lowest samples from each oxide category.
