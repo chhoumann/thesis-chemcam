@@ -35,7 +35,7 @@ This differential performance prompted us to explore architectural frameworks th
 A particularly exciting discovery from our literature review was a study on the stacking and chaining of normalization methods initially aimed at classification contexts. 
 Inspired by these ideas, we explored the possibility of improving model performance by optimizing the preprocessing chain for each model, per oxide, in order to determine which normalization methods would be most beneficial.
 For this purpose, we considered the following preprocessing techniques: Min-Max Scaling, Standard Scaling, Robust Scaling, MaxAbs Scaling, Quantile Transformer and Power Transformer. 
-Additionally, we also considered dimensionality reduction techniques such as PCA and KernelPCA.
+Additionally, we also considered dimensionality reduction techniques such as \gls{pca} and \gls{kernel-pca}.
 Through experimentation, we identified which preprocessing techniques were most effective for each model and oxide. 
 Realizing the potential of this, we decided to further investigate how the predictive accuracy and robustness could be improved by combining the strengths of these models and preprocessing techniques.
 From our investigation, we determined that the stacking ensemble method seemed very promising and novel in the LIBS analysis field, leading us to select it as the primary method for our study.
