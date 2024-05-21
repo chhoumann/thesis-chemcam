@@ -1,10 +1,10 @@
 \section{Methodology}\label{sec:methodology}
-In this section, we outline the methodology used in this study to address the challenges identified in the problem definition. Our objective was to identify the most promising machine learning models and preprocessing techniques proposed from the literature, as outlined in Section~\ref{sec:related-work}, for predicting major oxide compositions from LIBS data.
+In this section, we outline the methodology used in this study to address the challenges identified in Section~\ref{sec:problem_definition}. Our objective was to identify the most promising machine learning models and preprocessing techniques proposed from the literature, as outlined in Section~\ref{sec:related-work}, for predicting major oxide compositions from \gls{libs} data.
 Then, using this knowledge, develop a pipeline that utilizes the strengths of these models and preprocessing techniques to improve prediction accuracy and robustness of the predictions.
 We first describe the datasets used, including their preparation and the method of splitting for model training. Next, we outline the preprocessing steps and the model selection process, followed by a detailed explanation of the experimental setup and evaluation metrics. Finally, we discuss our validation testing procedures and the approach taken to ensure unbiased final model evaluations.
 
 
-\subsection{Data Prepraration}
+\subsection{Data Preparation}
 Similarly to our previous work \citet{p9_paper}, we used the publicly available \gls{ccs} data.
 \gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis.
 The full description of this preprocessing can be found in \citet{wiensPreflightCalibrationInitial2013}.
@@ -107,7 +107,7 @@ All models demonstrated robust performance; however, \gls{gbr}, \gls{svr}, \gls{
 Notably, we observed model-specific strengths for certain oxides --- \gls{svr} was particularly effective for \ce{SiO2}, while \gls{gbr} excelled with \ce{FeO_T}.
 This differential performance prompted us to explore architectural frameworks that could systematically capitalize on the strengths of each model for specific oxides.
 
-A particularly exciting discovery from our literature review was a study on the stacking and chaining of normalization methods initially aimed at classification contexts.
+An interesting discovery from our literature review was a study on the stacking and chaining of normalization methods initially aimed at classification contexts.
 Inspired by these ideas, we explored the possibility of improving model performance by optimizing the preprocessing chain for each model, per oxide, in order to determine which normalization methods would be most beneficial.
 For this purpose, we considered the following preprocessing techniques: Min-Max Scaling, Standard Scaling, Robust Scaling, MaxAbs Scaling, Quantile Transformer and Power Transformer.
 Additionally, we also considered dimensionality reduction techniques such as \gls{pca} and \gls{kernel-pca}.
