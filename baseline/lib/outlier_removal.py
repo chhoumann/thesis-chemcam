@@ -5,7 +5,10 @@ from sklearn.cross_decomposition import PLSRegression
 
 
 import matplotlib
-matplotlib.use('agg')
+from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
+
+matplotlib.use("agg")
 
 
 def calculate_mahalanobis(x, mean, cov):
@@ -41,9 +44,7 @@ def identify_outliers(leverage, Q):
     distances = np.array([calculate_mahalanobis(point, mean, cov) for point in data])
 
     # Set threshold based on chi-square distribution for a 95% confidence interval
-    threshold = stats.chi2.ppf(
-        0.975, df=2
-    )  # df=2 because we have two dimensions (leverage and Q)
+    threshold = stats.chi2.ppf(0.975, df=2)  # df=2 because we have two dimensions (leverage and Q)
 
     # Identify outliers
     outliers = distances > threshold
@@ -74,3 +75,17 @@ def plot_leverage_residuals(leverage, Q, outliers, plot_file_path=None) -> None:
         fig.savefig(plot_file_path)
 
     plt.close(fig)
+
+
+def global_local_outlier_removal(train, drop_cols):
+    iso_forest = IsolationForest(contamination="auto", random_state=42)
+    iso_forest_labels = iso_forest.fit_predict(train.drop(drop_cols, axis=1))
+
+    lof = LocalOutlierFactor(n_neighbors=20, contamination="auto")
+    lof_labels = lof.fit_predict(train.drop(drop_cols, axis=1))
+
+    outlier_labels = {"iso_forest_labels": iso_forest_labels, "lof_labels": lof_labels}
+
+    combined_outlier_label = (outlier_labels["iso_forest_labels"] == -1) & (outlier_labels["lof_labels"] == -1)
+
+    return combined_outlier_label
