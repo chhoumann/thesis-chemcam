@@ -1,9 +1,9 @@
-import math
 from datetime import datetime
+from typing import List
 
 import mlflow
-import numpy as np
 import optuna
+import pandas as pd
 import requests
 import typer
 from optuna.pruners import HyperbandPruner
@@ -32,7 +32,7 @@ from sklearn.pipeline import Pipeline
 from lib import full_flow_dataloader
 from lib.config import AppConfig
 from lib.cross_validation import (
-    CustomKFoldCrossValidator,
+    custom_kfold_cross_validation_new,
     get_cross_validation_metrics,
     perform_cross_validation,
 )
@@ -106,13 +106,13 @@ def champion_callback(study, frozen_trial, oxide, model):
                     / (sum(best_trial.values) / len(best_trial.values))
                 ) * 100
                 message = (
-                    f"{oxide} | Trial {frozen_trial.number} achieved avg RMSE_CV/STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` with "
+                    f"{oxide} | Trial {frozen_trial.number} achieved avg of RMSE_CV and STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` with "
                     f"{improvement_percent:.4f}% improvement using {model_type}.\n"
                     f"{cmn}"
                 )
             else:
                 message = (
-                    f"{oxide} | Initial trial {frozen_trial.number} achieved avg RMSE_CV/STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` using {model_type}.\n"
+                    f"{oxide} | Initial trial {frozen_trial.number} achieved avg of RMSE_CV and STD_DEV_CV: `{sum(frozen_trial.values) / len(frozen_trial.values):.4f}` using {model_type}.\n"
                     f"{cmn}"
                 )
 
@@ -175,6 +175,17 @@ def instantiate_scaler(trial, scaler_selector, logger):
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
 
+def get_data(target: str):
+    train_full, test_full = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
+    full_data = pd.concat([train_full, test_full], axis=0)
+
+    folds, train, test = custom_kfold_cross_validation_new(
+        data=full_data, k=5, group_by="Sample Name", target=target, random_state=42
+    )
+
+    return folds, train, test
+
+
 def combined_objective(trial, oxide, model_selector):
     try:
         with mlflow.start_run(nested=True) as run:
@@ -223,34 +234,37 @@ def combined_objective(trial, oxide, model_selector):
 
             preprocessor = Pipeline(steps)
 
-            # Drop all oxides except for the current oxide
-            drop_cols = ["ID", "Sample Name"] + major_oxides
-            train_full, test_full = full_flow_dataloader.load_full_flow_data(
-                load_cache_if_exits=True, average_shots=True
-            )
+            folds, train, test = get_data(oxide)
 
-            kf = CustomKFoldCrossValidator(k=5, group_by="Sample Name", random_state=42)
+            # Log the size of the train and test set to mlflow
+            mlflow.log_param("train_size", len(train))
+            mlflow.log_param("test_size", len(test))
+            # Log the size of each fold to mlflow
+            for i, (train_fold, val_fold) in enumerate(folds):
+                mlflow.log_param(f"fold_{i+1}_train_size", len(train_fold))
+                mlflow.log_param(f"fold_{i+1}_val_size", len(val_fold))
+
+            drop_cols = ["ID", "Sample Name"] + major_oxides
             preprocess_fn = get_preprocess_fn(preprocessor, oxide, drop_cols=drop_cols)
 
             cv_fold_metrics = perform_cross_validation(
-                data=train_full,
+                folds=folds,
                 model=model,  # type: ignore
                 preprocess_fn=preprocess_fn,
                 metric_fns=[rmse_metric, std_dev_metric],
-                kf=kf,
             )
 
             cv_metrics = get_cross_validation_metrics(cv_fold_metrics)
             mlflow.log_metrics(cv_metrics.as_dict())
 
-            X_train, y_train, X_test, y_test = preprocess_fn(train_full, test_full)
+            X_train, y_train, X_test, y_test = preprocess_fn(train, test)
 
             # Model training and evaluation
             model.fit(X_train, y_train)
             preds = model.predict(X_test)
             mse = mean_squared_error(y_test, preds)
-            rmse = math.sqrt(mse)
-            std_dev = np.std(y_test - preds)
+            rmse = rmse_metric(y_test, preds)
+            std_dev = std_dev_metric(y_test, preds)
 
             trial.set_user_attr("std_dev", float(std_dev))
             trial.set_user_attr("mse", float(mse))
@@ -270,20 +284,56 @@ def combined_objective(trial, oxide, model_selector):
 
         print(f"An error occurred: {e}")
         traceback.print_exc()
-        return float("inf")  # Return a large number to indicate failure
+        return float("inf"), float("inf")  # Return a large number to indicate failure
 
 
-models = ["gbr", "svr", "xgboost", "extra_trees", "pls"]
+models = ["gbr", "svr", "extra_trees", "pls", "xgboost"]
+
+
+def validate_oxides(ctx: typer.Context, param: typer.CallbackParam, value: List[str]) -> List[str]:
+    for oxide in value:
+        if oxide not in major_oxides:
+            raise typer.BadParameter(f"{oxide} is not a valid oxide. Choose from {major_oxides}")
+    return value
 
 
 def main(
-    n_trials: int = typer.Option(500, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
+    n_trials: int = typer.Option(200, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
+    selected_oxides: List[str] = typer.Option(
+        major_oxides, "--oxides", "-o", help="List of oxides to optimize", callback=validate_oxides
+    ),
 ):
-    sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
+    """
+    Executes hyperparameter optimization for specified oxides using Optuna with MLflow tracking.
+
+    This function sets up and runs an Optuna optimization study for different machine learning models
+    on specified oxide datasets. Each oxide and model combination is optimized separately with a given
+    number of trials. The function logs the optimization process and results to MLflow and optionally
+    sends notifications via Discord.
+
+    Parameters:
+    - n_trials (int): The number of trials to run for the hyperparameter optimization. Each trial
+                      tests a set of parameters on the specified model and oxide.
+    - selected_oxides (List[str]): A list of oxide names for which the optimization will be performed.
+                                   The oxides should be among the predefined valid oxides, and the
+                                   function will validate this list.
+
+    The function uses Typer for CLI argument parsing, allowing the number of trials and the list of
+    oxides to be specified at runtime. It supports dynamic adjustment of the experimental setup and
+    integrates with MLflow for experiment tracking and management.
+
+    Example CLI Usage:
+    - Run optimization for 100 trials on SiO2 and Al2O3:
+      `python optuna_run.py --n-trials 100 --oxides SiO2 --oxides Al2O3`
+    - Run optimization with default settings (200 trials on all predefined oxides):
+      `python optuna_run.py`
+    """
+    n_startup_trials = int(0.25 * n_trials)  # Reserve 25% of trials for exploration
+    sampler = TPESampler(n_startup_trials=n_startup_trials, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    for oxide in major_oxides:
+    for oxide in selected_oxides:
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}")
 

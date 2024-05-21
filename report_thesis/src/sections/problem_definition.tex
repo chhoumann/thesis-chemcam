@@ -12,19 +12,19 @@ The complexities presented by these challenges require the creation of advanced 
 
 The input to such models consists of \gls{libs} spectral data, which includes intensity readings across a spectrum of wavelengths.
 This data is in the form of Clean, Calibrated Spectra\cite{andersonImprovedAccuracyQuantitative2017}, the output of level 1 processing as described by \citet{wiensPreflightCalibrationInitial2013}.
-The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
+The wavelength intensities are quantified in units of \\ photon/shot/mm\textsuperscript{2}/sr/nm.
 
 Formally, we have:
 
 \begin{itemize}
-    \item \textbf{Matrix $A[t, o]$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across targets $t$. Here, $t$ represents the index for targets (samples or locations being analyzed) and $o$ denotes the index for oxides (different chemical compounds being quantified).
-    \item \textbf{Matrix $B[w, s]$}: A Boolean matrix that links wavelengths $w$ to spectrometers $s$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $s$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
-    \item \textbf{Matrix $C[t, l, s, w]$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a target $t$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the target where the measurement is taken.
-    \item \textbf{Matrix $D[t, l, w]$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
+    \item \textbf{Matrix $A[\chi, o]$}: This matrix denotes the chemical concentrations in weight percent for oxides $o$ across samples $\chi$. Here, $\chi$ represents the index for samples and $o$ denotes the index for oxides (different chemical compounds being quantified).
+    \item \textbf{Matrix $B[w, \gamma]$}: A Boolean matrix that links wavelengths $w$ to spectrometers $\gamma$, indicating whether a specific wavelength is detected by a spectrometer. $w$ is the index for wavelengths (specific wavelengths of light measured by the spectrometers) and $\gamma$ represents the index for shots (individual measurements or pulses of the laser used in the LIBS technique).
+    \item \textbf{Matrix $C[\chi, l, s, w]$}: Holds the spectral intensity data, where each entry represents the intensity recorded for a sample $\chi$ at location $l$, for shot $s$, at wavelength $w$. $l$ indicates the location on the sample where the measurement is taken.
+    \item \textbf{Matrix $D[\chi, l, w]$}: Derived from matrix $C$ by averaging the intensities across shots to provide a clearer signal for each location and wavelength:
     \[
-    D[t, l, w] = \frac{1}{|S|} \sum_{s \in S} C[t, l, s, w].
+    D[\chi, l, w] = \frac{1}{|S|} \sum_{s \in S} C[\chi, l, s, w].
     \]
-    \item \textbf{Matrix $E[t, l, w]$}: The result of $D$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
+    \item \textbf{Matrix $E[\chi, l, w]$}: The result of $D$ processed by applying wavelength-specific masks, setting intensities to zero in masking ranges to focus on relevant spectral features.
 \end{itemize}
 
 The model outputs are the quantified chemical compositions of geological samples. These are primarily the concentrations of major elements, represented in weight percentage. While background elements are also present, our current analysis does not quantify these.
@@ -42,12 +42,12 @@ The metric we use to evaluate the accuracy of our models is the \gls{rmse}. \gls
 \]
 where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. This measure quantifies the average magnitude of the prediction error across all predicted values, providing a clear indication of model accuracy in quantifying chemical compositions.
 
-We evaluate the robustness of our models using the standard deviation of prediction errors, defined as:
+We evaluate the robustness of our models using the sample standard deviation of prediction errors, defined as:
 \[
 \sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
 \]
 where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
-This sample standard deviation is used because it provides an unbiased estimate of the variability in prediction errors, crucial for assessing how well the model can be expected to perform on new, unseen data.
+Sample standard deviation is used because it provides an unbiased estimate of the variability in prediction errors, crucial for assessing how well the model can be expected to perform on new, unseen data.
 Correcting the variance calculation by using \( n-1 \) instead of \( n \) compensates for the tendency of smaller samples (specific datasets of \gls{libs} spectral data) to underestimate the variability of the entire population (all possible \gls{libs} data), bringing the sample standard deviation closer to the true standard deviation of the entire population.
 A lower standard deviation indicates a more robust model across different samples.
 
