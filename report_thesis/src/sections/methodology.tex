@@ -3,6 +3,7 @@ In this section, we outline the methodology used in this study to address the ch
 Then, using this knowledge, develop a pipeline that utilizes the strengths of these models and preprocessing techniques to improve prediction accuracy and robustness of the predictions.
 We first describe the datasets used, including their preparation and the method of splitting for model training. Next, we outline the preprocessing steps and the model selection process, followed by a detailed explanation of the experimental setup and evaluation metrics. Finally, we discuss our validation testing procedures and the approach taken to ensure unbiased final model evaluations.
 
+
 \subsection{Data Prepraration}
 Similarly to our previous work \citet{p9_paper}, we used the publicly available \gls{ccs} data.
 \gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis.
@@ -93,7 +94,6 @@ The \textit{Target} column contains the target name, while the \textit{ID} colum
 \end{table*}
 
 
-
 \subsection{Model and Preprocessing Selection}
 For the initial investigative experiments, we selected a range of models for further exploration, namely \gls{svr}, \gls{gbr}, \gls{pls}, \gls{xgboost}, \gls{ngboost}, \gls{etr}, \gls{enet}, and \gls{sgd}.
 We also included regular \gls{ann} and \gls{cnn} in this phase of experimentation.
@@ -120,7 +120,9 @@ Unlike the \gls{moc} model, which required manual determination of the model wei
 Stacking ensemble is beneficial as it dynamically adapts to our dataset's characteristics without the need for domain-specific knowledge.
 This approach represents a more sophisticated method, streamlining complex model configurations and potentially enhancing predictive accuracy through dynamically learned integrations, rather than fixed presets.
 
+
 \subsection{Experimental Setup}
+
 
 \subsection{Validation and Testing Procedures}
 
