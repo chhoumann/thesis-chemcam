@@ -8,8 +8,25 @@ Similarly to our previous work \citet{p9_paper}, we used the publicly available 
 \gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis.
 The full description of this preprocessing can be found in \citet{wiensPreFlight3}.
 
+\begin{table*}[h]
+\centering
+\begin{tabular}{llllllll}
+\toprule
+     wave &         shot1 &         shot2 &  $\cdots$ &        shot49 &       shot50  & median        & mean          \\
+\midrule
+240.81100 & 6.4026649e+15 & 4.0429349e+15 & $\cdots$  & 1.7922483e+15 & 1.7126615e+15 & 1.9892956e+15 & 1.7561699e+15 \\
+240.86501 & 3.8557462e+12 & 2.2923680e+12 & $\cdots$  & 1.1355429e+12 & 8.6930379e+11 & 7.8172542e+11 & 7.2805052e+11 \\
+$\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$      & $\vdots$      & $\vdots$      \\
+905.38062 & 1.8823427e+08 & 58500403.     & $\cdots$  & -8449286.6    & 8710775.0     & 4.0513312e+09 & 5.2188327e+09 \\
+905.57349 & 1.9864713e+10 & 1.2956832e+10 & $\cdots$  & 1.9785415e+10 & 7.1994239e+09 & 1.1311150e+10 & 1.2201224e+10 \\
+\bottomrule
+\end{tabular}
+\caption{Example of CCS data for a single target location.}
+\label{tab:ccs_data_example}
+\end{table*}
+
 While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing.
-The initial five shots from each sample are excluded because they are usually contaminated by dust covering the target, which is cleared away by the shock waves produced by the laser.
+The initial five shots from each target are excluded because they are usually contaminated by dust covering the target, which is cleared away by the shock waves produced by the laser.
 The remaining 45 shots from each location are then averaged, yielding a single spectrum per location and resulting in a total of five spectra for each target.
 
 At this stage, the data still contains noise at the edges of the spectrometers.
@@ -21,6 +38,10 @@ Consequently, these regions are masked by zeroing out the values, rather than re
 Additionally, as a result of the aforementioned preprocessing applied to the raw \gls{libs} data, negative values are present in the \gls{ccs} data.
 These negative values are not physically meaningful, since you cannot have negative light intensity.
 Similar to the noisy edges, these negative values are also masked by zeroing out the values.
+
+We transpose the data so that each row represents a target location and each column represents a wavelength feature.
+Each location is now represented as a vector of wavelengths, with the corresponding average intensity values for each wavelength.
+These vectors are then concatenated to form a matrix, where each row represents a target location and each column represents a wavelength feature.
 
 \subsection{Model and Preprocessing Selection}
 For the initial investigative experiments, we selected a range of models for further exploration, namely \gls{svr}, \gls{gbr}, \gls{pls}, \gls{xgboost}, \gls{ngboost}, \gls{etr}, \gls{enet}, and \gls{sgd}.
