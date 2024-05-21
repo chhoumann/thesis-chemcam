@@ -75,9 +75,9 @@ Several of the following challenges can be addressed through known methodologies
 However, these strategies are not feasible for the extraterrestrial applications relevant to this research.
 
 \subsubsection{Data Dimensionality}
-The large number of dimensions, as seen by having many wavelengths $\lambda$ in the Intensity Matrix $\mathbf{I}[\chi, l, s, \lambda]$, can lead to challenges such as noise in the data, computational inefficiency, and instability in model predictions.
+The large number of dimensions, as seen by having many wavelengths $\lambda$ in the Intensity Matrix $\mathbf{I}[\chi, l, s, \lambda]$, can lead to challenges such as noise management, computational inefficiency, and instability in model predictions.
 \begin{itemize}
-    \item \textbf{Noise:} With many dimensions, the spectral data can contain noise, which can obscure the true signal and lead to inaccurate predictions. This noise must be effectively managed to ensure the reliability of the chemical composition estimates.
+    \item \textbf{Noise Management:} While noise itself is a consequence of instrumental measurements\cite{wiensPreflightCalibrationInitial2013} and not directly caused by high dimensionality, having many dimensions can exacerbate the impact of noise. High-dimensional datasets, like \gls{libs} datasets, may include irrelevant or redundant features that obscure the true signal, complicating the process of accurately estimating the target variables. Therefore, effective noise management techniques can help ensure the reliability of predictions.
     
     \item \textbf{Computational Inefficiency:} Processing high-dimensional data requires substantial computational resources, which can be a bottleneck in model training and prediction. Efficient algorithms and dimensionality reduction techniques can be used to handle this complexity and improve computational efficiency. However, this problem is slightly alleviated due to the limited data availability.
 
@@ -99,7 +99,7 @@ To address the challenges in predicting major oxide compositions from \gls{libs}
 These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies. 
 
 Our proposed approach aims to address these challenges by leveraging state-of-the-art machine learning models, dimensionality reduction techniques, and feature engineering.
-By preprocessing the spectral data, we can enhance the signal quality and reduce noise.
+By preprocessing the spectral data, we can enhance the signal quality and handle noise.
 The development of robust models that can generalize well across different samples and conditions is crucial, particularly for extraterrestrial applications where data collection is constrained.
 
 The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness.
