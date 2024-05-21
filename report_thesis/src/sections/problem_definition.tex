@@ -73,13 +73,11 @@ The objective of this research is to develop a computational model, denoted as $
 As mentioned, quantifying chemical compositions from \gls{libs} spectral data involves several significant challenges that must be addressed to ensure accurate and robust predictions.
 
 \subsubsection{Data Dimensionality}
-The large number of dimensions, as seen by having many wavelengths $\lambda$ in the Intensity Matrix $\mathbf{I}[\chi, l, s, \lambda]$, can lead to challenges such as noise management, computational inefficiency, and instability in model predictions.
+The large number of dimensions, as seen by having many wavelengths $\lambda$ in the Intensity Matrix $\mathbf{I}[\chi, l, s, \lambda]$, can lead to challenges such as noise management and computational inefficiency.
 \begin{itemize}
     \item \textbf{Noise Management:} While noise itself is a consequence of instrumental measurements\cite{wiensPreflightCalibrationInitial2013} and not directly caused by high dimensionality, having many dimensions can exacerbate the impact of noise. High-dimensional datasets, like \gls{libs} datasets, may include irrelevant or redundant features that obscure the true signal, complicating the process of accurately estimating the target variables. Therefore, effective noise management techniques can help ensure the reliability of predictions.
     
     \item \textbf{Computational Inefficiency:} Processing high-dimensional data requires substantial computational resources, which can be a bottleneck in model training and prediction. Efficient algorithms and dimensionality reduction techniques can be used to handle this complexity and improve computational efficiency. However, this problem is slightly alleviated due to the limited data availability.
-
-    \item \textbf{Instability in Model Predictions:} High-dimensional data can lead to models that are sensitive to slight changes in the input data, resulting in significantly different outputs. This instability reduces the robustness and reliability of the predictions, making it challenging to achieve consistent and accurate results.
 \end{itemize}
 
 \subsubsection{Multicollinearity}
