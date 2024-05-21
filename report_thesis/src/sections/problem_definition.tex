@@ -52,7 +52,7 @@ The task of \gls{libs}-based quantification involves training the mapping functi
 To evaluate the performance of these models, we will use the \gls{rmse} to measure accuracy and the sample standard deviation of prediction errors to assess robustness.
 We define accuracy as the ability of a model to predict the composition of major oxides in geological samples, while robustness refers to the stability of these predictions across samples.
 
-The metric used to evaluate the accuracy of the models is the Root Mean Squared Error (RMSE):
+The metric used to evaluate the accuracy of the models is the \gls{rmse}:
 \[
 \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
 \]
@@ -64,6 +64,10 @@ Robustness is evaluated using the sample standard deviation of prediction errors
 \]
 where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
 A lower standard deviation indicates a more robust model across different samples.
+
+\textbf{Problem formulation}:
+The objective is to develop a computational model, denoted as the mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict the concentrations of major oxides in geological samples from processed \gls{libs} spectral data. The model will utilize feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Matrix $\mathbf{M}[\chi, l, \lambda]$ and output Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$. 
+
 
 \subsection{Challenges}
 As mentioned, quantifying chemical compositions from \gls{libs} spectral data involves several significant challenges that must be addressed to ensure accurate and robust predictions.
@@ -100,8 +104,6 @@ The development of robust models that can generalize well across different sampl
 
 The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness.
 These metrics will provide a comprehensive assessment of the models' performance in predicting the concentrations of major oxides in geological samples.
-
-Ultimately, this research aims to contribute to the field of planetary science by improving the reliability and accuracy of \gls{libs}-based quantification methods, thereby enhancing our understanding of Martian geology and its potential for past habitability.
 
 \subsection{Motivating Example: NASA's Mars Missions}
 NASA's exploration of Mars, beginning with the Viking missions in the 1970s, has progressively deepened our understanding of Mars \cite{marsnasagov_vikings}.
