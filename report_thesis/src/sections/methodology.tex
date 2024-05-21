@@ -21,7 +21,7 @@ These negative values are not physically meaningful, since you cannot have negat
 Once preprocessed, the data was conventionally split into training and testing sets. 
 As detailed in \citet{p9_paper} and \citet{cleggRecalibrationMarsScience2017}, it is essential to include samples with extreme element compositions in the training set to ensure the model can generalize effectively.
 To incorporate these extreme values, the training set was constructed to include the two highest and two lowest samples from each oxide category.
-Following the inclusion of extreme samples, we adjusted the size of the test split to accommodate the reduced pool of normal samples. 
+Following the inclusion of extreme samples, we adjusted the size of the test split to accommodate the reduced pool of normal samples.
 This adjustment was calculated by determining the number of extreme samples, subtracting this from the total sample count, and recalculating the test size proportionally. 
 This ensures that the proportion of the test set remains appropriate relative to the now smaller dataset. 
 Subsequently, we conducted the train-test split, where the normal samples --- those not categorized as extreme --- were divided according to the newly adjusted test size, with the extreme samples included to ensure exposure to varied data points.
