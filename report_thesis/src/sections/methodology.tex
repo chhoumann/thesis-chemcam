@@ -5,7 +5,7 @@ We first describe the datasets used, including their preparation and the method 
 
 
 \subsection{Data Preparation}
-Similarly to our previous work \citet{p9_paper}, we used the publicly available \gls{ccs} data.
+Similarly to our previous work \citet{p9_paper}, we used the publicly available \gls{ccs} data from NASA's \gls{pds}~\cite{PDSGeoscienceNode}.
 \gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis.
 The full description of this preprocessing can be found in \citet{wiensPreflightCalibrationInitial2013}.
 
@@ -28,7 +28,7 @@ $\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$
 
 While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing. Table~\ref{tab:ccs_data_example} shows an example of the \gls{ccs} data for a single target location of a sample. This corresponds to shots ($s$) and wavelength ($\lambda$) of the intensity matrix for this location.
 The initial five shots from each target are excluded because they are usually contaminated by dust covering the target, which is cleared away by the shock waves produced by the laser \cite{cleggRecalibrationMarsScience2017}.
-The remaining 45 shots from each location are then averaged, yielding a single spectrum per location and resulting in a total of five spectra for each target.
+The remaining 45 shots from each location are then averaged, yielding a single spectrum per location and resulting in a total of five spectra for each target, as represented by the Averaged Intensity Matrix . 
 
 At this stage, the data still contains noise at the edges of the spectrometers.
 These edges correspond to the boundaries of the three spectrometers, which collectively cover the \gls{uv}, \gls{vio}, and \gls{vnir} light spectra.
