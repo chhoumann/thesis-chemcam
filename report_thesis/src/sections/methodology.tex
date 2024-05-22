@@ -26,9 +26,9 @@ $\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$
 \label{tab:ccs_data_example}
 \end{table*}
 
-While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing. Table~\ref{tab:ccs_data_example} shows an example of the \gls{ccs} data for a single target location of a sample. This corresponds to shots ($s$) and wavelength ($\lambda$) of the intensity matrix for this location.
+While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing. Table~\ref{tab:ccs_data_example} shows an example of the \gls{ccs} data for a single target location of a sample. This corresponds to shots ($s$) and wavelength ($\lambda$) of the Intensity Matrix \ref{matrix:intensity} for this location.
 The initial five shots from each target are excluded because they are usually contaminated by dust covering the target, which is cleared away by the shock waves produced by the laser \cite{cleggRecalibrationMarsScience2017}.
-The remaining 45 shots from each location are then averaged, yielding a single spectrum per location and resulting in a total of five spectra for each target, as represented by the Averaged Intensity Matrix . 
+The remaining 45 shots from each location are then averaged, yielding a single spectrum per location and resulting in a total of five spectra for each target, as represented by the Averaged Intensity Matrix\ref{matrix:averaged_intensity}. 
 
 At this stage, the data still contains noise at the edges of the spectrometers.
 These edges correspond to the boundaries of the three spectrometers, which collectively cover the \gls{uv}, \gls{vio}, and \gls{vnir} light spectra.
@@ -37,7 +37,7 @@ In addition to being noisy regions, these regions do not contain any useful info
 Consequently, these regions are masked by zeroing out the values, rather than removing them, as they still provide valuable information for the model to learn from\cite{cleggRecalibrationMarsScience2017}.
 
 Additionally, as a result of the aforementioned preprocessing applied to the raw \gls{libs} data, negative values are present in the \gls{ccs} data.
-These negative values are not physically meaningful, since you cannot have negative light intensity.
+These negative values are not physically meaningful, since you cannot have negative light intensity \cite{p9_paper}.
 Similar to the noisy edges, these negative values are also masked by zeroing out the values.
 
 We transpose the data so that each row represents a target location and each column represents a wavelength feature.
@@ -47,6 +47,9 @@ These vectors are then concatenated to form a matrix, where each row represents 
 For each target, we have a corresponding set of major oxide compositions in weight percentage (wt\%).
 These compositions are used as the target labels for the machine learning models.
 An excerpt of this data is shown in Table \ref{tab:composition_data_example}.
+The \textit{Target}, \textit{Spectrum Name}, and \textit{Sample Names} are artifacts of the measurement process.
+We primarily regard the \textit{Sample Names}. 
+The eight oxides \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeO_T}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O} serve as our ground truth values, while the \textit{MOC total} is unused in this study. 
 
 \begin{table*}[h]
 \centering
