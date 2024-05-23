@@ -17,6 +17,7 @@ Their model outperformed traditional machine learning approaches, emphasizing th
 
 \subsection{Hybrid and Domain-Knowledge-Driven Models}
 Incorporating domain knowledge into machine learning models can significantly enhance their interpretability and performance.
+
 \citet{song_DF-K-ELM} introduced a hybrid model, \gls{df}-\gls{k-elm}, which integrates domain knowledge-based spectral lines with kernel extreme learning machines.
 This method was particularly effective across multiple regression tasks, demonstrating improved accuracy and generalizability.
 The integration of domain-specific insights allowed the model to adhere more closely to the physical principles underlying \gls{libs} quantification, making it highly relevant for applications requiring model interpretability.
@@ -28,9 +29,11 @@ By leveraging knowledge from one domain to address related problems in another, 
 Effective preprocessing and feature engineering are critical for enhancing the robustness of \gls{libs} models.
 
 \citet{jeonEffectsFeatureEngineering2024} investigated the effects of various feature-engineering techniques on the robustness of \gls{libs} models for steel classification.
-They found that using intensity ratios as input data significantly improved model robustness under varying measurement conditions, demonstrating the importance of selecting appropriate feature-engineering methods.
+They developed a remote \gls{libs} system to classify six steel types, using various feature-engineering and machine learning algorithms, including \gls{svm} and \gls{fcnn}, to handle different laser energies in test datasets.
+They found that using \gls{libs} signal intensity ratio as input data significantly improved model robustness under varying measurement conditions, demonstrating the importance of selecting appropriate feature-engineering methods.
 
 \citet{Huang2015AnEA} conducted a systematic analysis of data preprocessing techniques, emphasizing the need for tailored strategies to enhance model accuracy.
+Evaluating methods such as feature selection, case selection, scaling, and missing data treatments, they demonstrate that the effectiveness of these techniques varies markedly across different datasets and machine learning algorithms.
 Their findings underscore the interdependent relationship between preprocessing techniques and model selection, which is crucial for optimizing predictive performance.
 
 \subsection{Dimensionality Reduction Techniques}
