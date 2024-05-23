@@ -4,7 +4,7 @@ from sklearn.model_selection import GroupKFold
 import matplotlib.pyplot as plt
 import seaborn as sns
 from lib.full_flow_dataloader import load_full_flow_data
-from lib.cross_validation import custom_kfold_cross_validation_new
+from lib.cross_validation import custom_kfold_cross_validation_new, stratified_group_kfold_split
 from lib.reproduction import major_oxides
 
 # Set page layout to wide
@@ -22,10 +22,19 @@ random_state = 42
 # User selects target
 target = st.selectbox("Select target oxide:", major_oxides)
 
+# User selects cross-validation method
+cv_method = st.selectbox("Select cross-validation method:", ["Sorted", "Stratified Group K-Fold"])
+
 # Custom K-Fold Cross Validation
-folds_custom, train_full, test_full = custom_kfold_cross_validation_new(
-    data=data, k=5, group_by=group_by, target=target, random_state=random_state
-)
+if cv_method == "Sorted":
+    folds_custom, train_full, test_full = custom_kfold_cross_validation_new(
+        data=data, k=5, group_by=group_by, target=target, random_state=random_state
+    )
+else:
+    folds_custom = stratified_group_kfold_split(
+        data, group_by=group_by, target=target, num_bins=5, n_splits=5, random_state=random_state
+    )
+    train_full, test_full = folds_custom[0]
 
 # Distribution Plot
 st.subheader("Distribution Plot")
