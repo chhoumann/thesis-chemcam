@@ -1,54 +1,52 @@
 \section{Related Work}
-A sizeable body of methodologies has been developed to enhance the accuracy and robustness of \gls{libs} predictions. 
-Key strategies include the integration of machine learning and deep learning models, the incorporation of domain knowledge, effective preprocessing techniques, and dimensionality reduction methods. 
+A sizeable body of methodologies has been developed to enhance the accuracy and robustness of \gls{libs} predictions.
+Key strategies include the integration of machine learning and deep learning models, the incorporation of domain knowledge, effective preprocessing techniques, and dimensionality reduction methods.
 These approaches collectively aim to manage the complexities inherent in \gls{libs} data and improve predictive performance.
-
-This review adopts a thematic taxonomy to highlight existing research in this field. 
-The main themes covered include machine learning models, hybrid and domain-knowledge-driven approaches, deep learning techniques, preprocessing and feature engineering, and dimensionality reduction. 
+We review existing and relevant work through a thematic taxonomy, highlighting their potential applications in our study.
 
 \subsection{Machine Learning Models in LIBS Analysis}
 A significant body of research has applied machine learning models to analyze LIBS data, aiming to predict the composition of major oxides with high accuracy.
 
-\citet{andersonPostlandingMajorElement2022} utilized machine learning models to quantify major oxides on Mars using the SuperCam instrument on the Perseverance rover. 
-Their approach involved extensive preprocessing and normalization of LIBS spectra, followed by the development of multivariate regression models for each oxide. 
-They demonstrated that blending different models, such as \gls{gbr} and \gls{pls} for \ce{SiO2}, could improve prediction accuracy. 
+\citet{andersonPostlandingMajorElement2022} utilized machine learning models to quantify major oxides on Mars using the SuperCam instrument on the Perseverance rover.
+Their approach involved extensive preprocessing and normalization of LIBS spectra, followed by the development of multivariate regression models for each oxide.
+They demonstrated that blending different models, such as \gls{gbr} and \gls{pls} for \ce{SiO2}, could improve prediction accuracy.
 Their study serves as a benchmark for model performance on LIBS spectra and offers insights into model selection for similar datasets.
 
-Similarly, \citet{rezaei_dimensionality_reduction} explored various machine learning techniques combined with Principal Component Analysis (PCA) for dimensionality reduction. Their results showed that \gls{svr} variants performed best for different elements, highlighting the effectiveness of dimensionality reduction techniques in improving model performance by managing the complexities of high-dimensional data.
+Similarly, \citet{rezaei_dimensionality_reduction} explored various machine learning techniques combined with \gls{pca} for dimensionality reduction. Their results showed that \gls{svr} variants performed best for different elements, highlighting the effectiveness of dimensionality reduction techniques in improving model performance by managing the complexities of high-dimensional data.
 
 \subsection{Hybrid and Domain-Knowledge-Driven Models}
 Incorporating domain knowledge into machine learning models can significantly enhance their interpretability and performance.
-\citet{song_DF-K-ELM} introduced a hybrid model, \gls{df}-\gls{k-elm}, which integrates domain knowledge-based spectral lines with kernel extreme learning machines. 
-This method was particularly effective across multiple regression tasks, demonstrating improved accuracy and generalizability. 
+\citet{song_DF-K-ELM} introduced a hybrid model, \gls{df}-\gls{k-elm}, which integrates domain knowledge-based spectral lines with kernel extreme learning machines.
+This method was particularly effective across multiple regression tasks, demonstrating improved accuracy and generalizability.
 The integration of domain-specific insights allowed the model to adhere more closely to the physical principles underlying \gls{libs} quantification, making it highly relevant for applications requiring model interpretability.
 
-\citet{sunMachineLearningTransfer2021} applied transfer learning to \gls{libs} spectral data analysis, significantly improving model performance in rock classification on Mars. 
+\citet{sunMachineLearningTransfer2021} applied transfer learning to \gls{libs} spectral data analysis, significantly improving model performance in rock classification on Mars.
 By leveraging knowledge from one domain to address related problems in another, their approach addressed the physical matrix effect, enhancing the robustness of the models for rock classification.
 
 \subsection{Deep Learning Approaches}
 Deep learning techniques, particularly \gls{cnn}, have shown promise in handling the complexities of LIBS data.
 
-\citet{yangConvolutionalNeuralNetwork2022} demonstrated the effectiveness of a deep \gls{cnn} for classifying geochemical samples using \gls{libs} spectra collected at varying distances. 
+\citet{yangConvolutionalNeuralNetwork2022} demonstrated the effectiveness of a deep \gls{cnn} for classifying geochemical samples using \gls{libs} spectra collected at varying distances.
 Their model outperformed traditional machine learning approaches, emphasizing the potential of \gls{cnn}s for geochemical sample identification in planetary exploration missions like China's Tianwen-1.
 
 \subsection{Preprocessing and Feature Engineering}
 Effective preprocessing and feature engineering are critical for enhancing the robustness of \gls{libs} models.
 
-\citet{jeonEffectsFeatureEngineering2024} investigated the effects of various feature-engineering techniques on the robustness of \gls{libs} models for steel classification. 
+\citet{jeonEffectsFeatureEngineering2024} investigated the effects of various feature-engineering techniques on the robustness of \gls{libs} models for steel classification.
 They found that using intensity ratios as input data significantly improved model robustness under varying measurement conditions, demonstrating the importance of selecting appropriate feature-engineering methods.
 
-\citet{Huang2015AnEA} conducted a systematic analysis of data preprocessing techniques, emphasizing the need for tailored strategies to enhance model accuracy. 
+\citet{Huang2015AnEA} conducted a systematic analysis of data preprocessing techniques, emphasizing the need for tailored strategies to enhance model accuracy.
 Their findings underscore the interdependent relationship between preprocessing techniques and model selection, which is crucial for optimizing predictive performance.
 
 \subsection{Dimensionality Reduction Techniques}
 Dimensionality reduction techniques such as \gls{pca} play a crucial role in managing the high-dimensional nature of \gls{libs} data.
 
-\citet{woldPrincipalComponentAnalysis1987} provided a foundational understanding of \gls{pca}, highlighting its utility in simplifying complex datasets and enhancing interpretability. 
+\citet{woldPrincipalComponentAnalysis1987} provided a foundational understanding of \gls{pca}, highlighting its utility in simplifying complex datasets and enhancing interpretability.
 \gls{pca}'s ability to extract principal components that capture the most variance in the data is particularly relevant for improving the prediction accuracy of major oxide compositions from \gls{libs} data.
 
-\citet{scholkopftKPCA} introduced a method for nonlinear \gls{pca} using kernel functions, known as \gls{kernel-pca}. 
-This approach allows for efficient computation of principal components in high-dimensional feature spaces and the ability to handle nonlinear relationships in the data more effectively than traditional \gls{pca}. 
-This provides a powerful tool for dimensionality reduction in complex datasets, making it particularly relevant for LIBS analytics. 
+\citet{scholkopftKPCA} introduced a method for nonlinear \gls{pca} using kernel functions, known as \gls{kernel-pca}.
+While they do not apply it specifically to \gls{libs} data, this approach allows for efficient computation of principal components in high-dimensional feature spaces and the ability to handle nonlinear relationships in the data more effectively than traditional \gls{pca}.
+This provides a powerful tool for dimensionality reduction in complex datasets, making it particularly relevant for \gls{libs} analytics.
 
 % \section{Related Work}
 % In addressing the challenge of predicting major oxide compositions from \gls{libs} data, our investigation intersects with a broad spectrum of existing research that tackles similar computational hurdles, such as high dimensionality, multicollinearity, matrix effects, and the challenges of small datasets.
@@ -173,7 +171,7 @@ This provides a powerful tool for dimensionality reduction in complex datasets, 
 % This scarcity makes it difficult to construct robust models capable of comprehensively understanding the underlying patterns and physical principles within the data.
 % Utilizing related LIBS data could help the models first learn the general outline, shape and patterns in the LIBS data, making it easier for it to grasp the deeper patterns in the Mars related data.
 
-% \citet{Huang2015AnEA} conducted a systematic analysis of data preprocessing techniques for machine learning-based software cost estimation. 
-% Their study emphasizes the significant influence of tailored data preprocessing strategies on the prediction accuracy of models. Evaluating methods such as feature selection, case selection, scaling, and missing data treatments, they demonstrate that the effectiveness of these techniques varies markedly across different datasets and machine learning algorithms. 
+% \citet{Huang2015AnEA} conducted a systematic analysis of data preprocessing techniques for machine learning-based software cost estimation.
+% Their study emphasizes the significant influence of tailored data preprocessing strategies on the prediction accuracy of models. Evaluating methods such as feature selection, case selection, scaling, and missing data treatments, they demonstrate that the effectiveness of these techniques varies markedly across different datasets and machine learning algorithms.
 % Their findings highlight the necessity of customizing preprocessing approaches to the specific characteristics of each dataset and model.
-% This is relevant to our work, as it emphasizes the need to consider the preprocessing techniques and model selection as interdependent components that can significantly impact the predictive performance of machine learning models. 
+% This is relevant to our work, as it emphasizes the need to consider the preprocessing techniques and model selection as interdependent components that can significantly impact the predictive performance of machine learning models.
