@@ -23,18 +23,25 @@ random_state = 42
 target = st.selectbox("Select target oxide:", major_oxides)
 
 # User selects cross-validation method
-cv_method = st.selectbox("Select cross-validation method:", ["Sorted", "Stratified Group K-Fold"])
+cv_method = st.selectbox("Select cross-validation method:", ["Sorted Group K-Fold", "Stratified Group K-Fold"])
 
-# Custom K-Fold Cross Validation
-if cv_method == "Sorted":
+# Add links based on selection
+if cv_method == "Sorted Group K-Fold":
+    st.markdown(
+        "[View Sorted K-Fold Code](https://github.com/chhoumann/thesis-chemcam/blob/58822cb4a89426359458eee9c5bb6a0d4ad2af6f/baseline/lib/cross_validation.py#L13)"
+    )
     folds_custom, train_full, test_full = custom_kfold_cross_validation_new(
         data=data, k=5, group_by=group_by, target=target, random_state=random_state
     )
 else:
-    folds_custom = stratified_group_kfold_split(
-        data, group_by=group_by, target=target, num_bins=5, n_splits=5, random_state=random_state
+    st.markdown(
+        "[View Stratified Group K-Fold Code](https://github.com/chhoumann/thesis-chemcam/blob/58822cb4a89426359458eee9c5bb6a0d4ad2af6f/baseline/lib/cross_validation.py#L178)"
     )
-    train_full, test_full = folds_custom[0]
+    folds_custom = stratified_group_kfold_split(
+        train_processed, group_by=group_by, target=target, num_bins=5, n_splits=5, random_state=random_state
+    )
+    train_full = train_processed
+    test_full = test_processed
 
 # Distribution Plot
 st.subheader("Distribution Plot")
