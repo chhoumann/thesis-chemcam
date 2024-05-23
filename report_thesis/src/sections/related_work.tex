@@ -1,6 +1,13 @@
 \section{Related Work}
-Predicting major oxide compositions from \gls{libs} data presents multifaceted challenges, including high dimensionality, multicollinearity, matrix effects, and the constraints of small datasets. 
-This literature review explores various methodologies and techniques used in the field to enhance the accuracy and robustness of such predictions, emphasizing the integration of domain knowledge, advanced machine learning algorithms, and innovative preprocessing techniques.
+Predicting major oxide compositions from \gls{libs} data presents multifaceted challenges, such as high dimensionality, data complexity, and the need for effective preprocessing and feature engineering. 
+These issues represent important obstacles to overcome for advancing \gls{libs} analytics, particularly in applications like planetary exploration and geochemical analysis.
+
+A sizeable body of methodologies has been developed to enhance the accuracy and robustness of \gls{libs} predictions. 
+Key strategies include the integration of machine learning and deep learning models, the incorporation of domain knowledge, effective preprocessing techniques, and dimensionality reduction methods. 
+These approaches collectively aim to manage the complexities inherent in \gls{libs} data and improve predictive performance.
+
+This review adopts a thematic taxonomy to structure to highlight existing research in this field. 
+The main themes covered include machine learning models, hybrid and domain-knowledge-driven approaches, deep learning techniques, preprocessing and feature engineering, and dimensionality reduction. 
 
 \subsection{Machine Learning Models in LIBS Analysis}
 A significant body of research has applied machine learning models to analyze LIBS data, aiming to predict the composition of major oxides with high accuracy.
@@ -16,9 +23,9 @@ Similarly, \citet{rezaei_dimensionality_reduction} explored various machine lear
 Incorporating domain knowledge into machine learning models can significantly enhance their interpretability and performance.
 \citet{song_DF-K-ELM} introduced a hybrid model, \gls{df}-\gls{k-elm}, which integrates domain knowledge-based spectral lines with kernel extreme learning machines. 
 This method was particularly effective across multiple regression tasks, demonstrating improved accuracy and generalizability. 
-The integration of domain-specific insights allowed the model to adhere more closely to the physical principles underlying LIBS quantification, making it highly relevant for applications requiring model interpretability.
+The integration of domain-specific insights allowed the model to adhere more closely to the physical principles underlying \gls{libs} quantification, making it highly relevant for applications requiring model interpretability.
 
-\citet{sunMachineLearningTransfer2021} applied transfer learning to LIBS spectral data analysis, significantly improving model performance in rock classification on Mars. 
+\citet{sunMachineLearningTransfer2021} applied transfer learning to \gls{libs} spectral data analysis, significantly improving model performance in rock classification on Mars. 
 By leveraging knowledge from one domain to address related problems in another, their approach addressed the physical matrix effect, enhancing the robustness of the models for rock classification.
 
 \subsection{Deep Learning Approaches}
