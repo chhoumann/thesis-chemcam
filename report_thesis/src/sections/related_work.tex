@@ -5,14 +5,15 @@ These approaches collectively aim to manage the complexities inherent in \gls{li
 We review existing and relevant work through a thematic taxonomy, highlighting their potential applications in our study.
 
 \subsection{Machine Learning Models in LIBS Analysis}
-A significant body of research has applied machine learning models to analyze LIBS data, aiming to predict the composition of major oxides with high accuracy.
+Several studies have applied machine learning models to analyze \gls{libs} data, aiming to predict major oxide compositions with high accuracy.
 
 \citet{andersonPostlandingMajorElement2022} utilized machine learning models to quantify major oxides on Mars using the SuperCam instrument on the Perseverance rover.
 Their approach involved extensive preprocessing and normalization of LIBS spectra, followed by the development of multivariate regression models for each oxide.
 They demonstrated that blending different models, such as \gls{gbr} and \gls{pls} for \ce{SiO2}, could improve prediction accuracy.
 Their study serves as a benchmark for model performance on LIBS spectra and offers insights into model selection for similar datasets.
 
-Similarly, \citet{rezaei_dimensionality_reduction} explored various machine learning techniques combined with \gls{pca} for dimensionality reduction. Their results showed that \gls{svr} variants performed best for different elements, highlighting the effectiveness of dimensionality reduction techniques in improving model performance by managing the complexities of high-dimensional data.
+\citet{yangConvolutionalNeuralNetwork2022} demonstrated the effectiveness of a deep \gls{cnn} for classifying geochemical samples using \gls{libs} spectra collected at varying distances.
+Their model outperformed traditional machine learning approaches, emphasizing the potential of \gls{cnn}s for geochemical sample identification in planetary exploration missions like China's Tianwen-1.
 
 \subsection{Hybrid and Domain-Knowledge-Driven Models}
 Incorporating domain knowledge into machine learning models can significantly enhance their interpretability and performance.
@@ -22,12 +23,6 @@ The integration of domain-specific insights allowed the model to adhere more clo
 
 \citet{sunMachineLearningTransfer2021} applied transfer learning to \gls{libs} spectral data analysis, significantly improving model performance in rock classification on Mars.
 By leveraging knowledge from one domain to address related problems in another, their approach addressed the physical matrix effect, enhancing the robustness of the models for rock classification.
-
-\subsection{Deep Learning Approaches}
-Deep learning techniques, particularly \gls{cnn}, have shown promise in handling the complexities of LIBS data.
-
-\citet{yangConvolutionalNeuralNetwork2022} demonstrated the effectiveness of a deep \gls{cnn} for classifying geochemical samples using \gls{libs} spectra collected at varying distances.
-Their model outperformed traditional machine learning approaches, emphasizing the potential of \gls{cnn}s for geochemical sample identification in planetary exploration missions like China's Tianwen-1.
 
 \subsection{Preprocessing and Feature Engineering}
 Effective preprocessing and feature engineering are critical for enhancing the robustness of \gls{libs} models.
@@ -47,6 +42,8 @@ Dimensionality reduction techniques such as \gls{pca} play a crucial role in man
 \citet{scholkopftKPCA} introduced a method for nonlinear \gls{pca} using kernel functions, known as \gls{kernel-pca}.
 While they do not apply it specifically to \gls{libs} data, this approach allows for efficient computation of principal components in high-dimensional feature spaces and the ability to handle nonlinear relationships in the data more effectively than traditional \gls{pca}.
 This provides a powerful tool for dimensionality reduction in complex datasets, making it particularly relevant for \gls{libs} analytics.
+
+\citet{rezaei_dimensionality_reduction} explored various machine learning techniques combined with \gls{pca} for dimensionality reduction. Their results demonstrated that \gls{svr} with \gls{pca} performed the best for different elements, highlighting the effectiveness of dimensionality reduction techniques in improving model performance by managing the complexities of high-dimensional data.
 
 % \section{Related Work}
 % In addressing the challenge of predicting major oxide compositions from \gls{libs} data, our investigation intersects with a broad spectrum of existing research that tackles similar computational hurdles, such as high dimensionality, multicollinearity, matrix effects, and the challenges of small datasets.
