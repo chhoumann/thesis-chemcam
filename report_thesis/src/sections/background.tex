@@ -205,7 +205,9 @@ where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of 
 The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
 
 \subsubsection{Extra Trees Regressor (ETR)}
-Before discussing the \gls{etr} model, it is important to understand the concepts of decision trees and random forests.
+Before discussing the \gls{etr} model, it is important to first understand the concepts of decision trees and \gls{rf}.
+We give an overview of decision trees and \gls{rf} based on \citet{James2023AnIS}.
+Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
 
 A decision tree is a supervised learning model that partitions data into subsets based on feature values, resembling a tree structure.
 The goal is to create a tree that predicts the target variable by dividing the data into increasingly homogeneous subsets.
@@ -218,7 +220,7 @@ This technique allows each tree to be trained on a slightly different dataset, i
 As a result, some data points may appear multiple times in the subset, while others may be omitted entirely.
 By training multiple trees on different subsets and then aggregating their predictions, the model achieves better generalization and robustness, leading to more accurate and reliable final predictions.
 
-Mathematically, the prediction of a random forest model can be represented as:
+Mathematically, the prediction of a \gls{rf} model can be represented as:
 
 $$
 f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
@@ -227,7 +229,7 @@ $$
 where $f_m(x)$ is the prediction of the $m$-th tree in the forest, and $M$ is the total number of trees.
 
 \gls{etr} is an extension of the \gls{rf} model that introduces additional randomness in the tree-building process, namely \textit{random feature selection} and \textit{random split points}.
-While random forests use bootstrap sampling to create diverse training sets, \gls{etr} goes further by selecting a random subset of features at each node and determining split points randomly within the range of those features.
+While \gls{rf} use bootstrap sampling to create diverse training sets, \gls{etr} goes further by selecting a random subset of features at each node and determining split points randomly within the range of those features.
 This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
 As a tradeoff, ETR is less interpretable than a single decision tree, as the added randomness can introduce more bias than RF.
 However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets like LIBS data.
