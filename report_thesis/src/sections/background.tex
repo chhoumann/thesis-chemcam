@@ -166,7 +166,7 @@ The data points that lie closest to the hyperplane are called \textit{support ve
 We use our previous discussion of \gls{svm} to introduce \gls{svr} based on \citet{druckerSVR}.
 
 \gls{svr} aims to fit a function that predicts continuous values rather than finding the hyperplane that best separates data points.
-Instead of using a hyperplane to separate the data, \gls{svr} uses two parallel hyperplanes to define a margin within which the function should lie, often referred to as the \textit{tube}.
+Instead of using a hyperplane to separate the data, \gls{svr} uses two parallel hyperplanes to define a margin within which the function should lie, often referred to as the $\epsilon$-\textit{tube}, where $\epsilon$ is a hyperparameter that defines the width of the tube.
 The goal is to find a function $f(x)$ that lies within this tube and has the maximum number of data points within the tube.
 $f(x)$ is typically defined as a linear function of the form:
 
