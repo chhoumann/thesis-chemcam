@@ -1,0 +1,64 @@
+\subsubsection{Gradient Boosting Regression}\label{sec:gradientboost}
+Gradient boosting is an approach that is builds on a set of simpler concepts.
+It incorporates the idea of ensemble learning, with decision trees and boosting as its core components. 
+
+Ensemble learning is a machine learning technique where mulitple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
+Mathematically, ensemble learning can be defined as combining the predictions of $M$ weak learners to form a final prediction $\hat{y}$, such that:
+\begin{equation}
+    \hat{y} = \sum_{m=1}^{M} \alpha_m \hat{y}_m
+\end{equation}
+where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is the weight assigned to the $m$-th weak learner.
+Although various options exist for weak learners, decision trees are commonly used and have been selected for this study.
+
+The basic approach to decision trees involves partitioning the data into subsets based on feature values, with the goal of creating groups where the data points are more similar to each other in their predicted outcomes. 
+This similarity, or homogeneity, is described in terms of impurity, which is a measure of how mixed the data points are in a given region. 
+This is achieved through recursive binary splitting, where the dataset is divided into two regions based on the value of one of the predictors. 
+The aim at each step is to select the predictor and the split point that result in the greatest reduction in impurity.
+
+Impurity, in the context of regression trees, is measured using the \gls{rss}.
+Mathematically, for any predictor $X_j$ and split point $s$, the data is divided into two regions $R1$ and $R2$ defined as:
+$$
+\begin{aligned}
+    R1(j, s) &= \{X | X_j < s\} \\
+    R2(j, s) &= \{X | X_j \geq s\}
+\end{aligned}
+$$
+
+The goal is to find the values of $j$ and $s$ that minimize the RSS, which is calculated as:
+$$
+\sum_{i: x_i \in R1(j, s)} (y_i - \hat{y}_{R1})^2 + \sum_{i: x_i \in R2(j, s)} (y_i - \hat{y}_{R2})^2
+$$
+
+where $\hat{y}_{R1}$ and $\hat{y}_{R2}$ are the mean responses for the training observations in regions $R1$ and $R2$, respectively, $y_i$ is the response for the $i$-th observation and $x_i$ is the predictor value for the $i$-th observation. 
+
+Once the optimal splits are identified, the tree is constructed by repeating this process for each resulting subset until a stopping criterion is met, such as a minimum number of observations per node. 
+The final model consists of a series of splits that segment the data into distinct regions, each associated with a predicted response value based on the mean of the training observations in that region.
+
+This method ensures that each region contains data that is more homogeneous with respect to the target variable, effectively reducing impurity, which means that the regions are more uniform and the data points within each region are more similar to each other. 
+
+
+
+
+
+
+
+
+
+
+
+1. Introduction to Ensemble Methods
+    * Brief Introduction to Machine Learning: Supervised learning and prediction.
+    * Ensemble Methods: Combining multiple models for better performance.
+2. Decision Trees
+    * Concept: Explain the basic idea of decision trees.
+    * Pros and Cons: Advantages (interpretability, simplicity) and disadvantages (overfitting, instability).
+3. Bagging and Boosting
+    * Bagging: Mention briefly how bagging (Bootstrap Aggregating) works with decision trees (e.g., Random Forests).
+    * Boosting: Introduce boosting, focusing on the idea of sequentially training models to correct previous errors.
+4. Gradient Boosting
+    * Concept: Explain gradient boosting as a method to minimize a loss function using gradients.
+    * Training Process: Describe the iterative process of adding models to correct residuals.
+5. Gradient Boosting Regressor
+    * Implementation: Mention sklearn's Gradient Boosting Regressor, which uses decision trees as base learners.
+    * Advantages: Robust performance and ability to handle complex relationships
+    * Slow learner - Advantageous
