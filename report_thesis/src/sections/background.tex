@@ -1,5 +1,23 @@
 \section{Background}\label{sec:background}
-\subsection{Data Normalization}\label{sec:data_normalization}
+\subsection{Preprocessing}
+
+\subsubsection{Standard Scaler}
+
+\subsubsection{Max Absolute Scaler}
+
+\subsubsection{MinMax Scaler}
+
+\subsubsection{Robust Scaler}
+
+\subsubsection{Power Transformation}
+
+\subsubsection{Quantile Transformer}
+
+\subsubsection{Principal Component Analysis (PCA)}
+
+\subsubsection{Kernel PCA}
+
+\subsubsection{Norm 3}
 As previously mentioned, the \gls{chemcam} instrument consists of three spectrometers, each producing 2048 channels.
 For data normalization, we follow the approach taken by the SuperCam team and normalize across individual spectrometers' wavelength ranges, a process known as \textit{Norm 3}~\cite{andersonPostlandingMajorElement2022}.
 This method ensures that the wavelength intensities captured by each spectrometer is normalized independently.
@@ -127,3 +145,8 @@ $$
 $$
 
 The components are then used to predict the target variable by fitting a linear model via least squares regression.
+
+\subsection{Stacking Ensemble}
+\citet{pavlyshenko2018stacking} explored the use of stacking techniques to enhance predictive models in both time series forecasting and logistic regression.
+By combining predictions from multiple machine learning models, such as linear models, random forests, and neural networks, they managed to effectively handle high-dimensional data complexities and significantly improve model accuracy.
+This work highlights the potential benefits of stacking, making it particularly relevant to the analysis of \gls{libs} data due to its high-dimensional nature.
