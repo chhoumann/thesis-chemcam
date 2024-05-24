@@ -141,26 +141,26 @@ This means that in a two-dimensional space, a hyperplane is a line, while in a t
 This hyperplane is chosen to maximize the margin, which is the distance between the hyperplane and the nearest data point from either class.
 The data points that lie closest to the hyperplane are called \textit{support vectors}.
 
-Mathematically, \gls{svm} solves the optimization problem:
+% Mathematically, \gls{svm} solves the optimization problem:
 
-$$
-\min_{\mathbf{w}, b, \xi} \frac{1}{2} \|\mathbf{w}\|^2 + C \sum_{i=1}^{n} \xi_i,
-$$
+% $$
+% \min_{\mathbf{w}, b, \xi} \frac{1}{2} \|\mathbf{w}\|^2 + C \sum_{i=1}^{n} \xi_i,
+% $$
 
-subject to:
+% subject to:
 
-$$
-y_i (\mathbf{w} \cdot \mathbf{x}_i + b) \geq 1 - \xi_i,
-$$
+% $$
+% y_i (\mathbf{w} \cdot \mathbf{x}_i + b) \geq 1 - \xi_i,
+% $$
 
-where:
+% where:
 
-\begin{itemize}
-	\item $\mathbf{w}$ is the normal vector to the hyperplane,
-	\item $b$ is the bias term,
-	\item $\xi_i$ are slack variables that allow some points to be within the margin or misclassified, and
-	\item $C$ is a regularization parameter balancing the trade-off between maximizing the margin and minimizing the classification error.
-\end{itemize}
+% \begin{itemize}
+% 	\item $\mathbf{w}$ is the normal vector to the hyperplane,
+% 	\item $b$ is the bias term,
+% 	\item $\xi_i$ are slack variables that allow some points to be within the margin or misclassified, and
+% 	\item $C$ is a regularization parameter balancing the trade-off between maximizing the margin and minimizing the classification error.
+% \end{itemize}
 
 \gls{svr} extends the principles of \gls{svm} to regression problems.
 Instead of finding the hyperplane that best separates data points, \gls{svr} aims to fit a function that predicts continuous values.
@@ -175,8 +175,10 @@ $$
 where:
 
 \begin{itemize}
-	\item $\mathbf{w} = [\beta_1, \beta_2, \ldots, \beta_n]$ is the weight vector,
-	\item $\mathbf{x} = [x_1, x_2, \ldots, x_n]$ is the input vector, and
+	% \item $\mathbf{w} = [\beta_1, \beta_2, \ldots, \beta_n]$ is the weight vector,
+	% \item $\mathbf{x} = [x_1, x_2, \ldots, x_n]$ is the input vector, and
+	\item $\mathbf{w}$ is the weight vector,
+	\item $\mathbf{x}$ is the input vector, and
 	\item $b$ is the bias term.
 \end{itemize}
 
@@ -201,24 +203,24 @@ $$
 where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of the $\epsilon$-insensitive tube, respectively.
 
 The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
-Mathematically, this is expressed as:
+% Mathematically, this is expressed as:
 
-$$
-\min_{\mathbf{w}, b, \xi, \xi^*} \frac{1}{2} \|\mathbf{w}\|^2 + C \sum_{i=1}^{n} (\xi_i + \xi_i^*),
-$$
+% $$
+% \min_{\mathbf{w}, b, \xi, \xi^*} \frac{1}{2} \|\mathbf{w}\|^2 + C \sum_{i=1}^{n} (\xi_i + \xi_i^*),
+% $$
 
-subject to:
+% subject to:
 
-$$
-\begin{aligned}
-	y_i - (\mathbf{w} \cdot \mathbf{x}_i + b) &\leq \epsilon + \xi_i, \\
-	(\mathbf{w} \cdot \mathbf{x}_i + b) - y_i &\leq \epsilon + \xi_i^*,
-\end{aligned}
-$$
+% $$
+% \begin{aligned}
+% 	y_i - (\mathbf{w} \cdot \mathbf{x}_i + b) &\leq \epsilon + \xi_i, \\
+% 	(\mathbf{w} \cdot \mathbf{x}_i + b) - y_i &\leq \epsilon + \xi_i^*,
+% \end{aligned}
+% $$
 
-where:
+% where:
 
-\begin{itemize}
-	\item $\xi_i$ and $\xi_i^*$ are slack variables that allow for some errors beyond the $\epsilon$ margin, and
-	\item $C$ is a regularization term that controls the trade-off between the flatness of the function and the tolerance for errors larger than $\epsilon$.
-\end{itemize}
+% \begin{itemize}
+% 	\item $\xi_i$ and $\xi_i^*$ are slack variables that allow for some errors beyond the $\epsilon$ margin, and
+% 	\item $C$ is a regularization term that controls the trade-off between the flatness of the function and the tolerance for errors larger than $\epsilon$.
+% \end{itemize}
