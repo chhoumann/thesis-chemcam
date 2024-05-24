@@ -9,14 +9,6 @@
 
 \subsubsection{Robust Scaler}
 
-\subsubsection{Power Transformation}
-
-\subsubsection{Quantile Transformer}
-
-\subsubsection{Principal Component Analysis (PCA)}
-
-\subsubsection{Kernel PCA}
-
 \subsubsection{Norm 3}
 As previously mentioned, the \gls{chemcam} instrument consists of three spectrometers, each producing 2048 channels.
 For data normalization, we follow the approach taken by the SuperCam team and normalize across individual spectrometers' wavelength ranges, a process known as \textit{Norm 3}~\cite{andersonPostlandingMajorElement2022}.
@@ -48,6 +40,14 @@ where
 \end{itemize}
 
 This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
+
+\subsubsection{Power Transformation}
+
+\subsubsection{Quantile Transformer}
+
+\subsubsection{Principal Component Analysis (PCA)}
+
+\subsubsection{Kernel PCA}
 
 \subsection{Overview of Core Models}
 In this section, we provide an overview and definitions of \gls{pls}, primarily based on the methodologies described by \citet{James2023AnIS}.
