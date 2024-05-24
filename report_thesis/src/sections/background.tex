@@ -213,8 +213,11 @@ Each internal node in the tree represents a decision based on a specific feature
 The tree can make predictions for new data points by following a path from the root to a leaf node.
 
 \gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
-Each tree in the forest is trained on a random subset of the data (using bootstrap sampling), and the predictions are aggregated to form the final prediction.
-This ensemble approach helps to reduce overfitting and enhances the model's generalization performance.
+Each tree in the forest is trained on a random subset of the data using bootstrap sampling, a method where samples are drawn with replacement from the original dataset.
+This technique allows each tree to be trained on a slightly different dataset, introducing variability and reducing overfitting.
+As a result, some data points may appear multiple times in the subset, while others may be omitted entirely.
+By training multiple trees on different subsets and then aggregating their predictions, the model achieves better generalization and robustness, leading to more accurate and reliable final predictions.
+
 Mathematically, the prediction of a random forest model can be represented as:
 
 $$
@@ -223,18 +226,11 @@ $$
 
 where $f_m(x)$ is the prediction of the $m$-th tree in the forest, and $M$ is the total number of trees.
 
-\gls{etr} is an extension of the \gls{rf} model that introduces additional randomness in the tree-building process.
-In a standard decision tree, the best split for each node is determined by selecting the feature and threshold that maximize the information gain (or another impurity measure).
-In contrast, \gls{etr} incorporates two additional sources of randomness: random feature selection and random thresholds for splits.
-
-\begin{itemize} % TODO: Rewrite this list into prose instead (e.g., paragraph form)
-	\item \textbf{Random Feature Selection}: At each node, a random subset of features is selected from the total set of features. For example, if the dataset has 10 features, the algorithm might randomly select 3 features to consider for the split.
-	\item \textbf{Random Split Points}: For each feature in the random subset, the algorithm selects random split points within the range of that feature, rather than evaluating all possible split points. For instance, if a feature's values range from 0 to 100, the algorithm might randomly choose split points like 23.5, 47.8, or 89.1.
-\end{itemize}
-
-These additional sources of randomness help to further decorrelate the trees in the forest, reducing overfitting and improving the model's generalization capability. The predictions of the trees in the forest are then aggregated to form the final prediction.
-
-By introducing more randomness into the tree construction process, \gls{etr} achieves a better balance between bias and variance, resulting in a model that performs well on both training and unseen data.
+\gls{etr} is an extension of the \gls{rf} model that introduces additional randomness in the tree-building process, namely \textit{random feature selection} and \textit{random split points}.
+While random forests use bootstrap sampling to create diverse training sets, \gls{etr} goes further by selecting a random subset of features at each node and determining split points randomly within the range of those features.
+This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
+As a tradeoff, ETR is less interpretable than a single decision tree, as the added randomness can introduce more bias than RF.
+However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets like LIBS data.
 
 \subsubsection{Gradient Boosting Regressor (GBR)}
 
