@@ -37,7 +37,7 @@ The final model consists of splits that create distinct regions, each with a pre
 This method ensures each region is more homogeneous with respect to the target variable, effectively reducing impurity and making the data points within each region more similar.
 
 The predictions resulting from the decision trees can then be improved by growing the trees sequentially, with each new tree correcting the errors of the previous ones.
-This technique is referred to as \textit{boosting}.
+This technique is referred to as \textit{Gradient Boosting}.
 A usual feature of boosted trees, is that each tree is typically small, with few terminal nodes.
 The small size of the trees and small number of terminal nodes prevents the model from making large adjustments based on a single tree's predictions.
 It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
@@ -45,12 +45,13 @@ Finally, small trees have the property of high bias, meaning that they are unabl
 By combining multiple small trees, the model can capture complex relationships while maintaining a low variance.
 
 As implied, the model is constructed iteratively by adding trees to correct the residuals of the previous trees. Mathematically, the final model is given by:
-$$
-\hat{f}(x) = \sum_{b=1}^{B} \lambda \hat{f}_b(x) 
-$$
+\begin{equation}
+    \hat{f}(x) = \sum_{b=1}^{B} \lambda \hat{f}_b(x) 
+\label{eq:boosted_tree}
+\end{equation}
 
-where $\hat{f}_b(x)$ is the prediction of the $b$-th tree, $\lambda$ is the learning rate, and $B$ is the number of trees in the model.
-This model is obtained by first setting the initial prediction $\hat{f}_0(x) = 0$, and then updating the prediction at each iteration $b$ as: 
+where $\hat{f}_b(x)$ is the prediction of the $b$-th tree, $B$ is the number of trees in the model and $\lambda$ is the learning rate.
+This model is obtained by first setting the initial prediction $\hat{f}_0(x) = 0$ and $r_i = y_i$ for all $i$ in the training set.Then the predictions are updated at each iteration $b$ as: 
 
 $$
 \hat{f}(x) \leftarrow \hat{f}(x) + \lambda \hat{f}_b(x)
@@ -63,10 +64,88 @@ $$
 r_i \leftarrow y_i - \hat{f}(x)
 $$
 
-At each step, a new regression tree $\hat{f}_b(x)$ is fitted to these residuals. 
-This process is repeated for $B$ iterations, resulting in the final model.
+At each step, a new regression tree $\hat{f}_b(x)$ is trained on these residuals.
+That is, each tree is learning to predict how much the previous model was wrong.
+The process of training a weak learner to predict the residuals and using its predictions to update the model is repeated for $B$ iterations, resulting in the final model in equation~\ref{eq:boosted_tree}.
+The process of training a weak learner to predict the residuals and using its predictions to update the model is repeated for $B$ iterations, resulting in the final model in equation~\ref{eq:boosted_tree}. 
+Each tree is trained to target the negative gradient of the loss function, defined as:
+$$
+    \nabla L = y - \hat{y}
+$$ 
+which directs the model's adjustments in the steepest descent direction to efficiently reduce errors.
+A commonly used loss function for \gls{gbr} is the squared error: 
+$$ 
+    L = \frac{1}{2}(y - \hat{y})^2
+$$
+favored for its continuous and differentiable nature which facilitates the gradient computation and ensures stable optimization paths. 
 
 
+
+\subsubsection{Gradient Boosting Regression}\label{sec:gradientboost}
+Gradient boosting builds on simpler concepts and incorporates the idea of ensemble learning, with decision trees and boosting as its core components.
+
+Ensemble learning is a technique in machine learning where multiple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
+Mathematically, ensemble learning can be defined as combining the predictions of $M$ weak learners to form a final prediction $\hat{y}$, such that:
+\begin{equation}
+    \hat{y} = \sum_{m=1}^{M} \alpha_m \hat{y}_m
+\end{equation}
+where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is the weight assigned to the $m$-th weak learner.
+Although various options exist for weak learners, decision trees are commonly used and have been selected for this study.
+
+Decision trees partition the data into subsets based on feature values, aiming to create groups where the data points are more similar in their predicted outcomes. 
+This similarity, or homogeneity, is measured in terms of impurity, which is a measure of how mixed the data points are within a region. 
+This is achieved through recursive binary splitting, dividing the dataset into two regions based on the value of a predictor. 
+The goal at each step is to select the predictor and the split point that result in the greatest reduction in impurity.
+
+Impurity, in the context of decision trees, is measured using the residual sum of squares (RSS). For any predictor $X_j$ and split point $s$, the data is divided into two regions $R1$ and $R2$ defined as:
+$$
+\begin{aligned}
+    R1(j, s) &= \{X | X_j < s\} \\
+    R2(j, s) &= \{X | X_j \geq s\}
+\end{aligned}
+$$
+The goal is to find the values of $j$ and $s$ that minimize the RSS, calculated as:
+$$
+    \sum_{i: x_i \in R1(j, s)} (y_i - \hat{y}_{R1})^2 + \sum_{i: x_i \in R2(j, s)} (y_i - \hat{y}_{R2})^2
+$$
+where $\hat{y}_{R1}$ and $\hat{y}_{R2}$ are the mean responses for the training observations in regions $R1$ and $R2$, respectively.
+
+Once optimal splits are identified, the tree is constructed by repeating this process for each subset until a stopping criterion is met. 
+The final model consists of splits that create distinct regions, each with a predicted response value based on the mean of the observations in that region.
+
+The method ensures that each region is more homogeneous with respect to the target variable, effectively reducing impurity and making the data points within each region more similar.
+
+The predictions from the decision trees can then be improved by growing the trees sequentially, with each new tree correcting the errors of the previous ones. 
+This technique is referred to as \textit{Gradient Boosting}. 
+Each tree is small, with few terminal nodes, preventing large adjustments based on a single tree's predictions. 
+It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
+Finally, small trees have the property of high bias, meaning that they are unable to capture complex relationships in the data and low variance.
+By combining multiple small trees, the model can capture complex relationships while maintaining a low variance.
+
+The model is constructed iteratively by adding trees to correct the residuals of the previous trees. 
+Initially, the prediction is set as $\hat{f}_0(x) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set. 
+At each iteration $b$, predictions are updated as:
+$$
+    \hat{f}(x) = \hat{f}(x) + \lambda \hat{f}_b(x)
+$$
+where $\hat{f}_b(x)$ is the prediction of the $b$-th tree and $\lambda$ is the learning rate. Residuals, representing the errors to be corrected by the next tree, are updated as:
+$$
+    r_i = y_i - \hat{f}(x)
+$$
+Each tree is then trained on these updated residuals. This process of fitting a weak learner to predict the residuals and using its predictions to update the model is repeated for $B$ iterations, culminating in the final model:
+$$
+    \hat{f}(x) = \sum_{b=1}^{B} \lambda \hat{f}_b(x) 
+$$
+This final formulation effectively reduces errors by moving in the direction of the steepest descent as dictated by the gradient of the loss function. The commonly used squared error loss function is:
+$$
+L = \frac{1}{2}(y - \hat{y})^2
+$$
+which is continuous and differentiable, facilitating the computation of the gradient and ensuring stable optimization paths. The gradient, defined as:
+$$
+    \nabla L = y - \hat{f}(x),
+$$
+guides the model adjustments to efficiently reduce errors. 
+The learning rate $\lambda$ moderates the size of these adjustments, helping to maintain stability and prevent overfitting as the model iteratively fits to the residual errors.
 
 
 1. Introduction to Ensemble Methods
