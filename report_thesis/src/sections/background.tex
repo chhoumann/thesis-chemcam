@@ -46,7 +46,7 @@ This normalization method results in a total of $3N = 6144$ normalized features 
 \subsubsection{Quantile Transformer}
 
 \subsubsection{Principal Component Analysis (PCA)}
-\gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
+\gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components} \cite{James2023AnIS}.
 First, the data matrix $\mathbf{X}$ is centered by subtracting the mean of each variable to ensure that the data is centered at the origin:
 
 $$
@@ -94,15 +94,15 @@ where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
 % \citet{scholkopftKPCA}
 
 \subsection{Overview of Core Models}
-In this section, we provide an overview and definitions of \gls{pls}, primarily based on the methodologies described by \citet{James2023AnIS}.
+In this section, we provide an overview and definitions of \gls{pls}, \gls{svr}, \gls{etr}, \gls{gbr}, and \gls{xgboost}.
 These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
 
 \subsubsection{Partial Least Squares (PLS)}
-Having introduced \gls{pca}, we now describe \gls{pls}.
+Having previously introduced \gls{pca}, we now describe \gls{pls}.
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-First, \gls{pca} is applied to the dataset $\mathbf{X}$, transforming it into a set of uncorrelated variables, the principal components.
+First, \gls{pca} is applied to the dataset $\mathbf{X}$, transforming it into a set of uncorrelated variables, the principal components \cite{James2023AnIS}.
 These components, represented by scores $\mathbf{T}$, are derived from the eigenvectors $\mathbf{V}_n$ with the highest variances.
 
 In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
@@ -151,7 +151,7 @@ The components are then used to predict the target variable by fitting a linear 
 \gls{svr} is a regression technique that extends the principles of \gls{svm} to regression problems.
 We therefore provide an overview of \gls{svm}s before discussing \gls{svr}s.
 
-\gls{svm} is a supervised learning algorithm used primarily for classification tasks.
+\gls{svm} is a supervised learning algorithm used primarily for classification tasks \cite{James2023AnIS}.
 A core concept in \gls{svm} is the \textit{hyperplane}.
 Generally, a hyperplane is a subspace of one dimension less than its ambient space.
 This means that in a two-dimensional space, a hyperplane is a line, while in a three-dimensional space, it is a plane, and so on.
