@@ -205,6 +205,36 @@ where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of 
 The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
 
 \subsubsection{Extra Trees Regressor (ETR)}
+Before discussing the \gls{etr} model, it is important to understand the concepts of decision trees and random forests.
+
+A decision tree is a supervised learning model that partitions data into subsets based on feature values, resembling a tree structure.
+The goal is to create a tree that predicts the target variable by dividing the data into increasingly homogeneous subsets.
+Each internal node in the tree represents a decision based on a specific feature, while each leaf node represents a prediction for the target variable.
+The tree can make predictions for new data points by following a path from the root to a leaf node.
+
+\gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
+Each tree in the forest is trained on a random subset of the data (using bootstrap sampling), and the predictions are aggregated to form the final prediction.
+This ensemble approach helps to reduce overfitting and enhances the model's generalization performance.
+Mathematically, the prediction of a random forest model can be represented as:
+
+$$
+f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
+$$
+
+where $f_m(x)$ is the prediction of the $m$-th tree in the forest, and $M$ is the total number of trees.
+
+\gls{etr} is an extension of the \gls{rf} model that introduces additional randomness in the tree-building process.
+In a standard decision tree, the best split for each node is determined by selecting the feature and threshold that maximize the information gain (or another impurity measure).
+In contrast, \gls{etr} incorporates two additional sources of randomness: random feature selection and random thresholds for splits.
+
+\begin{itemize} % TODO: Rewrite this list into prose instead (e.g., paragraph form)
+	\item \textbf{Random Feature Selection}: At each node, a random subset of features is selected from the total set of features. For example, if the dataset has 10 features, the algorithm might randomly select 3 features to consider for the split.
+	\item \textbf{Random Split Points}: For each feature in the random subset, the algorithm selects random split points within the range of that feature, rather than evaluating all possible split points. For instance, if a feature's values range from 0 to 100, the algorithm might randomly choose split points like 23.5, 47.8, or 89.1.
+\end{itemize}
+
+These additional sources of randomness help to further decorrelate the trees in the forest, reducing overfitting and improving the model's generalization capability. The predictions of the trees in the forest are then aggregated to form the final prediction.
+
+By introducing more randomness into the tree construction process, \gls{etr} achieves a better balance between bias and variance, resulting in a model that performs well on both training and unseen data.
 
 \subsubsection{Gradient Boosting Regressor (GBR)}
 
