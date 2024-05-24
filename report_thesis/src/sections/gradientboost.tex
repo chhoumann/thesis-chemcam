@@ -31,17 +31,40 @@ $$
 
 where $\hat{y}_{R1}$ and $\hat{y}_{R2}$ are the mean responses for the training observations in regions $R1$ and $R2$, respectively, $y_i$ is the response for the $i$-th observation and $x_i$ is the predictor value for the $i$-th observation. 
 
-Once the optimal splits are identified, the tree is constructed by repeating this process for each resulting subset until a stopping criterion is met, such as a minimum number of observations per node. 
-The final model consists of a series of splits that segment the data into distinct regions, each associated with a predicted response value based on the mean of the training observations in that region.
+Once the optimal splits are identified, the tree is constructed by repeating this process for each subset until a stopping criterion, such as a minimum number of observations per node, is met. 
+The final model consists of splits that create distinct regions, each with a predicted response value based on the mean of the training observations in that region.
 
-This method ensures that each region contains data that is more homogeneous with respect to the target variable, effectively reducing impurity, which means that the regions are more uniform and the data points within each region are more similar to each other. 
+This method ensures each region is more homogeneous with respect to the target variable, effectively reducing impurity and making the data points within each region more similar.
 
+The predictions resulting from the decision trees can then be improved by growing the trees sequentially, with each new tree correcting the errors of the previous ones.
+This technique is referred to as \textit{boosting}.
+A usual feature of boosted trees, is that each tree is typically small, with few terminal nodes.
+The small size of the trees and small number of terminal nodes prevents the model from making large adjustments based on a single tree's predictions.
+It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
+Finally, small trees have the property of high bias, meaning that they are unable to capture complex relationships in the data and low variance.
+By combining multiple small trees, the model can capture complex relationships while maintaining a low variance.
 
+As implied, the model is constructed iteratively by adding trees to correct the residuals of the previous trees. Mathematically, the final model is given by:
+$$
+\hat{f}(x) = \sum_{b=1}^{B} \lambda \hat{f}_b(x) 
+$$
 
+where $\hat{f}_b(x)$ is the prediction of the $b$-th tree, $\lambda$ is the learning rate, and $B$ is the number of trees in the model.
+This model is obtained by first setting the initial prediction $\hat{f}_0(x) = 0$, and then updating the prediction at each iteration $b$ as: 
 
+$$
+\hat{f}(x) \leftarrow \hat{f}(x) + \lambda \hat{f}_b(x)
+$$
 
+where $\hat{f}_b(x)$ is the prediction of the $b$-th tree and $\lambda$ is the learning rate. 
+The residuals, which represent the errors to be corrected by the next tree, are updated as:
 
+$$
+r_i \leftarrow y_i - \hat{f}(x)
+$$
 
+At each step, a new regression tree $\hat{f}_b(x)$ is fitted to these residuals. 
+This process is repeated for $B$ iterations, resulting in the final model.
 
 
 
