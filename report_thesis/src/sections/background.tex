@@ -97,7 +97,7 @@ where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
 In this section, we provide an overview and definitions of \gls{pls}, primarily based on the methodologies described by \citet{James2023AnIS}.
 These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
 
-\subsubsection{PLS}
+\subsubsection{Partial Least Squares (PLS)}
 Having introduced \gls{pca}, we now describe \gls{pls}.
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
 
@@ -146,6 +146,14 @@ $$
 $$
 
 The components are then used to predict the target variable by fitting a linear model via least squares regression.
+
+\subsubsection{Support Vector Regression (SVR)}
+
+\subsubsection{Extra Trees Regressor (ETR)}
+
+\subsubsection{Gradient Boosting Regressor (GBR)}
+
+\subsubsection{XGBoost}
 
 \subsection{Stacking Ensemble}
 % \citet{pavlyshenko2018stacking}
