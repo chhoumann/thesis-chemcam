@@ -1,4 +1,4 @@
-\subsection{Validation and Testing Procedures}
+\subsection{Validation and Testing Procedures}\label{subsec:validation_testing_procedures}
 This section describes the validation and testing procedures that each of our experiments adhere to.
 Selecting appropriate testing procedures is crucial for ensuring the validity and reliability of the results.
 For that reason, we delineate a methodological approach that ensures our models are accurate and generalizable.
@@ -21,7 +21,7 @@ If we were to randomly split the dataset, some locations from a target could end
 This would cause data leakage, as the testing set would no longer consist solely of unseen targets.
 To prevent this, we ensure that each target is represented only once in the dataset by grouping data from all locations on a given target.
 
-\subsubsection{Dataset Partitioning}
+\subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
 To ensure rigorous evaluation of our models and to prevent data leakage, we have implemented a customized k-fold cross-validation procedure.
 This procedure ensures that all data points from a given target are either entirely in the training set or the test set.
 The following algorithm outlines the steps taken to partition the dataset effectively while addressing the specific challenges posed by our data.
@@ -55,7 +55,9 @@ The procedure begins by setting a random seed for reproducibility if one is prov
 This ensures that the results are consistent across different runs of the algorithm.
 Next, the dataset is processed to remove any duplicate entries based on the group column and then sorted by the target column (Line~\ref{line:remove_duplicates}).
 This step ensures that each group is uniquely identified and ordered appropriately.
-The dataset we illustrate in Table~\ref{tab:final_dataset_example} would require a group column $g$ of "\texttt{Target}" to group the data by target. The target column $t$ refers to the regression target, which would be the oxide for which we are predicting the concentration, e.g., \ce{SiO_2}.
+The dataset we illustrate in Table~\ref{tab:final_dataset_example} would require a group column $g$ of "\texttt{Target}" to group the data by target.
+The target column $t$ refers to the column with the target variable, which would be the oxide for which we are predicting the concentration, e.g., \ce{SiO_2}.
+By sorting the dataset by the target column, we ensure that the data is ordered by the target concentration values in ascending order.
 
 Fold numbers are then assigned sequentially to the unique targets (Line~\ref{line:assign_folds}).
 This initial assignment distributes the targets randomly across the folds.
@@ -86,21 +88,33 @@ Their process involved dividing the full set of laboratory data into five folds,
 This approach ensured that each fold represented the full elemental compositional variation, and extreme targets were included in the training folds to handle a wider range of compositions.
 For consistency, we also use \(k=5\) for our cross-validation.
 
+Additionally, by using $k=5$ folds, we have effectively chosen an 80\%/20\% split between the training and testing datasets.
+In our experience, this ratio maximizes the training set's capacity for effective model learning while ensuring that the testing set is sufficiently representative to provide an accurate assessment of the model's performance on new data.
+As detailed in Section~\ref{sec:problem_definition}, the limited availability of data is a primary constraint.
+Allocating too much data to the testing set could compromise the comprehensiveness of the training set, undermining the model's ability to generalize effectively.
 
-\subsubsection{Evaluation Metrics}
+
+\subsubsection{Evaluation Metrics}\label{subsubsec:evaluation_metrics}
 As mentioned in Section~\ref{sec:problem_definition}, the performance of the models was quantitatively assessed using the \gls{rmse} and the standard deviation of the residuals.
 These metrics are calculated for each fold and averaged across all folds to provide comprehensive indicators of model accuracy and variability.
 In addition, we also compute the metrics for the test set to provide a measure of the model's performance on unseen data.
 Therefore, we have the following metrics for each experiment:
 \begin{enumerate}
-    \item \textbf{Fold-specific RMSE and Standard Deviation:} For each of the $k$ folds, we calculate both the RMSE and standard deviation, denoted as \texttt{rmse\_cv\_n} and \texttt{std\_dev\_cv\_n}, where \texttt{n} ranges from 1 to $k$.
-    \item \textbf{Average RMSE and Standard Deviation:} The overall cross-validation RMSE (\texttt{rmse\_cv}) and standard deviation (\texttt{std\_dev\_cv}) are computed as the mean of the fold-specific values.
-    \item \textbf{Test Set RMSE and Standard Deviation:} The RMSE and standard deviation are also computed for the test set, denoted as \texttt{rmsep} and \texttt{std\_dev}, to provide a measure of the model's performance on unseen data.
+    \item \textbf{Fold-specific \gls{rmse} and Standard Deviation:} For each of the $k$ folds, we calculate both the \gls{rmse} and standard deviation, denoted as \texttt{rmse\_cv\_n} and \texttt{std\_dev\_cv\_n}, where \texttt{n} ranges from 1 to $k$.
+    \item \textbf{Average \gls{rmse} and Standard Deviation:} The overall cross-validation \gls{rmse} (\texttt{rmse\_cv}) and standard deviation (\texttt{std\_dev\_cv}) are computed as the mean of the fold-specific values.
+    \item \textbf{Test Set \gls{rmse} and Standard Deviation:} The \gls{rmse} and standard deviation are also computed for the test set, denoted as \texttt{rmsep} and \texttt{std\_dev}, to provide a measure of the model's performance on unseen data.
 \end{enumerate}
 
-\subsubsection{Conclusion}
-The implementation of a tailored validation and testing framework in this study ensures that the models developed are both accurate and generalizable.
-By integrating custom k-fold cross-validation and carefully selecting performance metrics, the methodology effectively addresses potential issues of data leakage and overfitting.
-These measures reinforce the reliability of the model evaluations and support the overarching goal of enhancing the accuracy and robustness of chemical composition analysis using \gls{libs} data.
+K-fold cross-validation provides a robust estimate of model performance by averaging metrics over multiple folds, reducing variance and offering a clearer picture of the model's generalizability.
+Evaluating the model on a separate test set representative of unseen data ensures that performance metrics accurately reflect the model's generalization capability.
+However, our data partitioning method, which moves the most extreme values into the training data, naturally results in the testing data being closer to the mean of the data distribution, making it easier to predict.
+Therefore, evaluating the model's performance using both the cross-validation metrics (\texttt{rmse\_cv} and \texttt{std\_dev\_cv}) and the test set metrics (\texttt{rmsep} and \texttt{std\_dev}) is crucial.
+The cross-validation metrics provide insights into the model's stability across different subsets, while the test set metrics offer a final measure of performance on truly unseen data, giving a comprehensive assessment of the model's generalizability.
 
+
+\subsubsection{Conclusion}
+In summary, our validation and testing procedures are designed to ensure the robustness and generalizability of our models by employing a combination of k-fold cross-validation and a separate test set.
+The customized k-fold cross-validation algorithm mitigates data leakage by ensuring that data points from the same target are not split across training and testing sets.
+This method, which includes handling extreme values, aligns with established practices and optimally partitions the dataset to maintain a balance between representativeness and model training efficacy.
+By assessing model performance through comprehensive metrics such as \gls{rmse} and standard deviation across both cross-validation folds and a separate test set, we provide a rigorous evaluation framework that underscores the reliability and accuracy of our predictive models.
 
