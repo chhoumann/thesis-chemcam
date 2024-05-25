@@ -6,11 +6,14 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import BaseCrossValidator, KFold, StratifiedGroupKFold
 
-from lib.outlier_removal import global_local_outlier_removal
-from lib.reproduction import major_oxides
 
+def sort_and_assign_folds(
+    data, group_by, target, n_splits=5, percentile=0.05, ensure_extremes_in_train=True, random_state=None
+):
+    # Set the random seed for reproducibility
+    if random_state is not None:
+        np.random.seed(random_state)
 
-def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in_train=True):
     # Sort the data by the target column
     unique_samples = (
         data.drop_duplicates(subset=[group_by])[[group_by, target]].sort_values(by=target).reset_index(drop=True)
@@ -21,9 +24,9 @@ def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in
 
     if ensure_extremes_in_train:
         # Identify extreme values (e.g., top and bottom 5%)
-        quantiles = unique_samples[target].quantile([0.05, 0.95])
+        quantiles = unique_samples[target].quantile([percentile, 1 - percentile])
         extremes = unique_samples[
-            (unique_samples[target] <= quantiles[0.05]) | (unique_samples[target] >= quantiles[0.95])
+            (unique_samples[target] <= quantiles[percentile]) | (unique_samples[target] >= quantiles[1 - percentile])
         ]
 
         # Set extreme values to training folds (0 to n_splits-2)
@@ -43,7 +46,7 @@ def sort_and_assign_folds(data, group_by, target, n_splits=5, ensure_extremes_in
     return data
 
 
-def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, random_state=None):
+def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, random_state=None, percentile=0.05):
     """
     Perform custom k-fold cross-validation with outlier removal.
 
@@ -59,7 +62,7 @@ def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, 
     - test_data: The test set.
     """
     # Sort and assign folds
-    data = sort_and_assign_folds(data, group_by, target, n_splits=k)
+    data = sort_and_assign_folds(data, group_by, target, n_splits=k, percentile=percentile, random_state=random_state)
 
     # Identify the test fold (the one with the highest fold number)
     test_fold_number = k - 1
