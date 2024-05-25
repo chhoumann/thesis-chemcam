@@ -98,18 +98,18 @@ Allocating too much data to the testing set could compromise the comprehensivene
 Figures \ref{fig:histogram_grid_plot} and \ref{fig:histogram_kde_plot} provide visual insights into the distribution of \ce{SiO_2} concentrations across different folds used in our custom k-fold data partitioning procedure.
 These figures illustrate the effectiveness of our data partitioning strategy in maintaining balanced and representative datasets.
 
+Figure \ref{fig:histogram_grid_plot} presents histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each of the four cross-validation folds and the full test set.
+Each subplot shows the \ce{SiO_2} concentration (x-axis) against the count of samples per bin (y-axis).
+The overlaid \gls{kde} curves provide a smoothed estimate of the probability density function for \ce{SiO_2} concentrations.
+The legends detail the fold number and respective counts of unique targets and total samples.
+As can be seen, the consistent distributions across folds suggest effective data partitioning, ensuring each fold is representative of the overall dataset.
+
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=\textwidth]{images/histogram_grid_plot.png}
     \caption{Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold.}
     \label{fig:histogram_grid_plot}
 \end{figure*}
-
-Figure \ref{fig:histogram_grid_plot} presents histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each of the four cross-validation folds and the full test set.
-Each subplot shows the \ce{SiO_2} concentration (x-axis) against the count of samples per bin (y-axis).
-The overlaid \gls{kde} curves provide a smoothed estimate of the probability density function for \ce{SiO_2} concentrations.
-The legends detail the fold number and respective counts of unique targets and total samples.
-As can be seen, the consistent distributions across folds suggest effective data partitioning, ensuring each fold is representative of the overall dataset.
 
 The consistency observed across the folds indicates that our cross-validation method effectively captures the underlying distribution of \ce{SiO_2} concentrations.
 This balance is crucial for developing generalizable models, as it ensures that each fold contains a similar distribution of \ce{SiO_2} values.
