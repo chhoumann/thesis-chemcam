@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from sklearn.model_selection import GroupKFold
 import matplotlib.pyplot as plt
 import seaborn as sns
 from lib.full_flow_dataloader import load_full_flow_data
@@ -15,7 +14,6 @@ st.title("Custom K-Fold Cross Validation")
 train_processed, test_processed = load_full_flow_data()
 data = pd.concat([train_processed, test_processed])
 group_by = "Sample Name"
-extreme_percentage = 0.05
 n_splits = 5
 random_state = 42
 
@@ -25,13 +23,16 @@ target = st.selectbox("Select target oxide:", major_oxides)
 # User selects cross-validation method
 cv_method = st.selectbox("Select cross-validation method:", ["Sorted Group K-Fold", "Stratified Group K-Fold"])
 
+# User selects extreme percentage
+extreme_percentage = st.slider("Select extreme percentage:", min_value=0.01, max_value=0.25, value=0.05, step=0.01)
+
 # Add links based on selection
 if cv_method == "Sorted Group K-Fold":
     st.markdown(
         "[View Sorted K-Fold Code](https://github.com/chhoumann/thesis-chemcam/blob/58822cb4a89426359458eee9c5bb6a0d4ad2af6f/baseline/lib/cross_validation.py#L13)"
     )
     folds_custom, train_full, test_full = custom_kfold_cross_validation_new(
-        data=data, k=5, group_by=group_by, target=target, random_state=random_state
+        data=data, k=5, group_by=group_by, target=target, random_state=random_state, percentile=extreme_percentage
     )
 else:
     st.markdown(
@@ -111,3 +112,4 @@ plt.legend()
 
 plt.tight_layout()
 st.pyplot(fig)
+
