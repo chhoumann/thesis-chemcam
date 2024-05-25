@@ -3,6 +3,7 @@ from typing import List
 
 import mlflow
 import optuna
+import pandas as pd
 import requests
 import typer
 from optuna.pruners import HyperbandPruner
@@ -31,7 +32,7 @@ from sklearn.pipeline import Pipeline
 from lib import full_flow_dataloader
 from lib.config import AppConfig
 from lib.cross_validation import (
-    CustomKFoldCrossValidator,
+    custom_kfold_cross_validation_new,
     get_cross_validation_metrics,
     perform_cross_validation,
 )
@@ -174,6 +175,17 @@ def instantiate_scaler(trial, scaler_selector, logger):
         raise ValueError(f"Unsupported scaler type: {scaler_selector}")
 
 
+def get_data(target: str):
+    train_full, test_full = full_flow_dataloader.load_full_flow_data(load_cache_if_exits=True, average_shots=True)
+    full_data = pd.concat([train_full, test_full], axis=0)
+
+    folds, train, test = custom_kfold_cross_validation_new(
+        data=full_data, k=5, group_by="Sample Name", target=target, random_state=42
+    )
+
+    return folds, train, test
+
+
 def combined_objective(trial, oxide, model_selector):
     try:
         with mlflow.start_run(nested=True) as run:
@@ -222,27 +234,30 @@ def combined_objective(trial, oxide, model_selector):
 
             preprocessor = Pipeline(steps)
 
-            # Drop all oxides except for the current oxide
-            drop_cols = ["ID", "Sample Name"] + major_oxides
-            train_full, test_full = full_flow_dataloader.load_full_flow_data(
-                load_cache_if_exits=True, average_shots=True
-            )
+            folds, train, test = get_data(oxide)
 
-            kf = CustomKFoldCrossValidator(k=5, group_by="Sample Name", random_state=42)
+            # Log the size of the train and test set to mlflow
+            mlflow.log_param("train_size", len(train))
+            mlflow.log_param("test_size", len(test))
+            # Log the size of each fold to mlflow
+            for i, (train_fold, val_fold) in enumerate(folds):
+                mlflow.log_param(f"fold_{i+1}_train_size", len(train_fold))
+                mlflow.log_param(f"fold_{i+1}_val_size", len(val_fold))
+
+            drop_cols = ["ID", "Sample Name"] + major_oxides
             preprocess_fn = get_preprocess_fn(preprocessor, oxide, drop_cols=drop_cols)
 
             cv_fold_metrics = perform_cross_validation(
-                data=train_full,
+                folds=folds,
                 model=model,  # type: ignore
                 preprocess_fn=preprocess_fn,
                 metric_fns=[rmse_metric, std_dev_metric],
-                kf=kf,
             )
 
             cv_metrics = get_cross_validation_metrics(cv_fold_metrics)
             mlflow.log_metrics(cv_metrics.as_dict())
 
-            X_train, y_train, X_test, y_test = preprocess_fn(train_full, test_full)
+            X_train, y_train, X_test, y_test = preprocess_fn(train, test)
 
             # Model training and evaluation
             model.fit(X_train, y_train)
@@ -313,7 +328,8 @@ def main(
     - Run optimization with default settings (200 trials on all predefined oxides):
       `python optuna_run.py`
     """
-    sampler = TPESampler(n_startup_trials=50, n_ei_candidates=20, seed=42)
+    n_startup_trials = int(0.25 * n_trials)  # Reserve 25% of trials for exploration
+    sampler = TPESampler(n_startup_trials=n_startup_trials, n_ei_candidates=20, seed=42)
     pruner = HyperbandPruner(min_resource=1, max_resource=10, reduction_factor=3)
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
 
