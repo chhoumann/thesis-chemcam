@@ -80,6 +80,12 @@ The final output of this procedure consists of:
 
 By following this detailed procedure, we ensure that our cross-validation is robust against data leakage, maintains the integrity of grouped targets, and carefully handles extreme values to improve the representativeness of the training set.
 
+Our method is broadly aligned with the approach described by \citet{andersonImprovedAccuracyQuantitative2017}.
+They employed a similar strategy to assess the performance of their PLS model, using k-fold cross-validation and a separate test set.
+Their process involved dividing the full set of laboratory data into five folds, using four for cross-validation and combining them as the final training set, while the fifth fold served as a test set.
+This approach ensured that each fold represented the full elemental compositional variation, and extreme targets were included in the training folds to handle a wider range of compositions.
+For consistency, we also use \(k=5\) for our cross-validation.
+
 
 \subsubsection{Evaluation Metrics}
 As mentioned in Section~\ref{sec:problem_definition}, the performance of the models was quantitatively assessed using the \gls{rmse} and the standard deviation of the residuals.
