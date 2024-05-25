@@ -1,7 +1,16 @@
 \section{Background}\label{sec:background}
 \subsection{Preprocessing}
 
-\subsubsection{Standard Scaler}
+\subsubsection{Z-score Normalization}
+Z-score normalization, also known as standard score normalization, transforms the data into a distribution with a mean of zero and a standard deviation of one. 
+This normalization is useful when the actual minimum and maximum of a feature are unknown or when there are outliers that may skew the distribution significantly. 
+The formula for Z-score normalization is given by:
+
+$$ v' = \frac{v - \overline{F}}{\sigma_F} $$
+
+where $v$ is the original value, $\overline{F}$ is the mean of the feature $F$, and $\sigma_F$ is the standard deviation of $F$. 
+By transforming the data using the Z-score, each value reflects the number of standard deviations away from the mean. 
+This method is helpful in environments where the data needs to be standardized to fit a normal distribution, making it easier to compare differences in data points~\cite{dataminingConcepts}.
 
 \subsubsection{Max Absolute Scaler}
 
