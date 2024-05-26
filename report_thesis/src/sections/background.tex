@@ -45,7 +45,7 @@ This normalization method results in a total of $3N = 6144$ normalized features 
 
 \subsubsection{Quantile Transformer}
 
-\subsubsection{Principal Component Analysis (PCA)}
+\subsubsection{Principal Component Analysis (PCA)}\label{subsec:pca}
 \gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
 We give an overview of the \gls{pca} algorithm based on \citet{James2023AnIS}.
 
@@ -93,7 +93,7 @@ $$
 where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
 
 \subsubsection{Kernel PCA}
-% \citet{scholkopftKPCA}
+The description of the \gls{kernel-pca} algorithm is based on \citet{learningwithkernels}.
 \gls{kernel-pca} is an extension of the traditional \gls{pca} that is used to handle nonlinear relationships among data points.
 The core idea behind \gls{kernel-pca} is to map the data into a higher-dimensional space using a kernel function, known as the \textit{kernel trick}. 
 This mapping allows for the linear separation of data points in the higher-dimensional space, even when the data is not linearly separable in the original space.
@@ -106,17 +106,11 @@ $$
 where $m$ is the number of data points and $\Phi(\mathbf{x}_j)$ represents the mapping of the data point $\mathbf{x}_j$ into the higher-dimensional feature space. 
 The term $\frac{1}{m}$ normalizes the sum, ensuring the covariance matrix represents the average pairwise relationships between data points.
 
-However, in practice, computing the covariance matrix is typically not feasible for large datasets, as computing the mapping function \(\Phi(\mathbf{x}_j)\) for each data point is computationally expensive and often impractical due to the high dimensionality of the feature space. 
-Instead, Kernel PCA leverages the kernel trick, which allows us to compute the similarity between data points directly in the original space using a kernel function \(k(\mathbf{x}_i, \mathbf{x}_j)\). 
-This kernel function implicitly computes the dot product \(\Phi(\mathbf{x}_i)^\top \Phi(\mathbf{x}_j)\) in the higher-dimensional feature space without explicitly performing the mapping. 
-By constructing the kernel matrix \(\mathbf{K}\) using these pairwise similarities, Kernel PCA can perform eigenvalue decomposition on \(\mathbf{K}\) to find the principal components in the feature space, thereby achieving dimensionality reduction while capturing the nonlinear relationships in the data.
-
-This version elaborates on the kernel trick and explains how it bypasses the need to explicitly compute the high-dimensional mapping.
-% To achieve this, \gls{kernel-pca} first computes the kernel matrix $\mathbf{K}$, where each element $K_{ij}$ is the result of applying the kernel function $k(\mathbf{x}_i, \mathbf{x}_j)$ to the data points $\mathbf{x}_i$ and $\mathbf{x}_j$.
-
-% The kernel function can be any valid kernel, such as the polynomial kernel, Gaussian kernel, or sigmoid kernel.
-
-
+However, in practice, computing the covariance matrix is typically not feasible for large datasets, as computing the mapping function $\Phi(\mathbf{x}_j$ for each data point is expensive and often impractical due to the high dimensionality of the feature space. 
+Instead, Kernel PCA leverages the kernel trick, which allows us to compute the similarity between data points directly in the original space using a kernel function $k(\mathbf{x}_i, \mathbf{x}_j)$. 
+This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\top \Phi(\mathbf{x}_j)$ in the higher-dimensional feature space without explicitly performing the mapping. 
+By constructing the kernel matrix \(\mathbf{K}\) using these pairwise similarities, Kernel PCA can perform eigenvalue decomposition to obtain the principal components in the feature space, in the same fashion as regular \gls{pca} described in Section~\ref{subsec:pca}.
+However, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
 
 \subsection{Overview of Core Models}
 In this section, we provide an overview and definitions of \gls{pls}, \gls{svr}, \gls{etr}, \gls{gbr}, and \gls{xgboost}.
