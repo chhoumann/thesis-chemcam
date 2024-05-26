@@ -21,9 +21,32 @@ If we were to randomly split the dataset, some locations from a target could end
 This would cause data leakage, as the testing set would no longer consist solely of unseen targets.
 To prevent this, we ensure that each target is represented only once in the dataset by grouping data from all locations on a given target.
 
+Furthermore, the limited availability we mention in Section~\ref{sec:problem_definition} of data poses another significant challenge.
+The dataset we use consists of 408 samples. This is a large dataset by \gls{libs} standards.
+As mentioned, the collection process is difficult, making datasets relatively small in general.
+Additionally, there are only a few samples with extreme concentration values for the oxides in the targets.
+These extreme values act as outliers, presenting concentrations significantly different from the rest of the data points.
+
+When performing a random split of the dataset into multiple folds for cross-validation, as well as for training and testing sets, this small number of extreme values can result in an uneven distribution.
+The presence or absence of these outliers in any given fold can heavily influence the model's performance metrics.
+If extreme values are disproportionately allocated to either the training or testing sets, the resulting model may struggle to generalize accurately.
+This uneven distribution can lead to models that perform well on the majority of the data but fail to predict accurately for these outlier concentrations, which are critical in many practical applications.
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{images/oxide_distributions.png}
+    \caption{Distributions of various oxide concentrations in the dataset. The histograms show the frequency of concentration values for \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeOT}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.}
+    \label{fig:oxide_distributions}
+\end{figure*}
+
+Figure~\ref{fig:oxide_distributions} illustrates the distributions of various oxide concentrations in our dataset.
+Notably, the bimodal distribution of \ce{SiO2} concentrations and the skewed distributions of \ce{FeOT} and \ce{CaO} highlight the presence of extreme values.
+These distributions confirm that certain concentrations are significantly overrepresented or underrepresented, further complicating the model training process.
+
+
 \subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
 To ensure rigorous evaluation of our models and to prevent data leakage, we have implemented a customized k-fold cross-validation procedure.
-This procedure ensures that all data points from a given target are either entirely in the training set or the test set.
+This procedure ensures that all data points from a given target are either entirely in the training set or the test set, overcoming the challenge of data leakage we mention above.
 The following algorithm outlines the steps taken to partition the dataset effectively while addressing the specific challenges posed by our data.
 
 \begin{algorithm}
@@ -98,11 +121,7 @@ Allocating too much data to the testing set could compromise the comprehensivene
 Figures \ref{fig:histogram_grid_plot} and \ref{fig:histogram_kde_plot} provide visual insights into the distribution of \ce{SiO_2} concentrations across different folds used in our custom k-fold data partitioning procedure.
 These figures illustrate the effectiveness of our data partitioning strategy in maintaining balanced and representative datasets.
 
-Figure \ref{fig:histogram_grid_plot} presents histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each of the four cross-validation folds and the full test set.
-Each subplot shows the \ce{SiO_2} concentration (x-axis) against the count of samples per bin (y-axis).
-The overlaid \gls{kde} curves provide a smoothed estimate of the probability density function for \ce{SiO_2} concentrations.
-The legends detail the fold number and respective counts of unique targets and total samples.
-As can be seen, the consistent distributions across folds suggest effective data partitioning, ensuring each fold is representative of the overall dataset.
+\subsubsection{Detailed Interpretation of Histograms and KDE Curves}
 
 \begin{figure*}[h!]
     \centering
@@ -111,24 +130,72 @@ As can be seen, the consistent distributions across folds suggest effective data
     \label{fig:histogram_grid_plot}
 \end{figure*}
 
-The consistency observed across the folds indicates that our cross-validation method effectively captures the underlying distribution of \ce{SiO_2} concentrations.
-This balance is crucial for developing generalizable models, as it ensures that each fold contains a similar distribution of \ce{SiO_2} values.
-The \gls{kde} curves' alignment across folds confirms the robustness of our custom k-fold cross-validation procedure in maintaining consistent data distribution.
+Figure \ref{fig:histogram_grid_plot} presents individual histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each of the four cross-validation folds' validation sets and the full test set.
+Each subplot shows the \ce{SiO_2} concentration (x-axis) against the count of samples per bin (y-axis).
+The overlaid \gls{kde} curves provide a smoothed estimate of the probability density function for \ce{SiO_2} concentrations.
+
+The histograms and \gls{kde} curves for each fold are remarkably similar, indicating that the data distribution within each fold closely matches the overall data distribution.
+This similarity ensures that each fold is representative of the entire dataset, which is crucial for developing models that can generalize well.
+The central tendency (mean) and spread (standard deviation) of \ce{SiO_2} concentrations appear consistent across all folds.
+The \gls{kde} curves highlight that the density peaks and the tails of the distributions align well, suggesting that no fold is disproportionately skewed or biased.
+
+These consistent distributions across folds validate our k-fold cross-validation method, confirming that each fold can provide a reliable estimate of model performance.
+This balance helps in preventing overfitting, as the model is trained and validated on similarly distributed data in each fold.
 
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=\textwidth]{images/histogram_kde_plot.png}
-    \caption{Combined Histogram and \gls{kde}\ce{SiO_2} Distribution in Each Fold.}
+    \caption{Combined Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold.}
     \label{fig:histogram_kde_plot}
 \end{figure*}
 
 Figure \ref{fig:histogram_kde_plot} combines the histograms and \gls{kde} curves of \ce{SiO_2} values from each fold and the full test set into a single plot, using different colors to represent each fold and the test set.
-This comprehensive visualization enables direct comparison of the distributions across the folds and the test set.
-The x-axis shows \ce{SiO_2} concentration, while the y-axis indicates the count of samples per bin.
-The alignment of \gls{kde} curves across folds and the test set suggests that our custom k-fold cross-validation method effectively maintains representativeness and balance in the data.
+This visualization enables direct comparison of the distributions across the folds and the test set.
+
+The combined histograms and \gls{kde} curves show a high degree of overlap, reinforcing the observation that the distributions are consistent across different folds and the test set.
+The test set distribution closely follows the overall pattern observed in the folds, indicating that the test set is also representative of the overall dataset.
+The presence of extreme values is evident in the tails of the distributions, particularly in the training folds.
+
+\subsubsection{Statistical Consistency}
+
+To further validate our visual analysis, we can look at quantitative measures such as the means and standard deviations of \ce{SiO_2} concentrations across the folds and the overall dataset.
+As shown in Table~\ref{tab:siO2_std_means}, the standard deviations and means for \ce{SiO_2} concentrations in each fold are as follows:
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Fold} & \textbf{Standard Deviation} & \textbf{Mean} \\
+        \hline
+        Fold 1 & 16.28 & 55.70 \\
+        \hline
+        Fold 2 & 12.46 & 57.59 \\
+        \hline
+        Fold 3 & 18.01 & 51.51 \\
+        \hline
+        Fold 4 & 15.77 & 55.10 \\
+        \hline
+        Test Full & 9.06 & 56.57 \\
+        \hline
+    \end{tabular}
+    \caption{Standard deviations and means of \ce{SiO_2} concentrations across different folds' validation sets and the full test set.}
+    \label{tab:siO2_std_means}
+\end{table}
+
+The means and standard deviations of \ce{SiO_2} concentrations for each fold are consistent with those of the overall dataset.
+These metrics are even more similar across folds for the training sets, indicating that the training sets are also representative of the entire dataset.
+This quantitative consistency supports the visual evidence that each fold is a reliable representative of the entire dataset.
+
+\subsubsection{Importance of Distribution Balance}
+
+Maintaining balanced and representative distributions in each fold is essential for training robust models.
+It ensures that the models are not biased towards any specific subset of the data, which is crucial for their generalization to unseen data.
+The balanced distributions across folds enable the model to be trained on diverse subsets of data, leading to better generalization.
+This approach reduces the risk of overfitting and ensures that the model performs well on new, unseen data.
 
 By ensuring that each fold is representative of the overall dataset, these visualizations validate our dataset partitioning strategy.
-We conclude that the consistency observed across folds supports that the data distribution method works as intended, providing confidence in the generalizability and reliability of our models.
+The consistency observed across folds supports the claim that the data distribution method works as intended, providing confidence in the generalizability and reliability of our models.
+
 
 \subsubsection{Evaluation Metrics}\label{subsubsec:evaluation_metrics}
 As mentioned in Section~\ref{sec:problem_definition}, the performance of the models was quantitatively assessed using the \gls{rmse} and the standard deviation of the residuals.
