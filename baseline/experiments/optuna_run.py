@@ -340,7 +340,7 @@ def main(
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}")
 
-        experiment_id = get_or_create_experiment(f"Optuna {oxide} - NGBoost - {current_date}")
+        experiment_id = get_or_create_experiment(f"Optuna {oxide} {current_date}")
         mlflow.set_experiment(experiment_id=experiment_id)
 
         for model in models:
