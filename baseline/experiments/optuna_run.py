@@ -290,7 +290,7 @@ def combined_objective(trial, oxide, model_selector):
         return float("inf"), float("inf")  # Return a large number to indicate failure
 
 
-models = ["ngboost"]
+models = ["gbr", "svr", "extra_trees", "pls", "xgboost", "ngboost"]
 
 
 def validate_oxides(ctx: typer.Context, param: typer.CallbackParam, value: List[str]) -> List[str]:
