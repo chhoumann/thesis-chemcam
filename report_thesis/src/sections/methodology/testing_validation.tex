@@ -84,8 +84,6 @@ By sorting the dataset by the target column, we ensure that the data is ordered 
 Fold numbers are then assigned sequentially to the unique targets (Line~\ref{line:assign_folds}).
 This initial assignment distributes the targets randomly across the folds.
 If handling of extreme values is enabled, the algorithm identifies the top and bottom percentiles of the target values (Line~\ref{line:identify_extremes}) and reassigns these extreme values to the training folds (0 to \( k-2 \)) to ensure they are well-represented during model training (Line~\ref{line:reassign_extremes}).
-For our purposes, it is always enabled.
-Moreover, we determined that utilizing a percentile value of $p=5\%$ strikes an optimal balance between maintaining the representativeness of the test dataset and ensuring that all highly influential targets are included in the training dataset.
 
 The fold assignments are then merged back into the original dataset (Line~\ref{line:merge_folds}), and the dataset is split into a test set (consisting of the highest fold number) and the remaining training data (Line~\ref{line:split_dataset}).
 The training data is further divided into \( k-1 \) folds for cross-validation.
