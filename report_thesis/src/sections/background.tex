@@ -4,10 +4,28 @@
 \subsubsection{Standard Scaler}
 
 \subsubsection{Max Absolute Scaler}
+Max absolute scaling is a normalization technique that scales each feature individually so that the maximum absolute value of each feature is 1. 
+This results in the data being normalized to a range between -1 and 1.
+The formula for max absolute scaling is given by:
+$$
+	X_{\text{scaled}} = \frac{x}{\max(|x|)},
+$$
+where $x$ is the original feature value and $X_{\text{scaled}}$ is the normalized feature value.
+This scaling method is useful for data that has been centered at zero or data that is sparse, as max absolute scaling does not center the data. 
+This maintains the sparsity of the data by not introducing non-zero values in the zero entries of the data~\cite{Vasques2024}.
 
-\subsubsection{MinMax Scaler}
+
+
+\subsubsection{MinMax Scaler}\label{subsec:minmax_scaler}
 
 \subsubsection{Robust Scaler}
+The robust scaler is a normalization technique that removes the median and scales the data according to the quantile range.
+The formula for the robust scaler is given by:
+$$
+X_{\text{scaled}} = \frac{X - \text{Q1}(X)}{\text{Q3}(X) - \text{Q1}(X)} \: ,
+$$
+where $X$ is the original data, $\text{Q1}(X)$ is the first quartile of $X$, and $\text{Q3}(X)$ is the third quartile of $X$.
+This technique can be advantageous in cases where the data contains outliers, as it relies on the median and quantile range instead of the mean and variance, both of which are sensitive to outliers~\cite{Vasques2024}.
 
 \subsubsection{Norm 3}
 As previously mentioned, the \gls{chemcam} instrument consists of three spectrometers, each producing 2048 channels.
@@ -209,6 +227,33 @@ where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of 
 The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
 
 \subsubsection{Extra Trees Regressor (ETR)}
+Before discussing the \gls{etr} model, it is important to first understand the concepts of decision trees and \gls{rf}.
+We give an overview of decision trees and \gls{rf} based on \citet{James2023AnIS}.
+Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
+
+A decision tree is a supervised learning model that partitions data into subsets based on feature values, creating a tree structure.
+The goal is to create a tree that predicts the target variable by dividing the data into increasingly homogeneous subsets.
+Each internal node in the tree represents a decision based on a specific feature, while each leaf node represents a prediction for the target variable.
+The tree can make predictions for new data points by following a path from the root to a leaf node.
+
+\gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
+Each tree is trained on a random subset of the data using bootstrap sampling, where samples are drawn with replacement, meaning the same sample can be selected multiple times.
+This introduces variability and reduces overfitting, as some data points may appear multiple times while others may be omitted.
+By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
+
+Mathematically, the prediction of a \gls{rf} model can be represented as:
+
+$$
+f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
+$$
+
+where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
+
+\gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
+While \gls{rf} uses bootstrap sampling and selects the best split from a random subset of features to create a set of diverse samples, \gls{etr} instead selects split points randomly within the chosen features, introducing additional randomness.
+This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
+As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
+However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
 
 \subsubsection{Gradient Boosting Regressor (GBR)}
 
