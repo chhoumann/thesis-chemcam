@@ -89,7 +89,8 @@ Fold numbers are then assigned sequentially using a modulo operation to ensure a
 This means that while the assignment process follows a sequence, the resulting distribution of targets is effectively randomized.
 If handling of extreme values is enabled, the algorithm identifies the top and bottom percentiles of the target values (Line~\ref{line:identify_extremes}) and reassigns these extreme values to the training folds (0 to \( k-2 \)) to ensure they are well-represented during model training (Line~\ref{line:reassign_extremes}).
 
-The fold assignments are then merged back into the original dataset (Line~\ref{line:merge_folds}), and the dataset is split into a test set (consisting of the highest fold number) and the remaining training data (Line~\ref{line:split_dataset}).
+The fold assignments are then merged back into the original dataset, as described in Line~\ref{line:merge_folds}.
+Following this, the dataset is divided into a test set, which always consists of the data points assigned to fold \( k-1 \), and the remaining data forms the training set, as outlined in Line~\ref{line:split_dataset}.
 The training data is further divided into \( k-1 \) folds for cross-validation.
 For each fold, the training data consists of all but one fold, which serves as the validation set.
 These pairs of training and validation sets are then appended to the list of cross-validation folds \(\mathbf{F}_\text{cv}\) (Line~\ref{line:create_folds}).
