@@ -39,8 +39,12 @@ This uneven distribution can lead to models that perform well on the majority of
 \end{figure*}
 
 Figure~\ref{fig:oxide_distributions} illustrates the distributions of various oxide concentrations in our dataset.
-Notably, the bimodal distribution of \ce{SiO2} concentrations and the skewed distributions of \ce{FeO_T} and \ce{CaO} highlight the presence of extreme values.
-These distributions confirm that certain oxide concentrations are significantly overrepresented or underrepresented, further complicating the model training process.
+Across all oxides, there is a general pattern of skewed distributions, with concentrations heavily weighted towards lower values.
+This is particularly notable in \ce{TiO2}, \ce{FeO_T}, \ce{MgO}, \ce{CaO}, and \ce{Na2O}.
+\ce{SiO2} and \ce{Al2O3} show more variability, with \ce{SiO2} exhibiting a bimodal distribution.
+These distributions confirm the presence of extreme values across all oxides, which are significantly overrepresented or underrepresented, further complicating the model training process.
+
+This necessitates careful dataset partitioning to ensure that the model training process accounts for these challenges, improving the generalizability and robustness of the models.
 
 
 \subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
