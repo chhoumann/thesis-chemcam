@@ -6,7 +6,9 @@ Z-score normalization, also known as standard score normalization, transforms da
 This technique is useful when the actual minimum and maximum of a feature are unknown or when outliers may significantly skew the distribution.
 The formula for Z-score normalization is given by:
 
-$$ v' = \frac{v - \overline{F}}{\sigma_F} $$
+$$ 
+v' = \frac{v - \overline{F}}{\sigma_F},
+$$
 
 where $v$ is the original value, $\overline{F}$ is the mean of the feature $F$, and $\sigma_F$ is the standard deviation of $F$. 
 By transforming the data using the Z-score, each value reflects the number of standard deviations away from the mean. 
