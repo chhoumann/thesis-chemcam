@@ -104,6 +104,9 @@ The final output of this procedure consists of:
     \item The test set \(\mathbf{D}_\text{test}\), distinct from the training set.
 \end{itemize}
 
+The data partitioning does not modify the original dataset, it merely partitions it.
+For that reason, each of the datasets that are returned have the same structure as shown in Table~\ref{tab:final_dataset_example}.
+
 By following this detailed procedure, we ensure that our cross-validation is robust against data leakage, maintains the integrity of grouped targets, and carefully handles extreme values to improve the representativeness of the training set.
 
 Our method is inspired by the approach described by \citet{andersonImprovedAccuracyQuantitative2017}.
