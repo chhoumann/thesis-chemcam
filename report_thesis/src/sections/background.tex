@@ -67,7 +67,7 @@ This process involves mapping the data $X$ to a set of probabilities $p$ using t
 Subsequently, the quantile function, which is the inverse of the \gls{cdf} of the desired distribution, is applied to these probabilities $p$ to generate the transformed data. 
 This method forces the data to conform to the specified distribution regardless of the original distribution's form~\cite{Vasques2024}.
 
-\subsubsection{Principal Component Analysis (PCA)}
+\subsubsection{Principal Component Analysis (PCA)}\label{subsec:pca}
 \gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
 We give an overview of the \gls{pca} algorithm based on \citet{James2023AnIS}.
 
@@ -115,7 +115,17 @@ $$
 where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
 
 \subsubsection{Kernel PCA}
-% \citet{scholkopftKPCA}
+We provide a brief overview of the \gls{kernel-pca} algorithm based on \citet{learningwithkernels}.
+\gls{kernel-pca} is an extension of traditional \gls{pca} designed to handle nonlinear relationships among data points.
+The core idea behind \gls{kernel-pca} is to map data into a higher-dimensional space using a kernel function, a technique known as the kernel trick.
+This mapping enables linear separation of data points in the higher-dimensional space, even if they are not linearly separable in the original space.
+
+Similar to \gls{pca}, as described in Section~\ref{subsec:pca}, the goal of \gls{kernel-pca} is to extract the principal components of the data.
+However, unlike \gls{pca}, \gls{kernel-pca} does not compute the covariance matrix of the data directly, as it often is infeasible to compute for high-dimensional datasets.
+\gls{kernel-pca} instead leverages the kernel trick to computate the similarities between data points directly in the original space using a kernel function $k(\mathbf{x}_i, \mathbf{x}_j)$. 
+This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\top \Phi(\mathbf{x}_j)$ in the higher-dimensional feature space without explicitly performing the mapping. 
+By constructing a kernel matrix $\mathbf{K}$ using these pairwise similarities, \gls{kernel-pca} can perform eigenvalue decomposition to obtain the principal components in the feature space, similar to regular \gls{pca} as described in Section~\ref{subsec:pca}.
+However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
 
 \subsection{Overview of Core Models}
 In this section, we provide an overview and definitions of \gls{pls}, \gls{svr}, \gls{etr}, \gls{gbr}, and \gls{xgboost}.
