@@ -216,8 +216,7 @@ The tree can make predictions for new data points by following a path from the r
 
 \gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
 Each tree in the forest is trained on a random subset of the data using bootstrap sampling, a method where samples are drawn with replacement from the original dataset.
-This technique allows each tree to be trained on a slightly different dataset, introducing variability and reducing overfitting.
-As a result, some data points may appear multiple times in the subset, while others may be omitted entirely.
+This introduces variability and reduces overfitting, as some data points may appear multiple times while others may be omitted.
 By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
 
 Mathematically, the prediction of a \gls{rf} model can be represented as:
