@@ -210,6 +210,7 @@ Therefore, we have the following metrics for each experiment:
 K-fold cross-validation provides a robust estimate of model performance by averaging metrics over multiple folds, reducing variance and offering a clearer picture of the model's generalizability.
 Evaluating the model on a separate test set representative of unseen data ensures that performance metrics accurately reflect the model's generalization capability.
 However, our data partitioning method, which moves the most extreme values into the training data, naturally results in the testing data being closer to the mean of the data distribution, making it easier to predict.
+In practice, this would result in lower \texttt{rmsep} and \texttt{std\_dev} values compared to the cross validation metrics.
 Therefore, evaluating the model's performance using both the cross-validation metrics (\texttt{rmse\_cv} and \texttt{std\_dev\_cv}) and the test set metrics (\texttt{rmsep} and \texttt{std\_dev}) is crucial.
 The cross-validation metrics provide insights into the model's stability across different subsets, while the test set metrics offer a final measure of performance on truly unseen data, giving a comprehensive assessment of the model's generalizability.
 
