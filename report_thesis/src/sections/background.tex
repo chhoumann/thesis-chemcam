@@ -228,7 +228,7 @@ $$
 
 where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
 
-\gls{etr} is an extension of the \gls{rf} model that introduces additional randomness in the tree-building process, namely \textit{random feature selection} and \textit{random split points}.
+\gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
 While \gls{rf} use bootstrap sampling to create diverse training sets, \gls{etr} goes further by selecting a random subset of features at each node and determining split points randomly within the range of those features.
 This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
 As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
