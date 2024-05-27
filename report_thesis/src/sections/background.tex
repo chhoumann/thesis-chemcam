@@ -98,7 +98,7 @@ We provide a brief overview of the \gls{kernel-pca} algorithm based on \citet{le
 The core idea behind \gls{kernel-pca} is to map data into a higher-dimensional space using a kernel function, a technique known as the \textit{kernel trick}.
 This mapping enables linear separation of data points in the higher-dimensional space, even if they are not linearly separable in the original space.
 
-The key idea of \gls{kernel-pca} is to extract the principal components of the data similar to \gls{pca}, as described in Section~\ref{subsec:pca}.
+The main idea behind \gls{kernel-pca} is to extract the principal components of the data, similar to \gls{pca} as described in Section~\ref{subsec:pca}.
 However, unlike \gls{pca}, \gls{kernel-pca} does not compute the covariance matrix of the data directly.
 This is due to the fact that the covariance matrix is often infeasible to compute for high-dimensional datasets.
 \gls{kernel-pca} instead leverages the kernel trick, to computate the similarities between data points directly in the original space using a kernel function $k(\mathbf{x}_i, \mathbf{x}_j)$. 
