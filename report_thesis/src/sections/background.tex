@@ -110,7 +110,7 @@ However, computing this covariance matrix directly is often infeasible for large
 Kernel PCA addresses this by leveraging the kernel trick, which allows the computation of similarities between data points directly in the original space using a kernel function $k(\mathbf{x}_i, \mathbf{x}_j)$. 
 This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\top \Phi(\mathbf{x}_j)$ in the higher-dimensional feature space without explicitly performing the mapping. 
 By constructing the kernel matrix \(\mathbf{K}\) using these pairwise similarities, Kernel PCA can perform eigenvalue decomposition to obtain the principal components in the feature space, similar to regular \gls{pca} as described in Section~\ref{subsec:pca}.
-However, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
+However, in Kernel PCA, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
 
 \subsection{Overview of Core Models}
 In this section, we provide an overview and definitions of \gls{pls}, \gls{svr}, \gls{etr}, \gls{gbr}, and \gls{xgboost}.
