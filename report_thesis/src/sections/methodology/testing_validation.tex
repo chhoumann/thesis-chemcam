@@ -96,6 +96,7 @@ For each fold, the training data consists of all but one fold, which serves as t
 These pairs of training and validation sets are then appended to the list of cross-validation folds \(\mathbf{F}_\text{cv}\) (Line~\ref{line:create_folds}).
 
 Finally, the fold indicator column is removed from all datasets before returning the final partitions (Line~\ref{line:remove_fold_column}).
+The fold indicator column was added to keep track of which data points belong to which folds, which is crucial for ensuring that data points are correctly partitioned into their respective training and test sets during cross-validation. 
 This cleanup step ensures that the fold information does not interfere with subsequent data processing or model training.
 
 The final output of this procedure consists of:
