@@ -4,8 +4,19 @@
 \subsubsection{Standard Scaler}
 
 \subsubsection{Max Absolute Scaler}
+Max absolute scaling is a normalization technique that scales each feature individually so that the maximum absolute value of each feature is 1. 
+This results in the data being normalized to a range between -1 and 1.
+The formula for max absolute scaling is given by:
+$$
+	X_{\text{scaled}} = \frac{x}{\max(|x|)},
+$$
+where $x$ is the original feature value and $X_{\text{scaled}}$ is the normalized feature value.
+This scaling method is useful for data that has been centered at zero or data that is sparse, as max absolute scaling does not center the data. 
+This maintains the sparsity of the data by not introducing non-zero values in the zero entries of the data~\cite{Vasques2024}.
 
-\subsubsection{MinMax Scaler}
+
+
+\subsubsection{MinMax Scaler}\label{subsec:minmax_scaler}
 
 \subsubsection{Robust Scaler}
 The robust scaler is a normalization technique that removes the median and scales the data according to the quantile range.
