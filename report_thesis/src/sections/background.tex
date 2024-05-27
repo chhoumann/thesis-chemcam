@@ -106,7 +106,7 @@ $$
 where $m$ is the number of data points and $\Phi(\mathbf{x}_j)$ represents the mapping of the data point $\mathbf{x}_j$ into the higher-dimensional feature space. 
 The term $\frac{1}{m}$ normalizes the sum, ensuring the covariance matrix represents the average pairwise relationships between data points.
 
-However, in practice, computing the covariance matrix is typically not feasible for large datasets, as computing the mapping function $\Phi(\mathbf{x}_j$ for each data point is expensive and often impractical due to the high dimensionality of the feature space. 
+However, computing this covariance matrix directly is often infeasible for large datasets due to the high dimensionality of the feature space. 
 Instead, Kernel PCA leverages the kernel trick, which allows us to compute the similarity between data points directly in the original space using a kernel function $k(\mathbf{x}_i, \mathbf{x}_j)$. 
 This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\top \Phi(\mathbf{x}_j)$ in the higher-dimensional feature space without explicitly performing the mapping. 
 By constructing the kernel matrix \(\mathbf{K}\) using these pairwise similarities, Kernel PCA can perform eigenvalue decomposition to obtain the principal components in the feature space, in the same fashion as regular \gls{pca} described in Section~\ref{subsec:pca}.
