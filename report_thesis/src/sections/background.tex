@@ -62,6 +62,10 @@ This normalization method results in a total of $3N = 6144$ normalized features 
 \subsubsection{Power Transformation}
 
 \subsubsection{Quantile Transformer}
+Quantile transformation is a method that applies a non-linear transformation to map data to a uniform or normal distribution. 
+This process involves mapping the data $X$ to a set of probabilities $p$ using the \gls{cdf}, which indicates the probability that a random variable will be less than or equal to a specific value in $X$'s original distribution. 
+Subsequently, the quantile function, which is the inverse of the \gls{cdf} of the desired distribution, is applied to these probabilities $p$ to generate the transformed data. 
+This method forces the data to conform to the specified distribution regardless of the original distribution's form~\cite{Vasques2024}.
 
 \subsubsection{Principal Component Analysis (PCA)}
 \gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
