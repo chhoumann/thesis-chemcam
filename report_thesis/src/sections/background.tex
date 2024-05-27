@@ -15,10 +15,36 @@ By transforming the data using the Z-score, each value reflects its distance fro
 Z-score normalization is particularly advantageous in scenarios where data features have different units or scales, or when preparing data for algorithms that assume normally distributed inputs~\cite{dataminingConcepts}.
 
 \subsubsection{Max Absolute Scaler}
+Max absolute scaling is a normalization technique that scales each feature individually so that the maximum absolute value of each feature is 1. 
+This results in the data being normalized to a range between -1 and 1.
+The formula for max absolute scaling is given by:
+$$
+	X_{\text{scaled}} = \frac{x}{\max(|x|)},
+$$
+where $x$ is the original feature value and $X_{\text{scaled}}$ is the normalized feature value.
+This scaling method is useful for data that has been centered at zero or data that is sparse, as max absolute scaling does not center the data. 
+This maintains the sparsity of the data by not introducing non-zero values in the zero entries of the data~\cite{Vasques2024}.
 
-\subsubsection{MinMax Scaler}
+
+\subsubsection{Min-Max Normalization}\label{subsec:min-max}
+Min-max normalization rescales the range of features to $[0, 1]$ or $[a, b]$, where $a$ and $b$ represent the new minimum and maximum values, respectively. 
+The goal is to normalize the range of the data to a specific scale, typically 0 to 1. 
+Mathematically, min-max normalization is defined as:
+$$ 
+	v' = \frac{v - \min(F)}{\max(F) - \min(F)} \times (b - a) + a,
+$$
+where $v$ is the original value, $\min(F)$ and $\max(F)$ are the minimum and maximum values of the feature $F$, respectively. 
+
+This type of normalization is beneficial because it ensures that each feature contributes equally to the analysis, regardless of its original scale.
 
 \subsubsection{Robust Scaler}
+The robust scaler is a normalization technique that removes the median and scales the data according to the quantile range.
+The formula for the robust scaler is given by:
+$$
+X_{\text{scaled}} = \frac{X - \text{Q1}(X)}{\text{Q3}(X) - \text{Q1}(X)} \: ,
+$$
+where $X$ is the original data, $\text{Q1}(X)$ is the first quartile of $X$, and $\text{Q3}(X)$ is the third quartile of $X$.
+This technique can be advantageous in cases where the data contains outliers, as it relies on the median and quantile range instead of the mean and variance, both of which are sensitive to outliers~\cite{Vasques2024}.
 
 \subsubsection{Norm 3}
 As previously mentioned, the \gls{chemcam} instrument consists of three spectrometers, each producing 2048 channels.
@@ -55,8 +81,12 @@ This normalization method results in a total of $3N = 6144$ normalized features 
 \subsubsection{Power Transformation}
 
 \subsubsection{Quantile Transformer}
+Quantile transformation is a method that applies a non-linear transformation to map data to a uniform or normal distribution. 
+This process involves mapping the data $X$ to a set of probabilities $p$ using the \gls{cdf}, which indicates the probability that a random variable will be less than or equal to a specific value in $X$'s original distribution. 
+Subsequently, the quantile function, which is the inverse of the \gls{cdf} of the desired distribution, is applied to these probabilities $p$ to generate the transformed data. 
+This method forces the data to conform to the specified distribution regardless of the original distribution's form~\cite{Vasques2024}.
 
-\subsubsection{Principal Component Analysis (PCA)}
+\subsubsection{Principal Component Analysis (PCA)}\label{subsec:pca}
 \gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
 We give an overview of the \gls{pca} algorithm based on \citet{James2023AnIS}.
 
@@ -104,7 +134,17 @@ $$
 where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
 
 \subsubsection{Kernel PCA}
-% \citet{scholkopftKPCA}
+We provide a brief overview of the \gls{kernel-pca} algorithm based on \citet{learningwithkernels}.
+\gls{kernel-pca} is an extension of traditional \gls{pca} designed to handle nonlinear relationships among data points.
+The core idea behind \gls{kernel-pca} is to map data into a higher-dimensional space using a kernel function, a technique known as the kernel trick.
+This mapping enables linear separation of data points in the higher-dimensional space, even if they are not linearly separable in the original space.
+
+Similar to \gls{pca}, as described in Section~\ref{subsec:pca}, the goal of \gls{kernel-pca} is to extract the principal components of the data.
+However, unlike \gls{pca}, \gls{kernel-pca} does not compute the covariance matrix of the data directly, as it often is infeasible to compute for high-dimensional datasets.
+\gls{kernel-pca} instead leverages the kernel trick to computate the similarities between data points directly in the original space using a kernel function $k(\mathbf{x}_i, \mathbf{x}_j)$. 
+This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\top \Phi(\mathbf{x}_j)$ in the higher-dimensional feature space without explicitly performing the mapping. 
+By constructing a kernel matrix $\mathbf{K}$ using these pairwise similarities, \gls{kernel-pca} can perform eigenvalue decomposition to obtain the principal components in the feature space, similar to regular \gls{pca} as described in Section~\ref{subsec:pca}.
+However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
 
 \subsection{Overview of Core Models}
 In this section, we provide an overview and definitions of \gls{pls}, \gls{svr}, \gls{etr}, \gls{gbr}, and \gls{xgboost}.
@@ -216,6 +256,33 @@ where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of 
 The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
 
 \subsubsection{Extra Trees Regressor (ETR)}
+Before discussing the \gls{etr} model, it is important to first understand the concepts of decision trees and \gls{rf}.
+We give an overview of decision trees and \gls{rf} based on \citet{James2023AnIS}.
+Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
+
+A decision tree is a supervised learning model that partitions data into subsets based on feature values, creating a tree structure.
+The goal is to create a tree that predicts the target variable by dividing the data into increasingly homogeneous subsets.
+Each internal node in the tree represents a decision based on a specific feature, while each leaf node represents a prediction for the target variable.
+The tree can make predictions for new data points by following a path from the root to a leaf node.
+
+\gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
+Each tree is trained on a random subset of the data using bootstrap sampling, where samples are drawn with replacement, meaning the same sample can be selected multiple times.
+This introduces variability and reduces overfitting, as some data points may appear multiple times while others may be omitted.
+By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
+
+Mathematically, the prediction of a \gls{rf} model can be represented as:
+
+$$
+f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
+$$
+
+where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
+
+\gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
+While \gls{rf} uses bootstrap sampling and selects the best split from a random subset of features to create a set of diverse samples, \gls{etr} instead selects split points randomly within the chosen features, introducing additional randomness.
+This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
+As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
+However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
 
 \subsubsection{Gradient Boosting Regressor (GBR)}
 
