@@ -11,7 +11,7 @@ To achieve this, we employ k-fold cross-validation to ensure our models have hig
 
 We use an $80\%/20\%$ split for training and testing sets. The training set is further subdivided into $k$ folds, which are used for cross validation.
 
-While we employ conventional techniques like holdout sets and k-fold cross validation, \gls{libs} imposes additional challenges to the process.
+While we employ conventional techniques like holdout sets and k-fold cross validation, \gls{libs} data imposes additional challenges to the process.
 
 One of the primary challenges is preventing data leakage.
 As per concentration matrix $\mathbf{C}$ in Section~\ref{sec:problem_definition}, each target only has one ground truth concentration value per oxide.
