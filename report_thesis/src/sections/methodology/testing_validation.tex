@@ -82,7 +82,7 @@ This ensures that the results are consistent across different runs of the algori
 Next, the dataset is processed to remove any duplicate entries based on the group column and then sorted by the target column (Line~\ref{line:remove_duplicates}).
 This step ensures that each group is uniquely identified and ordered appropriately.
 The dataset we illustrate in Table~\ref{tab:final_dataset_example} would require a group column $g$ of "\texttt{Target}" to group the data by target.
-The target column $t$ refers to the column with the target variable, which would be the oxide for which we are predicting the concentration, e.g., \ce{SiO_2}.
+The target column $t$ refers to the column with the target variable, which would be the oxide for which we are predicting the concentration, for example, \ce{SiO_2}.
 By sorting the dataset by the target column, we ensure that the data is ordered by the target concentration values in ascending order.
 
 Fold numbers are then assigned sequentially to the unique targets (Line~\ref{line:assign_folds}).
