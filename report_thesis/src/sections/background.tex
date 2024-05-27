@@ -218,7 +218,7 @@ The tree can make predictions for new data points by following a path from the r
 Each tree in the forest is trained on a random subset of the data using bootstrap sampling, a method where samples are drawn with replacement from the original dataset.
 This technique allows each tree to be trained on a slightly different dataset, introducing variability and reducing overfitting.
 As a result, some data points may appear multiple times in the subset, while others may be omitted entirely.
-By training multiple trees on different subsets and then aggregating their predictions, the model achieves better generalization and robustness, leading to more accurate and reliable final predictions.
+By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
 
 Mathematically, the prediction of a \gls{rf} model can be represented as:
 
