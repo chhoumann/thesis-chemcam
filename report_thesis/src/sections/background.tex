@@ -8,9 +8,9 @@ Max absolute scaling is a normalization technique similar to min-max scaling des
 The primary distinction between the two techniques lies in their scaling methodology: maximum absolute scaling normalizes the data to a range between 0 and 1 by utilizing the maximum absolute value of each feature, as opposed to employing the minimum and maximum values.
 The formula for max absolute scaling is given by:
 $$
-\zeta = \frac{x}{\max(|x|)}
+	X_{\text{scaled}} = \frac{x}{\max(|x|)},
 $$
-where $x$ is the original feature value and $\zeta$ is the normalized feature value.
+where $x$ is the original feature value and $X_{\text{scaled}}$ is the normalized feature value.
 This scaling method is useful for data that has been centered at zero or data that is sparse, as max absolute scaling does not center the data. 
 This maintains the sparsity of the data by not introducing non-zero values in the zero entries of the data~\cite{Vasques2024}.
 
