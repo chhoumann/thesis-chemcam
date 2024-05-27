@@ -85,8 +85,8 @@ The dataset we illustrate in Table~\ref{tab:final_dataset_example} would require
 The target column $t$ refers to the column with the target variable, which would be the oxide for which we are predicting the concentration, for example, \ce{SiO_2}.
 By sorting the dataset by the target column, we ensure that the data is ordered by the target concentration values in ascending order.
 
-Fold numbers are then assigned sequentially to the unique targets (Line~\ref{line:assign_folds}).
-This initial assignment distributes the targets randomly across the folds.
+Fold numbers are then assigned sequentially using a modulo operation to ensure a random-like distribution of the unique targets across the folds (Line~\ref{line:assign_folds}).
+This means that while the assignment process follows a sequence, the resulting distribution of targets is effectively randomized.
 If handling of extreme values is enabled, the algorithm identifies the top and bottom percentiles of the target values (Line~\ref{line:identify_extremes}) and reassigns these extreme values to the training folds (0 to \( k-2 \)) to ensure they are well-represented during model training (Line~\ref{line:reassign_extremes}).
 
 The fold assignments are then merged back into the original dataset (Line~\ref{line:merge_folds}), and the dataset is split into a test set (consisting of the highest fold number) and the remaining training data (Line~\ref{line:split_dataset}).
