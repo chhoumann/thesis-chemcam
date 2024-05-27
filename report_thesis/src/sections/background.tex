@@ -226,7 +226,7 @@ $$
 f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
 $$
 
-where $f_m(x)$ is the prediction of the $m$-th tree in the forest, and $M$ is the total number of trees.
+where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
 
 \gls{etr} is an extension of the \gls{rf} model that introduces additional randomness in the tree-building process, namely \textit{random feature selection} and \textit{random split points}.
 While \gls{rf} use bootstrap sampling to create diverse training sets, \gls{etr} goes further by selecting a random subset of features at each node and determining split points randomly within the range of those features.
