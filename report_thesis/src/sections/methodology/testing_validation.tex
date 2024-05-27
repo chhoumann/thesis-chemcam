@@ -24,12 +24,12 @@ To prevent this, we ensure that each target is represented only once in the data
 Furthermore, the limited availability mentioned in Section~\ref{sec:problem_definition} of data poses another significant challenge due to the difficult collection process.
 The dataset we use consists of 408 samples. This is a large dataset by \gls{libs} standards.
 However, despite this, there are only a few samples with extreme concentration values for the oxides in the targets.
-These extreme values act as outliers, presenting concentrations significantly different from the rest of the data points.
+These extreme values present concentrations significantly different from the rest of the data points. 
 
 When performing a random split of the dataset into multiple folds for cross-validation, as well as for training and testing sets, this small number of extreme values can result in an uneven distribution.
-The presence or absence of these outliers in any given fold can heavily influence the model's performance metrics.
+The presence or absence of these extreme values in any given fold can heavily influence the model's performance metrics.
 If extreme values are disproportionately allocated to either the training or testing sets, the resulting model may struggle to generalize accurately.
-This uneven distribution can lead to models that perform well on the majority of the data but fail to predict accurately for these outlier concentrations, which are critical in many practical applications.
+This uneven distribution can lead to models that perform well on the majority of the data but fail to predict accurately for these extreme concentration values, which are critical in many practical applications.
 
 \begin{figure*}[h!]
     \centering
