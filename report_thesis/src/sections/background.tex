@@ -14,8 +14,7 @@ $$
 X_{\text{scaled}} = \frac{X - \text{Q1}(X)}{\text{Q3}(X) - \text{Q1}(X)} \: ,
 $$
 where $X$ is the original data, $\text{Q1}(X)$ is the first quartile of $X$, and $\text{Q3}(X)$ is the third quartile of $X$.
-This technique is advantageous because it does not rely on the mean and variance of the data, which can be affected by outliers.
-Consequently, the robust scaler is a preferable choice when dealing with datasets that contain outliers~\cite{Vasques2024}.
+This technique can be advantageous in cases where the data contains outliers, as it relies on the median and quantile range instead of the mean and variance, both of which are sensitive to outliers~\cite{Vasques2024}.
 
 \subsubsection{Norm 3}
 As previously mentioned, the \gls{chemcam} instrument consists of three spectrometers, each producing 2048 channels.
