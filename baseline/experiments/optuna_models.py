@@ -1,7 +1,11 @@
+from ngboost import NGBRegressor
+from ngboost.distns import Exponential, LogNormal, Normal
+from ngboost.scores import LogScore
 from optuna import Trial
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.ensemble import ExtraTreesRegressor, GradientBoostingRegressor
 from sklearn.svm import SVR
+from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 
 
@@ -64,3 +68,42 @@ def instantiate_pls(trial: Trial, logger=lambda params: None) -> PLSRegression:
     }
     logger(params)
     return PLSRegression(**params)
+
+
+def instantiate_ngboost(trial: Trial, logger=lambda params: None) -> NGBRegressor:
+    distributions = {
+        "Normal": (Normal, LogScore),
+        "LogNormal": (LogNormal, LogScore),
+        "Exponential": (Exponential, LogScore),
+    }
+
+    dist_name = trial.suggest_categorical("Dist", list(distributions.keys()))
+    Dist, Score = distributions[dist_name]
+
+    default_tree_learner = DecisionTreeRegressor(
+        criterion="friedman_mse",
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0.0,
+        max_depth=trial.suggest_int("max_depth", 2, 10),
+        splitter="best",
+        random_state=None,
+    )
+
+    params = {
+        "Dist": Dist,
+        "Score": Score,
+        "Base": default_tree_learner,
+        "natural_gradient": trial.suggest_categorical("natural_gradient", [True, False]),
+        "n_estimators": trial.suggest_int("n_estimators", 50, 1000),
+        "learning_rate": trial.suggest_loguniform("learning_rate", 0.01, 0.5),
+        "minibatch_frac": trial.suggest_uniform("minibatch_frac", 0.5, 1.0),
+        "col_sample": trial.suggest_uniform("col_sample", 0.5, 1.0),
+        "tol": trial.suggest_loguniform("tol", 1e-5, 1e-3),
+        "random_state": 42,
+        "validation_fraction": trial.suggest_uniform("validation_fraction", 0.1, 0.5),
+        "early_stopping_rounds": trial.suggest_int("early_stopping_rounds", 10, 100),
+    }
+
+    logger(params)
+    return NGBRegressor(**params)

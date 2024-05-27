@@ -11,6 +11,7 @@ from optuna.samplers import TPESampler
 from optuna_models import (
     instantiate_extra_trees,
     instantiate_gbr,
+    instantiate_ngboost,
     instantiate_pls,
     instantiate_svr,
     instantiate_xgboost,
@@ -153,6 +154,8 @@ def instantiate_model(trial, model_selector, logger):
         return instantiate_extra_trees(trial, lambda params: _logger(params))
     elif model_selector == "pls":
         return instantiate_pls(trial, lambda params: _logger(params))
+    elif model_selector == "ngboost":
+        return instantiate_ngboost(trial, lambda params: _logger(params))
     else:
         raise ValueError(f"Unsupported model type: {model_selector}")
 
@@ -287,7 +290,7 @@ def combined_objective(trial, oxide, model_selector):
         return float("inf"), float("inf")  # Return a large number to indicate failure
 
 
-models = ["gbr", "svr", "extra_trees", "pls", "xgboost"]
+models = ["gbr", "svr", "extra_trees", "pls", "xgboost", "ngboost"]
 
 
 def validate_oxides(ctx: typer.Context, param: typer.CallbackParam, value: List[str]) -> List[str]:
