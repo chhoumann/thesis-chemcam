@@ -55,7 +55,7 @@ Additionally, it ensures that extreme values are handled appropriately to mainta
 \begin{algorithm}
 \caption{Custom k-Fold Cross-Validation with Extreme Value Handling}
 \begin{algorithmic}[1]
-\Require Dataset \( \mathbf{D} \), group column \( g \), target column \( t \), number of splits \( k \), percentile \( p \), random seed \( \text{seed} \)
+\Require Dataset \( \mathbf{D} \), group column \( g \), target column \( t \), number of splits \( k \), percentile \( p \), random seed \( \textit{seed} \)
 \Ensure Cross-validation folds \( \mathbf{F}_\text{cv} \), training set \( \mathbf{D}_\text{train} \), and test set \( \mathbf{D}_\text{test} \)
 \State \label{line:seed} Set random seed for reproducibility if \(\text{seed} \) is not None
 \State \label{line:remove_duplicates} Remove duplicate entries based on \( g \) and sort by \( t \)
