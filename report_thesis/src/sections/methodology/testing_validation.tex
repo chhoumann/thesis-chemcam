@@ -23,8 +23,7 @@ To prevent this, we ensure that each target is represented only once in the data
 
 Furthermore, the limited availability mentioned in Section~\ref{sec:problem_definition} of data poses another significant challenge due to the difficult collection process.
 The dataset we use consists of 408 samples. This is a large dataset by \gls{libs} standards.
-As mentioned, the collection process is difficult, making datasets relatively small in general.
-Additionally, there are only a few samples with extreme concentration values for the oxides in the targets.
+However, despite this, there are only a few samples with extreme concentration values for the oxides in the targets.
 These extreme values act as outliers, presenting concentrations significantly different from the rest of the data points.
 
 When performing a random split of the dataset into multiple folds for cross-validation, as well as for training and testing sets, this small number of extreme values can result in an uneven distribution.
@@ -41,7 +40,7 @@ This uneven distribution can lead to models that perform well on the majority of
 
 Figure~\ref{fig:oxide_distributions} illustrates the distributions of various oxide concentrations in our dataset.
 Notably, the bimodal distribution of \ce{SiO2} concentrations and the skewed distributions of \ce{FeO_T} and \ce{CaO} highlight the presence of extreme values.
-These distributions confirm that certain concentrations are significantly overrepresented or underrepresented, further complicating the model training process.
+These distributions confirm that certain oxide concentrations are significantly overrepresented or underrepresented, further complicating the model training process.
 
 
 \subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
@@ -157,7 +156,6 @@ The test set distribution closely follows the overall pattern observed in the fo
 The presence of extreme values is evident in the tails of the distributions, particularly in the training folds.
 
 \subsubsection{Statistical Consistency}
-
 To further validate our visual analysis, we can look at quantitative measures such as the means and standard deviations of \ce{SiO_2} concentrations across the folds and the overall dataset.
 As shown in Table~\ref{tab:siO2_std_means}, the standard deviations and means for \ce{SiO_2} concentrations in each fold are as follows:
 
