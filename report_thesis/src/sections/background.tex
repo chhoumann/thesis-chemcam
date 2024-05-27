@@ -11,10 +11,10 @@
 Robust scaler is a normalization technique that removes the median and scales the data according to the quantile range.
 The formula for the robust scaler is given by:
 $$
-X_{\text{scaled}} = \frac{X - \text{Q1}(X)}{\text{Q3}(X) - \text{Q1}(X)},
+X_{\text{scaled}} = \frac{X - \text{Q1}(X)}{\text{Q3}(X) - \text{Q1}(X)} \: ,
 $$
 where $X$ is the original data, $\text{Q1}(X)$ is the first quartile of $X$, and $\text{Q3}(X)$ is the third quartile of $X$.
-This technique is advantageous because it does not rely on the mean and variance of the data, which can be affected by outliers. 
+This technique is advantageous because it does not rely on the mean and variance of the data, which can be affected by outliers.
 Consequently, the robust scaler is a preferable choice when dealing with datasets that contain outliers~\cite{Vasques2024}.
 
 \subsubsection{Norm 3}
