@@ -330,9 +330,8 @@ where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is
 While there are various choices for weak learners, decision trees are a common choice.
 Decision trees are a core component of gradient boosting methods. 
 They partition the data into subsets based on feature values, aiming to create groups where data points have similar predicted outcomes. 
-The quality of a split is measured using various metrics. Some common metrics include impurity, information gain, and Gini index. 
 
-Once optimal splits are identified, the tree is constructed by repeatedly partitioning the data until a stopping criterion is met.
+Once optimal splits based on some evaluation metric, are identified, the tree is constructed by repeatedly partitioning the data until a stopping criterion is met.
 The final model consists of splits that create distinct regions, each with a predicted response value based on the mean of the observations in that region.
 
 This leads us to \textit{Gradient Boosting}.
