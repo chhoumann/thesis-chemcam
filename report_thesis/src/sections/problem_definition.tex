@@ -77,12 +77,9 @@ Effectiveness will be assessed by high accuracy, quantified by \gls{rmse}, and r
 As mentioned, quantifying chemical compositions from \gls{libs} spectral data involves several significant challenges that must be addressed to ensure accurate and robust predictions.
 
 \subsubsection{Data Dimensionality}
-The large number of dimensions, as seen by having many wavelengths $\lambda$ in the Intensity Tensor $\mathbf{I}[\chi, l, s, \lambda]$, can lead to challenges such as noise management and computational inefficiency.
-\begin{itemize}
-    \item \textbf{Noise Management:} While noise itself is a consequence of instrumental measurements\cite{wiensPreflightCalibrationInitial2013} and not directly caused by high dimensionality, having many dimensions can exacerbate the impact of noise. High-dimensional datasets, like \gls{libs} datasets, may include irrelevant or redundant features that obscure the true signal, complicating the process of accurately estimating the target variables. Therefore, effective noise management techniques can help ensure the reliability of predictions.
-    
-    \item \textbf{Computational Inefficiency:} Processing high-dimensional data requires substantial computational resources, which can be a bottleneck in model training and prediction. Efficient algorithms and dimensionality reduction techniques can be used to handle this complexity and improve computational efficiency. However, this problem is slightly alleviated due to the limited data availability.
-\end{itemize}
+The large number of dimensions, as seen by having many wavelengths (\lambda) in the Intensity Matrix (\mathbf{I}[\chi, l, s, \lambda]), can lead to challenges such as the inclusion of irrelevant or redundant features.
+
+High-dimensional datasets, like LIBS datasets, may include irrelevant or redundant features that obscure the true signal, complicating the process of accurately estimating the target variables. Effective dimensionality reduction techniques can help ensure the reliability of predictions.
 
 \subsubsection{Multicollinearity}
 The overlapping nature of emission lines from different elements results in high correlation between intensity readings at different wavelengths, making it difficult to extract independent spectral features necessary for accurate quantitative analysis \cite{andersonImprovedAccuracyQuantitative2017}.
