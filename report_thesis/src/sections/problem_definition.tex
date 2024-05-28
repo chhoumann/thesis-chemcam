@@ -49,7 +49,7 @@ These outputs are represented as vectors of estimated oxide concentrations:
     \item \textbf{Estimated Concentration Vectors} $\mathbf{v} \in \mathbb{R}^{n_o}$: Each vector $\mathbf{v}$ contains the predicted concentrations for $n_o$ target oxides. These predictions are derived from the mapping function $\mathcal{F}$ applied to the feature vectors $\mathbf{x}$.
 \end{itemize}
 
-The task of \gls{libs}-based quantification involves training the mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$ to accurately predict the oxide concentrations from the processed \gls{libs} signals.
+The task of \gls{libs}-based quantification involves fitting the parameters of a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$ to accurately predict the oxide concentrations from the processed \gls{libs} signals by optimizing the parameters to minimize a loss function.
 To evaluate the performance of these models, we will use the \gls{rmse} to measure accuracy and the sample standard deviation of prediction errors to assess robustness.
 We define accuracy as the ability of a model to predict the composition of major oxides in geological samples, while robustness refers to the stability of these predictions across samples.
 
