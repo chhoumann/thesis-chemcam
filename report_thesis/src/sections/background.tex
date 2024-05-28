@@ -341,7 +341,7 @@ It also ensures that each tree makes small and simple error corrections, such th
 
 Initially, the prediction is set as $\hat{f}_0(\mathbf{x}) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set, where $\mathbf{x}$ represents the vector of input feature(s) and $y$ is the true value or target variable. 
 The model is then iteratively improved over $B$ iterations, where $B$ is a hyperparameter controlling the total number of trees.
-At each iteration $b \in \{1, 2, \ldots, B\}$, predictions are updated as:
+With each iteration $b$ from $1$ to $B$, predictions are updated as:
 $$
     \hat{f}^{(b)}(\mathbf{x}) = \hat{f}^{(b-1)}(\mathbf{x}) + \lambda \hat{f}_b(\mathbf{x}),
 $$
