@@ -21,7 +21,7 @@ If we were to randomly split the dataset, some locations from a target could end
 This would cause data leakage, as the testing set would no longer consist solely of unseen targets.
 To prevent this, we ensure that each target is represented only once in the dataset by grouping data from all locations on a given target.
 
-Furthermore, the limited availability mentioned in Section~\ref{sec:problem_definition} of data poses another significant challenge due to the difficult collection process.
+Furthermore, the limited availability of data, as mentioned in Section~\ref{sec:problem_definition}, poses another significant challenge due to the difficult collection process.
 The dataset we use consists of 408 samples. This is a large dataset by \gls{libs} standards.
 However, despite this, there are only a few samples with extreme concentration values for the oxides in the targets.
 These extreme values present concentrations significantly different from the rest of the data points. 
@@ -86,7 +86,7 @@ The target column $t$ refers to the column with the target variable, which would
 By sorting the dataset by the target column, we ensure that the data is ordered by the target concentration values in ascending order.
 
 Fold numbers are then assigned sequentially using a modulo operation to ensure a random-like distribution of the unique targets across the folds (Line~\ref{line:assign_folds}).
-This means that while the assignment process follows a sequence, the resulting distribution of targets is effectively randomized.
+This means that, while the assignment process follows a sequence, the resulting distribution of targets is effectively randomized.
 If handling of extreme values is enabled, the algorithm identifies the top and bottom percentiles of the target values (Line~\ref{line:identify_extremes}) and reassigns these extreme values to the training folds (0 to \( k-2 \)) to ensure they are well-represented during model training (Line~\ref{line:reassign_extremes}).
 
 The fold assignments are then merged back into the original dataset, as described in Line~\ref{line:merge_folds}.
@@ -109,7 +109,7 @@ The final output of this procedure consists of:
 The data partitioning does not modify the original dataset, it merely partitions it.
 For that reason, each of the datasets that are returned have the same structure as shown in Table~\ref{tab:final_dataset_example}.
 
-By following this detailed procedure, we ensure that our cross-validation is robust against data leakage, maintains the integrity of grouped targets, and carefully handles extreme values to improve the representativeness of the training set.
+By following this procedure, we ensure that our cross-validation is robust against data leakage, maintains the integrity of grouped targets, and carefully handles extreme values to improve the representativeness of the training set.
 
 Our method is inspired by the approach described by \citet{andersonImprovedAccuracyQuantitative2017}.
 They employed a similar strategy to assess the performance of their PLS model, using k-fold cross-validation and a separate test set.
@@ -136,7 +136,7 @@ Similar analyses were conducted for other oxides; however, the plots and figures
 \end{figure*}
 
 Figure \ref{fig:histogram_grid_plot} presents individual histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each of the four cross-validation folds' validation sets and the full test set.
-Each subplot shows the \ce{SiO_2} concentration (x-axis) against the count of samples per bin (y-axis).
+Each subplot shows the count of samples per bin (y-axis) as a function of \ce{SiO_2} concentration (x-axis).
 The overlaid \gls{kde} curves provide a smoothed estimate of the probability density function for \ce{SiO_2} concentrations.
 
 The histograms and \gls{kde} curves for each fold are remarkably similar, indicating that the data distribution within each fold closely matches the overall data distribution.
@@ -202,7 +202,7 @@ As shown in Table~\ref{tab:siO2_std_means}, the standard deviations and means fo
     \label{tab:siO2_std_means}
 \end{table}
 
-The means and standard deviations of \ce{SiO_2} concentrations for each fold are consistent with those of the overall dataset.
+From the table, it is evident that the means and standard deviations of \ce{SiO_2} concentrations for each fold are consistent with those of the overall dataset.
 These metrics are even more similar across folds for the training sets, indicating that the training sets are also representative of the entire dataset.
 This quantitative consistency supports the visual evidence that each fold is a reliable representative of the entire dataset.
 
@@ -212,8 +212,8 @@ It ensures that the models are not biased towards any specific subset of the dat
 The balanced distributions across folds enable the model to be trained on diverse subsets of data, leading to better generalization.
 This approach reduces the risk of overfitting and ensures that the model performs well on new, unseen data.
 
-By ensuring that each fold is representative of the overall dataset, these visualizations validate our dataset partitioning strategy.
-The consistency observed across folds supports the claim that the data distribution method works as intended, providing confidence in the generalizability and reliability of our models.
+By ensuring that each fold is representative of the overall dataset, these visualizations support the validity of our dataset partitioning strategy.
+The consistency observed across folds further supports the claim that the data distribution method works as intended, providing confidence in the generalizability and reliability of our models.
 
 \subsubsection{Evaluation Metrics}\label{subsubsec:evaluation_metrics}
 As mentioned in Section~\ref{sec:problem_definition}, the performance of the models was quantitatively assessed using the \gls{rmse} and the standard deviation of the residuals.
