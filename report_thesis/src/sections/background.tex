@@ -334,7 +334,7 @@ They partition the data into subsets based on feature values, aiming to create g
 Once optimal splits based on some evaluation metric, are identified, the tree is constructed by repeatedly partitioning the data until a stopping criterion is met.
 The final model consists of splits that create distinct regions, each with a predicted response value based on the mean of the observations in that region.
 
-This leads us to \textit{Gradient Boosting}.
+This leads us to \textit{gradient boosting}.
 Instead of building a single decision tree, gradient boosting constructs multiple trees sequentially, with each new tree correcting the errors of the previous ones.
 Each tree is small, with few terminal nodes, preventing large adjustments based on a single tree's predictions. 
 It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
