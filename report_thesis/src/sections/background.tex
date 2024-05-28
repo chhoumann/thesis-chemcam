@@ -371,7 +371,7 @@ To formalize, let $\mathbf{X}$ be the input data and $\mathbf{y}$ be the target 
 First, $N$ base models $G_1, G_2, \ldots, G_N$ are trained on the dataset $\mathbf{X}$. 
 Each base model produces a set of predictions $\hat{\mathbf{y}}_i = G_i(\mathbf{X})$.
 
-The predictions from the base models are then combined into a new dataset $\mathbf{Z}$, where each column $\mathbf{z}_i$ in $\mathbf{Z}$ corresponds to the predictions from the $i$-th base model:
+The predictions from the base models are then combined into a new dataset $\mathbf{Z}$, where each column $\mathbf{z}_i \in \mathbf{Z}$ corresponds to the predictions from the $i$-th base model:
 
 $$
 \mathbf{Z} = [\hat{\mathbf{y}}_1, \hat{\mathbf{y}}_2, \ldots, \hat{\mathbf{y}}_N]
@@ -384,6 +384,5 @@ $$
 $$
 
 The final prediction is given by the meta-model $F$, which effectively combines the outputs of the base models in an optimal way to improve overall performance. 
-The training process of the meta-model typically involves cross-validation to ensure robust performance.
 
 The power of stacked generalization lies in its ability to exploit the unique strengths of different base models and mitigate their individual weaknesses, leading to a more accurate and generalizable ensemble model.
