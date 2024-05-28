@@ -34,7 +34,7 @@ At this stage, the data still contains noise at the edges of the spectrometers.
 These edges correspond to the boundaries of the three spectrometers, which collectively cover the \gls{uv}, \gls{vio}, and \gls{vnir} light spectra.
 The noisy edge ranges are as follows: 240.811-246.635 nm, 338.457-340.797 nm, 382.138-387.859 nm, 473.184-492.427 nm, and 849-905.574 nm.
 In addition to being noisy regions, these regions do not contain any useful information related to each of the major oxides.
-Consequently, these regions are masked by zeroing out the values, rather than removing them, as they still provide valuable information for the model to learn from\cite{cleggRecalibrationMarsScience2017}.
+Consequently, these regions are masked by zeroing out the values, rather than removing them, as they represent meaningful variation in the data~\cite{cleggRecalibrationMarsScience2017}.
 
 Additionally, as a result of the aforementioned preprocessing applied to the raw \gls{libs} data, negative values are present in the \gls{ccs} data.
 These negative values are not physically meaningful, since you cannot have negative light intensity \cite{p9_paper}.
@@ -42,7 +42,7 @@ Similar to the noisy edges, these negative values are also masked by zeroing out
 
 We transpose the data so that each row represents a location and each column represents a wavelength feature. 
 Each location is now represented as a vector of wavelengths, with the corresponding average intensity values for each wavelength. 
-These vectors are then concatenated to form a matrix, giving us the full Averaged Intensity Tensor.
+These vectors are then concatenated to form a tensor, giving us the full Averaged Intensity Tensor.
 
 For each sample, we have a corresponding set of major oxide compositions in weight percentage (wt\%).
 These compositions are used as the target labels for the machine learning models.
