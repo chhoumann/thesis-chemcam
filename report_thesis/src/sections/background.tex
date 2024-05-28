@@ -367,9 +367,9 @@ In this technique, multiple base models are trained on the original dataset.
 The outputs of these base models serve as inputs to a meta-model, which is trained to make the final prediction.
 This strategy enables the meta-model to learn the optimal way to combine the outputs of the base models to minimize the generalization error.
 
-To formalize, let $\mathbf{X}$ be the input data and $\mathbf{y}$ be the target variable. 
-First, $N$ base models $G_1, G_2, \ldots, G_N$ are trained on the dataset $\mathbf{X}$. 
-Each base model produces a set of predictions $\hat{\mathbf{y}}_i = G_i(\mathbf{X})$.
+Formally, let $\mathbf{X}$ denote the input data and $\mathbf{y}$ the target variable.
+Initially, $N$ base models $G_1, G_2, \ldots, G_N$ are trained on the dataset $\mathbf{X}$.
+Each base model generates a set of predictions $\hat{\mathbf{y}}_i = G_i(\mathbf{X})$.
 
 The predictions from the base models are then combined into a new dataset $\mathbf{Z}$, where each column $\mathbf{z}_i \in \mathbf{Z}$ corresponds to the predictions from the $i$-th base model:
 
