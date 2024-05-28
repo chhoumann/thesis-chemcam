@@ -340,7 +340,7 @@ Each tree is small, with few terminal nodes, preventing large adjustments based 
 It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
 
 Initially, the prediction is set as $\hat{f}_0(\mathbf{x}) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set, where $\mathbf{x}$ represents the vector of input feature(s) and $y$ is the true value or target variable. 
-The model is then iteratively improved over $B$ iterations, where $B$ is the total number of trees specified during model configuration. 
+The model is then iteratively improved over $B$ iterations, where $B$ is a hyperparameter controlling the total number of trees.
 At each iteration $b \in \{1, 2, \ldots, B\}$, predictions are updated as:
 $$
     \hat{f}(\mathbf{x}) = \hat{f}(\mathbf{x}) + \lambda \hat{f}_b(\mathbf{x})
