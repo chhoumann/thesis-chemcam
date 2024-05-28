@@ -347,7 +347,7 @@ $$
 $$
 where $\hat{f}_b(\mathbf{x})$ is the prediction of the $b$-th tree and $\lambda$ is the learning rate. Residuals are updated as:
 $$
-    r_i = y_i - \hat{f}(\mathbf{x})
+    r_i^{(b)} = y_i - \hat{f}^{(b-1)}(\mathbf{x}_i),
 $$
 Each tree is then trained on these updated residuals. 
 The repetitive process of fitting a weak learner to predict the residuals and using its predictions to update the model gives us the final model:
