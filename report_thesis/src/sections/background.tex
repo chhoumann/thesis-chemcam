@@ -376,7 +376,7 @@ Then, the algorithm enters an iterative process to refine its predictions.
 At the start of each iteration, the model computes its current predictions using the existing set of parameters.
 The algorithm then calculates the negative gradient of the loss function with respect to the current predictions.
 This involves computing the gradient of the negative log-likelihood, which quantifies the discrepancy between the current predictions and the actual observed data.
-The negative log-likelihood measures how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations. 
+The negative log-likelihood quantifies how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations. 
 
 Next, the \textit{Fisher information matrix} is computed. 
 This matrix encodes the curvature of the parameter space at the current parameter values, reflecting how sensitive the likelihood function is to changes in these parameters.
