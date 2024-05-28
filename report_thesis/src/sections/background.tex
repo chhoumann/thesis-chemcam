@@ -364,7 +364,7 @@ To minimize errors, gradient descent is used to iteratively update model paramet
 Stacked generalization, introduced by \citet{wolpertstacked_1992}, is a method designed to improve the predictive performance of machine learning models by leveraging the strengths of multiple models.
 
 In this technique, multiple base models are trained on the original dataset. 
-The predictions of these base models are then used as inputs to a meta-model (level-1 generalizer), which is trained to make the final prediction. 
+The outputs of these base models serve as inputs to a meta-model, which is trained to make the final prediction.
 This approach allows the meta-model to learn how to best combine the outputs of the base models to minimize generalization error.
 
 To formalize, let $\mathbf{X}$ be the input data and $\mathbf{y}$ be the target variable. 
