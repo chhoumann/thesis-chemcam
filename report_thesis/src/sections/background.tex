@@ -355,7 +355,7 @@ $$
     \hat{f}(\mathbf{x}) = \sum_{b=1}^{B} \lambda \hat{f}_b(\mathbf{x})
 $$
 In the context of regression, gradient boosting aims to minimize the difference between the predicted values and the actual target values by fitting successive trees to the residuals.
-To minimize errors, gradient descent is used, effectively reducing errors by moving in the direction of the steepest descent as dictated by the gradient of the loss function~\cite{gradientLossFunction}.
+To minimize errors, gradient descent is used to iteratively update model parameters in the direction of the negative gradient of the loss function, thereby following the path of steepest descent~\cite{gradientLossFunction}.
 
 
 \subsubsection{XGBoost}
