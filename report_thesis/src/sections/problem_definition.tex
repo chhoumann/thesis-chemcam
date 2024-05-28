@@ -57,7 +57,8 @@ The metric used to evaluate the accuracy of the models is the \gls{rmse}:
 \[
 \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
 \]
-where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. This measure quantifies the average magnitude of the prediction error across all predicted values.
+where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. 
+This measure quantifies the average magnitude of the prediction error across all predicted values.
 
 Robustness is evaluated using the sample standard deviation of prediction errors:
 \[
@@ -67,7 +68,9 @@ where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mea
 A lower standard deviation indicates a more robust model across different samples.
 
 \textbf{Problem formulation}:
-The objective of this research is to develop a computational model, denoted as $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict major oxide concentrations in geological samples from processed \gls{libs} spectral data. The model will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ and output Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$. Effectiveness will be measured by high accuracy, quantified by \gls{rmse}, and robustness, indicated by a low standard deviation of prediction errors across samples.
+The objective of this research is to develop a computational model, denoted as $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict major oxide concentrations in geological samples from processed \gls{libs} spectral data. 
+The model will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ and output Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$. 
+Effectiveness will be assessed by high accuracy, quantified by \gls{rmse}, and robustness, indicated by a low standard deviation of prediction errors across samples.
 
 
 \subsection{Challenges}
