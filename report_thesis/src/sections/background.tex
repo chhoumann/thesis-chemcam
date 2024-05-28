@@ -72,8 +72,8 @@ where
 
 \begin{itemize}
 	\item $\tilde{X}_{i,j}^{(\gamma)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer, with $\gamma \in \{1, 2, 3\}$ representing the \gls{uv}, \gls{vio}, and \gls{vnir} spectrometers, respectively,
-	\item $X_{i,j}^{(\gamma)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer,
-	\item $N = 2048$ is the number of channels in each spectrometer, and
+	\item $X_{i,j}^{(\gamma)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer, and
+	\item $N = 2048$ is the number of channels in each spectrometer.
 \end{itemize}
 
 This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
@@ -187,16 +187,13 @@ Having previously introduced \gls{pca}, we now describe \gls{pls} based on \cite
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-First, \gls{pca} is applied to the dataset $\mathbf{X}$, transforming it into a set of uncorrelated variables, the principal components.
-These components, represented by scores $\mathbf{T}$, are derived from the eigenvectors $\mathbf{V}_n$ with the highest variances.
-
 In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
 
 $$
 \mathbf{X} = \mathbf{TV}^T + \mathbf{E},
 $$
 
-where $\mathbf{T}$ represents the scores, and $\mathbf{V}$ represents the loadings.
+where $\mathbf{T}$ represents the scores, $\mathbf{E}$ are the residuals, and $\mathbf{V}$ represents the loadings.
 \gls{pcr} utilizes these scores $\mathbf{T}$ in a linear regression model to predict the target variable $\mathbf{y}$:
 
 $$
