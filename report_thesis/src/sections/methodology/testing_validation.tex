@@ -54,6 +54,7 @@ Additionally, it ensures that extreme values are handled appropriately to mainta
 
 \begin{algorithm}
 \caption{Custom k-Fold Cross-Validation with Extreme Value Handling}
+\label{alg:custom_kfold_cv}
 \begin{algorithmic}[1]
 \Require Dataset \( \mathbf{D} \), group column \( g \), target column \( t \), number of splits \( k \), percentile \( p \), random seed \( \textit{seed} \)
 \Ensure Cross-validation folds \( \mathbf{F}_\text{cv} \), training set \( \mathbf{D}_\text{train} \), and test set \( \mathbf{D}_\text{test} \)
@@ -77,7 +78,7 @@ Additionally, it ensures that extreme values are handled appropriately to mainta
 \end{algorithmic}
 \end{algorithm}
 
-The procedure begins by setting a random seed for reproducibility if one is provided (Line~\ref{line:seed}).
+The procedure outlined in Algorithm~\ref{alg:custom_kfold_cv} begins by setting a random seed for reproducibility if one is provided (Line~\ref{line:seed}).
 This ensures that the results are consistent across different runs of the algorithm.
 Next, the dataset is processed to remove any duplicate entries based on the group column and then sorted by the target column (Line~\ref{line:remove_duplicates}).
 This step ensures that each group is uniquely identified and ordered appropriately.
