@@ -46,7 +46,9 @@ def sort_and_assign_folds(
     return data
 
 
-def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, random_state=None, percentile=0.05):
+def custom_kfold_cross_validation_new(
+    data, k: int, group_by: str, target: str, random_state=None, percentile=0.05, remove_fold_column=True
+):
     """
     Perform custom k-fold cross-validation with outlier removal.
 
@@ -79,9 +81,10 @@ def custom_kfold_cross_validation_new(data, k: int, group_by: str, target: str, 
         folds_custom.append((train_val_data, test_val_data))
 
     # Remove the 'fold' column from all folds, train data, and test data
-    folds_custom = [(train.drop(columns=["fold"]), val.drop(columns=["fold"])) for train, val in folds_custom]
-    train_data = train_data.drop(columns=["fold"])
-    test_data = test_data.drop(columns=["fold"])
+    if remove_fold_column:
+        folds_custom = [(train.drop(columns=["fold"]), val.drop(columns=["fold"])) for train, val in folds_custom]
+        train_data = train_data.drop(columns=["fold"])
+        test_data = test_data.drop(columns=["fold"])
 
     return folds_custom, train_data, test_data
 
