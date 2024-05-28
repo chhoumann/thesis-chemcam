@@ -8,7 +8,7 @@ The instrument used to collect this data is a \gls{libs} instrument replicating 
 Both the \gls{chemcam} and laboratory instrument consist of three spectrometers, each producing 2048 channels.
 These spectrometers are used to capture the \gls{uv}, \gls{vio}, and \gls{vnir} regions of the spectrum.
 For each sample, five \gls{ccs} datasets are collected by firing 50 laser shots at five different locations on the sample and processing the raw spectral readings \cite{wiensPreflightCalibrationInitial2013}.
-Consequently, the \gls{ccs} data for each sample forms a high-dimensional intensity matrix $I$\ref{matrix:intensity} with dimensions $5 \times 50 \times 6144$.
+Consequently, the \gls{ccs} data for each sample forms a high-dimensional intensity tensor $I$\ref{matrix:intensity} with dimensions $5 \times 50 \times 6144$.
 An entry in this matrix represents the intensity of a specific wavelength in nanometers.
 Complementing the data is the matrix of the corresponding major oxide concentrations for each sample $C$\ref{matrix:concentration}, which serves as the target variable for the model.
 For more details, refer to Section 5 in \citet{p9_paper}.
