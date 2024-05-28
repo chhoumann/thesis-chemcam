@@ -371,7 +371,7 @@ Formally, let $\mathbf{X}$ denote the input data and $\mathbf{y}$ the target var
 Initially, $N$ base models $G_1, G_2, \ldots, G_N$ are trained on the dataset $\mathbf{X}$.
 Each base model generates a set of predictions $\hat{\mathbf{y}}_i = G_i(\mathbf{X})$.
 
-The predictions from the base models are then combined into a new dataset $\mathbf{Z}$, where each column $\mathbf{z}_i \in \mathbf{Z}$ corresponds to the predictions from the $i$-th base model:
+The predictions from the base models are then compiled into a new dataset $\mathbf{Z}$, where each column $\mathbf{z}_i \in \mathbf{Z}$ represents the predictions from the $i$-th base model:
 
 $$
 \mathbf{Z} = [\hat{\mathbf{y}}_1, \hat{\mathbf{y}}_2, \ldots, \hat{\mathbf{y}}_N]
