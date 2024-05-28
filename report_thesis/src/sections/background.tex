@@ -339,8 +339,6 @@ This leads us to \textit{Gradient Boosting}.
 Instead of building a single decision tree, gradient boosting constructs multiple trees sequentially, with each new tree correcting the errors of the previous ones.
 Each tree is small, with few terminal nodes, preventing large adjustments based on a single tree's predictions. 
 It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
-Finally, small trees have the property of high bias, meaning that they are unable to capture complex relationships in the data and low variance.
-By combining multiple small trees, the model can capture complex relationships while maintaining a low variance.
 
 The model is constructed iteratively by adding trees to correct the residuals of the previous trees. 
 Initially, the prediction is set as $\hat{f}_0(x) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set, where $x$ represents the input feature(s) and $y$ is the true value or target variable. 
