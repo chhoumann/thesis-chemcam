@@ -1,8 +1,8 @@
 \section{Background}\label{sec:background}
-In this section, we provide an overview of the preprocessing techniques and machine learning models integral to our proposed pipeline. 
-We discuss various normalization techniques, dimensionality reduction methods, ensemble learning strategies, linear and regularization models, and stacked generalization approaches. 
-Each technique is examined to highlight its underlying concepts, algorithms, and relevance to our pipeline. 
-The section begins with an introduction to preprocessing techniques, followed by detailed descriptions of the machine learning models utilized.
+In this section, we provide an overview of the preprocessing techniques and machine learning models used in our proposed pipeline. 
+We outline the various normalization techniques and dimensionality reduction methods, followed the ensemble learning and linear and regularization models used. 
+Finally, we outline stacked generalization. 
+The section begins with an introduction to the preprocessing techniques, followed by detailed descriptions of the machine learning models utilized.
 
 \subsection{Preprocessing}
 The preprocessing techniques used in our proposed pipeline include Z-score normalization, max absolute scaling, min-max normalization, robust scaling, Norm 3, power transformation, and quantile transformation. 
@@ -183,7 +183,9 @@ This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\to
 By constructing a kernel matrix $\mathbf{K}$ using these pairwise similarities, \gls{kernel-pca} can perform eigenvalue decomposition to obtain the principal components in the feature space, similar to regular \gls{pca} as described in Section~\ref{subsec:pca}.
 However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
 
-\subsection{Ensemble Learning Techniques}
+\subsection{Ensemble Learning Models}
+In this section we introduce the concept of ensemble learning and decision trees, as they are fundamental aspects of the ensemble learning models we discuss.
+Following this we outline \gls{etr}, \gls{gbr}, \gls{ngboost}, and \gls{xgboost}.
 
 \subsubsection{Ensemble Learning}
 Ensemble learning is a technique in machine learning where multiple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
@@ -286,7 +288,7 @@ This iterative process of computing predictions, calculating gradients, fitting 
 \subsubsection{XGBoost}
 
 \subsection{Linear and Regularization Models}
-
+In this section we outline \gls{pls} and \gls{svr}.
 \subsubsection{Partial Least Squares (PLS)}
 We now describe \gls{pls} based on \citet{James2023AnIS}.
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
