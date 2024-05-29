@@ -48,10 +48,11 @@ This technique can be advantageous in cases where the data contains outliers, as
 
 \subsubsection{Norm 3}
 As previously mentioned, the \gls{chemcam} instrument consists of three spectrometers, each producing 2048 channels.
-For data normalization, we follow the approach taken by the SuperCam team and normalize across individual spectrometers' wavelength ranges, a process known as \textit{Norm 3}~\cite{andersonPostlandingMajorElement2022}.
-This method ensures that the wavelength intensities captured by each spectrometer is normalized independently.
+For data normalization, we follow the approach taken by the ChemCam team and normalize across individual spectrometers' wavelength ranges, a process known as \textit{Norm 3}~\cite{cleggRecalibrationMarsScience2017, andersonImprovedAccuracyQuantitative2017}.
+This method ensures that the wavelength intensities captured by each spectrometer are normalized independently, thus preserving the relative intensities within each spectrometer.
 
-Figure~\ref{fig:spectral_plot} shows a spectral plot of the \gls{ccs} data for the \textit{ultramafic} sample, illustrating the three distinct spectral regions, each captured by one of the three spectrometers. Specifically, one spectrometer captures the \gls{uv} region, another captures the \gls{vio} region, and the third captures the \gls{vnir} region.
+Figure~\ref{fig:spectral_plot} shows a spectral plot of the \gls{ccs} data for the \textit{ultramafic} sample, illustrating the three distinct spectral regions, each captured by one of the three spectrometers.
+Specifically, one spectrometer captures the \gls{uv} region, another captures the \gls{vio} region, and the third captures the \gls{vnir} region.
 
 \begin{figure}[H]
 	\centering
