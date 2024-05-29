@@ -1,5 +1,12 @@
 \section{Background}\label{sec:background}
+In this section, we provide an overview of the preprocessing techniques and machine learning models integral to our proposed pipeline. 
+We discuss various normalization techniques, dimensionality reduction methods, ensemble learning strategies, linear and regularization models, and stacked generalization approaches. 
+Each technique is examined to highlight its underlying concepts, algorithms, and relevance to our pipeline. 
+The section begins with an introduction to preprocessing techniques, followed by detailed descriptions of the machine learning models utilized.
+
 \subsection{Preprocessing}
+In this section, we introduce the preprocessing techniques used in our proposed pipeline. 
+The techniques covered include Z-score normalization, max absolute scaling, min-max normalization, robust scaling, Norm 3, power transformation, and quantile transformation. 
 
 \subsubsection{Z-score Normalization}
 Z-score normalization, also standardization, transforms data to have a mean of zero and a standard deviation of one.
@@ -24,7 +31,6 @@ $$
 where $x$ is the original feature value and $X_{\text{scaled}}$ is the normalized feature value.
 This scaling method is useful for data that has been centered at zero or data that is sparse, as max absolute scaling does not center the data.
 This maintains the sparsity of the data by not introducing non-zero values in the zero entries of the data~\cite{Vasques2024}.
-
 
 \subsubsection{Min-Max Normalization}\label{subsec:min-max}
 Min-max normalization rescales the range of features to $[0, 1]$ or $[a, b]$, where $a$ and $b$ represent the new minimum and maximum values, respectively.
@@ -178,111 +184,11 @@ This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\to
 By constructing a kernel matrix $\mathbf{K}$ using these pairwise similarities, \gls{kernel-pca} can perform eigenvalue decomposition to obtain the principal components in the feature space, similar to regular \gls{pca} as described in Section~\ref{subsec:pca}.
 However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
 
-\subsection{Overview of Core Models}
-In this section, we provide an overview and definitions of \gls{pls}, \gls{svr}, \gls{etr}, \gls{gbr}, and \gls{xgboost}.
-These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
+\subsection{Ensemble Learning Techniques}
 
-\subsubsection{Partial Least Squares (PLS)}
-Having previously introduced \gls{pca}, we now describe \gls{pls} based on \citet{James2023AnIS}.
-In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
+\subsubsection{What Is Ensemble Learning?}
 
-\gls{pcr} extends \gls{pca} in the context of regression analysis.
-In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
-
-$$
-\mathbf{X} = \mathbf{TV}^T + \mathbf{E},
-$$
-
-where $\mathbf{T}$ represents the scores, $\mathbf{E}$ represents the residual matrix, and $\mathbf{V}$ represents the loadings.
-\gls{pcr} utilizes these scores $\mathbf{T}$ in a linear regression model to predict the target variable $\mathbf{y}$:
-
-$$
-\mathbf{y} = \mathbf{Tb} + \mathbf{e},
-$$
-
-where $\mathbf{b}$ are the regression coefficients correlating $\mathbf{T}$ to $\mathbf{y}$, and $\mathbf{e}$ is the vector of residuals, capturing the prediction errors.
-
-One drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
-This assumption does not always hold, which is what \gls{pls} aims to address.
-
-\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
-These components, $Z$, are linear combinations of the original features, $\mathbf{X}_j$, weighted by coefficients, $\phi_j$, which are specifically calculated to reflect this covariance.
-The formula for each component is expressed as:
-
-$$
-    Z = \sum_{j=1}^{p} \phi_j \mathbf{X}_j,
-$$
-
-where $Z$ represents the component, $\mathbf{X}_j$ is the $j$-th feature, and $\phi_j$ is the weight for the $j$-th feature.
-The weights, $\phi_j$, are determined by the formula:
-
-$$
-    \phi_j = \frac{\text{cov}(\mathbf{X}_j, Y)}{\text{var}(\mathbf{X}_j)}.
-$$
-
-To refine the model iteratively, PLS uses the residuals from the previous components to calculate the next component.
-The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components:
-
-$$
-    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{\mathbf{X}}_{j, m-1}.
-$$
-
-The components are then used to predict the target variable by fitting a linear model via least squares regression.
-
-\subsubsection{Support Vector Regression (SVR)}
-\gls{svr} is a regression technique that extends the principles of \gls{svm} to regression problems.
-We therefore provide an overview of \gls{svm}s based on \citet{James2023AnIS} before discussing \gls{svr}s.
-
-\gls{svm} is a supervised learning algorithm used primarily for classification tasks.
-A core concept in \gls{svm} is the \textit{hyperplane}.
-Generally, a hyperplane is a subspace of one dimension less than its ambient space.
-This means that in a two-dimensional space, a hyperplane is a line, while in a three-dimensional space, it is a plane, and so on.
-
-\gls{svm} is built on the idea of finding the hyperplane that best separates the data points into different classes.
-This hyperplane is chosen to maximize the margin, which is the distance between the hyperplane and the nearest data point from either class.
-The instances right on or inside the margin are called \textit{support vectors}, which are used to 'support' the margin and decision boundary.
-
-\gls{svr} extends the principles of \gls{svm} to regression problems.
-We use our previous discussion of \gls{svm} to introduce \gls{svr} based on \citet{druckerSVR}.
-
-\gls{svr} aims to fit a function that predicts continuous values rather than finding the hyperplane that best separates data points.
-Instead of using a hyperplane to separate the data, \gls{svr} uses two parallel hyperplanes to define a margin within which the function should lie, often referred to as the $\epsilon$-\textit{tube}, where $\epsilon$ is a hyperparameter that defines the width of the tube.
-The goal is to find a function $f(x)$ that lies within this tube and has the maximum number of data points within the tube.
-$f(x)$ is typically defined as a linear function of the form:
-
-$$
-f(x) = \mathbf{w} \cdot \mathbf{x} + b,
-$$
-
-where:
-
-\begin{itemize}
-	\item $\mathbf{w}$ is the weight vector,
-	\item $\mathbf{x}$ is the input vector, and
-	\item $b$ is the bias term.
-\end{itemize}
-
-The two parallel hyperplanes at a distance $\epsilon$ from the hyperplane are defined as:
-
-$$
-\begin{aligned}
-    \mathbf{w} \cdot \mathbf{x} + b &= f(\mathbf{x}) + \epsilon, \\
-    \mathbf{w} \cdot \mathbf{x} + b &= f(\mathbf{x}) - \epsilon.
-\end{aligned}
-$$
-
-Or, more succinctly:
-
-$$
-\begin{aligned}
-    f^+(\mathbf{x}) &= f(\mathbf{x}) + \epsilon, \\
-    f^-(\mathbf{x}) &= f(\mathbf{x}) - \epsilon,
-\end{aligned}
-$$
-
-where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of the $\epsilon$-insensitive tube, respectively.
-
-The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
+\subsubsection{Decision Trees}
 
 \subsubsection{Extra Trees Regressor (ETR)}
 Before discussing the \gls{etr} model, it is important to first understand the concepts of decision trees and \gls{rf}.
@@ -392,7 +298,111 @@ This iterative process of computing predictions, calculating gradients, fitting 
 
 \subsubsection{XGBoost}
 
-\subsubsection{Stacked Generalization}
+\subsection{Linear and Regularization Models}
+
+\subsubsection{Partial Least Squares (PLS)}
+Having previously introduced \gls{pca}, we now describe \gls{pls} based on \citet{James2023AnIS}.
+In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
+
+\gls{pcr} extends \gls{pca} in the context of regression analysis.
+In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
+
+$$
+\mathbf{X} = \mathbf{TV}^T + \mathbf{E},
+$$
+
+where $\mathbf{T}$ represents the scores, $\mathbf{E}$ represents the residual matrix, and $\mathbf{V}$ represents the loadings.
+\gls{pcr} utilizes these scores $\mathbf{T}$ in a linear regression model to predict the target variable $\mathbf{y}$:
+
+$$
+\mathbf{y} = \mathbf{Tb} + \mathbf{e},
+$$
+
+where $\mathbf{b}$ are the regression coefficients correlating $\mathbf{T}$ to $\mathbf{y}$, and $\mathbf{e}$ is the vector of residuals, capturing the prediction errors.
+
+One drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
+This assumption does not always hold, which is what \gls{pls} aims to address.
+
+\gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
+These components, $Z$, are linear combinations of the original features, $\mathbf{X}_j$, weighted by coefficients, $\phi_j$, which are specifically calculated to reflect this covariance.
+The formula for each component is expressed as:
+
+$$
+    Z = \sum_{j=1}^{p} \phi_j \mathbf{X}_j,
+$$
+
+where $Z$ represents the component, $\mathbf{X}_j$ is the $j$-th feature, and $\phi_j$ is the weight for the $j$-th feature.
+The weights, $\phi_j$, are determined by the formula:
+
+$$
+    \phi_j = \frac{\text{cov}(\mathbf{X}_j, Y)}{\text{var}(\mathbf{X}_j)}.
+$$
+
+To refine the model iteratively, PLS uses the residuals from the previous components to calculate the next component.
+The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components:
+
+$$
+    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{\mathbf{X}}_{j, m-1}.
+$$
+
+The components are then used to predict the target variable by fitting a linear model via least squares regression.
+
+\subsubsection{Support Vector Regression (SVR)}
+\gls{svr} is a regression technique that extends the principles of \gls{svm} to regression problems.
+We therefore provide an overview of \gls{svm}s based on \citet{James2023AnIS} before discussing \gls{svr}s.
+
+\gls{svm} is a supervised learning algorithm used primarily for classification tasks.
+A core concept in \gls{svm} is the \textit{hyperplane}.
+Generally, a hyperplane is a subspace of one dimension less than its ambient space.
+This means that in a two-dimensional space, a hyperplane is a line, while in a three-dimensional space, it is a plane, and so on.
+
+\gls{svm} is built on the idea of finding the hyperplane that best separates the data points into different classes.
+This hyperplane is chosen to maximize the margin, which is the distance between the hyperplane and the nearest data point from either class.
+The instances right on or inside the margin are called \textit{support vectors}, which are used to 'support' the margin and decision boundary.
+
+\gls{svr} extends the principles of \gls{svm} to regression problems.
+We use our previous discussion of \gls{svm} to introduce \gls{svr} based on \citet{druckerSVR}.
+
+\gls{svr} aims to fit a function that predicts continuous values rather than finding the hyperplane that best separates data points.
+Instead of using a hyperplane to separate the data, \gls{svr} uses two parallel hyperplanes to define a margin within which the function should lie, often referred to as the $\epsilon$-\textit{tube}, where $\epsilon$ is a hyperparameter that defines the width of the tube.
+The goal is to find a function $f(x)$ that lies within this tube and has the maximum number of data points within the tube.
+$f(x)$ is typically defined as a linear function of the form:
+
+$$
+f(x) = \mathbf{w} \cdot \mathbf{x} + b,
+$$
+
+where:
+
+\begin{itemize}
+	\item $\mathbf{w}$ is the weight vector,
+	\item $\mathbf{x}$ is the input vector, and
+	\item $b$ is the bias term.
+\end{itemize}
+
+The two parallel hyperplanes at a distance $\epsilon$ from the hyperplane are defined as:
+
+$$
+\begin{aligned}
+    \mathbf{w} \cdot \mathbf{x} + b &= f(\mathbf{x}) + \epsilon, \\
+    \mathbf{w} \cdot \mathbf{x} + b &= f(\mathbf{x}) - \epsilon.
+\end{aligned}
+$$
+
+Or, more succinctly:
+
+$$
+\begin{aligned}
+    f^+(\mathbf{x}) &= f(\mathbf{x}) + \epsilon, \\
+    f^-(\mathbf{x}) &= f(\mathbf{x}) - \epsilon,
+\end{aligned}
+$$
+
+where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of the $\epsilon$-insensitive tube, respectively.
+
+The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
+
+\subsection{Stacked Generalization}
 Stacked generalization, introduced by \citet{wolpertstacked_1992}, is a method designed to improve the predictive performance of machine learning models by leveraging the strengths of multiple models.
 
 In this technique, multiple base models are trained on the original dataset. 
