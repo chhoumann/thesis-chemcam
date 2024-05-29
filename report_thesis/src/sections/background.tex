@@ -5,8 +5,7 @@ Each technique is examined to highlight its underlying concepts, algorithms, and
 The section begins with an introduction to preprocessing techniques, followed by detailed descriptions of the machine learning models utilized.
 
 \subsection{Preprocessing}
-In this section, we introduce the preprocessing techniques used in our proposed pipeline. 
-The techniques covered include Z-score normalization, max absolute scaling, min-max normalization, robust scaling, Norm 3, power transformation, and quantile transformation. 
+The preprocessing techniques used in our proposed pipeline include Z-score normalization, max absolute scaling, min-max normalization, robust scaling, Norm 3, power transformation, and quantile transformation. 
 
 \subsubsection{Z-score Normalization}
 Z-score normalization, also standardization, transforms data to have a mean of zero and a standard deviation of one.
@@ -186,19 +185,24 @@ However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the k
 
 \subsection{Ensemble Learning Techniques}
 
-\subsubsection{What Is Ensemble Learning?}
+\subsubsection{Ensemble Learning}
+Ensemble learning is a technique in machine learning where multiple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
+Mathematically, ensemble learning can be defined as combining the predictions of $M$ weak learners to form a final prediction $\hat{y}$, such that:
+\begin{equation}
+    \hat{y} = \sum_{m=1}^{M} \alpha_m \hat{y}_m,
+\end{equation}
+where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is the weight assigned to the $m$-th weak learner.
+While there are various choices for weak learners, decision trees are a common choice\cite{James2023AnIS}.
 
 \subsubsection{Decision Trees}
-
-\subsubsection{Extra Trees Regressor (ETR)}
-Before discussing the \gls{etr} model, it is important to first understand the concepts of decision trees and \gls{rf}.
-We give an overview of decision trees and \gls{rf} based on \citet{James2023AnIS}.
-Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
-
 A decision tree is a supervised learning model that partitions data into subsets based on feature values, creating a tree structure.
 The goal is to create a tree that predicts the target variable by dividing the data into increasingly homogeneous subsets.
 Each internal node in the tree represents a decision based on a specific feature, while each leaf node represents a prediction for the target variable.
-The tree can make predictions for new data points by following a path from the root to a leaf node.
+The tree can make predictions for new data points by following a path from the root to a leaf node\cite{James2023AnIS}.
+
+\subsubsection{Extra Trees Regressor (ETR)}
+We give an overview of \gls{rf} based on \citet{James2023AnIS}.
+Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
 
 \gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
 Each tree is trained on a random subset of the data using bootstrap sampling, where samples are drawn with replacement, meaning the same sample can be selected multiple times.
@@ -221,26 +225,9 @@ However, it often achieves better generalization performance, especially in high
 
 \subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
 In this section we introduce \gls{gbr} primarily based on \citet{James2023AnIS}.
-\gls{gbr} is an ensemble learning method that builds models sequentially, each one trying to correct the errors of the previous one, using gradient descent and boosting techniques.
-
-To understand \gls{gbr}, it is helpful to build on the concepts of ensemble learning and decision trees.
-Ensemble learning is a technique in machine learning where multiple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
-Mathematically, ensemble learning can be defined as combining the predictions of $M$ weak learners to form a final prediction $\hat{y}$, such that:
-\begin{equation}
-    \hat{y} = \sum_{m=1}^{M} \alpha_m \hat{y}_m,
-\end{equation}
-where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is the weight assigned to the $m$-th weak learner.
-While there are various choices for weak learners, decision trees are a common choice.
-Decision trees are a core component of gradient boosting methods.
-They partition the data into subsets based on feature values, aiming to create groups where data points have similar predicted outcomes.
-
-Once optimal splits are identified, the tree is constructed by repeatedly partitioning the data until a stopping criterion is met.
-The final model consists of splits that create distinct regions, each with a predicted response value based on the mean of the observations in that region.
-
-This leads us to \textit{gradient boosting}.
-Instead of building a single decision tree, gradient boosting constructs multiple trees sequentially, with each new tree correcting the errors of the previous ones.
+\gls{gbr} is an ensemble learning method that sequentially construct multiple decision trees, each one correcting the errors of the previous one, using gradient descent and boosting techniques.
 Each tree is small, with few terminal nodes, preventing large adjustments based on a single tree's predictions.
-It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
+This ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
 
 Initially, the prediction is set as $\hat{f}_0(\mathbf{x}) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set, where $\mathbf{x}$ represents the vector of input feature(s) and $y$ is the true value or target variable.
 The model is then iteratively improved over $B$ iterations, where $B$ is a hyperparameter controlling the total number of trees.
@@ -301,11 +288,11 @@ This iterative process of computing predictions, calculating gradients, fitting 
 \subsection{Linear and Regularization Models}
 
 \subsubsection{Partial Least Squares (PLS)}
-Having previously introduced \gls{pca}, we now describe \gls{pls} based on \citet{James2023AnIS}.
+We now describe \gls{pls} based on \citet{James2023AnIS}.
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
+In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using \gls{pca} as:
 
 $$
 \mathbf{X} = \mathbf{TV}^T + \mathbf{E},
