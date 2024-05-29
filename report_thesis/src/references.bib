@@ -579,3 +579,19 @@ author = {David H. Wolpert},
 keywords = {Generalization and induction, Combining generalizers, Learning set preprocessing, cross-validation, Error estimation and correction},
 abstract = {This paper introduces stacked generalization, a scheme for minimizing the generalization error rate of one or more generalizers. Stacked generalization works by deducing the biases of the generalizer(s) with respect to a provided learning set. This deduction proceeds by generalizing in a second space whose inputs are (for example) the guesses of the original generalizers when taught with part of the learning set and trying to guess the rest of it, and whose output is (for example) the correct guess. When used with multiple generalizers, stacked generalization can be seen as a more sophisticated version of cross-validation, exploiting a strategy more sophisticated than cross-validation's crude winner-takes-all for combining the individual generalizers. When used with a single generalizer, stacked generalization is a scheme for estimating (and then correcting for) the error of a generalizer which has been trained on a particular learning set and then asked a particular question. After introducing stacked generalization and justifying its use, this paper presents two numerical experiments. The first demonstrates how stacked generalization improves upon a set of separate generalizers for the NETtalk task of translating text to phonemes. The second demonstrates how stacked generalization improves the performance of a single surface-fitter. With the other experimental evidence in the literature, the usual arguments supporting cross-validation, and the abstract justifications presented in this paper, the conclusion is that for almost any real-world generalization problem one should use some version of stacked generalization to minimize the generalization error rate. This paper ends by discussing some of the variations of stacked generalization, and how it touches on other fields like chaos theory.}
 }
+
+@misc{duan_ngboost_2020,
+	title = {{NGBoost}: {Natural} {Gradient} {Boosting} for {Probabilistic} {Prediction}},
+	shorttitle = {{NGBoost}},
+	url = {http://arxiv.org/abs/1910.03225},
+	abstract = {We present Natural Gradient Boosting (NGBoost), an algorithm for generic probabilistic prediction via gradient boosting. Typical regression models return a point estimate, conditional on covariates, but probabilistic regression models output a full probability distribution over the outcome space, conditional on the covariates. This allows for predictive uncertainty estimation — crucial in applications like healthcare and weather forecasting. NGBoost generalizes gradient boosting to probabilistic regression by treating the parameters of the conditional distribution as targets for a multiparameter boosting algorithm. Furthermore, we show how the Natural Gradient is required to correct the training dynamics of our multiparameter boosting approach. NGBoost can be used with any base learner, any family of distributions with continuous parameters, and any scoring rule. NGBoost matches or exceeds the performance of existing methods for probabilistic prediction while offering additional beneﬁts in ﬂexibility, scalability, and usability. An open-source implementation is available at github.com/stanfordmlgroup/ngboost.},
+	language = {en},
+	urldate = {2024-05-28},
+	publisher = {arXiv},
+	author = {Duan, Tony and Avati, Anand and Ding, Daisy Yi and Thai, Khanh K. and Basu, Sanjay and Ng, Andrew Y. and Schuler, Alejandro},
+	month = jun,
+	year = {2020},
+	note = {arXiv:1910.03225 [cs, stat]},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
+	annote = {Comment: Accepted for ICML 2020},
+}

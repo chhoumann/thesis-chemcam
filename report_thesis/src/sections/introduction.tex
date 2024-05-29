@@ -24,7 +24,8 @@ To achieve these objectives, we build upon the baseline established in~\cite{p9_
 These models were identified and selected through a combination of extensive literature review and the consideration of unconventional approaches not typically covered in the \gls{libs}-based calibration literature.
 The ten models fall into three categories: Ensemble learning models, linear and regularization models, and neural network models.
 In addition to model exploration, we also investigate a selection of preprocessing techniques: scaling (including normalization), dimensionality reduction, and data transformation.
-Specifically, we designed and implemented a framework for experimental analysis using the automated hyperparameter optimization framework Optuna~\cite{optuna} to determine the most effective combinations of preprocessing methods and models for each regression target.
+Specifically, we designed and implemented a framework for experimental analysis using the automated hyperparameter optimization framework Optuna~\cite{optuna_2019}.
+We then used this framework to determine the most effective combinations of preprocessing methods and models for each regression target.
 We began by identifying the most promising models from the literature, after which we evaluated various preprocessing techniques to understand their impact on model performance, selecting those that demonstrated the highest impact on improving the performance of each model.
 Following preprocessing, we optimized the chosen models through hyperparameter tuning to ensure optimal performance tailored to the specific data characteristics of each oxide.
 Once the best hyperparameters were identified, a stacking ensemble method was employed to create a meta learner for each oxide, significantly enhancing prediction accuracy and robustness beyond the capabilities of individual models.
@@ -47,7 +48,7 @@ Section~\ref{sec:methodology} describes our proposed methodology, including data
 Section~\ref{sec:experiments} presents our experimental setup and results.
 Finally, Section~\ref{sec:conclusion} concludes the paper and discusses future work.
 
-In table \ref{tab:terms}, we provide a list of terms used throughout this paper.
+Due to the overlapping nature of terminology used in \gls{libs} data analysis and machine learning, we provide a list of terms in Table~\ref{tab:terms} to clarify their meaning.
 
 \begin{table}
 \centering

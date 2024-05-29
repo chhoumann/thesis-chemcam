@@ -71,9 +71,9 @@ Formally, Norm 3 is defined as
 where
 
 \begin{itemize}
-	\item $\tilde{X}_{i,j}^{(\gamma)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer with $\gamma \in \{1, 2, 3\}$,
-	\item $X_{i,j}^{(\gamma)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer,
-	\item $N = 2048$ is the number of channels in each spectrometer, and
+	\item $\tilde{X}_{i,j}^{(\gamma)}$ is the normalized wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer, with $\gamma \in \{1, 2, 3\}$ representing the \gls{uv}, \gls{vio}, and \gls{vnir} spectrometers, respectively,
+	\item $X_{i,j}^{(\gamma)}$ is the original wavelength intensity for the $i$-th sample in the $j$-th channel on the $\gamma$-th spectrometer, and
+	\item $N = 2048$ is the number of channels in each spectrometer.
 \end{itemize}
 
 This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
@@ -138,15 +138,16 @@ $$
 
 where $n$ is the number of samples.
 
-Then, the covariance matrix $C$ is decomposed into its eigenvectors $\mathbf{V}$ and eigenvalues $\mathbf{D}$:
+Then, the covariance matrix $\mathbf{C}$ is decomposed into its eigenvectors $\mathbf{V}$ and eigenvalues $\mathbf{D}$:
 
 $$
 \mathbf{C} = \mathbf{V} \mathbf{D} \mathbf{V}^T,
 $$
 
-where matrix $\mathbf{V}$ contains the eigenvectors of $\mathbf{C}$ and represents the principal component loadings.
-These loadings indicate the directions of maximum variance in $\mathbf{X}$.
-The matrix $\mathbf{D}$ is diagonal and holds the eigenvalues, each of which quantifies the variance captured by its corresponding loading.
+where $\mathbf{V}$ contains the eigenvectors of $\mathbf{C}$. 
+These eigenvectors represent the principal components, indicating the directions of maximum variance in $\mathbf{X}$. 
+The interpretation of the principal components is that the first captures the most variance, the second captures the next most variance, and so on. 
+The matrix $\mathbf{D}$ is diagonal and contains the eigenvalues, each quantifying the variance captured by its corresponding principal component.
 
 These components are the scores $\mathbf{T}$, calculated as follows:
 
@@ -187,16 +188,13 @@ Having previously introduced \gls{pca}, we now describe \gls{pls} based on \cite
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-First, \gls{pca} is applied to the dataset $\mathbf{X}$, transforming it into a set of uncorrelated variables, the principal components.
-These components, represented by scores $\mathbf{T}$, are derived from the eigenvectors $\mathbf{V}_n$ with the highest variances.
-
 In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
 
 $$
 \mathbf{X} = \mathbf{TV}^T + \mathbf{E},
 $$
 
-where $\mathbf{T}$ represents the scores, and $\mathbf{V}$ represents the loadings.
+where $\mathbf{T}$ represents the scores, $\mathbf{E}$ represents the residual matrix, and $\mathbf{V}$ represents the loadings.
 \gls{pcr} utilizes these scores $\mathbf{T}$ in a linear regression model to predict the target variable $\mathbf{y}$:
 
 $$
@@ -205,29 +203,29 @@ $$
 
 where $\mathbf{b}$ are the regression coefficients correlating $\mathbf{T}$ to $\mathbf{y}$, and $\mathbf{e}$ is the vector of residuals, capturing the prediction errors.
 
-However, one drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
+One drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
 This assumption does not always hold, which is what \gls{pls} aims to address.
 
 \gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
-These components, $Z$, are linear combinations of the original features, $X_j$, weighted by coefficients, $\phi_j$, which are specifically calculated to reflect this covariance.
+These components, $Z$, are linear combinations of the original features, $\mathbf{X}_j$, weighted by coefficients, $\phi_j$, which are specifically calculated to reflect this covariance.
 The formula for each component is expressed as:
 
 $$
-    Z = \sum_{j=1}^{p} \phi_j X_j,
+    Z = \sum_{j=1}^{p} \phi_j \mathbf{X}_j,
 $$
 
-where $Z$ represents the component, $X_j$ is the $j$-th feature, and $\phi_j$ is the weight for the $j$-th feature.
+where $Z$ represents the component, $\mathbf{X}_j$ is the $j$-th feature, and $\phi_j$ is the weight for the $j$-th feature.
 The weights, $\phi_j$, are determined by the formula:
 
 $$
-    \phi_j = \frac{\text{cov}(X_j, Y)}{\text{var}(X_j)}.
+    \phi_j = \frac{\text{cov}(\mathbf{X}_j, Y)}{\text{var}(\mathbf{X}_j)}.
 $$
 
 To refine the model iteratively, PLS uses the residuals from the previous components to calculate the next component.
 The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components:
 
 $$
-    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{X}_{j, m-1}.
+    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{\mathbf{X}}_{j, m-1}.
 $$
 
 The components are then used to predict the target variable by fitting a linear model via least squares regression.
@@ -357,6 +355,41 @@ $$
 In the context of regression, gradient boosting aims to minimize the difference between the predicted values and the actual target values by fitting successive trees to the residuals.
 To minimize errors, gradient descent is used to iteratively update model parameters in the direction of the negative gradient of the loss function, thereby following the path of steepest descent~\cite{gradientLossFunction}.
 
+\subsubsection{Natural Gradient Boosting (NGBoost)}
+Having introduced \gls{gbr}, we now give an overview of \gls{ngboost} based on \citet{duan_ngboost_2020}.
+
+\gls{ngboost} is a variant of the gradient boosting algorithm that leverages the concept of natural gradients with the goal of improving convergence speed and model performance.
+In more complex models, the parameter space can be curved and thus non-Euclidean, making the standard gradient descent less effective.
+Consequently, using the standard gradient descent can lead to slow convergence and suboptimal performance.
+In such scenarios, the application of natural gradients becomes particularly advantageous.
+
+Natural gradients account for the underlying geometry of the parameter space by using information about its curvature.
+By incorporating this information, natural gradients can navigate the parameter space more efficiently, leading to faster convergence and better performance.
+In addition, \gls{ngboost} provides its predictions in the form of probability distributions, allowing it to estimate the uncertainty associated with its predictions.
+
+The algorithm starts by initializing a model with a guess for the parameters of the probability distribution, usually starting with something simple like a Gaussian distribution.
+This initial model prediction represents the probability distribution over the target variable based on the given features.
+
+Then, the algorithm enters an iterative process to refine its predictions.
+At the start of each iteration, the model computes its current predictions using the existing set of parameters.
+The algorithm then calculates the negative gradient of the loss function with respect to the current predictions.
+This involves computing the gradient of the negative log-likelihood, which quantifies the discrepancy between the current predictions and the actual observed data.
+The negative log-likelihood quantifies how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations. 
+
+Next, the \textit{Fisher information matrix} is computed. 
+This matrix encodes the curvature of the parameter space at the current parameter values, reflecting how sensitive the likelihood function is to changes in these parameters.
+For example, if the likelihood function is highly sensitive to changes in a particular parameter, the Fisher information matrix will have a high value for that parameter.
+Using this information, the model can adjust its parameters more effectively, focusing on the most sensitive parameters to improve performance.
+
+The standard gradient, or residuals, which is derived from the negative log-likelihood, is then transformed using the inverse of the Fisher information matrix to obtain what is known as the natural gradient.
+Next, a weak learner, typically a decision tree, is fitted to these natural gradients.
+This step is similar to traditional gradient boosting, where a tree is fitted to the residuals, but in \gls{ngboost}, the tree is fitted to the natural gradients instead.
+
+The parameters of the model are then updated using the output from the weak learner.
+This update process incorporates a learning rate to control the step size, ensuring that the model makes gradual improvements rather than drastic changes.
+
+Using the newly updated parameters, the model recalculates its predictions, refining the probability distribution of the target variable. 
+This iterative process of computing predictions, calculating gradients, fitting weak learners, and updating parameters continues for a predetermined number of iterations or until the model's performance converges.
 
 \subsubsection{XGBoost}
 
