@@ -226,7 +226,7 @@ As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as t
 However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
 
 \subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
-Gradient Boosting is an ensemble learning algorithm that combines multiple weaker learners to predict a target variable.
+\gls{gbr} is an ensemble learning algorithm that combines multiple weaker learners to predict a target variable.
 This supervised algorithm works by sequentially adding predictors to correct the errors of the previous predictors.
 It uses gradient descent to minimize the loss function when incorporating new models into the ensemble.
 
@@ -235,7 +235,9 @@ This differentiable nature is crucial, hence the term 'gradient' boosting.
 Initially, we start with a very weak learner.
 This can, for example, be represented as $F_{1}(x) = f_{1}(x) = \overline{y}$, where $\overline{y}$ is simply the mean of the target values.
 This weak learner provides a basic starting point for predictions.
-Next, we compute the residuals \(\hat{r}_{1,i}\) for each data point \(i\). These residuals are the gradients of the loss function with respect to the current predictions. Formally, this is expressed as:
+Next, we compute the residuals \(\hat{r}_{1,i}\) for each data point \(i\).
+These residuals are the gradients of the loss function with respect to the current predictions.
+Formally, this is expressed as:
 
 $$
 \hat{r}_{1,i} = \frac{d \mathcal{L}(y_{i}, \hat{y}_{i})}{d \hat{y}_{i}}
