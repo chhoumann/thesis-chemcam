@@ -301,7 +301,7 @@ $$
 
 where $f_k$ represents the individual regression trees.
 
-The model is trained in an additive manner, where at each iteration, the objective function is approximated to efficiently compute the gain from adding a new tree. 
+The model is trained in an additive manner where, at each iteration, the objective function is approximated to efficiently compute the gain from adding a new tree. 
 The gain is determined by evaluating the improvement in accuracy from splitting a node into two new nodes. 
 It takes into account the gradients (first derivatives of the loss function) to evaluate the direction of optimization, and the Hessians (second derivatives of the loss function) to understand the curvature of the loss function. 
 Additionally, the regularization parameter helps to control the complexity of the model, and a penalty term is included to account for the cost of adding new leaves to the tree.
