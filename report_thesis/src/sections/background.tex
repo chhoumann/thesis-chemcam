@@ -1,11 +1,11 @@
 \section{Background}\label{sec:background}
-In this section, we provide an overview of the preprocessing techniques and machine learning models used in our proposed pipeline. 
-We outline the various normalization techniques and dimensionality reduction methods, followed the ensemble learning and linear and regularization models used. 
-Finally, we outline stacked generalization. 
+In this section, we provide an overview of the preprocessing techniques and machine learning models used in our proposed pipeline.
+We outline the various normalization techniques and dimensionality reduction methods, followed the ensemble learning and linear and regularization models used.
+Finally, we outline stacked generalization.
 The section begins with an introduction to the preprocessing techniques, followed by detailed descriptions of the machine learning models utilized.
 
 \subsection{Preprocessing}
-The preprocessing techniques used in our proposed pipeline include Z-score normalization, max absolute scaling, min-max normalization, robust scaling, Norm 3, power transformation, and quantile transformation. 
+The preprocessing techniques used in our proposed pipeline include Z-score normalization, max absolute scaling, min-max normalization, robust scaling, Norm 3, power transformation, and quantile transformation.
 
 \subsubsection{Z-score Normalization}
 Z-score normalization, also standardization, transforms data to have a mean of zero and a standard deviation of one.
@@ -148,9 +148,9 @@ $$
 \mathbf{C} = \mathbf{V} \mathbf{D} \mathbf{V}^T,
 $$
 
-where $\mathbf{V}$ contains the eigenvectors of $\mathbf{C}$. 
-These eigenvectors represent the principal components, indicating the directions of maximum variance in $\mathbf{X}$. 
-The interpretation of the principal components is that the first captures the most variance, the second captures the next most variance, and so on. 
+where $\mathbf{V}$ contains the eigenvectors of $\mathbf{C}$.
+These eigenvectors represent the principal components, indicating the directions of maximum variance in $\mathbf{X}$.
+The interpretation of the principal components is that the first captures the most variance, the second captures the next most variance, and so on.
 The matrix $\mathbf{D}$ is diagonal and contains the eigenvalues, each quantifying the variance captured by its corresponding principal component.
 
 These components are the scores $\mathbf{T}$, calculated as follows:
@@ -226,28 +226,47 @@ As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as t
 However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
 
 \subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
-In this section we introduce \gls{gbr} primarily based on \citet{James2023AnIS}.
-\gls{gbr} is an ensemble learning method that sequentially construct multiple decision trees, each one correcting the errors of the previous one, using gradient descent and boosting techniques.
-Each tree is small, with few terminal nodes, preventing large adjustments based on a single tree's predictions.
-This ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
+Gradient Boosting is an ensemble learning algorithm that combines multiple weaker learners to predict a target variable.
+This supervised algorithm works by sequentially adding predictors to correct the errors of the previous predictors.
+It uses gradient descent to minimize the loss function when incorporating new models into the ensemble.
 
-Initially, the prediction is set as $\hat{f}_0(\mathbf{x}) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set, where $\mathbf{x}$ represents the vector of input feature(s) and $y$ is the true value or target variable.
-The model is then iteratively improved over $B$ iterations, where $B$ is a hyperparameter controlling the total number of trees.
-With each iteration $b$ from $1$ to $B$, predictions are updated as:
+A differentiable loss function, $\mathcal{L}(y, \hat{y})$, is defined, where $y$ represents the true value and $\hat{y}$ is the predicted value.
+This differentiable nature is crucial, hence the term 'gradient' boosting.
+Initially, we start with a very weak learner.
+This can, for example, be represented as $F_{1}(x) = f_{1}(x) = \overline{y}$, where $\overline{y}$ is simply the mean of the target values.
+This weak learner provides a basic starting point for predictions.
+Next, we compute the residuals \(\hat{r}_{1,i}\) for each data point \(i\). These residuals are the gradients of the loss function with respect to the current predictions. Formally, this is expressed as:
+
 $$
-    \hat{f}^{(b)}(\mathbf{x}) = \hat{f}^{(b-1)}(\mathbf{x}) + \lambda \hat{f}_b(\mathbf{x}),
+\hat{r}_{1,i} = \frac{d \mathcal{L}(y_{i}, \hat{y}_{i})}{d \hat{y}_{i}}
 $$
-where $\hat{f}_b(\mathbf{x})$ is the prediction of the $b$-th tree and $\lambda$ is the learning rate. Residuals are updated as:
+
+where \(\hat{y}_{i} = F_{1}(x_{i})\). These residuals indicate how much each prediction needs to be adjusted to decrease the loss.
+With these residuals, we fit a new weak learner.
+The new weak learner, $f_{2}(x)$, is trained with the residuals $\hat{r}_{1}$ as the target and the same features $x$ as before.
+
+To determine the optimal contribution of the newly trained weak learner to the model, we introduce the parameter $\gamma$, sometimes referred to as the \textit{shrinkage parameter}.
+For a model $f_{m}(x)$, the parameter $\gamma_{m}$ denotes the shrinkage parameter for the $m$-th weak learner being added to the ensemble.
+Thus, in this instance, $\gamma_{2}$ determines the influence of the newly introduced second weak learner $f_{2}(x)$ on the current ensemble model.
+This ensures that the inclusion of the new learner incrementally improves the model's performance.
+Formally, $\gamma_{2}$ is computed by minimizing the combined loss function, which accounts for both the current model's predictions and the new weak learner's adjustments.
+This minimization problem is expressed as:
+
 $$
-    r_i^{(b)} = y_i - \hat{f}^{(b-1)}(\mathbf{x}_i),
+\gamma_{2} = \arg\min_{\gamma} \left[ \sum_{i=1}^{N} \mathcal{L}(y_{i}, f_{1}(x_{i}) + \gamma f_{2}(x_{i})) \right],
 $$
-Each tree is then trained on these updated residuals.
-The repetitive process of fitting a weak learner to predict the residuals and using its predictions to update the model gives us the final model:
+
+where $f_{1}(x_{i})$ are the predictions from the initial weak learner, and $f_{2}(x_{i})$ are the predictions from the new weak learner.
+By solving for $\gamma_{2}$, we identify the optimal weighting that minimizes the loss, thereby enhancing the model's accuracy while avoiding overfitting.
+
+The updated model is then given by:
+
 $$
-    \hat{f}(\mathbf{x}) = \sum_{b=1}^{B} \lambda \hat{f}_b(\mathbf{x})
+F_{2}(x) = f_{1}(x) + \hat{\gamma}_{2} f_{2}(x)
 $$
-In the context of regression, gradient boosting aims to minimize the difference between the predicted values and the actual target values by fitting successive trees to the residuals.
-To minimize errors, gradient descent is used to iteratively update model parameters in the direction of the negative gradient of the loss function, thereby following the path of steepest descent~\cite{gradientLossFunction}.
+
+This process of computing residuals, fitting new weak learners, and updating the model is repeated iteratively, continually refining the model and reducing prediction errors.
+Each iteration builds upon the previous model, gradually improving its accuracy and robustness.
 
 \subsubsection{Natural Gradient Boosting (NGBoost)}
 Having introduced \gls{gbr}, we now give an overview of \gls{ngboost} based on \citet{duan_ngboost_2020}.
@@ -268,9 +287,9 @@ Then, the algorithm enters an iterative process to refine its predictions.
 At the start of each iteration, the model computes its current predictions using the existing set of parameters.
 The algorithm then calculates the negative gradient of the loss function with respect to the current predictions.
 This involves computing the gradient of the negative log-likelihood, which quantifies the discrepancy between the current predictions and the actual observed data.
-The negative log-likelihood quantifies how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations. 
+The negative log-likelihood quantifies how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations.
 
-Next, the \textit{Fisher information matrix} is computed. 
+Next, the \textit{Fisher information matrix} is computed.
 This matrix encodes the curvature of the parameter space at the current parameter values, reflecting how sensitive the likelihood function is to changes in these parameters.
 For example, if the likelihood function is highly sensitive to changes in a particular parameter, the Fisher information matrix will have a high value for that parameter.
 Using this information, the model can adjust its parameters more effectively, focusing on the most sensitive parameters to improve performance.
@@ -282,7 +301,7 @@ This step is similar to traditional gradient boosting, where a tree is fitted to
 The parameters of the model are then updated using the output from the weak learner.
 This update process incorporates a learning rate to control the step size, ensuring that the model makes gradual improvements rather than drastic changes.
 
-Using the newly updated parameters, the model recalculates its predictions, refining the probability distribution of the target variable. 
+Using the newly updated parameters, the model recalculates its predictions, refining the probability distribution of the target variable.
 This iterative process of computing predictions, calculating gradients, fitting weak learners, and updating parameters continues for a predetermined number of iterations or until the model's performance converges.
 
 \subsubsection{XGBoost}
@@ -394,7 +413,7 @@ The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ a
 \subsection{Stacked Generalization}
 Stacked generalization, introduced by \citet{wolpertstacked_1992}, is a method designed to improve the predictive performance of machine learning models by leveraging the strengths of multiple models.
 
-In this technique, multiple base models are trained on the original dataset. 
+In this technique, multiple base models are trained on the original dataset.
 The outputs of these base models serve as inputs to a meta-model, which is trained to make the final prediction.
 This strategy enables the meta-model to learn the optimal way to combine the outputs of the base models to minimize the generalization error.
 
