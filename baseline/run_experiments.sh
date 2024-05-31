@@ -11,8 +11,8 @@ run_experiment() {
     for model in "${models[@]}"; do
         models_str+="-m $model "
     done
-    echo "$(date): Starting experiment with -o $param and models ${models[*]}" >> master_log_ngb.txt
-    nohup venv/bin/python3.12 experiments/optuna_run.py -n 200 -o $param $models_str > optuna_log_ngb_$param.txt 2>&1 &
+    echo "$(date): Starting experiment with -o $param and models ${models[*]}" >> master_log.txt
+    nohup venv/bin/python3.12 experiments/optuna_run.py -n 200 -o $param $models_str > optuna_log_$param.txt 2>&1 &
     echo $! >> pids.txt  # Record the PID of the background process
 }
 
@@ -23,9 +23,9 @@ check_status() {
     wait $pid
     local status=$?
     if [ $status -ne 0 ]; then
-        echo "$(date): Experiment with -o $param failed with status $status" >> master_log_ngb.txt
+        echo "$(date): Experiment with -o $param failed with status $status" >> master_log.txt
     else
-        echo "$(date): Experiment with -o $param completed successfully" >> master_log_ngb.txt
+        echo "$(date): Experiment with -o $param completed successfully" >> master_log.txt
     fi
 }
 
