@@ -226,50 +226,40 @@ As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as t
 However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
 
 \subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
-The following is an overview of the \gls{gbr} algorithm based on \citet{zemel_gbr}.
-\gls{gbr} is an ensemble learning algorithm that combines multiple weaker learners to predict a target variable.
-This supervised algorithm works by sequentially adding predictors to correct the errors of the previous predictors.
-It uses gradient descent to minimize the loss function when incorporating new models into the ensemble.
+Continuing with the discussion of ensemble learning models, we introduce \gls{gbr} based on Chapter 10.10 of \citet{hastie_elements}.
 
-A differentiable loss function, $\mathcal{L}(y, \hat{y})$, is defined, where $y$ represents the true value and $\hat{y}$ is the predicted value.
-This differentiable nature is crucial, hence the term 'gradient' boosting.
-Initially, we start with a very weak learner.
-This can, for example, be represented as $F_{1}(x) = f_{1}(x) = \overline{y}$, where $\overline{y}$ is simply the mean of the target values.
-This weak learner provides a basic starting point for predictions.
-Next, we compute the residuals \(\hat{r}_{1,i}\) for each data point \(i\).
-These residuals are the gradients of the loss function with respect to the current predictions.
-Formally, this is expressed as:
+Gradient Boosting is a powerful machine learning technique used for regression and classification tasks.
+The core idea is to build a model from weak learners, typically decision trees, in a sequential manner.
+Each subsequent model aims to correct the errors of its predecessor, resulting in a strong predictive model.
 
-$$
-\hat{r}_{1,i} = \frac{d \mathcal{L}(y_{i}, \hat{y}_{i})}{d \hat{y}_{i}}
-$$
+\gls{gbr} is a specific implementation of gradient boosting for regression tasks.
+\gls{gbr} builds a series of decision trees sequentially, where each tree tries to reduce the errors made by the previous one.
+It starts by constructing a model with an initial prediction and then iteratively adds decision trees to improve the model's accuracy.
+Each new tree is trained to predict the residuals of the current model.
 
-where \(\hat{y}_{i} = F_{1}(x_{i})\). These residuals indicate how much each prediction needs to be adjusted to decrease the loss.
-With these residuals, we fit a new weak learner.
-The new weak learner, $f_{2}(x)$, is trained with the residuals $\hat{r}_{1}$ as the target and the same features $x$ as before.
-
-To determine the optimal contribution of the newly trained weak learner to the model, we introduce the parameter $\gamma$, sometimes referred to as the \textit{shrinkage parameter}.
-For a model $f_{m}(x)$, the parameter $\gamma_{m}$ denotes the shrinkage parameter for the $m$-th weak learner being added to the ensemble.
-Thus, in this instance, $\gamma_{2}$ determines the influence of the newly introduced second weak learner $f_{2}(x)$ on the current ensemble model.
-This ensures that the inclusion of the new learner incrementally improves the model's performance.
-Formally, $\gamma_{2}$ is computed by minimizing the combined loss function, which accounts for both the current model's predictions and the new weak learner's adjustments.
-This minimization problem is expressed as:
+The loss function, $L(f)$, is minimized during this process.
+The loss function quantifies the discrepancy between the predicted values and the actual target values, aiming to reduce this discrepancy as much as possible.
+Formally, the loss function can be expressed as:
 
 $$
-\gamma_{2} = \arg\min_{\gamma} \left[ \sum_{i=1}^{N} \mathcal{L}(y_{i}, f_{1}(x_{i}) + \gamma f_{2}(x_{i})) \right],
+L(f) = \sum_{i=1}^n L(y_i, f(x_i)),
 $$
 
-where $f_{1}(x_{i})$ are the predictions from the initial weak learner, and $f_{2}(x_{i})$ are the predictions from the new weak learner.
-By solving for $\gamma_{2}$, we identify the optimal weighting that minimizes the loss, thereby enhancing the model's accuracy while avoiding overfitting.
+where $y_i$ is the actual target value, $f(x_i)$ is the predicted value, and $L(y_i, f(x_i))$ measures the error for each instance $i$.
 
-The updated model is then given by:
+Instead of directly using the gradient of the loss function, \gls{gbr} uses residuals as an approximation.
+Residuals are the differences between the actual values and the predicted values from the current model.
+A weak learner, often a simple decision tree with limited depth, is fitted to these residuals.
+This weak learner tries to capture the errors made by the current model.
 
+The output of the weak learner is used to update the parameters of the model.
+Specifically, the model is updated in the direction that reduces the residuals, thereby improving the accuracy of the predictions.
+The update can be expressed as:
 $$
-F_{2}(x) = f_{1}(x) + \hat{\gamma}_{2} f_{2}(x)
+f_m = f_{m-1} + \rho_m g_m,
 $$
 
-This process of computing residuals, fitting new weak learners, and updating the model is repeated iteratively, continually refining the model and reducing prediction errors.
-Each iteration builds upon the previous model, gradually improving its accuracy and robustness.
+where $f_m$ is the model at iteration $m$, $f_{m-1}$ is the model at the previous iteration, $\rho_m$ is the learning rate, and $g_m$ is the output of the weak learner at iteration $m$.
 
 \subsubsection{Natural Gradient Boosting (NGBoost)}
 Having introduced \gls{gbr}, we now give an overview of \gls{ngboost} based on \citet{duan_ngboost_2020}.
