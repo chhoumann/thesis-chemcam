@@ -4,6 +4,7 @@ from ngboost.scores import LogScore
 from optuna import Trial
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.ensemble import ExtraTreesRegressor, GradientBoostingRegressor
+from sklearn.linear_model import ElasticNet, Lasso, Ridge
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
@@ -107,3 +108,28 @@ def instantiate_ngboost(trial: Trial, logger=lambda params: None) -> NGBRegresso
 
     logger(params)
     return NGBRegressor(**params)
+
+
+def instantiate_lasso(trial: Trial, logger=lambda params: None) -> Lasso:
+    params = {
+        "alpha": trial.suggest_float("lasso_alpha", 1e-3, 1e3, log=True),
+    }
+    logger(params)
+    return Lasso(**params)
+
+
+def instantiate_ridge(trial: Trial, logger=lambda params: None) -> Ridge:
+    params = {
+        "alpha": trial.suggest_float("ridge_alpha", 1e-3, 1e3, log=True),
+    }
+    logger(params)
+    return Ridge(**params)
+
+
+def instantiate_elasticnet(trial: Trial, logger=lambda params: None) -> ElasticNet:
+    params = {
+        "alpha": trial.suggest_float("elasticnet_alpha", 1e-3, 1e3, log=True),
+        "l1_ratio": trial.suggest_float("elasticnet_l1_ratio", 0, 1),
+    }
+    logger(params)
+    return ElasticNet(**params)
