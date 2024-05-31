@@ -77,7 +77,7 @@ where
 
 This normalization method results in a total of $3N = 6144$ normalized features for each sample, as each of the three spectrometers contributes 2048 channels.
 
-\subsubsection{Power Transformation}
+\subsubsection{Power Transformation}\label{subsec:power-transformation}
 Power transformations are a class of mathematical functions used to stabilize variance and make data more closely approximate a normal distribution.
 They are particularly useful in statistical modeling and data analysis to meet the assumptions of linear models.
 
@@ -111,7 +111,7 @@ For non-negative values, the Yeo-Johnson transformation simplifies to the Box-Co
 The key benefit of the Yeo-Johnson transformation is its ability to handle any real number, making it a robust choice for transforming data to achieve approximate normality or symmetry.
 This property is particularly beneficial for preparing data for statistical analyses and machine learning models that require normally distributed input data.
 
-\subsubsection{Quantile Transformer}
+\subsubsection{Quantile Transformer}\label{subsec:quantile-transform}
 Quantile transformation is a method that applies a non-linear transformation to map data to a uniform or normal distribution.
 This process involves mapping the data $X$ to a set of probabilities $p$ using the \gls{cdf}, which indicates the probability that a random variable will be less than or equal to a specific value in $X$'s original distribution.
 Subsequently, the quantile function, which is the inverse of the \gls{cdf} of the desired distribution, is applied to these probabilities $p$ to generate the transformed data.
@@ -392,7 +392,7 @@ This iterative process of computing predictions, calculating gradients, fitting 
 
 \subsubsection{XGBoost}
 
-\subsubsection{Stacked Generalization}
+\subsubsection{Stacked Generalization}\label{subsec:stacked-generalization}
 Stacked generalization, introduced by \citet{wolpertstacked_1992}, is a method designed to improve the predictive performance of machine learning models by leveraging the strengths of multiple models.
 
 In this technique, multiple base models are trained on the original dataset. 
