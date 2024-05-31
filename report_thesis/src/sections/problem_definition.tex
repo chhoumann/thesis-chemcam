@@ -67,12 +67,6 @@ Robustness is evaluated using the sample standard deviation of prediction errors
 where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
 A lower standard deviation indicates a more robust model across different samples.
 
-\textbf{Problem formulation}:
-The objective of this research is to develop a computational model, denoted as $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict major oxide concentrations in geological samples from processed \gls{libs} spectral data. 
-The model will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ and output Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$. 
-Effectiveness will be assessed by high accuracy, quantified by \gls{rmse}, and robustness, indicated by a low standard deviation of prediction errors across samples.
-
-
 \subsection{Challenges}
 As mentioned, quantifying chemical compositions from \gls{libs} spectral data involves several significant challenges that must be addressed to ensure accurate and robust predictions.
 
@@ -91,37 +85,5 @@ Matrix effects, along with other physical processes, can induce nonlinearity in 
 \subsubsection{Data Availability}
 Due to the high cost of data collection, datasets are often small. This limits the number of samples available for evaluation, affecting the generalizability and robustness of the models\cite{p9_paper}.
 
-\subsection{Proposed Approach}
-To address the challenges in predicting major oxide compositions from \gls{libs} data, we propose the development of advanced computational models capable of effectively handling the multifaceted challenges arising from the high dimensionality of spectral data, multicollinearity, matrix effects, and limited data availability.
-These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies. 
-
-Our proposed approach aims to address these challenges by leveraging state-of-the-art machine learning models, dimensionality reduction techniques, and feature engineering.
-By preprocessing the spectral data, we can enhance the signal quality and handle noise.
-The development of robust models that can generalize well across different samples and conditions is crucial, particularly for extraterrestrial applications where data collection is constrained.
-
-The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness.
-These metrics will provide a comprehensive assessment of the models' performance in predicting the concentrations of major oxides in geological samples.
-
-\subsection{Motivating Example: NASA's Mars Missions}
-NASA's exploration of Mars, beginning with the Viking missions in the 1970s, has progressively deepened our understanding of Mars \cite{marsnasagov_vikings}.
-The \gls{msl} mission, which landed the Curiosity rover in Gale Crater in 2012, represents a pivotal step in this journey.
-Curiosity is equipped with the \gls{chemcam} instrument, a tool that uses \gls{libs} to analyze the chemical composition of Martian rocks and soils directly and non-invasively \cite{chemcamNasaWebsite}.
-
-\gls{libs} is particularly suitable for the Martian environment because of its ability to perform rapid chemical analyses remotely, creating a plasma that can be spectrally analyzed to determine the elemental composition of the vaporized material.
-This capability allows scientists to quickly and efficiently assess the geochemistry of multiple sites without physically moving the rover, thus conservatively managing the rover's limited energy and resources.
-The mission's focus has been on assessing past habitability, and the data gathered by \gls{chemcam} has been instrumental in identifying environments that could have supported life \cite{chemcamNasaWebsite, curiosityNasaWebsite}.
-
-The task of quantifying the oxides in Martian rock and soil samples begins with the \gls{libs} spectral data collected by Curiosity.
-This data comprises high-dimensional spectra with thousands of potential features, each corresponding to a specific element's emission lines.
-The computational challenge lies in accurately interpreting these complex data sets to deduce the concentrations of various elements, especially major oxides like iron, magnesium, and silicon, which are crucial for understanding Martian geology.
-
-Following preprocessing to correct instrumental effects and calibrate spectra, the cleaned data is input into machine learning models.
-These models, trained on databases of Earth-based and synthetic Martian analogs, output quantitative analyses of chemical compositions in weight percentages of the target oxides \cite{wiensPreflightCalibrationInitial2013, cleggRecalibrationMarsScience2017}.
-\citet{cleggRecalibrationMarsScience2017} undertook this task and created a pipeline for predicting the concentration of oxides in Martian soil samples, referred to as \gls{moc}.
-
-More recently, in 2022, the Perseverance rover landed on Mars, equipped with advanced instruments designed to continue the exploration and analysis of the Martian surface.
-This rover also uses a \gls{libs} instrument, called SuperCam, which is the successor to \gls{chemcam}.
-The Perseverance mission highlighted the ongoing research effort in developing elemental quantification models using \gls{libs} data \cite{andersonPostlandingMajorElement2022}, demonstrating its continued importance as a research field.
-
-The use of \gls{libs} on the Curiosity rover within the MSL mission shows how computational advancements can enhance our understanding of extraterrestrial geology.
-By effectively quantifying chemical compositions from \gls{libs} data, we can infer the historical climatic conditions of Mars, offering clues to its past habitability.
+\subsection{Problem Formulation}
+The objective of this research is to develop a computational model, denoted as $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict major oxide concentrations in geological samples from processed \gls{libs} spectral data. 
