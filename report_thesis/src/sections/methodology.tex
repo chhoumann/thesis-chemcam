@@ -97,42 +97,17 @@ The \textit{Target} column corresponds to the sample name, while the \textit{ID}
 
 
 \subsection{Model and Preprocessing Selection}
-% Structure:
-    % Introduction where we relate back to the problem def. We know these "general" themes can handle the challenges outlined in problem def.
-    % Stacking ensemble is the approach we chose, therefore each item below is required to work with this..
-    % Requirements for preprocessing:
-        % We wanted to experiment with all the standard normalization methods (Z-score, minmax etc.).
-        % We wanted to also try dimensionality reduction (PCA) - Why disqualify others(nice to have - perhaps didnt see in literature?
-        % We discovered that there was lacking literature in the field of libs regarding transformers (power transform, quantile transform) and kernel pca - Therefore we decided to include these to assess their potential
-            % Why these are relevant (refer back to background)
-        % Feature selection was considered, but decided against due to time
-    % Requirements for models:
-        % We needed a variety of models to get a breadth of results
-            % Each model should be different enough that it made sense to use in stacking ensemble
-                % i.e. the internal approach/architecture should be different (meaning even though we selected many tree models for our final pipeline, they are still different enough to be useful in the ensemble)
-        % They should be suitable for LIBS data as evidenced by the literature
-            % Assessed by RMSEP/RMSECV - Whichever was available in the papers
-        % .. But we also had some other models in minds
-            % They should show potential at handling high dimensional data (this excludes i.e. straight up linear regression)
-            % Should have potential to handle non-linear data
-            % Should handle regression tasks
-        % We did not care for computational efficiency or speed of prediction. Accuracy and robustness uber alles.
-    % Requirements for model training strategies:
-        % We considered several approaches, but settled on stacking ensemble due to its potential to combine the strengths of the models
-        % Analogous to MOC (pasting/bagging (dont mention directly or at all) - average predictions), natural to try other approach in the same family (stacking - weighted average predictions)
-        % We learned (from literature) that different models perform well on different oxides, so we wanted to leverage this
-
 Choosing the right models and preprocessing techniques for \gls{libs} data analysis is a challenging task. 
 The literature suggests a variety of models and preprocessing techniques that promise to be adept at handling data that exhibits high-dimensionality, multi-collinearity, and matrix effects.
 Additionally, different machine learning models perform best on different oxides in LIBS data due to the complex nature of the data. 
 These challenges and model-specific strengths suggests that an optimal approach would involve combining multiple models. 
-This notion is supported by the advent of models, such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017}, which combines the predictions of multiple models using a predefined weighting of the predictions made of each model, per-oxide.
+This notion is supported by the advent of models such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017}, which combines the predictions of multiple models using a predefined weighting of the predictions made of each model, per-oxide.
 This approach improved the accuracy over the individual models, but required manual tuning of the weights for each model.
-The manual tuning poses limitations, both in terms of the analysis required to determine a weighting, as well as, the potential for suboptimal weighting.
+The manual tuning poses limitations, both in terms of the analysis required to determine a weighting, as well as, the risk for suboptimal weighting.
 Based on these considerations, it seems reasonable to consider techniques that could automate such a process, while still being able to leverage the strengths of multiple models.
 To address these criteria, we chose to adopt a stacking ensemble approach. 
-As described in Section~\ref{subsec:stacked-generalization}, stacking ensemble is based on training multiple base estimators and to then train a meta-learner on the predictions of these base estimators.
-This approach allows us to leverage the strengths of multiple models, while also automating the process of determining the optimal weighting of the predictions made by each model.
+As described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
+This approach has the benefit of being able to leverage the strengths of multiple models on a per-oxide basis in conjunction with the most beneficial preprocessors for each of these models.
 
 We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, ensuring that our selections were informed by existing literature while also allowing for independent assessment and validation.
 
@@ -140,12 +115,8 @@ To guide our selection of preprocessing techniques, we had several consideration
 Firstly, our review of the literature revealed that there is no consensus on a single, most effective normalization method for \gls{libs} data.
 This led us to include the traditional normalization methods, such as Z-score normalization, Min-Max scaling, and Max Absolute scaling, in our experiments.
 This approach allowed us to determine which normalization method was most effective for our dataset. 
-Additionally, dimensionality reduction techniques, such as \gls{pca}, were considered by the literature to be effective at reducing the dimensionality of the data while preserving the most important information. 
-However, we found that there was a lack of literature on the effectiveness of other preprocessing techniques, such as power transformation, quantile transformation, and \gls{kernel-pca}, in the context of \gls{libs} data.
-Power transformation and quantile transformation, as mentioned in Section~\ref{subsec:power-transformation} and Section~\ref{subsec:quantile-transformation} transform the data to be more Gaussian-like or entirely Gaussian, respectively.
-\citet{pls_non_normal_data} have shown that models such as \gls{pls} have diminished accuracy when data is non-normal.
-Using these transformations would ensure that the data is more Gaussian-like, potentially improving the performance of models such as \gls{pls}.
-Similarly, the ability of \gls{kernel-pca} to capture non-linear relationships within the data could enhance the accuracy of models that base their predictions on the latent features extracted by Kernel PCA, if such non-linear relationships are present.
+Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality. Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}. However, \citet{pca_review_paper} also made the case that the assumptions for \gls{pca} regarding linearity of the data are only met up to a certain point, after which it breaks. They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data. Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data. Therefore, we decided to include this in our experiments to further assess its potential. In addition to the non-linearity, \citet{pca_review_paper} also argue that the assumptions of normality in the data are not always met in \gls{libs} data. For this reason, we decided to include power transformation and quantile transformation in our experiments as models such as \gls{pca} benefit from a normal distribution of the data. We assume that models such as \gls{pls} may also benefit from a more Gaussian-like distribution of the data, by virtue of the model being partly based on \gls{pca}.
+
 While these preprocessing techniques are not an exhaustive list, they represent a diverse set of methods.
 Techniques such as feature selection were not considered to limit the scope of the study and due to time constraints.
 
@@ -159,26 +130,25 @@ The following table summarizes the preprocessing techniques and models selected 
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{@{}ll@{}}
+\begin{tabularx}{\columnwidth}{lX} % Define the columns, one fixed-width and one flexible
 \toprule
-\textbf{Preprocessing Technique}    & \textbf{Model} \\ \midrule
-Z-Score Normalization               & Partial Least Squares \\
-Min-Max Normalization               & Support Vector Regression \\
-Max Absolute Scaling                & Gradient Boost Regression \\
-Robust Scaling                      & Extra Trees Regression \\
-Norm 3                              & Natural Gradient Boosting \\ \bottomrule
-Power Transformation                & XGBoost \\ \bottomrule
-Quantile Transformation             & Stochastic Gradient Regression \\ \bottomrule
-Principal Component Analysis        & Convolutional Neural Networks \\ \bottomrule
-Kernel Principal Component Analysis & Artificial Neural Networks \\ \bottomrule
-                                    & Elastic Nets \\ \bottomrule
-\end{tabular}
+\multirow{5}{*}{Preprocessing Techniques:} & Z-Score Normalization \\
+                                           & Min-Max Normalization \\
+                                           & Max Absolute Scaling \\
+                                           & Robust Scaling \\
+                                           & Norm 3 \\
+\midrule
+\multirow{6}{*}{Models:}                   & Partial Least Squares \\
+                                           & Support Vector Regression \\
+                                           & Gradient Boost Regression \\
+                                           & Extra Trees Regression \\
+                                           & Natural Gradient Boosting \\
+                                           & Elastic Nets \\
+\bottomrule
+\end{tabularx}
 \caption{Summary of Preprocessing Techniques and Models}
 \label{tab:preprocessing-models}
 \end{table}
-
-
-
 
 \subsection{Experimental Setup}
 Experiments were conducted on a machine equipped with an Intel Xeon Gold 6242 CPU, featuring 16 cores and 32 threads.
