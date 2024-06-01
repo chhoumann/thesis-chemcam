@@ -2,7 +2,7 @@
 \section{Proposed Approach}
 To address the challenges in predicting major oxide compositions from \gls{libs} data, we propose the development of advanced computational models capable of effectively handling the multifaceted challenges arising from the high dimensionality of spectral data, multicollinearity, matrix effects, and limited data availability.
 These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies. 
-Our proposed approach aims to address these challenges by leveraging state-of-the-art machine learning models, alongside data normalization, transformation techniques, and dimensionality reduction methods.
+
 Our approach aims to enhance the prediction accuracy and robustness for major oxides in \gls{libs} data by leveraging specific combinations of models and preprocessors that are particularly effective at predicting individual oxides.
 The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$, derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ after processing by one or more preprocessors, and output Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$.
 The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors across samples for robustness.
