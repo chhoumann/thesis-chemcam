@@ -8,6 +8,11 @@ The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$, derived from 
 The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors across samples for robustness.
 These metrics will provide a comprehensive assessment of the models' performance in predicting the concentrations of major oxides in geological samples.
 
+To ensure generalizability for our models, we will employ a k-fold cross-validation strategy, for partitioning the data into training and test sets.
+However, as stated in Section~\ref{sec:problem-definition} the Masked Intensity Tensor contains multiple locations for each sample.
+This necessitates careful considerations when constructing each fold to prevent data leakage of location data across the training and test partitions.
+To this end, we have devised a custom k-fold cross validation method to address this issue.
+
 \input{sections/proposed_approach/testing_validation.tex}
 
 \subsection{Motivating Example: NASA's Mars Missions}

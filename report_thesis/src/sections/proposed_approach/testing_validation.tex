@@ -1,7 +1,7 @@
-\subsection{Validation and Testing Procedures for Model Evaluation}\label{subsec:validation_testing_procedures}
-This section describes the validation and testing procedures our experiments follow.
-Selecting appropriate testing procedures is crucial for ensuring the validity and reliability of the results.
-For that reason, we delineate a methodological approach that ensures our models are accurate and generalizable.
+\subsection{Custom K-Fold Cross-Validation}\label{subsec:custom-k-fold-cross-val}%\label{subsec:validation_testing_procedures}
+% This section describes the validation and testing procedures our experiments follow.
+% Selecting appropriate testing procedures is crucial for ensuring the validity and reliability of the results.
+% For that reason, we delineate a methodological approach that ensures our models are accurate and generalizable.
 
 We have chosen to test and evaluate all our experiments using both cross-validation and a separate test set.
 Evaluating results solely on the test set could lead to models that are overly specialized to the test set.
@@ -45,7 +45,6 @@ This is particularly notable in \ce{TiO2}, \ce{FeO_T}, \ce{MgO}, \ce{CaO}, and \
 These distributions confirm the presence of extreme values across all oxides, which are significantly overrepresented or underrepresented, further complicating the model training process.
 
 This necessitates careful dataset partitioning to ensure that the model training process accounts for these challenges, improving the generalizability and robustness of the models.
-
 
 \subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
 To ensure rigorous evaluation of our models and to address the challenges of data leakage and uneven distribution of extreme values, we have implemented a customized k-fold cross-validation procedure.

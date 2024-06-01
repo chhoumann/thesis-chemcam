@@ -38,7 +38,7 @@ In a \gls{libs} dataset, we have:
 The primary input to our computational models is the processed \gls{libs} spectral data.
 Formally, we have:
 \begin{itemize}
-    \item \textbf{Masked Intensity Tensor} $\mathbf{M}[\chi, l, \lambda]$: This matrix represents the spectral intensity data after applying wavelength-specific masks to the Averaged Intensity Tensor $\mathbf{A}$. It serves as the main input to the models.
+    \item \textbf{Masked Intensity Tensor} $\mathbf{M}[\chi, l, \lambda]$: This tensor represents the spectral intensity data after applying wavelength-specific masks to the Averaged Intensity Tensor $\mathbf{A}$. It serves as the main input to the models.
     \item \textbf{Feature Vectors} $\mathbf{x} \in \mathbb{R}^N$: These vectors are extracted from the Masked Intensity Tensor $\mathbf{M}$ and represent the processed \gls{libs} signals. Each feature vector corresponds to a sample and contains $N$ dimensions, where $N$ is the number of relevant spectral features.
 \end{itemize}
 
