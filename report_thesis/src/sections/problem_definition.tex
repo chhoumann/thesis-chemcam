@@ -71,21 +71,3 @@ Due to the high cost of data collection, datasets are often small. This limits t
 
 \subsection{Problem Formulation}
 The objective of this research is to develop a computational model, denoted as $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict major oxide concentrations in geological samples from processed \gls{libs} spectral data. 
-
-\subsubsection{Evaluation Metrics}\label{subsubsec:problem_evaluation_metrics}
-To evaluate the performance of these models, we will use the \gls{rmse} to measure accuracy and the sample standard deviation of prediction errors to assess robustness.
-We define accuracy as the ability of a model to predict the composition of major oxides in geological samples, while robustness refers to the stability of these predictions across samples.
-
-The metric used to evaluate the accuracy of the models is the \gls{rmse}:
-\[
-\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
-\]
-where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. 
-This measure quantifies the average magnitude of the prediction error across all predicted values.
-
-Robustness is evaluated using the sample standard deviation of prediction errors:
-\[
-\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
-\]
-where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
-A lower standard deviation indicates a more robust model across different samples.
