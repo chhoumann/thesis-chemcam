@@ -227,28 +227,33 @@ As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as t
 However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
 
 \subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
-In this section we introduce \gls{gbr} primarily based on \citet{James2023AnIS}.
-\gls{gbr} is an ensemble learning method that sequentially construct multiple decision trees, each one correcting the errors of the previous one, using gradient descent and boosting techniques.
-Each tree is small, with few terminal nodes, preventing large adjustments based on a single tree's predictions.
-This ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
+In this section, we introduce \gls{gbr} primarily based on \citet{hastie_elements} and \citet{burkovHundredpageMachineLearning2023}.
 
-Initially, the prediction is set as $\hat{f}_0(\mathbf{x}) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set, where $\mathbf{x}$ represents the vector of input feature(s) and $y$ is the true value or target variable.
-The model is then iteratively improved over $B$ iterations, where $B$ is a hyperparameter controlling the total number of trees.
-With each iteration $b$ from $1$ to $B$, predictions are updated as:
+Gradient Boosting is a machine learning technique used for various tasks, including regression and classification.
+The fundamental concept involves sequentially adding models to minimize a loss function, where each successive model addresses the errors of the ensemble of preceding models.
+
+This technique utilizes gradient descent to optimize the loss function, allowing for the selection of different loss functions depending on the specific task.
+\gls{gbr} is a specialized application of gradient boosting for regression tasks, where it minimizes a regression-appropriate loss function, such as mean squared error or mean absolute error.
+
+The process starts with an initial model $f_{0}(x)$ that minimizes the loss function over the entire dataset:
 $$
-    \hat{f}^{(b)}(\mathbf{x}) = \hat{f}^{(b-1)}(\mathbf{x}) + \lambda \hat{f}_b(\mathbf{x}),
+f_{0}(x)=\arg\min_{\gamma}\sum^{N}_{i=1}L(y_{i},\gamma)
 $$
-where $\hat{f}_b(\mathbf{x})$ is the prediction of the $b$-th tree and $\lambda$ is the learning rate. Residuals are updated as:
-$$
-    r_i^{(b)} = y_i - \hat{f}^{(b-1)}(\mathbf{x}_i),
-$$
-Each tree is then trained on these updated residuals.
-The repetitive process of fitting a weak learner to predict the residuals and using its predictions to update the model gives us the final model:
-$$
-    \hat{f}(\mathbf{x}) = \sum_{b=1}^{B} \lambda \hat{f}_b(\mathbf{x})
-$$
-In the context of regression, gradient boosting aims to minimize the difference between the predicted values and the actual target values by fitting successive trees to the residuals.
-To minimize errors, gradient descent is used to iteratively update model parameters in the direction of the negative gradient of the loss function, thereby following the path of steepest descent~\cite{gradientLossFunction}.
+where $L(y,\hat{y})$ is the chosen loss function, $N$ is the number of samples, $y_{i}$ are the true values, and $\gamma$ is a constant.
+
+Then we start the iterative process of adding models to the ensemble.
+For each iteration $m$, from $1$ to $M$:
+
+\begin{enumerate}
+    \item Compute the residuals of the current model. For regression, this could be the squared error loss, $L(y, \hat{y}) = (y - \hat{y})^2$. The residuals $r_{i}^{(m)}$ for each data point $i$ are calculated as $r_{i}^{(m)} = y_{i} - f_{m-1}(x_{i})$, where $f_{m-1}(x_{i})$ is the prediction of the previous model.
+    \item Fit a new model $h_{m}(x)$ to the residuals. This model aims to correct the errors of the current ensemble by using the residuals instead of ground truth values. Essentially, $h_{m}(x)$ tries to predict the residuals $r_{i}^{(m)}$.
+    \item Update the ensemble model by adding the predictions of the new model $h_{m}(x)$, multiplied by a learning rate $\eta$. The learning rate $\eta$ controls the contribution of each new model to the ensemble, preventing overfitting by scaling the updates:
+    $$
+    f_{m}(x)=f_{m-1}(x)+\eta h_{m}(x)
+    $$
+\end{enumerate}
+
+This iterative process continues until the maximum number $M$ of trees are combined, resulting in the final model $\hat{f}(x) = f_{M}(x)$.
 
 \subsubsection{Natural Gradient Boosting (NGBoost)}
 \gls{ngboost} is a variant of the gradient boosting algorithm that leverages the concept of natural gradients with the goal of improving convergence speed and model performance.
