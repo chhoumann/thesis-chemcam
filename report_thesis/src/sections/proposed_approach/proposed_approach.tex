@@ -6,7 +6,7 @@ Our approach aims to enhance the prediction accuracy and robustness for major ox
 The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$, derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ after processing by one or more preprocessors, and output Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$. 
 For each model, we calculate a vector of prediction errors $\mathbf{e}$, where each entry $e_i$ represents the difference between the actual and predicted concentration for the $i$-th oxide. Subsequently, for each oxide, we aggregate the corresponding prediction errors across all models to construct a vector. 
 This results in $n$ vectors, each containing prediction errors for a specific oxide from all models.
-Finally, we fit a mapping function $\mathcal{F}$ to the prediction error vectors for each oxide.
+Finally, we fit a mapping function $\mathcal{F}$ to the prediction error vectors for each oxide, to produce a final prediction for that oxide.
 We use metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness to evaluate our models.
 
 \input{sections/proposed_approach/evaluation_metrics.tex}
