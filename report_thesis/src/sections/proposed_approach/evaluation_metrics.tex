@@ -1,4 +1,4 @@
-\subsubsection{Evaluation Metrics}\label{subsubsec:evaluation_metrics}
+\subsection{Evaluation Metrics}\label{subsec:evaluation_metrics}
 As mentioned in Section~\ref{subsubsec:problem_evaluation_metrics}, the performance of the models is quantitatively assessed using the \gls{rmse} and the standard deviation of the residuals.
 These metrics are calculated for each fold and averaged across all folds to provide comprehensive indicators of model accuracy and variability.
 In addition, we also compute the metrics for the test set to provide a measure of the model's performance on unseen data.
@@ -15,8 +15,3 @@ However, our data partitioning method, which moves the most extreme values into 
 In practice, this would result in lower \texttt{rmsep} and \texttt{std\_dev} values compared to the cross validation metrics.
 Therefore, evaluating the model's performance using both the cross-validation metrics (\texttt{rmse\_cv} and \texttt{std\_dev\_cv}) and the test set metrics (\texttt{rmsep} and \texttt{std\_dev}) is crucial.
 The cross-validation metrics provide insights into the model's stability across different subsets, while the test set metrics offer a final measure of performance on truly unseen data, giving a comprehensive assessment of the model's generalizability.
-
-To ensure generalizability for our models, we will employ a k-fold cross-validation strategy, for partitioning the data into training and test sets.
-However, as stated in Section~\ref{subsec:quantification} the Masked Intensity Tensor contains multiple locations for each sample.
-This necessitates careful considerations when constructing each fold to prevent data leakage of location data across the training and test partitions.
-To this end, we have devised a custom k-fold cross validation method to address this issue.

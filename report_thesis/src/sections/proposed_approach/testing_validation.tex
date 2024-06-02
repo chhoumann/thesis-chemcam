@@ -1,8 +1,9 @@
-\subsection{Custom K-Fold Cross-Validation}\label{subsec:custom-k-fold-cross-val}%\label{subsec:validation_testing_procedures}
-This section further motivates the need for a custom k-fold cross-validation procedure, followed by a detailed description of the dataset partitioning process and the algorithm devised to solve this problem.
-Finally, we outline the evaluation metrics used to assess the performance of our models.
+\subsection{Validation and Testing Procedures for Model Evaluation}\label{subsec:validation_testing_procedures}
+This section describes the validation and testing procedures our experiments follow.
+Selecting appropriate testing procedures is crucial for ensuring the validity and reliability of the results.
+For that reason, we delineate a methodological approach that ensures our models are accurate and generalizable.
 
-\subsubsection{Motivation}\label{subsubsec:motivation}
+We have chosen to test and evaluate all our experiments using both cross-validation and a separate test set.
 Evaluating results solely on the test set could lead to models that are overly specialized to the test set.
 This occurs when searching for the optimal configuration of hyperparameters specifically tailored to the test set.
 However, our objective is to develop models that demonstrate high accuracy and robustness, even on entirely unseen data.
