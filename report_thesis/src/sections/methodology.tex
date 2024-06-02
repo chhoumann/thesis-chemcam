@@ -106,7 +106,7 @@ This approach improved the accuracy over the individual models, but required man
 The manual tuning poses limitations, both in terms of the analysis required to determine a weighting, as well as, the risk for suboptimal weighting.
 Based on these considerations, it seems reasonable to consider techniques that could automate such a process, while still being able to leverage the strengths of multiple models.
 To address these criteria, we chose to adopt a stacking ensemble approach. 
-As described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
+Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
 This approach has the benefit of being able to leverage the strengths of multiple models on a per-oxide basis in conjunction with the most beneficial preprocessors for each of these models.
 
 We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, ensuring that our selections were informed by existing literature while also allowing for independent assessment and validation.
