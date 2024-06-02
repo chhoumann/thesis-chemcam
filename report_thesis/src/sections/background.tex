@@ -1,5 +1,12 @@
 \section{Background}\label{sec:background}
+In this section, we provide an overview of the preprocessing techniques and machine learning models used in our proposed pipeline. 
+We outline the various normalization techniques and dimensionality reduction methods, followed by the ensemble learning, linear models, and regularization models used.
+Finally, we outline stacked generalization. 
+
 \subsection{Preprocessing}
+In this subsection, we discuss the preprocessing methods used in our machine learning pipeline.
+We cover various normalization techniques such as Z-score normalization, max absolute scaling, min-max normalization, robust scaling, Norm 3, power transformation, and quantile transformation.
+These techniques are essential for standardizing data, handling different scales, and improving the performance of machine learning models.
 
 \subsubsection{Z-score Normalization}
 Z-score normalization, also standardization, transforms data to have a mean of zero and a standard deviation of one.
@@ -24,7 +31,6 @@ $$
 where $x$ is the original feature value and $X_{\text{scaled}}$ is the normalized feature value.
 This scaling method is useful for data that has been centered at zero or data that is sparse, as max absolute scaling does not center the data.
 This maintains the sparsity of the data by not introducing non-zero values in the zero entries of the data~\cite{Vasques2024}.
-
 
 \subsubsection{Min-Max Normalization}\label{subsec:min-max}
 Min-max normalization rescales the range of features to $[0, 1]$ or $[a, b]$, where $a$ and $b$ represent the new minimum and maximum values, respectively.
@@ -178,16 +184,122 @@ This kernel function implicitly computes the dot product $\Phi(\mathbf{x}_i)^\to
 By constructing a kernel matrix $\mathbf{K}$ using these pairwise similarities, \gls{kernel-pca} can perform eigenvalue decomposition to obtain the principal components in the feature space, similar to regular \gls{pca} as described in Section~\ref{subsec:pca}.
 However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix $\mathbf{K}$ rather than the covariance matrix $\mathbf{C}$.
 
-\subsection{Overview of Core Models}
-In this section, we provide an overview and definitions of \gls{pls}, \gls{svr}, \gls{etr}, \gls{gbr}, and \gls{xgboost}.
-These models form the basis of the final architecture of our proposed pipeline, detailed further in Section~\ref{sec:methodology}.
+\subsection{Ensemble Learning Models}
+In this section we introduce the concept of ensemble learning and decision trees based on \citet{James2023AnIS}, as they are fundamental aspects of the ensemble learning models we discuss.
+Following this, we outline \gls{etr}, \gls{gbr}, \gls{ngboost}, and \gls{xgboost}.
 
+\subsubsection{Ensemble Learning}
+Ensemble learning is a technique in machine learning where multiple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
+Mathematically, ensemble learning can be defined as combining the predictions of $M$ weak learners to form a final prediction $\hat{y}$, such that:
+\begin{equation}
+    \hat{y} = \sum_{m=1}^{M} \alpha_m \hat{y}_m,
+\end{equation}
+where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is the weight assigned to the $m$-th weak learner.
+While there are various choices for weak learners, decision trees are a common choice\cite{James2023AnIS}.
+
+\subsubsection{Decision Trees}
+A decision tree is a supervised learning model that partitions data into subsets based on feature values, creating a tree structure.
+The goal is to create a tree that predicts the target variable by dividing the data into increasingly homogeneous subsets.
+Each internal node in the tree represents a decision based on a specific feature, while each leaf node represents a prediction for the target variable.
+The tree can make predictions for new data points by following a path from the root to a leaf node\cite{James2023AnIS}.
+
+\subsubsection{Extra Trees Regressor (ETR)}
+We give an overview of \gls{rf} based on \citet{James2023AnIS}.
+Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
+
+\gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
+Each tree is trained on a random subset of the data using bootstrap sampling, where samples are drawn with replacement, meaning the same sample can be selected multiple times.
+This introduces variability and reduces overfitting, as some data points may appear multiple times while others may be omitted.
+By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
+
+Mathematically, the prediction of a \gls{rf} model can be represented as:
+
+$$
+f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
+$$
+
+where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
+
+\gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
+While \gls{rf} uses bootstrap sampling and selects the best split from a random subset of features to create a set of diverse samples, \gls{etr} instead selects split points randomly within the chosen features, introducing additional randomness.
+This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
+As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
+However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
+
+\subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
+In this section, we introduce \gls{gbr} primarily based on \citet{hastie_elements} and \citet{burkovHundredpageMachineLearning2023}.
+
+Gradient Boosting is a machine learning technique used for various tasks, including regression and classification.
+The fundamental concept involves sequentially adding models to minimize a loss function, where each successive model addresses the errors of the ensemble of preceding models.
+
+This technique utilizes gradient descent to optimize the loss function, allowing for the selection of different loss functions depending on the specific task.
+\gls{gbr} is a specialized application of gradient boosting for regression tasks, where it minimizes a regression-appropriate loss function, such as mean squared error or mean absolute error.
+Typically, decision trees are used as the base models in each iteration.
+
+The process starts with an initial model $f_{0}(x)$ that minimizes the loss function over the entire dataset:
+$$
+f_{0}(x)=\arg\min_{\gamma}\sum^{N}_{i=1}L(y_{i},\gamma)
+$$
+where $L(y,\hat{y})$ is the chosen loss function, $N$ is the number of samples, $y_{i}$ are the true values, and $\gamma$ is a constant.
+
+Then we start the iterative process of adding models to the ensemble.
+For each iteration $m$, from $1$ to $M$:
+
+\begin{enumerate}
+    \item Compute the residuals of the current model. For regression, this could be the squared error loss, $L(y, \hat{y}) = (y - \hat{y})^2$. The residuals $r_{i}^{(m)}$ for each data point $i$ are calculated as $r_{i}^{(m)} = y_{i} - f_{m-1}(x_{i})$, where $f_{m-1}(x_{i})$ is the prediction of the previous model.
+    \item Fit a new decision tree $h_{m}(x)$ to the residuals. This tree aims to correct the errors of the current ensemble by using the residuals instead of ground truth values. Essentially, $h_{m}(x)$ tries to predict the residuals $r_{i}^{(m)}$.
+    \item Update the ensemble model by adding the predictions of the new tree $h_{m}(x)$, multiplied by a learning rate $\eta$. The learning rate $\eta$ controls the contribution of each new tree to the ensemble, preventing overfitting by scaling the updates:
+    $$
+    f_{m}(x)=f_{m-1}(x)+\eta h_{m}(x)
+    $$
+\end{enumerate}
+
+This iterative process continues until the maximum number $M$ of trees is combined, resulting in the final model $\hat{f}(x) = f_{M}(x)$.
+
+\subsubsection{Natural Gradient Boosting (NGBoost)}
+\gls{ngboost} is a variant of the gradient boosting algorithm that leverages the concept of natural gradients with the goal of improving convergence speed and model performance.
+In more complex models, the parameter space can be curved and thus non-Euclidean, making the standard gradient descent less effective.
+Consequently, using the standard gradient descent can lead to slow convergence and suboptimal performance.
+In such scenarios, the application of natural gradients becomes particularly advantageous.
+
+Natural gradients account for the underlying geometry of the parameter space by using information about its curvature.
+By incorporating this information, natural gradients can navigate the parameter space more efficiently, leading to faster convergence and better performance.
+In addition, \gls{ngboost} provides its predictions in the form of probability distributions, allowing it to estimate the uncertainty associated with its predictions.
+
+The algorithm starts by initializing a model with a guess for the parameters of the probability distribution, usually starting with something simple like a Gaussian distribution.
+This initial model prediction represents the probability distribution over the target variable based on the given features.
+
+Then, the algorithm enters an iterative process to refine its predictions.
+At the start of each iteration, the model computes its current predictions using the existing set of parameters.
+The algorithm then calculates the negative gradient of the loss function with respect to the current predictions.
+This involves computing the gradient of the negative log-likelihood, which quantifies the discrepancy between the current predictions and the actual observed data.
+The negative log-likelihood quantifies how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations. 
+
+Next, the \textit{Fisher information matrix} is computed. 
+This matrix encodes the curvature of the parameter space at the current parameter values, reflecting how sensitive the likelihood function is to changes in these parameters.
+For example, if the likelihood function is highly sensitive to changes in a particular parameter, the Fisher information matrix will have a high value for that parameter.
+Using this information, the model can adjust its parameters more effectively, focusing on the most sensitive parameters to improve performance.
+
+The standard gradient, or residuals, which is derived from the negative log-likelihood, is then transformed using the inverse of the Fisher information matrix to obtain what is known as the natural gradient.
+Next, a weak learner, typically a decision tree, is fitted to these natural gradients.
+This step is similar to traditional gradient boosting, where a tree is fitted to the residuals, but in \gls{ngboost}, the tree is fitted to the natural gradients instead.
+
+The parameters of the model are then updated using the output from the weak learner.
+This update process incorporates a learning rate to control the step size, ensuring that the model makes gradual improvements rather than drastic changes.
+
+Using the newly updated parameters, the model recalculates its predictions, refining the probability distribution of the target variable. 
+This iterative process of computing predictions, calculating gradients, fitting weak learners, and updating parameters continues for a predetermined number of iterations or until the model's performance converges.
+
+\subsubsection{XGBoost}
+
+\subsection{Linear and Regularization Models}
+In this section we outline \gls{pls} and \gls{svr}.
 \subsubsection{Partial Least Squares (PLS)}
-Having previously introduced \gls{pca}, we now describe \gls{pls} based on \citet{James2023AnIS}.
+We now describe \gls{pls} based on \citet{James2023AnIS}.
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using PCA as:
+In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using \gls{pca} as:
 
 $$
 \mathbf{X} = \mathbf{TV}^T + \mathbf{E},
@@ -284,115 +396,7 @@ where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of 
 
 The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.
 
-\subsubsection{Extra Trees Regressor (ETR)}
-Before discussing the \gls{etr} model, it is important to first understand the concepts of decision trees and \gls{rf}.
-We give an overview of decision trees and \gls{rf} based on \citet{James2023AnIS}.
-Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
-
-A decision tree is a supervised learning model that partitions data into subsets based on feature values, creating a tree structure.
-The goal is to create a tree that predicts the target variable by dividing the data into increasingly homogeneous subsets.
-Each internal node in the tree represents a decision based on a specific feature, while each leaf node represents a prediction for the target variable.
-The tree can make predictions for new data points by following a path from the root to a leaf node.
-
-\gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
-Each tree is trained on a random subset of the data using bootstrap sampling, where samples are drawn with replacement, meaning the same sample can be selected multiple times.
-This introduces variability and reduces overfitting, as some data points may appear multiple times while others may be omitted.
-By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
-
-Mathematically, the prediction of a \gls{rf} model can be represented as:
-
-$$
-f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
-$$
-
-where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
-
-\gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
-While \gls{rf} uses bootstrap sampling and selects the best split from a random subset of features to create a set of diverse samples, \gls{etr} instead selects split points randomly within the chosen features, introducing additional randomness.
-This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
-As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
-However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
-
-\subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
-In this section we introduce \gls{gbr} primarily based on \citet{James2023AnIS}.
-\gls{gbr} is an ensemble learning method that builds models sequentially, each one trying to correct the errors of the previous one, using gradient descent and boosting techniques.
-
-To understand \gls{gbr}, it is helpful to build on the concepts of ensemble learning and decision trees.
-Ensemble learning is a technique in machine learning where multiple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
-Mathematically, ensemble learning can be defined as combining the predictions of $M$ weak learners to form a final prediction $\hat{y}$, such that:
-\begin{equation}
-    \hat{y} = \sum_{m=1}^{M} \alpha_m \hat{y}_m,
-\end{equation}
-where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is the weight assigned to the $m$-th weak learner.
-While there are various choices for weak learners, decision trees are a common choice.
-Decision trees are a core component of gradient boosting methods.
-They partition the data into subsets based on feature values, aiming to create groups where data points have similar predicted outcomes.
-
-Once optimal splits are identified, the tree is constructed by repeatedly partitioning the data until a stopping criterion is met.
-The final model consists of splits that create distinct regions, each with a predicted response value based on the mean of the observations in that region.
-
-This leads us to \textit{gradient boosting}.
-Instead of building a single decision tree, gradient boosting constructs multiple trees sequentially, with each new tree correcting the errors of the previous ones.
-Each tree is small, with few terminal nodes, preventing large adjustments based on a single tree's predictions.
-It also ensures that each tree makes small and simple error corrections, such that each step refines the model's performance more reliably.
-
-Initially, the prediction is set as $\hat{f}_0(\mathbf{x}) = 0$ and residuals as $r_i = y_i$ for all $i$ in the training set, where $\mathbf{x}$ represents the vector of input feature(s) and $y$ is the true value or target variable.
-The model is then iteratively improved over $B$ iterations, where $B$ is a hyperparameter controlling the total number of trees.
-With each iteration $b$ from $1$ to $B$, predictions are updated as:
-$$
-    \hat{f}^{(b)}(\mathbf{x}) = \hat{f}^{(b-1)}(\mathbf{x}) + \lambda \hat{f}_b(\mathbf{x}),
-$$
-where $\hat{f}_b(\mathbf{x})$ is the prediction of the $b$-th tree and $\lambda$ is the learning rate. Residuals are updated as:
-$$
-    r_i^{(b)} = y_i - \hat{f}^{(b-1)}(\mathbf{x}_i),
-$$
-Each tree is then trained on these updated residuals.
-The repetitive process of fitting a weak learner to predict the residuals and using its predictions to update the model gives us the final model:
-$$
-    \hat{f}(\mathbf{x}) = \sum_{b=1}^{B} \lambda \hat{f}_b(\mathbf{x})
-$$
-In the context of regression, gradient boosting aims to minimize the difference between the predicted values and the actual target values by fitting successive trees to the residuals.
-To minimize errors, gradient descent is used to iteratively update model parameters in the direction of the negative gradient of the loss function, thereby following the path of steepest descent~\cite{gradientLossFunction}.
-
-\subsubsection{Natural Gradient Boosting (NGBoost)}
-Having introduced \gls{gbr}, we now give an overview of \gls{ngboost} based on \citet{duan_ngboost_2020}.
-
-\gls{ngboost} is a variant of the gradient boosting algorithm that leverages the concept of natural gradients with the goal of improving convergence speed and model performance.
-In more complex models, the parameter space can be curved and thus non-Euclidean, making the standard gradient descent less effective.
-Consequently, using the standard gradient descent can lead to slow convergence and suboptimal performance.
-In such scenarios, the application of natural gradients becomes particularly advantageous.
-
-Natural gradients account for the underlying geometry of the parameter space by using information about its curvature.
-By incorporating this information, natural gradients can navigate the parameter space more efficiently, leading to faster convergence and better performance.
-In addition, \gls{ngboost} provides its predictions in the form of probability distributions, allowing it to estimate the uncertainty associated with its predictions.
-
-The algorithm starts by initializing a model with a guess for the parameters of the probability distribution, usually starting with something simple like a Gaussian distribution.
-This initial model prediction represents the probability distribution over the target variable based on the given features.
-
-Then, the algorithm enters an iterative process to refine its predictions.
-At the start of each iteration, the model computes its current predictions using the existing set of parameters.
-The algorithm then calculates the negative gradient of the loss function with respect to the current predictions.
-This involves computing the gradient of the negative log-likelihood, which quantifies the discrepancy between the current predictions and the actual observed data.
-The negative log-likelihood quantifies how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations. 
-
-Next, the \textit{Fisher information matrix} is computed. 
-This matrix encodes the curvature of the parameter space at the current parameter values, reflecting how sensitive the likelihood function is to changes in these parameters.
-For example, if the likelihood function is highly sensitive to changes in a particular parameter, the Fisher information matrix will have a high value for that parameter.
-Using this information, the model can adjust its parameters more effectively, focusing on the most sensitive parameters to improve performance.
-
-The standard gradient, or residuals, which is derived from the negative log-likelihood, is then transformed using the inverse of the Fisher information matrix to obtain what is known as the natural gradient.
-Next, a weak learner, typically a decision tree, is fitted to these natural gradients.
-This step is similar to traditional gradient boosting, where a tree is fitted to the residuals, but in \gls{ngboost}, the tree is fitted to the natural gradients instead.
-
-The parameters of the model are then updated using the output from the weak learner.
-This update process incorporates a learning rate to control the step size, ensuring that the model makes gradual improvements rather than drastic changes.
-
-Using the newly updated parameters, the model recalculates its predictions, refining the probability distribution of the target variable. 
-This iterative process of computing predictions, calculating gradients, fitting weak learners, and updating parameters continues for a predetermined number of iterations or until the model's performance converges.
-
-\subsubsection{XGBoost}
-
-\subsubsection{Stacked Generalization}
+\subsection{Stacked Generalization}
 Stacked generalization, introduced by \citet{wolpertstacked_1992}, is a method designed to improve the predictive performance of machine learning models by leveraging the strengths of multiple models.
 
 In this technique, multiple base models are trained on the original dataset. 
