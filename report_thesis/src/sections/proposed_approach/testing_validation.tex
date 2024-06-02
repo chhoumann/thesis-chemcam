@@ -52,7 +52,7 @@ This procedure ensures that all data points from a given target are either entir
 Additionally, it ensures that extreme values are handled appropriately to maintain an even distribution across folds, as demonstrated by the data distributions in Figure~\ref{fig:oxide_distributions}.
 
 \begin{algorithm}
-\caption{Custom k-Fold Cross-Validation with Extreme Value Handling}
+\caption{Data Partitioning With Extreme Value Handling}
 \label{alg:custom_kfold_cv}
 \begin{algorithmic}[1]
 \Require Dataset \( \mathbf{D} \), group column \( g \), target column \( t \), number of splits \( k \), percentile \( p \), random seed \( \textit{seed} \)
