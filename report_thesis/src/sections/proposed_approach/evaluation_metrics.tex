@@ -17,6 +17,6 @@ Therefore, evaluating the model's performance using both the cross-validation me
 The cross-validation metrics provide insights into the model's stability across different subsets, while the test set metrics offer a final measure of performance on truly unseen data, giving a comprehensive assessment of the model's generalizability.
 
 To ensure generalizability for our models, we will employ a k-fold cross-validation strategy, for partitioning the data into training and test sets.
-However, as stated in Section~\ref{sec:problem-definition} the Masked Intensity Tensor contains multiple locations for each sample.
+However, as stated in Section~\ref{sec:problem_definition} the Masked Intensity Tensor contains multiple locations for each sample.
 This necessitates careful considerations when constructing each fold to prevent data leakage of location data across the training and test partitions.
 To this end, we have devised a custom k-fold cross validation method to address this issue.
