@@ -99,28 +99,28 @@ The \textit{Target} column corresponds to the sample name, while the \textit{ID}
 \subsection{Model and Preprocessing Selection}
 Choosing the right models and preprocessing techniques for \gls{libs} data analysis is a challenging task. 
 The literature suggests a variety of models and preprocessing techniques that promise to be adept at handling data that exhibits high-dimensionality, multi-collinearity, and matrix effects.
-Additionally, different machine learning models perform best on different oxides in LIBS data due to the complex nature of the data. 
+Additionally, different machine learning models perform better on some oxides than others. 
 These challenges and model-specific strengths suggests that an optimal approach would involve combining multiple models. 
 This notion is supported by the advent of models such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017}, which combines the predictions of multiple models using a predefined weighting of the predictions made of each model, per-oxide.
 This approach improved the accuracy over the individual models, but required manual tuning of the weights for each model.
 The manual tuning poses limitations, both in terms of the analysis required to determine a weighting, as well as, the risk for suboptimal weighting.
 Based on these considerations, it seems reasonable to consider techniques that could automate such a process, while still being able to leverage the strengths of multiple models.
 To address these criteria, we chose to adopt a stacking ensemble approach. 
-As described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
+Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
 This approach has the benefit of being able to leverage the strengths of multiple models on a per-oxide basis in conjunction with the most beneficial preprocessors for each of these models.
 
 We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, ensuring that our selections were informed by existing literature while also allowing for independent assessment and validation.
 
-To guide our selection of preprocessing techniques, we had several considerations.
+We had several considerations to guide our selection of preprocessing techniques.
 Firstly, our review of the literature revealed that there is no consensus on a single, most effective normalization method for \gls{libs} data.
 This led us to include the traditional normalization methods, such as Z-score normalization, Min-Max scaling, and Max Absolute scaling, in our experiments.
 This approach allowed us to determine which normalization method was most effective for our dataset. 
-Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality. Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}. However, \citet{pca_review_paper} also made the case that the assumptions for \gls{pca} regarding linearity of the data are only met up to a certain point, after which it breaks. They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data. Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data. Therefore, we decided to include this in our experiments to further assess its potential. In addition to the non-linearity, \citet{pca_review_paper} also argue that the assumptions of normality in the data are not always met in \gls{libs} data. For this reason, we decided to include power transformation and quantile transformation in our experiments as models such as \gls{pca} benefit from a normal distribution of the data. We assume that models such as \gls{pls} may also benefit from a more Gaussian-like distribution of the data, by virtue of the model being partly based on \gls{pca}.
+Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality. Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}. However, \citet{pca_review_paper} makes the case that the assumptions for \gls{pca} regarding linearity of the data are only met up to a certain point, after which it breaks. They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data. Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data. Therefore, we decided to include this in our experiments to further assess its potential. In addition to the non-linearity, \citet{pca_review_paper} also argue that the assumptions of normality in the data are not always met in \gls{libs} data. For this reason, we decided to include power transformation and quantile transformation in our experiments as models such as \gls{pca} benefit from a normal distribution of the data. We assume that models such as \gls{pls} may also benefit from a more Gaussian-like distribution of the data, by virtue of the model being partly based on \gls{pca}.
 
 While these preprocessing techniques are not an exhaustive list, they represent a diverse set of methods.
 Techniques such as feature selection were not considered to limit the scope of the study and due to time constraints.
 
-For the selection of models, we also had several requirements.
+We also had several requirements for the selection of models.
 The models selected for experimentation had to be diverse to ensure that we had enough breadth in our results to make informed decisions about which models should be included in the final pipeline.
 Additionally, these models should be suitable for regression tasks and suitable for \gls{libs} data, as evidenced by their \gls{rmsep} and \gls{rmsecv} in the related literature.
 To further bolster our selection pool, we chose to include models that were in the same family of models as those that showed promise in the literature.
@@ -130,7 +130,7 @@ In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques 
 
 \begin{table}[ht]
 \centering
-\begin{tabularx}{\columnwidth}{lX} % Define the columns, one fixed-width and one flexible
+\begin{tabularx}{\columnwidth}{lX}
 \toprule
 \multirow{9}{*}{Preprocessing Techniques:} & Z-Score Normalization \\
                                            & Min-Max Normalization \\
