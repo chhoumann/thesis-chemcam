@@ -9,10 +9,14 @@ import typer
 from optuna.pruners import HyperbandPruner
 from optuna.samplers import TPESampler
 from optuna_models import (
+    instantiate_elasticnet,
     instantiate_extra_trees,
     instantiate_gbr,
+    instantiate_lasso,
     instantiate_ngboost,
     instantiate_pls,
+    instantiate_ridge,
+    instantiate_random_forest,
     instantiate_svr,
     instantiate_xgboost,
 )
@@ -156,6 +160,14 @@ def instantiate_model(trial, model_selector, logger):
         return instantiate_pls(trial, lambda params: _logger(params))
     elif model_selector == "ngboost":
         return instantiate_ngboost(trial, lambda params: _logger(params))
+    elif model_selector == "lasso":
+        return instantiate_lasso(trial, lambda params: _logger(params))
+    elif model_selector == "ridge":
+        return instantiate_ridge(trial, lambda params: _logger(params))
+    elif model_selector == "elasticnet":
+        return instantiate_elasticnet(trial, lambda params: _logger(params))
+    elif model_selector == "random_forest":
+        return instantiate_random_forest(trial, lambda params: _logger(params))
     else:
         raise ValueError(f"Unsupported model type: {model_selector}")
 
@@ -290,7 +302,7 @@ def combined_objective(trial, oxide, model_selector):
         return float("inf"), float("inf")  # Return a large number to indicate failure
 
 
-models = ["gbr", "svr", "extra_trees", "pls", "xgboost", "ngboost"]
+models = ["gbr", "svr", "extra_trees", "pls", "xgboost", "ngboost", "lasso", "ridge", "elasticnet", "random_forest"]
 
 
 def validate_oxides(ctx: typer.Context, param: typer.CallbackParam, value: List[str]) -> List[str]:
@@ -300,10 +312,20 @@ def validate_oxides(ctx: typer.Context, param: typer.CallbackParam, value: List[
     return value
 
 
+def validate_models(ctx: typer.Context, param: typer.CallbackParam, value: List[str]) -> List[str]:
+    for model in value:
+        if model not in models:
+            raise typer.BadParameter(f"{model} is not a valid model. Choose from {models}")
+    return value
+
+
 def main(
     n_trials: int = typer.Option(200, "--n-trials", "-n", help="Number of trials for hyperparameter optimization"),
     selected_oxides: List[str] = typer.Option(
         major_oxides, "--oxides", "-o", help="List of oxides to optimize", callback=validate_oxides
+    ),
+    selected_models: List[str] = typer.Option(
+        models, "--models", "-m", help="List of models to optimize", callback=validate_models
     ),
 ):
     """
@@ -340,10 +362,10 @@ def main(
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}")
 
-        experiment_id = get_or_create_experiment(f"Optuna {oxide} {current_date}")
+        experiment_id = get_or_create_experiment(f"Optuna {oxide} {f'- {models[0]}' if len(selected_models) == 1 else ''} - {current_date}")
         mlflow.set_experiment(experiment_id=experiment_id)
 
-        for model in models:
+        for model in selected_models:
             print(f"Optimizing {model}")
             notify_discord(f"## Optimizing {model}")
 
