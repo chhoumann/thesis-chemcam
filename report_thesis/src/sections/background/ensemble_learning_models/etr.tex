@@ -1,0 +1,22 @@
+\subsubsection{Extra Trees Regressor (ETR)}
+We give an overview of \gls{rf} based on \citet{James2023AnIS}.
+Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
+
+\gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
+Each tree is trained on a random subset of the data using bootstrap sampling, where samples are drawn with replacement, meaning the same sample can be selected multiple times.
+This introduces variability and reduces overfitting, as some data points may appear multiple times while others may be omitted.
+By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
+
+Mathematically, the prediction of a \gls{rf} model can be represented as:
+
+$$
+f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
+$$
+
+where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
+
+\gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
+While \gls{rf} uses bootstrap sampling and selects the best split from a random subset of features to create a set of diverse samples, \gls{etr} instead selects split points randomly within the chosen features, introducing additional randomness.
+This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
+As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
+However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
