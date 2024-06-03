@@ -1,0 +1,30 @@
+\subsubsection{Gradient Boosting Regression (GBR)}\label{sec:gradientboost}
+In this section, we introduce \gls{gbr} based on \citet{hastie_elements} and \citet{burkovHundredpageMachineLearning2023}.
+
+Gradient Boosting is a machine learning technique used for various tasks, including regression and classification.
+The fundamental concept involves sequentially adding models to minimize a loss function, where each successive model addresses the errors of the ensemble of preceding models.
+
+This technique utilizes gradient descent to optimize the loss function, allowing for the selection of different loss functions depending on the specific task.
+The loss function is generally defined as $L(y,\hat{y})$, and measures the discrepancy between the true values $y$ and the predicted values $\hat{y}$.
+\gls{gbr} is a specialized application of gradient boosting for regression tasks, where it minimizes a regression-appropriate loss function, such as mean squared error or mean absolute error.
+Typically, decision trees are used as the base models in each iteration.
+
+The process starts with an initial model $f_{0}(x)$ that minimizes the loss function over the entire dataset:
+$$
+f_{0}(x)=\arg\min_{\gamma}\sum^{N}_{i=1}L(y_{i},\gamma)
+$$
+where $L$ is the chosen loss function, $N$ is the number of samples, $y_{i}$ are the true values, and $\gamma$ is a constant that represents the prediction of the initial model.
+
+Then we start the iterative process of adding models to the ensemble.
+For each iteration $m$, from $1$ to $M$:
+
+\begin{enumerate}
+    \item Compute the residuals of the current model. For regression, this could be the squared error loss, $L(y, \hat{y}) = (y - \hat{y})^2$. The residuals $r_{i}^{(m)}$ for each data point $i$ are calculated as $r_{i}^{(m)} = y_{i} - f_{m-1}(x_{i})$, where $f_{m-1}(x_{i})$ is the prediction of the previous model.
+    \item Fit a new decision tree $h_{m}(x)$ to the residuals. This tree aims to correct the errors of the current ensemble by using the residuals instead of ground truth values. Essentially, $h_{m}(x)$ tries to predict the residuals $r_{i}^{(m)}$.
+    \item Update the ensemble model by adding the predictions of the new tree $h_{m}(x)$, multiplied by a learning rate $\eta$. The learning rate $\eta$ controls the contribution of each new tree to the ensemble, preventing overfitting by scaling the updates:
+    $$
+    f_{m}(x)=f_{m-1}(x)+\eta h_{m}(x)
+    $$
+\end{enumerate}
+
+This iterative process continues until the maximum number $M$ of trees is combined, resulting in the final model $\hat{f}(x) = f_{M}(x)$.
