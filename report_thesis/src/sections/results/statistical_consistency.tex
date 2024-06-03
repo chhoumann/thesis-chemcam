@@ -1,0 +1,41 @@
+\subsubsection{Statistical Consistency}
+To further validate our visual analysis, we can look at quantitative measures such as the means and standard deviations of \ce{SiO_2} concentrations across the folds and the overall dataset.
+As shown in Table~\ref{tab:siO2_std_means}, the standard deviations and means for \ce{SiO_2} concentrations in each fold are as follows:
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Fold} & \textbf{Standard Deviation} & \textbf{Mean} \\
+        \hline
+        Fold 1 & 16.28 & 55.70 \\
+        \hline
+        Fold 2 & 12.46 & 57.59 \\
+        \hline
+        Fold 3 & 18.01 & 51.51 \\
+        \hline
+        Fold 4 & 15.77 & 55.10 \\
+        \hline
+        Train Full & 15.91 & 54.96 \\
+        \hline
+        Test Full & 9.06 & 56.57 \\
+        \hline
+        Full & 14.94 & 55.25 \\
+        \hline
+    \end{tabular}
+    \caption{Standard deviations and means of \ce{SiO_2} concentrations across different folds' validation sets, the full training set, the full test set, and the entire dataset.}
+    \label{tab:siO2_std_means}
+\end{table}
+
+From the table, it is evident that the means and standard deviations of \ce{SiO_2} concentrations for each fold are consistent with those of the overall dataset.
+These metrics are even more similar across folds for the training sets, indicating that the training sets are also representative of the entire dataset.
+This quantitative consistency supports the visual evidence that each fold is a reliable representative of the entire dataset.
+Furthermore, we can see that the standard deviation in the training sets is higher than the standard deviation in the test set, which is expected given the reassignment of extreme values to the training sets.
+
+Maintaining balanced and representative distributions in each fold is essential for training robust models.
+It ensures that the models are not biased towards any specific subset of the data, which is crucial for their generalization to unseen data.
+The balanced distributions across folds enable the model to be trained on diverse subsets of data, leading to better generalization.
+This approach reduces the risk of overfitting and ensures that the model performs well on new, unseen data.
+
+By ensuring that each fold is representative of the overall dataset, these visualizations support the validity of our dataset partitioning strategy.
+The consistency observed across folds further supports the claim that the data distribution method works as intended, providing confidence in the generalizability and reliability of our models.
