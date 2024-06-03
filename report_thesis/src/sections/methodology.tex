@@ -109,16 +109,16 @@ To address these criteria, we chose to adopt a stacking ensemble approach.
 Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
 By combining a diverse set of base models, stacking can correct for the biases of individual models.
 Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
-This approach of leveraging the strength of multiple models that each model the problem differently can lead to better generalization on unseen data. \cite{wolpertstacked_1992} \cite{survey_of_ensemble_learning}
+This approach of leveraging the strength of multiple models that each model the problem differently can lead to better generalization on unseen data by automating and potentially improving upon manual tuning through the use of a meta-learner to discern patterns in the base predictors' outputs. \cite{wolpertstacked_1992} \cite{survey_of_ensemble_learning}
 However, some consideration has be made towards training of the base models in order to prevent data leakage and overfitting.
 As emphasized by \citet{cvstacking}, if the base models are trained on the same dataset, the meta learner might favor certain base models over others.
 This can cause the meta learner to be influenced by the same patterns and biases that the base models are susceptible to, leading to overfitting.
 To mitigate this risk and ensure generalizability, a cross-validation strategy should be employed to ensure that the meta learner's training data accurately reflects the true performance of the base learners.
 
-We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, to be used in our stacking ensemble, ensuring that our selections were informed by existing literature while also allowing for independent assessment and validation.
+We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, to be used in our stacking ensemble, ensuring that our selections were informed by our literature review while also allowing for independent assessment and validation.
 
 We had several considerations to guide our selection of preprocessing techniques.
-Firstly, our review of the literature revealed that there is no consensus on a single, most effective normalization method for \gls{libs} data.
+Firstly, our review of the literature revealed that there seems to be no consensus on a single, most effective normalization method for \gls{libs} data.
 This led us to include the traditional normalization methods, such as Z-score normalization, Min-Max scaling, and Max Absolute scaling, in our experiments.
 This approach allowed us to determine which normalization method was most effective for our dataset. 
 Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality. Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}. However, \citet{pca_review_paper} makes the case that the assumptions for \gls{pca} regarding linearity of the data are only met up to a certain point, after which it breaks. They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data. Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data. Therefore, we decided to include this in our experiments to further assess its potential. In addition to the non-linearity, \citet{pca_review_paper} also argue that the assumptions of normality in the data are not always met in \gls{libs} data. For this reason, we decided to include power transformation and quantile transformation in our experiments as models such as \gls{pca} benefit from a normal distribution of the data. We assume that models such as \gls{pls} may also benefit from a more Gaussian-like distribution of the data, by virtue of the model being partly based on \gls{pca}.
@@ -127,10 +127,15 @@ While these preprocessing techniques are not an exhaustive list, they represent 
 Techniques such as feature selection were not considered to limit the scope of the study and due to time constraints.
 
 We also had several requirements for the selection of models.
-The models selected for experimentation had to be diverse to ensure that we had enough breadth in our results to make informed decisions about which models should be included in the final pipeline.
-Additionally, these models should be suitable for regression tasks and suitable for \gls{libs} data, as evidenced by their \gls{rmsep} and \gls{rmsecv} in the related literature.
+The models selected for experimentation had to be diverse to ensure that we had enough breadth in our results to make informed decisions about which models should be included in the final stacking ensemble pipeline.
+The literature suggests that a variety of models fit this criteria.
+For example, \citet{andersonPostlandingMajorElement2022} demonstrated that that models such as \gls{gbr}, \gls{pls}, \gls{lasso}, \gls{rf} were each effective at predicting different major oxides.
+Additionaly, \citet{svrforlibs} demonstrated in their work that \gls{svr} outperforms \gls{plsr} in predicting \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe} and \gls{Al}.
+While these examples are not exhaustive, they underscore the potential of these models for \gls{libs} data.
 To further bolster our selection pool, we chose to include models that were in the same family of models as those that showed promise in the literature.
-For example, we chose to include \gls{etr} and \gls{ngboost} on this basis.
+For example \gls{xgboost} was included as an option due to its promise in various settings. For example \citet{xgboost_in_biomedicie} showed that \gls{xgboost} outperfomed models such as \gls{rf} and \gls{svm} in predicting biological activity based on quantitative description of the compound's molecular structure. 
+While this study is not related to \gls{libs} data, it demonstrated higher accuracy than \gls{rf} and \gls{svm} that have been shown to be effective in \gls{libs} data.
+% For example, we chose to include \gls{etr} and \gls{ngboost} on this basis.
 
 In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques and models selected for our experimentation:
 
@@ -148,7 +153,7 @@ In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques 
                                            & PCA \\
                                            & Kernel PCA \\
 \midrule
-\multirow{8}{*}{Models:}                   & Partial Least Squares \\
+\multirow{10}{*}{Models:}                   & Partial Least Squares \\
                                            & Support Vector Regression \\
                                            & Gradient Boost Regression \\
                                            & Extra Trees Regression \\
@@ -156,6 +161,8 @@ In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques 
                                            & Elastic Nets \\
                                            & Least Absolute Shrinkage and Selection Operator \\
                                            & Ridge Regression \\
+                                           & Random Forest \\
+                                           & XGBoost \\
 \bottomrule
 \end{tabularx}
 \caption{Summary of Preprocessing Techniques and Models}
