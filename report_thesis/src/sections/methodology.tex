@@ -131,7 +131,7 @@ The models selected for experimentation had to be diverse to ensure that we had 
 Additionally, the models had to be suitable for regression tasks and if no research was available in the context of \gls{libs} data, they had to be models that have shown promise in other domains.
 Our literature review found that a variety of models fit this criteria.
 For example, \citet{andersonPostlandingMajorElement2022} demonstrated that that models such as \gls{gbr}, \gls{pls}, \gls{lasso}, \gls{rf} were each effective at predicting different major oxides.
-Additionaly, \citet{svrforlibs} demonstrated in their work that \gls{svr} outperforms \gls{plsr} in predicting \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe} and \gls{Al}.
+Additionaly, \citet{svrforlibs} demonstrated in their work that \gls{svr} outperforms \gls{plsr} in predicting \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe} and \ce{Al}.
 As a result, we have included \gls{gbr}, \gls{pls}, \gls{lasso}, \gls{rf}, and \gls{svr} in our experiments.
 
 In the neural network domain, \cite{ann_libs_soil_analysis} showed that on \gls{libs} data their 3-layer \gls{ann} relative error of prediction for \ce{Ca}, \ce{Fe}, \ce{Al} was below 20\%.
@@ -156,35 +156,47 @@ In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques 
 
 \begin{table}[ht]
 \centering
-\begin{tabularx}{\columnwidth}{lX}
+\begin{tabularx}{\columnwidth}{>{\raggedright\arraybackslash}X}
 \toprule
-\multirow{9}{*}{Preprocessing Techniques:} & Z-Score Normalization \\
-                                           & Min-Max Normalization \\
-                                           & Max Absolute Scaling \\
-                                           & Robust Scaling \\
-                                           & Norm 3 \\
-                                           & Power Transformation \\
-                                           & Quantile Transformation \\
-                                           & PCA \\
-                                           & Kernel PCA \\
+\textbf{Normalization / Scaling:} \\
 \midrule
-\multirow{10}{*}{Models:}                  & Partial Least Squares \\
-                                           & Support Vector Regression \\
-                                           & Gradient Boost Regression \\
-                                           & Extra Trees Regression \\
-                                           & Natural Gradient Boosting \\
-                                           & Elastic Nets \\
-                                           & Least Absolute Shrinkage and Selection Operator \\
-                                           & Ridge Regression \\
-                                           & Random Forest \\
-                                           & XGBoost \\
-                                           & Artificial Neural Networks \\
-                                           & Convolutional Neural Networks \\
-\bottomrule
+Z-Score Normalization \\
+Min-Max Normalization \\
+Max Absolute Scaling \\
+Robust Scaling \\
+Norm 3 \\
+\midrule
+\textbf{Transformation Methods:} \\
+\midrule
+Power Transformation \\
+Quantile Transformation \\
+\midrule
+\textbf{Dimensionality Reduction Methods:} \\
+\midrule
+PCA \\
+Kernel PCA \\
+\midrule
+\textbf{Model Types:} \\
+\midrule
+\textbf{Regression Models:} \\
+\quad Partial Least Squares \\
+\quad Support Vector Regression \\
+\quad Elastic Nets \\
+\quad Least Absolute Shrinkage and Selection Operator \\
+\quad Ridge Regression \\
+\textbf{Ensemble Models:} \\
+\quad Random Forest \\
+\quad Gradient Boost Regression \\
+\quad Extra Trees Regression \\
+\quad XGBoost \\
+\quad Natural Gradient Boosting \\
+\textbf{Neural Networks:} \\
+\quad Artificial Neural Networks \\
+\quad Convolutional Neural Networks \\\bottomrule
 \end{tabularx}
-\caption{Summary of Preprocessing Techniques and Models}
-\label{tab:preprocessing-models}
+\caption{Overview of Preprocessing Techniques and Models}
 \end{table}
+
 
 \subsection{Experimental Setup}
 Experiments were conducted on a machine equipped with an Intel Xeon Gold 6242 CPU, featuring 16 cores and 32 threads.
