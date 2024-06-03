@@ -22,9 +22,11 @@ This would cause data leakage, as the testing set would no longer consist solely
 To prevent this, we ensure that each target is represented only once in the dataset by grouping data from all locations on a given target.
 
 Furthermore, the limited availability of data, as mentioned in Section~\ref{sec:problem_definition}, poses another significant challenge due to the difficult collection process.
-The dataset we use consists of 408 samples. This is a large dataset by \gls{libs} standards.
-However, despite this, there are only a few samples with extreme concentration values for the oxides in the targets.
-These extreme values present concentrations significantly different from the rest of the data points. 
+The dataset we use consists of 408 samples, which is relatively large by \gls{libs} standards.
+However, there are only a few samples with concentration values for the oxides in the targets that are either very high or very low compared to the rest of the data.
+These less frequent high and low concentration values can be problematic.
+If such values end up in the test set, the model may be evaluated on data points outside the range it was trained on.
+This situation can lead to an inaccurate assessment of the model's performance, as it might not handle these less common concentration ranges effectively.
 
 When performing a random split of the dataset into multiple folds for cross-validation, as well as for training and testing sets, this small number of extreme values can result in an uneven distribution.
 The presence or absence of these extreme values in any given fold can heavily influence the model's performance metrics.
