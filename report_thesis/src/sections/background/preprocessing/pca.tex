@@ -1,21 +1,15 @@
 \subsubsection{Principal Component Analysis (PCA)}\label{subsec:pca}
-\gls{pca} is a dimensionality reduction technique used to reduce the number of features in a dataset while retaining as much information as possible.
-We provide an intuitive explanation of \gls{pca} in this section based on \citet{dataminingConcepts}.
+\gls{pca} is a dimensionality reduction technique used to reduce the number of features in a dataset while retaining as much information as possible. We provide an intuitive explanation of \gls{pca} in this section based on \citet{dataminingConcepts} and \citet{Vasques2024}.
 
-\gls{pca} works by identifying the directions in which the\\$n$-dimensional data varies the most and projects the data onto these $k$ dimensions, where $k \leq n$.
-This projection results in a lower-dimensional representation of the data.
-\gls{pca} can reveal the underlying structure of the data, which enables interpretation that would not be possible with the original high-dimensional data.
+\gls{pca} works by identifying the directions in which the\\$n$-dimensional data varies the most and projects the data onto these $k$ dimensions, where $k \leq n$. This projection results in a lower-dimensional representation of the data. \gls{pca} can reveal the underlying structure of the data, which enables interpretation that would not be possible with the original high-dimensional data.
 
-\gls{pca} works as follows.
-First, the input data are normalized, which prevents features with larger scales from dominating the analysis.
+\gls{pca} works as follows. First, the input data are normalized, which prevents features with larger scales from dominating the analysis.
 
-Then, $k$ orthogonal unit vectors, called \textit{principal components}, are computed.
+Then, the covariance matrix of the normalized data is computed.
+The covariance matrix captures how each pair of features in the dataset varies together.
+$k$ orthogonal unit vectors, called \textit{principal components}, are then computed from this covariance matrix.
 These vectors are perpendicular to each other and capture the directions of maximum variance in the data.
 
-The principal component are then sorted such that the first component captures the most variance, the second component captures the second most variance, and so on.
-Variance is assumed by \gls{pca} to be a measure of information.
-In other words, the principal components are sorted based on the amount of information they capture.
+The principal components are then sorted such that the first component captures the most variance, the second component captures the second most variance, and so on. Variance is assumed by \gls{pca} to be a measure of information. In other words, the principal components are sorted based on the amount of information they capture.
 
-After computing and sorting the principal components, the data can be projected onto the most informative principal components.
-This projection results in a lower-dimensional approximation of the original data.
-The number of principal components to keep is a hyperparameter that can be tuned to balance the trade-off between the amount of information retained and the dimensionality of the data.
+After computing and sorting the principal components, the data can be projected onto the most informative principal components. This projection results in a lower-dimensional approximation of the original data. The number of principal components to keep is a hyperparameter that can be tuned to balance the trade-off between the amount of information retained and the dimensionality of the data.
