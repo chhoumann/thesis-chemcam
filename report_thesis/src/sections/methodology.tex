@@ -107,9 +107,15 @@ The manual tuning poses limitations, both in terms of the analysis required to d
 Based on these considerations, it seems reasonable to consider techniques that could automate such a process, while still being able to leverage the strengths of multiple models.
 To address these criteria, we chose to adopt a stacking ensemble approach. 
 Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
-This approach has the benefit of being able to leverage the strengths of multiple models on a per-oxide basis in conjunction with the most beneficial preprocessors for each of these models.
+By combining a diverse set of base models, stacking can correct for the biases of individual models.
+Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
+This approach of leveraging the strength of multiple models that each model the problem differently can lead to better generalization on unseen data. \cite{wolpertstacked_1992} \cite{survey_of_ensemble_learning}
+However, some consideration has be made towards training of the base models in order to prevent data leakage and overfitting.
+As emphasized by \citet{cvstacking}, if the base models are trained on the same dataset, the meta learner might favor certain base models over others.
+This can cause the meta learner to be influenced by the same patterns and biases that the base models are susceptible to, leading to overfitting.
+To mitigate this risk and ensure generalizability, a cross-validation strategy should be employed to ensure that the meta learner's training data accurately reflects the true performance of the base learners.
 
-We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, ensuring that our selections were informed by existing literature while also allowing for independent assessment and validation.
+We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, to be used in our stacking ensemble, ensuring that our selections were informed by existing literature while also allowing for independent assessment and validation.
 
 We had several considerations to guide our selection of preprocessing techniques.
 Firstly, our review of the literature revealed that there is no consensus on a single, most effective normalization method for \gls{libs} data.
