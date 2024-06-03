@@ -10,7 +10,7 @@ In addition to bootstrap sampling, random forests introduce an additional layer 
 This further decorrelates the trees, enhancing the model's robustness and reducing the risk of overfitting.
 By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
 
-Mathematically, the prediction of a \gls{rf} model can be represented as:
+For a feature vector $x$, the prediction of a \gls{rf} model can be represeted as an aggregation of the predictions of individual trees:
 
 $$
 f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
