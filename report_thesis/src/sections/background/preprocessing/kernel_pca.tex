@@ -5,10 +5,10 @@ The core idea behind \gls{kernel-pca} is to map data into a higher-dimensional s
 This mapping enables linear separation of data points in the higher-dimensional space, even if they are not linearly separable in the original space.
 
 Similar to \gls{pca}, as described in Section~\ref{subsec:pca}, the goal of \gls{kernel-pca} is to extract the principal components of the data.
-Unlike \gls{pca}, \gls{kernel-pca} does not compute the covariance matrix of the data directly, as it often is infeasible to compute for high-dimensional datasets.
-\gls{kernel-pca} instead leverages the kernel trick to computate the similarities between data points directly in the original space using a kernel function
+Unlike \gls{pca}, \gls{kernel-pca} does not compute the covariance matrix of the data directly, as this is often infeasible for high-dimensional datasets.
+Instead, \gls{kernel-pca} leverages the kernel trick to compute the similarities between data points directly in the original space using a kernel function.
 This kernel function implicitly computes the dot product in the higher-dimensional feature space without explicitly mapping the data points into that space.
-By constructing a kernel matrix, also known as the Gram matrix, using these pairwise similarities, \gls{kernel-pca} can perform eigenvalue decomposition to obtain the principal components in the feature space, similar to regular \gls{pca} as described in Section~\ref{subsec:pca}.
+
 By using pairwise similarities to construct a kernel matrix, also referred to as a Gram matrix, \gls{kernel-pca} can perform eigenvalue decomposition.
 This process allows for the extraction of principal components in the feature space, similar to the approach used in regular \gls{pca} as described in Section~\ref{subsec:pca}.
 However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix rather than the covariance matrix, allowing for the extraction of nonlinear principal components.
