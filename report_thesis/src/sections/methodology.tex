@@ -128,13 +128,25 @@ Techniques such as feature selection were not considered to limit the scope of t
 
 We also had several requirements for the selection of models.
 The models selected for experimentation had to be diverse to ensure that we had enough breadth in our results to make informed decisions about which models should be included in the final stacking ensemble pipeline.
-The literature suggests that a variety of models fit this criteria.
+Additionally, the models had to be suitable for regression tasks and if no research was available in the context of \gls{libs} data, they had to be models that have shown promise in other domains.
+Our literature review found that a variety of models fit this criteria.
 For example, \citet{andersonPostlandingMajorElement2022} demonstrated that that models such as \gls{gbr}, \gls{pls}, \gls{lasso}, \gls{rf} were each effective at predicting different major oxides.
 Additionaly, \citet{svrforlibs} demonstrated in their work that \gls{svr} outperforms \gls{plsr} in predicting \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe} and \gls{Al}.
-While these examples are not exhaustive, they underscore the potential of these models for \gls{libs} data.
+As a result, we have included \gls{gbr}, \gls{pls}, \gls{lasso}, \gls{rf}, and \gls{svr} in our experiments.
+
+In the neural network domain, \cite{ann_libs_soil_analysis} showed that on \gls{libs} data their 3-layer \gls{ann} relative error of prediction for \ce{Ca}, \ce{Fe}, \ce{Al} was below 20\%.
+Likewise, \citet{yangConvolutionalNeuralNetwork2022} showed that \gls{cnn} outperformed methods such as \gls{logreg}, \gls{svm} and linear discriminant analysis at correctly classifying twelve different types of rocks based on \gls{libs} data. 
+While this example for \gls{cnn} is a classification task, \gls{cnn} can be adjusted for regression tasks by changing the loss function and output layer.
+Based on these factors, we decided to include \gls{ann} and \gls{cnn} in our experiments to further increase the diversity of our model selection.
+
 To further bolster our selection pool, we chose to include models that were in the same family of models as those that showed promise in the literature.
-For example \gls{xgboost} was included as an option due to its promise in various settings. For example \citet{xgboost_in_biomedicie} showed that \gls{xgboost} outperfomed models such as \gls{rf} and \gls{svm} in predicting biological activity based on quantitative description of the compound's molecular structure. 
-While this study is not related to \gls{libs} data, it demonstrated higher accuracy than \gls{rf} and \gls{svm} that have been shown to be effective in \gls{libs} data.
+
+\gls{xgboost} was included as an option based on its promising accuracy in various settings.
+For example \citet{xgboost_in_biomedicie} showed that \gls{xgboost} outperfomed models such as \gls{rf} and \gls{svm} in predicting biological activity based on quantitative description of the compound's molecular structure. 
+Another example is \citet{xgboost_in_heart_disease} that used \gls{xgboost} to predict heart disease, where \gls{xgboost} outperformed \gls{rf} and \gls{etr} at correctly classifying patients with heart disease.
+Because of these factors and that \gls{xgboost} has not been widely studied in the context of \gls{libs} data, we decided to include it in our experiments.
+
+
 % For example, we chose to include \gls{etr} and \gls{ngboost} on this basis.
 
 In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques and models selected for our experimentation:
@@ -153,7 +165,7 @@ In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques 
                                            & PCA \\
                                            & Kernel PCA \\
 \midrule
-\multirow{10}{*}{Models:}                   & Partial Least Squares \\
+\multirow{10}{*}{Models:}                  & Partial Least Squares \\
                                            & Support Vector Regression \\
                                            & Gradient Boost Regression \\
                                            & Extra Trees Regression \\
@@ -163,6 +175,8 @@ In Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques 
                                            & Ridge Regression \\
                                            & Random Forest \\
                                            & XGBoost \\
+                                           & Artificial Neural Networks \\
+                                           & Convolutional Neural Networks \\
 \bottomrule
 \end{tabularx}
 \caption{Summary of Preprocessing Techniques and Models}
