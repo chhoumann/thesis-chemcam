@@ -240,7 +240,7 @@ The process starts with an initial model $f_{0}(x)$ that minimizes the loss func
 $$
 f_{0}(x)=\arg\min_{\gamma}\sum^{N}_{i=1}L(y_{i},\gamma)
 $$
-where $L(y,\hat{y})$ is the chosen loss function, $N$ is the number of samples, $y_{i}$ are the true values, and $\gamma$ is a constant.
+where $L(y,\hat{y})$ is the chosen loss function, which measures the discrepancy between the true values $y$ and the predicted values $\hat{y}$, $N$ is the number of samples, $y_{i}$ are the true values, and $\gamma$ is a constant that represents the prediction of the initial model.
 
 Then we start the iterative process of adding models to the ensemble.
 For each iteration $m$, from $1$ to $M$:
