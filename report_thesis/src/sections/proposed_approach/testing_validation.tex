@@ -16,7 +16,7 @@ While we employ conventional techniques like holdout sets and k-fold cross valid
 One of the primary challenges is preventing data leakage.
 As per concentration matrix $\mathbf{C}$ in Section~\ref{sec:problem_definition}, each target only has one ground truth concentration value per oxide.
 However, each target is shot at multiple locations, resulting in multiple instances of the same target in the dataset, as shown in Table~\ref{tab:final_dataset_example}.
-Although the intensity values vary for each location, they fundamentally represent different measurements of the same target.
+Although the intensity values vary for each location, they fundamentally represent measurements of the same target.
 If we were to randomly split the dataset, some locations from a target could end up in the testing set while others remain in the training set.
 This would cause data leakage, as the testing set would no longer consist solely of unseen targets.
 To prevent this, we ensure that each target is represented only once in the dataset by grouping data from all locations on a given target.
