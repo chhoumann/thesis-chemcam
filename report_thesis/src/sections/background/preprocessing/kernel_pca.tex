@@ -10,5 +10,5 @@ Instead, \gls{kernel-pca} leverages the kernel trick to compute the similarities
 This kernel function implicitly computes the dot product in the higher-dimensional feature space without explicitly mapping the data points into that space.
 
 By using pairwise similarities to construct a kernel matrix, also referred to as a Gram matrix, \gls{kernel-pca} can perform eigenvalue decomposition.
-This process allows for the extraction of principal components in the feature space, similar to the approach used in regular \gls{pca} as described in Section~\ref{subsec:pca}.
+This process allows for the extraction of principal components in the feature space, similar to the approach used in regular \gls{pca}.
 However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix rather than the covariance matrix, allowing for the extraction of nonlinear principal components.
