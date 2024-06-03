@@ -23,11 +23,11 @@ The Yeo-Johnson power transformation is defined as:
 $$
 \psi(\lambda, \mathbf{x}) =
 \begin{cases}
-\frac{(\mathbf{x} + 1)^\lambda - 1}{\lambda} & \text{if } \mathbf{x} \geq 0, \lambda \neq 0 \\
-\log(\mathbf{x} + 1) & \text{if } \mathbf{x} \geq 0, \lambda = 0 \\
--\frac{(-\mathbf{x} + 1)^{2 - \lambda} - 1}{2 - \lambda} & \text{if } \mathbf{x} < 0, \lambda \neq 2 \\
--\log(-\mathbf{x} + 1) & \text{if } \mathbf{x} < 0, \lambda = 2
-\end{cases},
+\frac{(\mathbf{x} + 1)^\lambda - 1}{\lambda} & (\mathbf{x} \geq 0, \lambda \neq 0) \\
+\log(\mathbf{x} + 1) & (\mathbf{x} \geq 0, \lambda = 0) \\
+- \frac{(-\mathbf{x} + 1)^{2 - \lambda} - 1}{2 - \lambda} & (\mathbf{x} < 0, \lambda \neq 2) \\
+-\log(-\mathbf{x} + 1) & (\mathbf{x} < 0, \lambda = 2)
+\end{cases}
 $$
 
 For non-negative values, the Yeo-Johnson transformation simplifies to the Box-Cox transformation, making them equivalent in this context.
