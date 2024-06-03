@@ -16,6 +16,7 @@ from optuna_models import (
     instantiate_ngboost,
     instantiate_pls,
     instantiate_ridge,
+    instantiate_random_forest,
     instantiate_svr,
     instantiate_xgboost,
 )
@@ -165,6 +166,8 @@ def instantiate_model(trial, model_selector, logger):
         return instantiate_ridge(trial, lambda params: _logger(params))
     elif model_selector == "elasticnet":
         return instantiate_elasticnet(trial, lambda params: _logger(params))
+    elif model_selector == "random_forest":
+        return instantiate_random_forest(trial, lambda params: _logger(params))
     else:
         raise ValueError(f"Unsupported model type: {model_selector}")
 
@@ -299,7 +302,7 @@ def combined_objective(trial, oxide, model_selector):
         return float("inf"), float("inf")  # Return a large number to indicate failure
 
 
-models = ["gbr", "svr", "extra_trees", "pls", "xgboost", "ngboost", "lasso", "ridge", "elasticnet"]
+models = ["gbr", "svr", "extra_trees", "pls", "xgboost", "ngboost", "lasso", "ridge", "elasticnet", "random_forest"]
 
 
 def validate_oxides(ctx: typer.Context, param: typer.CallbackParam, value: List[str]) -> List[str]:
@@ -359,7 +362,7 @@ def main(
         print(f"Optimizing for {oxide}")
         notify_discord(f"# Optimizing for {oxide}")
 
-        experiment_id = get_or_create_experiment(f"Optuna {oxide} - Linear - {current_date}")
+        experiment_id = get_or_create_experiment(f"Optuna {oxide} {f'- {models[0]}' if len(selected_models) == 1 else ''} - {current_date}")
         mlflow.set_experiment(experiment_id=experiment_id)
 
         for model in selected_models:

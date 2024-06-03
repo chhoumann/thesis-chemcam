@@ -3,8 +3,8 @@ from ngboost.distns import Exponential, LogNormal, Normal
 from ngboost.scores import LogScore
 from optuna import Trial
 from sklearn.cross_decomposition import PLSRegression
-from sklearn.ensemble import ExtraTreesRegressor, GradientBoostingRegressor
 from sklearn.linear_model import ElasticNet, Lasso, Ridge
+from sklearn.ensemble import ExtraTreesRegressor, GradientBoostingRegressor, RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
@@ -133,3 +133,15 @@ def instantiate_elasticnet(trial: Trial, logger=lambda params: None) -> ElasticN
     }
     logger(params)
     return ElasticNet(**params)
+
+def instantiate_random_forest(trial: Trial, logger=lambda params: None) -> RandomForestRegressor:
+    params = {
+        "n_estimators": trial.suggest_int("rf_n_estimators", 100, 300),
+        "max_depth": trial.suggest_int("rf_max_depth", 2, 15),
+        "min_samples_split": trial.suggest_int("rf_min_samples_split", 2, 10),
+        "min_samples_leaf": trial.suggest_int("rf_min_samples_leaf", 1, 10),
+        "max_features": trial.suggest_categorical("rf_max_features", ["sqrt", "log2"]),
+    }
+    logger(params)
+    return RandomForestRegressor(**params)
+
