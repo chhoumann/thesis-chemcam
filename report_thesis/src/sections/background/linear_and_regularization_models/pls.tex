@@ -3,7 +3,7 @@ In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as 
 We provide provide an overview of both regression techniques based on \citet{James2023AnIS}.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-First, \gls{pca} is performed to identify the $k$ principal components that capture the most variance in the data.
+First, \gls{pca} is performed to identify the $M$ principal components that capture the most variance in the data.
 These components are then used in a linear regression model to predict the target variable by fitting a linear model via least squares regression.
 The key intuition behind \gls{pcr} is that a small number of principal components are sufficient to capture most of the variance in the data, which can then be used to predict the target variable.
 That is, the directions of the principal components are assumed to be associated with the target variable.
@@ -14,11 +14,12 @@ The components that capture the most variation may not be the most predictive of
 
 To address this limitation, \gls{pls} extends \gls{pcr} by considering the target variable when identifying the components.
 \gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
-Similar to \gls{pcr}, \gls{pls} identifies $k$ components that capture the most variance in the data and fits a linear model with least squares regression.
+Similar to \gls{pcr}, \gls{pls} identifies $M$ components that capture the most variance in the data and fits a linear model with least squares regression.
 However, unlike \gls{pcr}, \gls{pls} uses the target variable to identify the components that are most predictive of the target, resulting in components that not only approximate the data but also relate to the target variable.
 In essence, \gls{pls} aims to find components that are both informative about the data and predictive of the target.
 
 This is an iterative process where the residuals from the previous components are used to calculate the next component.
-That is, the $m$-th component, is derived from the residuals of the previous $m-1$ components.
-One can interpret these residuals as the part of the data that has not been explained by the previous components.
-After some number of iterations, the components are used to predict the target variable by fitting a linear model via least squares regression, just like in \gls{pcr}.
+Specifically, the $m$-th component is derived from the residuals of the previous $m-1$ components.
+These residuals represent the part of the data that has not been explained by the previous components.
+The iteration can be repeated $M$ times to identify $M$ components, where $M$ is a tunable hyperparameter.
+Afterwards, the components are used to predict the target variable by fitting a linear model via least squares regression, just like in \gls{pcr}.
