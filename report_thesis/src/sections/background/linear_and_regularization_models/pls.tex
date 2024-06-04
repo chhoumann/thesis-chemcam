@@ -19,6 +19,6 @@ However, unlike \gls{pcr}, \gls{pls} uses the target variable to identify the co
 In essence, \gls{pls} aims to find components that are both informative about the data and predictive of the target.
 
 This is an iterative process where the residuals from the previous components are used to calculate the next component.
-The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components.
+That is, the $m$-th component, is derived from the residuals of the previous $m-1$ components.
 One can interpret these residuals as the part of the data that has not been explained by the previous components.
 After some number of iterations, the components are used to predict the target variable by fitting a linear model via least squares regression, just like in \gls{pcr}.
