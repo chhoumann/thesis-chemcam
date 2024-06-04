@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'report_thesis/**'
+  workflow_dispatch:
 permissions:
     contents: write
     pull-requests: write
