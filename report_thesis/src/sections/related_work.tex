@@ -8,9 +8,14 @@ We review existing and relevant work through a thematic taxonomy, highlighting t
 Several studies have applied machine learning models to analyze \gls{libs} data, aiming to predict major oxide compositions with high accuracy.
 
 \citet{andersonPostlandingMajorElement2022} utilized machine learning models to quantify major oxides on Mars using the SuperCam instrument on the Perseverance rover.
-Their approach involved extensive preprocessing and normalization of LIBS spectra, followed by the development of multivariate regression models for each oxide.
+Their approach involved extensive preprocessing and normalization of \gls{libs} spectra, followed by the development of multivariate regression models for each oxide.
 They demonstrated that blending different models, such as \gls{gbr} and \gls{pls} for \ce{SiO2}, could improve prediction accuracy.
-Their study serves as a benchmark for model performance on LIBS spectra and offers insights into model selection for similar datasets.
+Their study serves as a benchmark for model performance on \gls{libs} spectra and offers insights into model selection for similar datasets.
+
+\citet{shi_svr_libs_2015} compared the performance of \gls{svr} and \gls{plsr} for quantitative analysis of major elements (Si, Ca, Mg, Fe, Al) in sedimentary rock samples using \gls{libs} data.
+They optimized the SVR model parameters using a genetic algorithm and cross-validation, selecting 20 characteristic emission lines as input features without dimensionality reduction.
+Their results were evaluated using the \gls{rmse} and \gls{rsd} of predicted versus measured concentrations and showed that the non-linear \gls{svr} model significantly outperformed the linear \gls{plsr} model at predicting elemental concentrations.
+The superior performance of \gls{svr} was attributed to its ability to handle non-linearities and matrix effects in the complex geological samples, demonstrating the potential of this machine learning technique for quantitative \gls{libs} analysis in geoscience applications.
 
 \citet{yangConvolutionalNeuralNetwork2022} demonstrated the effectiveness of a deep \gls{cnn} for classifying geochemical samples using \gls{libs} spectra collected at varying distances.
 Their model outperformed traditional machine learning approaches, emphasizing the potential of \gls{cnn}s for geochemical sample identification in planetary exploration missions like China's Tianwen-1.
