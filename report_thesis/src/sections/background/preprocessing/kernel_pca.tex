@@ -8,6 +8,7 @@ Similar to \gls{pca}, as described in Section~\ref{subsec:pca}, the goal of \gls
 Unlike \gls{pca}, \gls{kernel-pca} does not compute the covariance matrix of the data directly, as this is often infeasible for high\\-dimensional datasets.
 Instead, \gls{kernel-pca} leverages the kernel trick to compute the similarities between data points directly in the original space using a kernel function.
 This kernel function implicitly computes the dot product in the higher-dimensional feature space without explicitly mapping the data points into that space.
+That way, \gls{kernel-pca} can capture nonlinear relationships among data points without explicitly transforming them into a higher-dimensional space.
 
 By using pairwise similarities to construct a kernel matrix, also referred to as a Gram matrix, \gls{kernel-pca} can perform eigenvalue decomposition.
 This process allows for the extraction of principal components in the feature space, similar to the approach used in regular \gls{pca}.
