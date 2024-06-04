@@ -9,7 +9,8 @@ The key intuition behind \gls{pcr} is that a small number of principal component
 That is, the directions of the principal components are assumed to be associated with the target variable.
 If this assumption holds, a least squares regression model fitted to the principal components provides better predictions than a model fitted to the original features because the principal components indeed capture the most important information in the data.
 
-One drawback of \gls{pcr} is that it does not consider the target variable in the decomposition of the features and therefore assumes that components with larger variance have a stronger correlation with the target than those with smaller variance. In other words, the components that capture the most variation may not be the most predictive of the target. Some data might be highly variable but irrelevant to the target.
+One drawback of \gls{pcr} is that it does not consider the target variable in the decomposition of the features and therefore assumes that components with larger variance have a stronger correlation with the target than those with smaller variance.
+The components that capture the most variation may not be the most predictive of the target; some data might be highly variable but irrelevant to the target.
 
 To address this limitation, \gls{pls} extends \gls{pcr} by considering the target variable when identifying the components.
 \gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
