@@ -1,0 +1,33 @@
+\subsection{Evaluation Metrics}\label{subsec:evaluation_metrics}
+To evaluate the performance of these models, we will use the \gls{rmse} to measure accuracy and the sample standard deviation of prediction errors to assess robustness.
+We define accuracy as the ability of a model to predict the composition of major oxides in geological samples, while robustness refers to the stability of these predictions across samples.
+
+The metric used to evaluate the accuracy of the models is the \gls{rmse}:
+\[
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
+\]
+where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. 
+This measure quantifies the average magnitude of the prediction error across all predicted values.
+
+Robustness is evaluated using the sample standard deviation of prediction errors:
+\[
+\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
+\]
+where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
+A lower standard deviation indicates a more robust model across different samples.
+
+These metrics are calculated for each fold and averaged across all folds to provide comprehensive indicators of model accuracy and variability.
+In addition, we also compute the metrics for the test set to provide a measure of the model's performance on unseen data.
+Therefore, we have the following metrics for each experiment:
+\begin{enumerate}
+    \item \textbf{Fold-specific \gls{rmse} and Standard Deviation:} For each of the $k$ folds, we calculate both the \gls{rmse} and standard deviation, denoted as \texttt{rmse\_cv\_n} and \texttt{std\_dev\_cv\_n}, where \texttt{n} ranges from 1 to $k$.
+    \item \textbf{Average \gls{rmse} and Standard Deviation:} The overall cross-validation \gls{rmse} (\texttt{rmse\_cv}) and standard deviation (\texttt{std\_dev\_cv}) are computed as the mean of the fold-specific values.
+    \item \textbf{Test Set \gls{rmse} and Standard Deviation:} The \gls{rmse} and standard deviation are also computed for the test set, denoted as \texttt{rmsep} and \texttt{std\_dev}, to provide a measure of the model's performance on unseen data.
+\end{enumerate}
+
+K-fold cross-validation provides a robust estimate of model performance by averaging metrics over multiple folds, reducing variance and offering a clearer picture of the model's generalizability.
+Evaluating the model on a separate test set representative of unseen data ensures that performance metrics accurately reflect the model's generalization capability.
+However, our data partitioning method, which moves the most extreme values into the training data, naturally results in the testing data being closer to the mean of the data distribution, making it easier to predict.
+In practice, this would result in lower \texttt{rmsep} and \texttt{std\_dev} values compared to the cross validation metrics.
+Therefore, evaluating the model's performance using both the cross-validation metrics (\texttt{rmse\_cv} and \texttt{std\_dev\_cv}) and the test set metrics (\texttt{rmsep} and \texttt{std\_dev}) is crucial.
+The cross-validation metrics provide insights into the model's stability across different subsets, while the test set metrics offer a final measure of performance on truly unseen data, giving a comprehensive assessment of the model's generalizability.

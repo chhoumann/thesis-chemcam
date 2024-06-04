@@ -1,0 +1,12 @@
+\section{Proposed Approach}
+To address the challenges in predicting major oxide compositions from \gls{libs} data, we propose the development of advanced computational models capable of effectively handling the multifaceted challenges we describe in \ref{subsec:challenges}.
+These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies. 
+
+Our approach aims to enhance the prediction accuracy and robustness for major oxides in \gls{libs} data by leveraging specific combinations of machine learning models and preprocessors that are particularly effective at predicting individual oxides.
+The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features. 
+The output will be Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$.
+The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness.
+These metrics will provide a comprehensive assessment of the models' performance in predicting the concentrations of major oxides in geological samples.
+
+\input{sections/proposed_approach/testing_validation.tex}
+\input{sections/proposed_approach/evaluation_metrics.tex}
