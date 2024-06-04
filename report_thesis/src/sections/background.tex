@@ -285,34 +285,6 @@ This update process incorporates a learning rate to control the step size, ensur
 Using the newly updated parameters, the model recalculates its predictions, refining the probability distribution of the target variable. 
 This iterative process of computing predictions, calculating gradients, fitting weak learners, and updating parameters continues for a predetermined number of iterations or until the model's performance converges.
 
-\subsubsection{XGBoost}
-We now describe XGBoost based on \citet{ChenGuestrin2016}.
-
-\gls{xgboost} is an advanced implementation of gradient boosting designed for speed and performance. 
-It builds upon traditional boosting techniques by introducing several algorithmic enhancements to improve execution speed and model performance.
-
-The core mechanism of \gls{xgboost} can be summarized in the following way:
-\begin{enumerate}
-\item The algorithm first step involves sorting the feature values and proposing candidate split points based on the distribution of these values.
-\item It then maps these features into buckets based on the candidate splitting points.
-\item For each candidate split, the algorithm calculates a split score using a loss function that measures the difference between predicted and actual values.
-\item The split that minimizes the loss function is chosen, and the data is partitioned based on this optimal split point. 
-	\begin{itemize}
-		\item Parallelism is leveraged here, where the computations for different features and split points can be distributed across multiple processors. 
-		This is facilitated by storing each feature in a compressed, sorted column format, allowing efficient linear scans and parallel processing.
-	\end{itemize}
-\item This process is recursively applied to each partition, building a tree structure by continually splitting the data to minimize the loss function at each node.
-\end{enumerate}
-During tree construction, regularization is applied to control the complexity of the model. 
-The regularization term penalizes the complexity of the tree, helping to prevent overfitting.
-Once the tree is fully grown, a pruning step is performed. 
-Tree pruning works by starting from the leaves and moving backwards to the root, removing branches that do not contribute to reducing the overall loss function. 
-This step ensures that only the most useful splits are retained.
-Additionally, techniques such as shrinkage and column subsampling are employed. 
-When new weights are added shrinkage scales these weights by a factor $\eta$ after each step.
-This reduces the contribution of each tree and allows for new trees to improve the model.
-Column subsampling involves using a random subset of features for splitting which, for some problems, improves the model's robustness and computational efficiency.
-
 \subsection{Linear and Regularization Models}
 In this section we outline \gls{pls} and \gls{svr}.
 \subsubsection{Partial Least Squares (PLS)}
