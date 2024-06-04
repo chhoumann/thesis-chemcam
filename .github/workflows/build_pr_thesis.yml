@@ -10,6 +10,9 @@ permissions:
 defaults:
     run:
         working-directory: report_thesis
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -40,7 +43,9 @@ jobs:
               with:
                   script: |
                     const artifactUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${{ steps.upload_pdf.outputs.artifact-id }}`;
-                    const comment = `Built PDF for this PR: [Download PDF](${artifactUrl})`;
+                    const commitHash = context.sha;
+                    const commitMessage = context.payload.head_commit.message;
+                    const comment = `Built PDF for this PR: [Download PDF](${artifactUrl})\n\nCommit: \`${commitHash}\`\n\nMessage: ${commitMessage}`;
                     await github.rest.issues.createComment({
                       ...context.repo,
                       issue_number: context.issue.number,
