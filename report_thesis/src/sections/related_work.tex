@@ -49,9 +49,17 @@ Their findings underscore the interdependent relationship between preprocessing 
 \subsection{Dimensionality Reduction Techniques}
 Dimensionality reduction techniques such as \gls{pca} play a crucial role in managing the high-dimensional nature of \gls{libs} data.
 
-\citet{rezaei_dimensionality_reduction} explored various machine learning techniques combined with \gls{pca} for dimensionality reduction. Their results demonstrated that \gls{svr} with \gls{pca} performed the best for different elements, highlighting the effectiveness of dimensionality reduction techniques in improving model performance by managing the complexities of high-dimensional data.
+\cite{pca_review_paper} conducted a comprehensive review of \gls{pca} applied in a \gls{libs} context. 
+Their review highlighted several studies that succesfully deployed \gls{pca}.
+For example, \cite{moncayo_pca} used \gls{pca} to analyze megapixel elemental maps composed of more than 1 million LIBS spectra. 
+\gls{pca} successfully separated the contributions of various minerals, including those present in low amounts, highlighting the power of \gls{pca} in handling highly diverse samples.
+Another example is \citet{porizka_pca} used \gls{pca} to filter outliers and classify samples according to their matrix. 
+This was followed by a univariate calibration of copper (\ce{Cu}) in soil samples, which resulted in a reduced bias. 
+Rather than mitigating the matrix effect, the use of PCA avoided it altogether.
+These studies among others highlighted by \citet{pca_review_paper} demonstrate the effectiveness of \gls{pca} as a preprocessing technique in \gls{libs} analysis.
 
-The study by \citet{liuComparisonQuantitativeAnalysis2022} explores the use of \gls{marscode} \gls{libs} for quantitative analysis of olivine in a simulated Martian atmosphere, focusing on multivariate analysis methods to address challenges posed by \gls{libs} data, such as high dimensionality and multicollinearity.
-The methods evaluated include \gls{ulr}, \gls{mvlr}, \gls{pcr}, \gls{plsr}, ridge regression, \gls{lasso}, \gls{enet}, and \gls{bpnn}.
-The findings demonstrate the effectiveness of dimension reduction techniques, especially \gls{plsr}, and nonlinear analysis for improving quantitative analysis accuracy of olivine using \gls{libs} data.
-This approach is particularly relevant to our work due to the focus on advanced statistical methods and machine learning algorithms for handling complex, high-dimensional \gls{libs} data, aligning with our objectives of improving accuracy and robustness in predicting major oxide compositions.
+\citet{sirven_pca_ann_plsr} investigated the influence of matrix effects on the performance of quantitative analysis of chromium (\ce{Cr}) in soil samples using \gls{libs}. 
+\gls{pca} was used to classify spectra from two different soils and to detect outliers. 
+\gls{pca} was successful in separating spectra from agricultural soil and kaolinite in the plane of the first two components. 
+Additionally, \gls{pca} was employed to identify and remove outliers from the data set, enhancing the accuracy of subsequent analyses using \gls{ann}s and \gls{plsr}.
+This study demonstrated the utility of \gls{pca} in managing matrix effects and improving the accuracy of quantitative \gls{libs} analysis.
