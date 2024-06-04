@@ -17,7 +17,7 @@ f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
 $$
 
 where $f_m(x)$ is the prediction of the $m$-th tree, and $M$ is the total number of trees.
-This aggregation is a form of bagging, which averages the predictions of the individual trees to produce a final prediction, reducing the overall variance of the model.
+This form of aggregation reduces the overall variance of the model, by averaging the predictions of the individual trees to produce a final prediction.
 
 \gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
 While \gls{rf} uses bootstrap sampling and selects the best split from a random subset of features to create a set of diverse samples, \gls{etr} instead selects split points randomly within the chosen features, introducing additional randomness.
