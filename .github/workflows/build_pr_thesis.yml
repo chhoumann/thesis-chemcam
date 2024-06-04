@@ -38,7 +38,7 @@ jobs:
                   script: |
                     const pdfUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/suites/${context.runId}/artifacts/${context.runId}`;
                     const comment = `Built PDF for this PR: [Download PDF](${pdfUrl})`;
-                    await github.issues.createComment({
+                    await github.rest.issues.createComment({
                       ...context.repo,
                       issue_number: context.issue.number,
                       body: comment
