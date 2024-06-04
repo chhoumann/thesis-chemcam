@@ -6,7 +6,7 @@ Our approach aims to enhance the prediction accuracy and robustness for major ox
 The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features. 
 The output will be Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$.
 
-As the literature highlighted in Section~\ref{sec:related-work} suggests, a variety of models and preprocessing techniques that promise to be adept at handling data that exhibits high-dimensionality, multi-collinearity, and matrix effects.
+As the literature highlighted in Section~\ref{sec:related-work} suggests, a variety of models and preprocessing techniques promise to be adept at handling data that exhibit high-dimensionality, multi-collinearity, and matrix effects.
 Additionally, different machine learning models perform better on some oxides than others. 
 These challenges and model-specific strengths suggests that an optimal approach would involve hybrid methodology, integrating multiple models and preprocessing steps tailored to the specific characteristics of the data.
 This could include leveraging ensemble learning techniques to combine the predictions of various models, implementing dimensionality reduction techniques like \gls{pca} to mitigate high-dimensionality issues, and employing robust preprocessing strategies to address multi-collinearity and matrix effects.
