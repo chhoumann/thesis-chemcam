@@ -23,5 +23,5 @@ Tree pruning works by starting from the leaves and moving backwards to the root,
 This step ensures that only the most useful splits are retained.
 Additionally, techniques such as shrinkage and column subsampling are employed. 
 When new weights are added shrinkage scales these weights by a factor $\eta$ after each step.
-This reduces the contribution of each tree and allows for new trees to improve the model.
+This reduces the influence of each tree and allows for new trees to improve the model.
 Column subsampling involves using a random subset of features for splitting which, for some problems, improves the model's robustness and computational efficiency.
