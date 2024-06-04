@@ -1,0 +1,54 @@
+\subsubsection{Support Vector Regression (SVR)}
+\gls{svr} is a regression technique that extends the principles of \gls{svm} to regression problems.
+We therefore provide an overview of \gls{svm}s based on \citet{James2023AnIS} before discussing \gls{svr}s.
+
+\gls{svm} is a supervised learning algorithm used primarily for classification tasks.
+A core concept in \gls{svm} is the \textit{hyperplane}.
+Generally, a hyperplane is a subspace of one dimension less than its ambient space.
+This means that in a two-dimensional space, a hyperplane is a line, while in a three-dimensional space, it is a plane, and so on.
+
+\gls{svm} is built on the idea of finding the hyperplane that best separates the data points into different classes.
+This hyperplane is chosen to maximize the margin, which is the distance between the hyperplane and the nearest data point from either class.
+The instances right on or inside the margin are called \textit{support vectors}, which are used to 'support' the margin and decision boundary.
+
+\gls{svr} extends the principles of \gls{svm} to regression problems.
+We use our previous discussion of \gls{svm} to introduce \gls{svr} based on \citet{druckerSVR} and \citet{smola_svr_tutorial_2004}.
+
+\gls{svr} aims to fit a function that predicts continuous values rather than finding the hyperplane that best separates data points.
+Instead of using a hyperplane to separate the data, \gls{svr} uses two parallel hyperplanes to define a margin within which the function should lie, often referred to as the $\epsilon$-\textit{tube}, where $\epsilon$ is a hyperparameter that defines the width of the tube.
+The goal is to find a function $f(x)$ that lies within this tube and has the maximum number of data points within the tube.
+$f(x)$ is typically defined as a linear function of the form:
+
+$$
+f(x) = \mathbf{w} \cdot \mathbf{x} + b,
+$$
+
+where:
+
+\begin{itemize}
+	\item $\mathbf{w}$ is the weight vector,
+	\item $\mathbf{x}$ is the input vector, and
+	\item $b$ is the bias term.
+\end{itemize}
+
+The two parallel hyperplanes at a distance $\epsilon$ from the hyperplane are defined as:
+
+$$
+\begin{aligned}
+    \mathbf{w} \cdot \mathbf{x} + b &= f(\mathbf{x}) + \epsilon, \\
+    \mathbf{w} \cdot \mathbf{x} + b &= f(\mathbf{x}) - \epsilon.
+\end{aligned}
+$$
+
+Or, more succinctly:
+
+$$
+\begin{aligned}
+    f^+(\mathbf{x}) &= f(\mathbf{x}) + \epsilon, \\
+    f^-(\mathbf{x}) &= f(\mathbf{x}) - \epsilon,
+\end{aligned}
+$$
+
+where $f^+(\mathbf{x})$ and $f^-(\mathbf{x})$ are the upper and lower bounds of the $\epsilon$-insensitive tube, respectively.
+
+The optimization problem in \gls{svr} is to find the coefficients $\mathbf{w}$ and $b$ that minimize the norm of $\mathbf{w}$ (i.e., keep the regression function as flat as possible) while ensuring that most data points lie within the $\epsilon$ margin.

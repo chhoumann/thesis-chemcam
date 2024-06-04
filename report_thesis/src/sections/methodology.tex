@@ -1,4 +1,4 @@
-\section{Methodology}\label{sec:methodology}
+\section{Experimental Design}\label{sec:methodology}
 In this section, we outline the methodology used in this study to address the challenges identified in Section~\ref{sec:problem_definition}. Our objective was to identify the most promising machine learning models and preprocessing techniques proposed from the literature, as outlined in Section~\ref{sec:related-work}, for predicting major oxide compositions from \gls{libs} data.
 Then, using this knowledge, develop a pipeline that utilizes the strengths of these models and preprocessing techniques to improve prediction accuracy and robustness of the predictions.
 We first describe the datasets used, including their preparation and the method of splitting for model training. Next, we outline the preprocessing steps and the model selection process, followed by a detailed explanation of the experimental setup and evaluation metrics. Finally, we discuss our validation testing procedures and the approach taken to ensure unbiased final model evaluations.
@@ -103,7 +103,6 @@ Models were implemented using Python 3.10.11.
 The primary libraries used were Scikit-learn 1.4.2, XGBoost 2.0.3, Torch 2.2.2, NumPy 1.26.4, Pandas 2.2.1, Keras 3.2.1 and Optuna 3.6.1.
 
 % \subsection{Validation and Testing Procedures}
-\input{sections/methodology/testing_validation.tex}
 
 
 \subsection{Summary}

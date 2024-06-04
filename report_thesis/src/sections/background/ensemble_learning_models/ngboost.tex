@@ -1,0 +1,33 @@
+\subsubsection{Natural Gradient Boosting (NGBoost)}
+\gls{ngboost} is a variant of the gradient boosting algorithm that leverages the concept of natural gradients with the goal of improving convergence speed and model performance.
+In more complex models, the parameter space can be curved and thus non-Euclidean, making the standard gradient descent less effective.
+Consequently, using the standard gradient descent can lead to slow convergence and suboptimal performance.
+In such scenarios, the application of natural gradients becomes particularly advantageous.
+
+Natural gradients account for the underlying geometry of the parameter space by using information about its curvature.
+By incorporating this information, natural gradients can navigate the parameter space more efficiently, leading to faster convergence and better performance.
+In addition, \gls{ngboost} provides its predictions in the form of probability distributions, allowing it to estimate the uncertainty associated with its predictions.
+
+The algorithm starts by initializing a model with a guess for the parameters of the probability distribution, usually starting with something simple like a Gaussian distribution.
+This initial model prediction represents the probability distribution over the target variable based on the given features.
+
+Then, the algorithm enters an iterative process to refine its predictions.
+At the start of each iteration, the model computes its current predictions using the existing set of parameters.
+The algorithm then calculates the negative gradient of the loss function with respect to the current predictions.
+This involves computing the gradient of the negative log-likelihood, which quantifies the discrepancy between the current predictions and the actual observed data.
+The negative log-likelihood quantifies how well the model's predicted probability distribution matches the observed data, with lower values indicating better alignment between predictions and observations.
+
+Next, the \textit{Fisher information matrix} is computed.
+This matrix encodes the curvature of the parameter space at the current parameter values, reflecting how sensitive the likelihood function is to changes in these parameters.
+For example, if the likelihood function is highly sensitive to changes in a particular parameter, the Fisher information matrix will have a high value for that parameter.
+Using this information, the model can adjust its parameters more effectively, focusing on the most sensitive parameters to improve performance.
+
+The standard gradient, or residuals, which is derived from the negative log-likelihood, is then transformed using the inverse of the Fisher information matrix to obtain what is known as the natural gradient.
+Next, a weak learner, typically a decision tree, is fitted to these natural gradients.
+This step is similar to traditional gradient boosting, where a tree is fitted to the residuals, but in \gls{ngboost}, the tree is fitted to the natural gradients instead.
+
+The parameters of the model are then updated using the output from the weak learner.
+This update process incorporates a learning rate to control the step size, ensuring that the model makes gradual improvements rather than drastic changes.
+
+Using the newly updated parameters, the model recalculates its predictions, refining the probability distribution of the target variable.
+This iterative process of computing predictions, calculating gradients, fitting weak learners, and updating parameters continues for a predetermined number of iterations or until the model's performance converges.

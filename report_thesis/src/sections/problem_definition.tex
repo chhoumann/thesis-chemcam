@@ -11,7 +11,7 @@ Furthermore, \citet{jeonEffectsFeatureEngineering2024} emphasized the importance
 Lastly, \citet{sunMachineLearningTransfer2021} demonstrated the efficacy of transfer learning in overcoming matrix effects and improving model robustness for rock classification on Mars. Their findings suggest that similar improvements can be achieved in oxide quantification by leveraging knowledge from related domains.
 Studies such as these provide a strong foundation for our assumption that addressing the identified challenges will lead to significant improvements in the accuracy and robustness of predicting elemental concentrations from \gls{libs} data.
 
-\subsection{Quantification based on \gls{libs} data}
+\subsection{Quantification based on \gls{libs} data}\label{subsec:quantification}
 \gls{libs} spectral data provides intensity readings across a spectrum of wavelengths in the form of Clean, Calibrated Spectra \cite{andersonImprovedAccuracyQuantitative2017}, as described by \citet{wiensPreflightCalibrationInitial2013}.
 The wavelength intensities are quantified in units of photon/shot/mm\textsuperscript{2}/sr/nm.
 
@@ -38,7 +38,7 @@ In a \gls{libs} dataset, we have:
 The primary input to our computational models is the processed \gls{libs} spectral data.
 Formally, we have:
 \begin{itemize}
-    \item \textbf{Masked Intensity Tensor} $\mathbf{M}[\chi, l, \lambda]$: This matrix represents the spectral intensity data after applying wavelength-specific masks to the Averaged Intensity Tensor $\mathbf{A}$. It serves as the main input to the models.
+    \item \textbf{Masked Intensity Tensor} $\mathbf{M}[\chi, l, \lambda]$: This tensor represents the spectral intensity data after applying wavelength-specific masks to the Averaged Intensity Tensor $\mathbf{A}$. It serves as the main input to the models.
     \item \textbf{Feature Vectors} $\mathbf{x} \in \mathbb{R}^N$: These vectors are extracted from the Masked Intensity Tensor $\mathbf{M}$ and represent the processed \gls{libs} signals. Each feature vector corresponds to a sample and contains $N$ dimensions, where $N$ is the number of relevant spectral features.
 \end{itemize}
 
@@ -50,34 +50,12 @@ These outputs are represented as vectors of estimated oxide concentrations:
 \end{itemize}
 
 The task of \gls{libs}-based quantification involves fitting the parameters of a mapping function $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$ to accurately predict oxide concentrations from processed \gls{libs} signals by optimizing these parameters to minimize a loss function.
-To evaluate the performance of these models, we will use the \gls{rmse} to measure accuracy and the sample standard deviation of prediction errors to assess robustness.
-We define accuracy as the ability of a model to predict the composition of major oxides in geological samples, while robustness refers to the stability of these predictions across samples.
 
-The metric used to evaluate the accuracy of the models is the \gls{rmse}:
-\[
-\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
-\]
-where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. 
-This measure quantifies the average magnitude of the prediction error across all predicted values.
-
-Robustness is evaluated using the sample standard deviation of prediction errors:
-\[
-\sigma_{error} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (e_i - \bar{e})^2}
-\]
-where \( e_i = \mathbf{v}_i - \hat{\mathbf{v}}_i \) and \( \bar{e} \) is the mean error.
-A lower standard deviation indicates a more robust model across different samples.
-
-\textbf{Problem formulation}:
-The objective of this research is to develop a computational model, denoted as $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict major oxide concentrations in geological samples from processed \gls{libs} spectral data. 
-The model will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ and output Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$. 
-Effectiveness will be assessed by high accuracy, quantified by \gls{rmse}, and robustness, indicated by a low standard deviation of prediction errors across samples.
-
-
-\subsection{Challenges}
+\subsection{Challenges}\label{subsec:challenges}
 As mentioned, quantifying chemical compositions from \gls{libs} spectral data involves several significant challenges that must be addressed to ensure accurate and robust predictions.
 
 \subsubsection{Data Dimensionality}
-The large number of dimensions, as seen by having many wavelengths $lambda$ in the Intensity Tensor $\mathbf{I}[\chi, l, s, \lambda]$, can lead to challenges such as the inclusion of irrelevant or redundant features.
+The large number of dimensions, as seen by having many wavelengths $\lambda$ in the Intensity Tensor $\mathbf{I}[\chi, l, s, \lambda]$, can lead to challenges such as the inclusion of irrelevant or redundant features.
 
 High-dimensional datasets, like \gls{libs} datasets, may include irrelevant or redundant features that obscure the true signal, complicating the process of accurately estimating the target variables. Effective dimensionality reduction techniques can help ensure the reliability of predictions.
 
@@ -91,37 +69,5 @@ Matrix effects, along with other physical processes, can induce nonlinearity in 
 \subsubsection{Data Availability}
 Due to the high cost of data collection, datasets are often small. This limits the number of samples available for evaluation, affecting the generalizability and robustness of the models\cite{p9_paper}.
 
-\subsection{Proposed Approach}
-To address the challenges in predicting major oxide compositions from \gls{libs} data, we propose the development of advanced computational models capable of effectively handling the multifaceted challenges arising from the high dimensionality of spectral data, multicollinearity, matrix effects, and limited data availability.
-These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies. 
-
-Our proposed approach aims to address these challenges by leveraging state-of-the-art machine learning models, dimensionality reduction techniques, and feature engineering.
-By preprocessing the spectral data, we can enhance the signal quality and handle noise.
-The development of robust models that can generalize well across different samples and conditions is crucial, particularly for extraterrestrial applications where data collection is constrained.
-
-The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness.
-These metrics will provide a comprehensive assessment of the models' performance in predicting the concentrations of major oxides in geological samples.
-
-\subsection{Motivating Example: NASA's Mars Missions}
-NASA's exploration of Mars, beginning with the Viking missions in the 1970s, has progressively deepened our understanding of Mars \cite{marsnasagov_vikings}.
-The \gls{msl} mission, which landed the Curiosity rover in Gale Crater in 2012, represents a pivotal step in this journey.
-Curiosity is equipped with the \gls{chemcam} instrument, a tool that uses \gls{libs} to analyze the chemical composition of Martian rocks and soils directly and non-invasively \cite{chemcamNasaWebsite}.
-
-\gls{libs} is particularly suitable for the Martian environment because of its ability to perform rapid chemical analyses remotely, creating a plasma that can be spectrally analyzed to determine the elemental composition of the vaporized material.
-This capability allows scientists to quickly and efficiently assess the geochemistry of multiple sites without physically moving the rover, thus conservatively managing the rover's limited energy and resources.
-The mission's focus has been on assessing past habitability, and the data gathered by \gls{chemcam} has been instrumental in identifying environments that could have supported life \cite{chemcamNasaWebsite, curiosityNasaWebsite}.
-
-The task of quantifying the oxides in Martian rock and soil samples begins with the \gls{libs} spectral data collected by Curiosity.
-This data comprises high-dimensional spectra with thousands of potential features, each corresponding to a specific element's emission lines.
-The computational challenge lies in accurately interpreting these complex data sets to deduce the concentrations of various elements, especially major oxides like iron, magnesium, and silicon, which are crucial for understanding Martian geology.
-
-Following preprocessing to correct instrumental effects and calibrate spectra, the cleaned data is input into machine learning models.
-These models, trained on databases of Earth-based and synthetic Martian analogs, output quantitative analyses of chemical compositions in weight percentages of the target oxides \cite{wiensPreflightCalibrationInitial2013, cleggRecalibrationMarsScience2017}.
-\citet{cleggRecalibrationMarsScience2017} undertook this task and created a pipeline for predicting the concentration of oxides in Martian soil samples, referred to as \gls{moc}.
-
-More recently, in 2022, the Perseverance rover landed on Mars, equipped with advanced instruments designed to continue the exploration and analysis of the Martian surface.
-This rover also uses a \gls{libs} instrument, called SuperCam, which is the successor to \gls{chemcam}.
-The Perseverance mission highlighted the ongoing research effort in developing elemental quantification models using \gls{libs} data \cite{andersonPostlandingMajorElement2022}, demonstrating its continued importance as a research field.
-
-The use of \gls{libs} on the Curiosity rover within the MSL mission shows how computational advancements can enhance our understanding of extraterrestrial geology.
-By effectively quantifying chemical compositions from \gls{libs} data, we can infer the historical climatic conditions of Mars, offering clues to its past habitability.
+\subsection{Problem Formulation}
+The objective of this research is to develop a computational model, denoted as $\mathcal{F}: \mathbb{R}^N \rightarrow \mathbb{R}^{n_o}$, to predict major oxide concentrations in geological samples from processed \gls{libs} spectral data. 
