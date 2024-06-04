@@ -101,7 +101,7 @@ Choosing the right models and preprocessing techniques for \gls{libs} data analy
 As the literature highlighted in Section~\ref{sec:related-work} suggests, a variety of models and preprocessing techniques that promise to be adept at handling data that exhibits high-dimensionality, multi-collinearity, and matrix effects.
 Additionally, different machine learning models perform better on some oxides than others. 
 These challenges and model-specific strengths suggests that an optimal approach would involve combining multiple models. 
-This notion is supported by the advent of models such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017}, which combines the predictions of multiple models using a predefined weighting of the predictions made of each model, per-oxide.
+This notion is supported by the advent of models such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017} model, which combines the predictions of multiple models using a predetermined weighting for each model's predictions on a per-oxide basis.
 This approach improved the accuracy over the individual models, but required manual tuning of the weights for each model.
 The manual tuning poses limitations, both in terms of the analysis required to determine a weighting, as well as, the risk for suboptimal weighting.
 Based on these considerations, it seems reasonable to consider techniques that could automate such a process, while still being able to leverage the strengths of multiple models.
