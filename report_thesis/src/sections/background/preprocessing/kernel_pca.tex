@@ -12,4 +12,5 @@ That way, \gls{kernel-pca} can capture nonlinear relationships among data points
 
 By using pairwise similarities to construct a kernel matrix, also referred to as a Gram matrix, \gls{kernel-pca} can perform eigenvalue decomposition.
 This process allows for the extraction of principal components in the feature space, similar to the approach used in regular \gls{pca}.
-However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix rather than the covariance matrix, allowing for the extraction of nonlinear principal components.
+However, in \gls{kernel-pca}, the eigenvalue decomposition is performed on the kernel matrix rather than the covariance matrix, resulting in the prinpical components.
+These principal components are nonlinear combinations of the original data points, enabling the algorithm to capture complex relationships among data points that are not linearly separable in the original space.
