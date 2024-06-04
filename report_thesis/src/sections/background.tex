@@ -291,18 +291,23 @@ We now describe XGBoost based on \citet{ChenGuestrin2016}.
 \gls{xgboost} is an advanced implementation of gradient boosting designed for speed and performance. 
 It builds upon traditional boosting techniques by introducing several algorithmic enhancements to improve execution speed and model performance.
 
-\gls{xgboost} optimizes the training process by using a more regularized model formalization to control overfitting. 
-The objective function to be minimized is composed of a convex loss function $L$ that measures the difference between the prediction $\hat{y}_i$ and the target $y_i$, and a regularization term $\Omega$ that penalizes the complexity of the model. 
-A convex loss function has the property of having a single global minimum, which simplifies the optimization process and ensures reliable convergence:
+The objective function to be minimized is composed of a loss function $L$ that measures the difference between the prediction $\hat{y}_i$ and the target $y_i$ for each sample $i$.
+The objective function is defined as:
 
 $$
-Obj(\theta) = \sum_{i=1}^{n} L(y_i, \hat{y}_i) + \sum_{k=1}^{K} \Omega(f_k),
+\mathcal{L}(\phi) = \sum_{i=1} L(\hat{y}_i, y_i) + \sum_{k=1} \Omega(f_k),
 $$
 
-where $f_k$ represents the individual regression trees.
+Where $\Omega$ is the regularization term, and $f_k$ is the $k$-th independent tree.
 
-The model is trained in an additive manner where, at each iteration, the objective function is approximated to efficiently compute the gain from adding a new tree. 
-The gain is determined by evaluating the improvement in accuracy from splitting a node into two new nodes. 
+The core mechanism of \gls{xgboost} can be summarized in the following way:
+\begin{enumerate}
+	\item The algorithm first finds canditate splitting points according to the percentiles of the feature distribution 
+	\item It then maps these features into buckets based on the candidate splitting points
+	\item Once split, the algorithm calculates 
+\end{enumerate}
+% The model is trained in an additive manner where, at each iteration, the objective function is approximated to efficiently compute the gain from adding a new tree. 
+The gain is determined by evaluating the improvement in accuracy from splitting a node into two new nodes.
 It takes into account the gradients (first derivatives of the loss function) to evaluate the direction of optimization, and the Hessians (second derivatives of the loss function) to understand the curvature of the loss function. 
 Additionally, the regularization parameter helps to control the complexity of the model, and a penalty term is included to account for the cost of adding new leaves to the tree.
 
