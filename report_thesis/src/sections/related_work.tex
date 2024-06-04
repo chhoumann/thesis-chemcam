@@ -17,6 +17,10 @@ They optimized the \gls{svr} model parameters using a genetic algorithm and cros
 Their results were evaluated using the \gls{rmse} and \gls{rsd} of predicted versus measured concentrations and showed that the non-linear \gls{svr} model significantly outperformed the linear \gls{plsr} model at predicting elemental concentrations.
 The superior performance of \gls{svr} was attributed to its ability to handle non-linearities and matrix effects in the complex geological samples, demonstrating the potential of this machine learning technique for quantitative \gls{libs} analysis in geoscience applications.
 
+\citet{el_haddad_ann_2013} explored the application of \gls{ann} for quantitative analysis of soil samples using \gls{libs}, employing a three-layer perceptron \gls{ann} architecture to address matrix effects and nonlinearities.
+They demonstrated that \gls{ann} is efficient for predicting the concentrations of \ce{Al}, \ce{Ca}, \ce{Cu}, and \ce{Fe}.
+Incorporating additional spectral lines from other chemical elements, thereby increasing the amount of data input to the model, was also shown to significantly improve predictive accuracy.
+
 \citet{yangConvolutionalNeuralNetwork2022} demonstrated the effectiveness of a deep \gls{cnn} for classifying geochemical samples using \gls{libs} spectra collected at varying distances.
 Their model outperformed traditional machine learning approaches, emphasizing the potential of \gls{cnn}s for geochemical sample identification in planetary exploration missions like China's Tianwen-1.
 
