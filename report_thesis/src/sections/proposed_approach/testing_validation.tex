@@ -9,7 +9,7 @@ This occurs when searching for the optimal configuration of hyperparameters spec
 However, our objective is to develop models that demonstrate high accuracy and robustness, even on entirely unseen data.
 To achieve this, we employ k-fold cross-validation to ensure our models have high generalizability, thereby increasing the likelihood that they will perform as expected on new data.
 
-We use an $80\%/20\%$ split for training and testing sets. The training set is further subdivided into $k=5$ folds, which are used for cross validation.
+We use an $80\%/20\%$ split for training and testing sets. The training set is further subdivided into $4$ folds, which are used for cross validation.
 
 While we employ conventional techniques like holdout sets and k-fold cross validation, the dataset we use imposes additional challenges to the process.
 
@@ -60,45 +60,48 @@ Additionally, it ensures that extreme values are handled by redistributing them 
 \caption{Data Partitioning With Extreme Value Handling}
 \label{alg:custom_kfold_cv}
 \begin{algorithmic}[1]
-\Require Dataset \( \mathbf{D} \), group column \( g \), target column \( t \), number of splits \( k \), percentile \( p \), random seed \( \textit{seed} \)
-\Ensure Cross-validation folds \( \mathbf{F}_\text{cv} \), training set \( \mathbf{D}_\text{train} \), and test set \( \mathbf{D}_\text{test} \)
-\State \label{line:seed} Set random seed for reproducibility if \(\text{seed} \) is not None
-\State \label{line:remove_duplicates} Remove duplicate entries based on \( g \) and sort by \( t \)
-\State \label{line:assign_folds} Assign fold numbers sequentially from 0 to \( k-1 \) to unique targets
+\Require Dataset $\mathbf{D}$, group column $g$, target column $t$, number of splits $k$, percentile $p$, random seed $\textit{seed}$
+\Ensure Training and validation sets for cross-validation $\mathbf{T}_\text{cv}$, training set $\mathbf{D}_\text{train}$, and test set $\mathbf{D}_\text{test}$
+\State \label{line:seed} Set random seed for reproducibility if $\text{seed}$ is not None
+\State \label{line:remove_duplicates} Remove duplicate entries based on $g$ and sort by $t$
+\State \label{line:assign_folds} Assign fold numbers sequentially from 0 to $k-1$ to unique targets
 \If{extreme values handling is enabled}
-    \State \label{line:identify_extremes} Identify extreme values at percentiles \( p \) and \( 1-p \)
-    \State \label{line:reassign_extremes} Reassign extreme values to folds \( 0 \) to \( k-2 \)
+    \State \label{line:identify_extremes} Identify extreme values at percentiles $p$ and $1-p$
+    \State \label{line:reassign_extremes} Reassign extreme values to folds $0$ to $k-2$
 \EndIf
-\State \label{line:merge_folds} Merge fold assignments back into the original dataset
-\State \label{line:split_dataset} Split dataset into test set \( \mathbf{D}_\text{test} \) (fold \( k-1 \)) and remaining data \( \mathbf{D}_\text{train} \)
-\State \label{line:create_folds} Create \( k-1 \) training and validation folds
-\For{each fold \( i \) from 0 to \( k-2 \)}
-    \State \( \mathbf{F}_\text{train}[i] \gets \mathbf{D}_\text{train} \setminus \text{fold}_i \)
-    \State \( \mathbf{F}_\text{val}[i] \gets \text{fold}_i \)
-    \State Append \((\mathbf{F}_\text{train}[i], \mathbf{F}_\text{val}[i])\) to \(\mathbf{F}_\text{cv}\)
+\State \label{line:merge_folds} Merge fold assignments information into the original dataset
+\State \label{line:split_dataset} Split dataset into test set $\mathbf{D}_\text{test}$ (fold $k-1$) and remaining data $\mathbf{D}_\text{train}$
+\State \label{line:create_folds} Create $k-1$ training and validation sets
+\For{each fold $i$ from 0 to $k-2$}
+    \State $\mathbf{T}_\text{train}[i] \gets \mathbf{D}_\text{train} \setminus \text{fold}_i$
+    \State $\mathbf{T}_\text{val}[i] \gets \text{fold}_i$
+    \State Append $(\mathbf{T}_\text{train}[i], \mathbf{T}_\text{val}[i])$ to $\mathbf{T}_\text{cv}$
 \EndFor
 \State \label{line:remove_fold_column} Remove fold column from all datasets
-\State \Return \( \mathbf{F}_\text{cv}, \mathbf{D}_\text{train}, \mathbf{D}_\text{test} \)
+\State \Return $\mathbf{T}_\text{cv}, \mathbf{D}_\text{train}, \mathbf{D}_\text{test}$
 \end{algorithmic}
 \end{algorithm}
 
 The procedure outlined in Algorithm~\ref{alg:custom_kfold_cv} begins by setting a random seed for reproducibility if one is provided (Line~\ref{line:seed}).
 This ensures that the results are consistent across different runs of the algorithm.
-Next, the dataset is processed to remove any duplicate entries based on the group column and then sorted by the target column (Line~\ref{line:remove_duplicates}).
+Next, the dataset is processed to remove any duplicate entries based on the group column $g$ and then sorted by the target column $t$ (Line~\ref{line:remove_duplicates}).
 This step ensures that each group is uniquely identified and ordered appropriately.
 The dataset we illustrate in Table~\ref{tab:final_dataset_example} would require a group column $g$ of "\texttt{Target}" to group the data by target.
 The target column $t$ refers to the column with the target variable, which would be the oxide for which we are predicting the concentration, for example, \ce{SiO_2}.
-By sorting the dataset by the target column, we ensure that the data is ordered by the target concentration values in ascending order.
+By sorting the dataset by the target column $t$, we ensure that the data is ordered by the target concentration values in ascending order.
 
 Fold numbers are then assigned sequentially using a modulo operation to ensure a random-like distribution of the unique targets across the folds (Line~\ref{line:assign_folds}).
 This means that, while the assignment process follows a sequence, the resulting distribution of targets is effectively randomized.
-If handling of extreme values is enabled, the algorithm identifies the top and bottom percentiles of the target values (Line~\ref{line:identify_extremes}) and reassigns these extreme values to the training folds (0 to \( k-2 \)) to ensure they are well-represented during model training (Line~\ref{line:reassign_extremes}).
+Fold numbers start in 0 and go up to $k-1$, as implied by the modulo operation.
+If handling of extreme values is enabled, the algorithm identifies the top and bottom percentiles of the target values (Line~\ref{line:identify_extremes}).
+These extreme values are then reassigned to the training folds (0 to \( k-2 \)), ensuring they are evenly distributed across these folds (Line~\ref{line:reassign_extremes}).
 
-The fold assignments are then merged back into the original dataset, as described in Line~\ref{line:merge_folds}.
-Following this, the dataset is divided into a test set, which always consists of the data points assigned to fold \( k-1 \), and the remaining data forms the training set, as outlined in Line~\ref{line:split_dataset}.
-The training data is further divided into \( k-1 \) folds for cross-validation.
-For each fold, the training data consists of all but one fold, which serves as the validation set.
-These pairs of training and validation sets are then appended to the list of cross-validation folds \(\mathbf{F}_\text{cv}\) (Line~\ref{line:create_folds}).
+The fold assignments are then merged into the original dataset, as described in Line~\ref{line:merge_folds}.
+Essentially, this step enables the partitioning steps that follow, by ensuring each data item has an associated fold number.
+Following this, the dataset is divided into a test set, which always consists of the data points assigned to fold $k-1$, and the remaining data forms the training set, as outlined in Line~\ref{line:split_dataset}.
+The training data is further divided into $k-1$ sets for cross-validation. 
+For each fold $i$ where $i \in \{0, 1, \ldots, k-2\}$, we create a cross-validation training set $\mathbf{T}_\text{train}[i]$ by excluding the $i$-th fold from the set of $k-1$ folds, and use the $i$-th fold as the validation set $\mathbf{T}_\text{val}[i]$.
+These pairs of training and validation sets are then appended to the list of cross-validation sets $\mathbf{T}_\text{cv}$ (Line~\ref{line:create_folds}).
 
 Finally, the fold indicator column is removed from all datasets before returning the final partitions (Line~\ref{line:remove_fold_column}).
 The fold indicator column was added to keep track of which data points belong to which folds, which is crucial for ensuring that data points are correctly partitioned into their respective training and test sets during cross-validation. 
@@ -106,22 +109,22 @@ This cleanup step ensures that the fold information does not interfere with subs
 
 The final output of this procedure consists of:
 \begin{itemize}
-    \item The cross-validation folds \(\mathbf{F}_\text{cv}\), each containing a tuple of training and validation sets.
-    \item The training set \(\mathbf{D}_\text{train}\) in its entirety.
+    \item A set of tuples \(\mathbf{T}_\text{cv}\), where each tuple contains a training set and a validation set.
+    \item The overall training set \(\mathbf{D}_\text{train}\), consisting of all the data points not in the test set.
     \item The test set \(\mathbf{D}_\text{test}\), distinct from the training set.
 \end{itemize}
 
-The data partitioning does not modify the original dataset, it merely partitions it.
-For that reason, each of the datasets that are returned have the same structure as shown in Table~\ref{tab:final_dataset_example}.
+The data partitioning does not modify the original dataset; it merely partitions it.
+For that reason, each of the datasets that are returned has the same structure as shown in Table~\ref{tab:final_dataset_example}.
 
 By following this procedure, we ensure that our cross-validation is robust against data leakage, maintains the integrity of grouped targets, and carefully handles extreme values to improve the representativeness of the training set.
 
 Our method is inspired by the approach described by \citet{andersonImprovedAccuracyQuantitative2017}.
 They employed a similar strategy to assess the performance of their PLS model, using k-fold cross-validation and a separate test set.
 Their process involved dividing the full set of laboratory data into five folds, using four for cross-validation and combining them as the final training set, while the fifth fold served as a test set.
-This approach ensured that each fold represented the full elemental compositional variation, and extreme targets were included in the training folds to handle a wider range of compositions.
-For consistency, we also use \(k=5\) for our cross-validation.
+For consistency, we also use $k = 5$ for our data partitioning.
+Given that the $k$-th fold is used as the test set, having $k=5$ results in 4 folds for cross-validation.
 
-Additionally, by using $k=5$ folds, we have effectively chosen an 80\%/20\% split between the training and testing datasets.
+Additionally, by using $k = 5$ folds, we have effectively chosen an 80\%/20\% split between the training and testing datasets.
 In our experience, this ratio maximizes the training set's capacity for effective model learning while ensuring that the testing set is sufficiently representative to provide an accurate assessment of the model's performance on new data.
 Allocating too much data to the testing set could compromise the comprehensiveness of the training set, undermining the model's ability to generalize effectively due to the limited availability of data.
