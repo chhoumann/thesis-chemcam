@@ -8,7 +8,7 @@ This approach allowed us to determine which normalization method was most effect
 Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality. Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}. However, \citet{pca_review_paper} makes the case that the assumptions for \gls{pca} regarding linearity of the data are only met up to a certain point, after which it breaks. They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data. Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data. Therefore, we decided to include this in our experiments to further assess its potential. In addition to the non-linearity, \citet{pca_review_paper} also argue that the assumptions of normality in the data are not always met in \gls{libs} data. For this reason, we decided to include power transformation and quantile transformation in our experiments as models such as \gls{pca} benefit from a normal distribution of the data. We assume that models such as \gls{pls} may also benefit from a more Gaussian-like distribution of the data, by virtue of the model being partly based on \gls{pca}.
 
 While these preprocessing techniques are not an exhaustive list, they represent a diverse set of methods.
-Techniques such as feature selection were not considered to limit the scope of the study and due to time constraints.
+Techniques such as feature selection were not considered, in order to limit the scope of the study and due to time constraints.
 
 We also had several requirements for the selection of models.
 The models selected for experimentation had to be diverse to ensure that we had enough breadth in our results to make informed decisions about which models should be included in the final stacking ensemble pipeline.
@@ -26,7 +26,7 @@ Based on these factors, we decided to include \gls{ann} and \gls{cnn} in our exp
 To further bolster our selection pool, we chose to include models that were in the same family of models as those that showed promise in the literature.
 
 \gls{xgboost} was included as an option based on its promising accuracy in various settings.
-For example \citet{xgboost_in_biomedicie} showed that \gls{xgboost} outperfomed models such as \gls{rf} and \gls{svm} in predicting biological activity based on quantitative description of the compound's molecular structure. 
+For example \citet{xgboost_in_biomedicie} showed that \gls{xgboost} outperformed models such as \gls{rf} and \gls{svm} in predicting biological activity based on quantitative description of the compound's molecular structure. 
 Another example is \citet{xgboost_in_heart_disease} that used \gls{xgboost} to predict heart disease, where \gls{xgboost} outperformed \gls{rf} and \gls{etr} at correctly classifying patients with heart disease.
 Because of these factors and that \gls{xgboost} has not been widely studied in the context of \gls{libs} data, we decided to include it in our experiments.
 
@@ -34,7 +34,8 @@ Following the same logic, we included \gls{ngboost}.
 \gls{ngboost} is a recent model introduced by \citet{duan_ngboost_2020} that according to their work improves upon \gls{gbr} by using a more sophisticated loss function and a more advanced gradient boosting algorithm.
 A very limited amount of research has been conducted using this algorithm in the context of \gls{libs} data, however, \citet{ngboost_landslide} showed that \gls{ngboost} outperformed \gls{xgboost} and \gls{rf} and correctly determining landslide-prone fields with an AUC of 0.898 compared to an AUC of 0.871 and 0.863 of \gls{xgboost} and \gls{rf} respectively.
 
-Finally, \gls{enet}, \gls{ridge} and \gls{etr} were included, not necessarily for their performance in the literature, but to further diversy the set of models in our experiments.
+Finally, \gls{ridge}, \gls{enet}, \gls{etr} and \gls{lasso} were used in various studies and showed promising results, despite not necessarily being best performing in their respective studies.
+Therefore, we chose to include these in our experiments to further diversify our model selection. 
 
 Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques and models selected for our experimentation.
 
