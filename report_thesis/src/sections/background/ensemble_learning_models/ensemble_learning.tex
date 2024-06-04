@@ -1,8 +1,7 @@
 \subsubsection{Ensemble Learning}
-Ensemble learning is a technique in machine learning where multiple models, known as \textit{weak learners}, are combined to produce more accurate predictions.
-Mathematically, ensemble learning can be defined as combining the predictions of $M$ weak learners to form a final prediction $\hat{y}$, such that:
-\begin{equation}
-    \hat{y} = \sum_{m=1}^{M} \alpha_m \hat{y}_m,
-\end{equation}
-where $\hat{y}_m$ is the prediction of the $m$-th weak learner and $\alpha_m$ is the weight assigned to the $m$-th weak learner.
-While there are various choices for weak learners, decision trees are a common choice\cite{James2023AnIS}.
+Ensemble learning is a machine learning technique that combines multiple models, referred to as weak learners, to generate more accurate predictions.
+Individually, weak learners might have limited performance, but their combination can lead to a more precise and robust model.
+Decision trees are often chosen as weak learners due to their simplicity and effectiveness.
+Ensemble learning encompasses several methods, including bagging, boosting, and stacking\cite{James2023AnIS}.
+
+In this section, we provide an overview of the ensemble learning methods used in this work.
