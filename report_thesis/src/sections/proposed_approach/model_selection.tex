@@ -1,5 +1,5 @@
 \subsection{Model and Preprocessing Selection}
-Having established the validation and testing procedures as well as the evaluation metrics in our experiments, this section will detail our approach to model and preprocessing selection.
+Having established the validation and testing procedures, as well as, the evaluation metrics in our experiments, this section will detail our approach to model and preprocessing selection.
 
 Choosing the right models and preprocessing techniques for \gls{libs} data analysis is a challenging task. 
 As the literature highlighted in Section~\ref{sec:related-work} suggests, a variety of models and preprocessing techniques that promise to be adept at handling data that exhibits high-dimensionality, multi-collinearity, and matrix effects.
@@ -51,7 +51,7 @@ Another example is \citet{xgboost_in_heart_disease} that used \gls{xgboost} to p
 Because of these factors and that \gls{xgboost} has not been widely studied in the context of \gls{libs} data, we decided to include it in our experiments.
 
 Following the same logic, we included \gls{ngboost}. 
-\gls{ngboost} is a recent model introduced by \citet{ngboost} that according to their work improves upon \gls{gbr} by using a more sophisticated loss function and a more advanced gradient boosting algorithm.
+\gls{ngboost} is a recent model introduced by \citet{duan_ngboost_2020} that according to their work improves upon \gls{gbr} by using a more sophisticated loss function and a more advanced gradient boosting algorithm.
 A very limited amount of research has been conducted using this algorithm in the context of \gls{libs} data, however, \citet{ngboost_landslide} showed that \gls{ngboost} outperformed \gls{xgboost} and \gls{rf} and correctly determining landslide-prone fields with an AUC of 0.898 compared to an AUC of 0.871 and 0.863 of \gls{xgboost} and \gls{rf} respectively.
 
 Finally, \gls{enet}, \gls{ridge} and \gls{etr} were included, not necessarily for their performance in the literature, but to further diversy the set of models in our experiments.
