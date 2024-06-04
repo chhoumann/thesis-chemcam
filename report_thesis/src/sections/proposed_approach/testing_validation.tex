@@ -23,7 +23,7 @@ To prevent this, we ensure that each target is represented only once in the data
 
 Furthermore, the limited availability of data, as mentioned in Section~\ref{sec:problem_definition}, poses another significant challenge due to the difficult collection process.
 The dataset we use consists of 408 samples, which is relatively large by \gls{libs} standards.
-However, there are only a few samples with concentration values for the oxides in the targets that are either very high or very low compared to the rest of the data.
+However, there are only a few samples with concentration values for the oxides in the targets that are either very high or very low compared to the rest of the data, which we call extreme values.
 These less frequent high and low concentration values can be problematic.
 If such values end up in the test set, the model may be evaluated on data points outside the range it was trained on.
 This situation can lead to an inaccurate assessment of the model's performance, as it might not handle these less common concentration ranges effectively.
