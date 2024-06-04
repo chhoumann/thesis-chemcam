@@ -6,13 +6,12 @@ We focus specifically on \ce{SiO_2} as a representative example to illustrate ou
 Similar analyses were conducted for other oxides; however, the plots and figures for these are omitted here for brevity.
 
 Figure \ref{fig:histogram_grid_plot} presents individual histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each of the four cross-validation folds' validation sets and the full test set.
-Each subplot shows the count of samples per bin (y-axis) as a function of \ce{SiO_2} concentration (x-axis).
 The overlaid \gls{kde} curves provide a smoothed estimate of the probability density function for \ce{SiO_2} concentrations.
 
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=\textwidth]{images/histogram_grid_plot.png}
-    \caption{Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold.}
+    \caption{Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{SiO_2} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
     \label{fig:histogram_grid_plot}
 \end{figure*}
 
@@ -27,7 +26,7 @@ This balance helps in preventing overfitting, as the model is trained and valida
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=\textwidth]{images/histogram_kde_plot.png}
-    \caption{Combined Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold.}
+    \caption{Combined Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{SiO_2} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
     \label{fig:histogram_kde_plot}
 \end{figure*}
 
