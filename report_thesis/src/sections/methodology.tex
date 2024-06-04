@@ -102,8 +102,8 @@ As the literature highlighted in Section~\ref{sec:related-work} suggests, a vari
 Additionally, different machine learning models perform better on some oxides than others. 
 These challenges and model-specific strengths suggests that an optimal approach would involve combining multiple models. 
 This notion is supported by the advent of models such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017} model, which combines the predictions of multiple models using a predetermined weighting for each model's predictions on a per-oxide basis.
-This approach improved the accuracy over the individual models, but required manual tuning of the weights for each model.
-The manual tuning poses limitations, both in terms of the analysis required to determine a weighting, as well as, the risk for suboptimal weighting.
+While this approach improved accuracy compared to individual models, it required manual tuning of the weights for each model.
+This manual tuning presents limitations, including the analysis required to determine appropriate weights and the risk of suboptimal weighting.
 Based on these considerations, it seems reasonable to consider techniques that could automate such a process, while still being able to leverage the strengths of multiple models.
 To address these criteria, we chose to adopt a stacking ensemble approach. 
 Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
