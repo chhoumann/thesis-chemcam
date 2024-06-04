@@ -4,7 +4,7 @@ Then, we introduce the \gls{etr} model based on \citet{geurtsERF}.
 
 \gls{rf} is an ensemble learning method that improves the accuracy and robustness of decision trees by building multiple trees and combining their predictions.
 Each tree is trained on a random subset of the data using bootstrap sampling, where samples are drawn with replacement, meaning the same sample can be selected multiple times.
-Bagging, or bootstrap aggregating, uses these bootstrap samples to create multiple versions of the training set.
+Bagging, or bootstrap aggregating, involves training each tree on a different bootstrap sample and then aggregating their predictions to form the final output.
 This introduces variability and reduces overfitting, as some data points may appear multiple times while others may be omitted.
 In addition to bootstrap sampling, random forests introduce an additional layer of randomness by selecting a random subset of features for splitting at each node of the trees.
 This further decorrelates the trees, enhancing the model's robustness and reducing the risk of overfitting.
