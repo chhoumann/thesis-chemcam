@@ -30,8 +30,11 @@ This situation can lead to an inaccurate assessment of the model's performance, 
 
 When performing a random split of the dataset into multiple folds for cross-validation, as well as for training and testing sets, this small number of extreme values can result in an uneven distribution.
 The presence or absence of these extreme values in any given fold can heavily influence the model's performance metrics.
-If extreme values are disproportionately allocated to either the training or testing sets, the resulting model may struggle to generalize accurately.
+If extreme values are disproportionately allocated to the testing set, the resulting model may struggle to generalize accurately.
 This uneven distribution can lead to models that perform well on the majority of the data but fail to predict accurately for these extreme concentration values, which are critical in many practical applications.
+Conversely, if the scarce extreme values are disproportionately assigned to the training set, the model may become overly specialized in handling these extreme values, potentially leading to overfitting.
+This means the model might perform well on the training set, including the extreme values, but fail to generalize effectively to new, unseen data, especially if the test set does not contain similar extreme values.
+This could result in an inaccurate assessment of the model's performance, as the test set would not adequately challenge the model's ability to predict across the full range of data variability.
 
 \begin{figure*}[h!]
     \centering
