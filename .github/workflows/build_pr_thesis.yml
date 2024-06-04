@@ -36,7 +36,6 @@ jobs:
               uses: actions/github-script@v6
               with:
                   script: |
-                    const { context } = require('@actions/github');
                     const pdfUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/suites/${context.runId}/artifacts/${context.runId}`;
                     const comment = `Built PDF for this PR: [Download PDF](${pdfUrl})`;
                     await github.issues.createComment({
