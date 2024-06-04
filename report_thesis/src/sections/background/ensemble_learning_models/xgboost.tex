@@ -6,7 +6,7 @@ It builds upon traditional boosting techniques by introducing several algorithmi
 
 The core mechanism of \gls{xgboost} can be summarized in the following way:
 \begin{enumerate}
-\item The algorithm first step involves sorting the feature values and proposing candidate split points based on the distribution of these values.
+\item The algorithms first step involves sorting the feature values and proposing candidate split points based on the distribution of these values.
 \item It then maps these features into buckets based on the candidate splitting points.
 \item For each candidate split, the algorithm calculates a split score using a loss function that measures the difference between predicted and actual values.
 \item The split that minimizes the loss function is chosen, and the data is partitioned based on this optimal split point. 
