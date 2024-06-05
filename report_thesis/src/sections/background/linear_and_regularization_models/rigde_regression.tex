@@ -16,7 +16,6 @@ $$
 \text{RSS} + \lambda L_2
 $$
 
-where $\text{RSS}$ is the residual sum of squares defined in Section~\ref{sec:ols}and $\lambda$ is the regularization parameter that controls the strength of the penalty.
+where $\text{RSS}$ is the residual sum of squares defined in Section~\ref{sec:ols}and $\lambda$ is the regularization parameter --- a hyperparameter that controls the strength of the penalty.
 Introducing this regularization term usually results in a model with higher bias compared to one fitted with \gls{ols} regression because the regularization can cause a worse fit to the training data.
 However, the model has a lower variance, making it less prone to overfitting and more generalizable to unseen data.
-The hyperparameter $\lambda$ is typically chosen using cross-validation to find the optimal value that minimizes the model's error on unseen data while preventing overfitting.
