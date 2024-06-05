@@ -59,7 +59,8 @@ Due to these factors and the limited study of \gls{xgboost} in the context of \g
 
 Following the same logic, we included \gls{ngboost}. 
 \gls{ngboost} is a recent model introduced by \citet{duan_ngboost_2020} that, according to their work, improves upon \gls{gbr} by using a more sophisticated loss function and a more advanced gradient boosting algorithm.
-A very limited amount of research has been conducted using this algorithm in the context of \gls{libs} data, however, \citet{ngboost_landslide} showed that \gls{ngboost} outperformed \gls{xgboost} and \gls{rf} and correctly determining landslide-prone fields with an AUC of 0.898 compared to an AUC of 0.871 and 0.863 of \gls{xgboost} and \gls{rf} respectively.
+Limited research has been conducted using this algorithm in the context of \gls{libs} data. 
+However, \citet{ngboost_landslide} showed that \gls{ngboost} outperformed \gls{xgboost} and \gls{rf} in correctly determining landslide-prone fields, with an AUC of 0.898 compared to 0.871 and 0.863 for \gls{xgboost} and \gls{rf}, respectively.
 
 Finally, \gls{ridge}, \gls{enet}, \gls{etr} and \gls{lasso} were used in various studies and showed promising results, despite not necessarily being best performing in their respective studies.
 Therefore, we chose to include these in our experiments to further diversify our model selection. 
