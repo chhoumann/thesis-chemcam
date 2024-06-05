@@ -118,7 +118,25 @@ The final output of this procedure consists of:
 The data partitioning does not modify the original dataset; it merely partitions it.
 For that reason, each of the datasets that are returned has the same structure as shown in Table~\ref{tab:final_dataset_example}.
 
-By following this procedure, we ensure that our cross-validation is robust against data leakage, maintains the integrity of grouped targets, and carefully handles extreme values to improve the representativeness of the training set.
+Our method for handling extreme values ensures that the test set does not include samples outside the range seen in the training set.
+This approach addresses several critical challenges and represents a deliberate trade-off to improve the reliability of our model evaluation:
+
+Firstly, it mitigates the risk of uneven distribution of extreme values, which can disproportionately affect model performance metrics.
+If extreme values are unevenly distributed between the training and test sets, the evaluation of the model can be heavily skewed, leading to unreliable and misleading performance metrics.
+By redistributing extreme values evenly across the training folds, we ensure a more balanced and fair assessment of the model's capabilities during cross-validation.
+
+Secondly, this trade-off allows for a more stable and reliable assessment of the model's performance on typical data points.
+While the test set may be less representative of the full range of data, particularly regarding rare extreme values, the evaluation focuses on the model's ability to generalize from the training data to new data within the same distribution range.
+This is prudent because, in many practical applications, the reliability of the model on typical data points is more critical than its performance on rare extremes.
+By using cross-validation in conjunction with a separate test set, we ensure that the model is robust and performs well under typical conditions.
+
+However, it is important to recognize the limitation this approach introduces: excluding extreme values from the test set means we can only confidently assess the model's performance within the range of the test set.
+If we receive predictions outside this range, we cannot reliably assert their accuracy, as the model has not been fully evaluated on such data.
+This could potentially make the model less useful in scenarios where predictions on extreme values are critical.
+Nevertheless, cross-validation partially mitigates this issue by allowing the model to learn from extreme values during the training and validation phases, thereby improving its robustness.
+Metrics obtained from cross-validation provide a broader picture of the model's accuracy and robustness across the entire dataset, including extreme values.
+
+Therefore, although our approach may make the test set less representative of the full dataset, it is a deliberate trade-off aimed at achieving a more accurate and reliable evaluation of the model's generalization performance.
 
 Our method is inspired by the approach described by \citet{andersonImprovedAccuracyQuantitative2017}.
 They employed a similar strategy to assess the performance of their PLS model, using k-fold cross-validation and a separate test set.
@@ -129,3 +147,6 @@ Given that the $k$-th fold is used as the test set, having $k=5$ results in 4 fo
 Additionally, by using $k = 5$ folds, we have effectively chosen an 80\%/20\% split between the training and testing datasets.
 In our experience, this ratio maximizes the training set's capacity for effective model learning while ensuring that the testing set is sufficiently representative to provide an accurate assessment of the model's performance on new data.
 Allocating too much data to the testing set could compromise the comprehensiveness of the training set, undermining the model's ability to generalize effectively due to the limited availability of data.
+
+\subsubsection{Cross-Validation}
+% Section on cross validation approach
