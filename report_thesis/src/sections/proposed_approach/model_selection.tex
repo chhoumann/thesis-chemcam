@@ -8,7 +8,7 @@ This notion is supported by the advent of models such as the \gls{moc}~\cite{cle
 While this approach improved accuracy compared to individual models, it required manual tuning of the weights for each model.
 This manual tuning presents limitations, including the analysis required to determine appropriate weights and the risk of suboptimal weighting.
 Given these limitations, it is reasonable to explore techniques that can automate the weighting process while still leveraging the strengths of multiple models.
-To address these criteria, we chose to adopt a stacking ensemble approach. 
+To fulfill these criteria, we chose to adopt a stacking ensemble approach. 
 Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
 By combining a diverse set of base models, stacking can correct for the biases of individual models.
 Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
