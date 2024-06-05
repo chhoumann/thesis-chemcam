@@ -26,7 +26,7 @@ Therefore, we included traditional normalization methods in our experiments, suc
 This approach allowed us to determine which normalization method was most effective for our dataset. 
 Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality. 
 Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}. 
-However, \citet{pca_review_paper} make the case that the assumptions for \gls{pca} regarding linearity of the data are only met up to a certain point, after which it breaks. 
+However, \citet{pca_review_paper} argue that the assumptions of \gls{pca} regarding the linearity of the data are only valid up to a certain point, beyond which they break down.
 They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data. 
 Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data. 
 Therefore, we decided to include this in our experiments to further assess its potential. 
