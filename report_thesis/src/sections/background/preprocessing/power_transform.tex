@@ -4,13 +4,13 @@ They are particularly useful in statistical modeling and data analysis to meet t
 
 One of the first influential power transformation techniques is the Box-Cox power transform, introduced by \citet{BoxAndCox} in 1964.
 This is defined for positive data and is aimed at normalizing data or making it more symmetric.
-For a feature vector $\mathbf{x}$, the Box-Cox transformation is defined as:
+For a feature value $x$, the Box-Cox transformation is defined as:
 
 $$
-\psi^{\text{BC}}(\lambda, \mathbf{x}) =
+\psi^{\text{BC}}(\lambda, x) =
 \begin{cases}
-\frac{\mathbf{x}^\lambda - 1}{\lambda}, & (\lambda \neq 0) \\
-\log(\mathbf{x}), & (\lambda = 0)
+\frac{x^\lambda - 1}{\lambda}, & (\lambda \neq 0) \\
+\log(x), & (\lambda = 0)
 \end{cases},
 $$
 
@@ -21,12 +21,12 @@ To overcome the limitations of the Box-Cox transformation, \citet{YeoJohnson} in
 The Yeo-Johnson power transformation is defined as:
 
 $$
-\psi(\lambda, \mathbf{x}) =
+\psi(\lambda, x) =
 \begin{cases}
-\frac{(\mathbf{x} + 1)^\lambda - 1}{\lambda} & (\mathbf{x} \geq 0, \lambda \neq 0) \\
-\log(\mathbf{x} + 1) & (\mathbf{x} \geq 0, \lambda = 0) \\
-- \frac{(-\mathbf{x} + 1)^{2 - \lambda} - 1}{2 - \lambda} & (\mathbf{x} < 0, \lambda \neq 2) \\
--\log(-\mathbf{x} + 1) & (\mathbf{x} < 0, \lambda = 2)
+\frac{(x + 1)^\lambda - 1}{\lambda} & (x \geq 0, \lambda \neq 0) \\
+\log(x + 1) & (x \geq 0, \lambda = 0) \\
+- \frac{(-x + 1)^{2 - \lambda} - 1}{2 - \lambda} & (x < 0, \lambda \neq 2) \\
+-\log(-x + 1) & (x < 0, \lambda = 2)
 \end{cases}
 $$
 
