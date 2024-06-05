@@ -1,7 +1,7 @@
 \subsubsection{Ridge Regression}
-A major limitation of \gls{ols} regression is that it cannot handle multicollinearity effectively.
-We now provide an overview of ridge regression, an extension of \gls{ols} regression designed to address this limitation, based on \citet{James2023AnIS}.
-Ridge regression introduces a regularization term to the \gls{ols} objective function to prevent overfitting and reduce the model's variance.
+A major limitation of \gls{olsr} is that it cannot handle multicollinearity effectively.
+We now provide an overview of ridge regression, an extension of \gls{olsr} designed to address this limitation, based on \citet{James2023AnIS}.
+Ridge regression introduces a regularization term to the \gls{olsr} objective function to prevent overfitting and reduce the model's variance.
 This regularization term is known as the $L_2$ norm and is defined as the sum of the squared regression coefficients:
 
 $$
@@ -16,5 +16,5 @@ $$
 $$
 
 where $\text{RSS}$ is the residual sum of squares defined in Section~\ref{sec:ols} and $\lambda$ is the regularization parameter --- a hyperparameter that controls the strength of the penalty.
-Introducing this regularization term usually results in a model with higher bias compared to one fitted with \gls{ols} regression because the regularization can cause a worse fit to the training data.
+Introducing this regularization term usually results in a model with higher bias compared to one fitted with \gls{olsr} because the regularization can cause a worse fit to the training data.
 However, the model has a lower variance, making it less prone to overfitting and more generalizable to unseen data.
