@@ -19,7 +19,8 @@ To fulfill these criteria, we chose to adopt a stacking ensemble approach.
 Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
 By combining a diverse set of base models, stacking can correct for the biases of individual models.
 Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
-This approach of leveraging the strength of multiple models that each model the problem differently can lead to better generalization on unseen data by automating and potentially improving upon manual tuning through the use of a meta-learner to discern patterns in the base predictors' outputs. \cite{wolpertstacked_1992, survey_of_ensemble_learning}
+Leveraging the strengths of multiple models that each approach the problem differently can lead to better generalization on unseen data.
+This is achieved by using a meta-learner to discern patterns in the base predictors' outputs\cite{wolpertstacked_1992, survey_of_ensemble_learning}, with the added benefit of automating and potentially improving upon the manual tuning employed by the \gls{moc} model.
 However, it is crucial to consider the training of the base models to prevent data leakage and overfitting.
 As emphasized by \citet{cvstacking}, if the base models are trained on the same dataset, the meta learner might favor certain base models over others.
 This can cause the meta learner to be influenced by the same patterns and biases that the base models are susceptible to, leading to overfitting.
