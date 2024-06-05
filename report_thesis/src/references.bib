@@ -96,21 +96,20 @@
   langid   = {english}
 }
 
-@article{yang_laser-induced_2022,
-  title        = {Laser-induced breakdown spectroscopy combined with a convolutional neural network: A promising methodology for geochemical sample identification in Tianwen-1 Mars mission},
-  volume       = {192},
-  issn         = {0584-8547},
-  url          = {https://www.sciencedirect.com/science/article/pii/S0584854722000611},
-  doi          = {10.1016/j.sab.2022.106417},
-  shorttitle   = {Laser-induced breakdown spectroscopy combined with a convolutional neural network},
-  abstract     = {As an in-situ and stand-off detection technique, laser-induced breakdown spectroscopy ({LIBS}) can perform efficient geochemical sample identification and classification with chemometrics, and therefore {LIBS} has played a shining role in planetary exploration missions. Unlike in laboratory experiments, the {LIBS} sampling distance in field detection for planetary exploration naturally varies. The considerable spectral differences caused by the varying distance can be a critical challenge for chemometrics model training and testing. In this research, we address this issue by focusing on the construction of a chemometrics model with powerful learning ability rather than the conventional spectral data processing for distance correction. Specifically, we have investigated the performance of a designed deep convolutional neural network ({CNN}) on datasets consisting of multi-distance spectra. More than 18,000 {LIBS} spectra were collected by a duplicate model of the {MarSCoDe} instrument for China's Tianwen-1 Mars mission, at eight different distances ranging from 2.0 m to 5.0 m. These spectra were acquired from 39 geochemical standard samples, which were classified by the deep {CNN}. The competence of the {CNN} is compared with that of four alternative chemometrics, i. e. back-propagation neural network, support vector machine, linear discriminant analysis, and logistic regression. The {CNN} can surpass the other four algorithms in terms of overall prediction accuracy. In addition, we have inspected the dependence of the {CNN} performance on the distance number involved in the training set and the data properties of the testing set. Furthermore, it has been revealed that the {CNN} model can behave even better if an extremely simple distance correction procedure is supplemented. Our results show that {CNN} is an extraordinary chemometrics for material classification on multi-distance spectra datasets, implying that {CNN}-{LIBS} is a promising methodology for geochemical sample identification/classification in Tianwen-1 mission and other future planetary exploration missions, and in even more field detection scenarios with varying sampling distance.},
-  pages        = {106417},
-  journaltitle = {Spectrochimica Acta Part B: Atomic Spectroscopy},
-  shortjournal = {Spectrochimica Acta Part B: Atomic Spectroscopy},
-  author       = {Yang, Fan and Li, Lu-Ning and Xu, Wei-Ming and Liu, Xiang-Feng and Cui, Zhi-Cheng and Jia, Liang-Chen and Liu, Yang and Xu, Jun-Hua and Chen, Yu-Wei and Xu, Xue-Sen and Wang, Jian-Yu and Qi, Hai and Shu, Rong},
-  urldate      = {2024-02-22},
-  date         = {2022-06-01},
-  keywords     = {Convolutional neural network, Laser-induced breakdown spectroscopy, {MarSCoDe}, Multi-distance spectra, Sampling distance}
+@article{li2020cnn,
+	title = {A laser-induced breakdown spectroscopy multi-component quantitative analytical method based on a deep convolutional neural network},
+	volume = {169},
+	issn = {0584-8547},
+	url = {https://www.sciencedirect.com/science/article/pii/S0584854719304938},
+	doi = {10.1016/j.sab.2020.105850},
+	abstract = {One major technical difficulty of laser-induced breakdown spectroscopy (LIBS) lies in achieving ideal accuracy of quantitative determination of the multiple chemical components in a target sample. In this study, we propose a LIBS multi-component quantitative analytical method based on the construction of a deep convolutional neural network (CNN). More than 1400 LIBS spectra, collected from 23 China national standard reference materials, were utilized to train the CNN and validate its predictive ability as well. The experiment was implemented by the LIBS system in MarSCoDe, which would be the Mars Surface Composition Detector on the rover of China's first Mars exploration mission in 2020. To evaluate the performance of the CNN, we inspect the root mean square error (RMSE) value of the prediction, with both overall RMSE and component-wise RMSE considered, and we further look into the prediction relative error of each component. We compare the performance of the CNN with that of two alternative schemes based on back-propagation neural network (BPNN) and partial least squares (PLS) regression respectively, with the PLS scheme actually containing two methods, i. e. PLS1 and PLS2. Besides the examination of the specific values of RMSE and relative error, we have also carried out some statistical analysis to endow the comparison with statistical significance. Moreover, we investigate the effect of baseline removal preprocessing upon the predictive ability of each method. The results show that the CNN method has the best performance among the four methods in terms of overall accuracy, no matter the test is based on the spectra with or without baseline removal, and the superiority of the CNN over the other three methods is more significant in the latter case. Since the number of samples is relatively small, the results demonstrated in this work are preliminary and unsuitable for immediate generalization, but they indicate that the CNN-based methodology is a promising tool for LIBS quantitative analysis with good accuracy and high efficiency.},
+	urldate = {2024-06-05},
+	journal = {Spectrochimica Acta Part B: Atomic Spectroscopy},
+	author = {Li, Lu-Ning and Liu, Xiang-Feng and Xu, Wei-Ming and Wang, Jian-Yu and Shu, Rong},
+	month = jul,
+	year = {2020},
+	keywords = {Convolutional neural network, Deep learning, Laser-induced breakdown spectroscopy, MarSCoDe, Multi-component quantitative analysis},
+	pages = {105850},
 }
 
 @online{marsnasagov_msl,
@@ -631,8 +630,8 @@ address = {San Francisco, CA, USA}
 
 @ARTICLE{survey_of_ensemble_learning,
   author={Mienye, Ibomoiye Domor and Sun, Yanxia},
-  journal={IEEE Access}, 
-  title={A Survey of Ensemble Learning: Concepts, Algorithms, Applications, and Prospects}, 
+  journal={IEEE Access},
+  title={A Survey of Ensemble Learning: Concepts, Algorithms, Applications, and Prospects},
   year={2022},
   volume={10},
   number={},
