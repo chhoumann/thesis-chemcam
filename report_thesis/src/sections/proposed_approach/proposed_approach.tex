@@ -29,9 +29,9 @@ To mitigate this risk and ensure generalizability, a cross-validation strategy s
 We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques for use in our stacking ensemble. 
 This ensured our selections were informed by the literature review while allowing for independent assessment and validation.
 
-To systematically address the challenges in predicting major oxide compositions from \gls{libs} data, we have devised a comprehensive approach that integrates model and preprocessing selection, an experimental framework, evaluation and comparison, and the construction of a stacking ensemble.
+To systematically address the challenges in predicting major oxide compositions from \gls{libs} data, we have devised an approach that integrates model and preprocessing selection, an experimental framework, evaluation and comparison, and the construction of a stacking ensemble.
 
-Firstly, we conducted an extensive literature review and preliminary experiments to select a diverse set of machine learning models and preprocessing techniques.
+Firstly, we conducted a literature review and performed preliminary experiments to select a diverse set of machine learning models and preprocessing techniques.
 These include ensemble learning models, linear and regularization models, neural network models, scaling methods, dimensionality reduction techniques, and data transformations.
 This selection process is detailed in Section~\ref{sec:model_selection}.
 
@@ -43,9 +43,9 @@ Each configuration is then evaluated using a customized k-fold cross-validation 
 This procedure addresses challenges such as data leakage and uneven distribution of extreme values.
 The results from these evaluations are compared to identify the best-performing configurations for each oxide.
 
-Furthermore, we present the metrics we will use to evaluate the performance of our models in Section~\ref{subsec:evaluation_metrics}.
+We present the metrics we use to evaluate the performance of our models in Section~\ref{subsec:evaluation_metrics}.
 These metrics include the \gls{rmse} for accuracy and the sample standard deviation of prediction errors for robustness.
-By evaluating both cross-validation and test set metrics, we ensure a comprehensive assessment of the model's generalizability and performance on unseen data.
+By evaluating both cross-validation and test set metrics, we ensure a thorough assessment of the model's generalizability and performance on unseen data.
 
 Finally, the top-performing configurations are used to construct a stacking ensemble.
 This ensemble leverages the strengths of multiple models, with a meta-learner trained to optimize the final predictions.
