@@ -11,7 +11,36 @@ At the core of the framework is what is referred to as the objective function.
 The objective function acts as the primary building block, where the sampling parameters are set for the preprocessing techniques and the models and is the function that is minimized.
 Sampling parameters in this context relate to the range of values or options that the optimizer can choose from.
 
-In our framework we are optimizing 
+Because we want to identify not only the best model configuration, but also the best preprocessing configuration for that model, we have combined the sampling of the model and preprocessing parameters into a single objective function.
+By doing this, we can optimize the entire pipeline in a single step, rather than optimizing the model and preprocessing steps separately.
+With such a setup, Optuna will attempt to optimize any permutation of scaler, transformer, dimensionality reduction, and model hyperparameters throughout the optimization process.
+This allows us to fully utilize Optunas sampling and pruning strategies, minimizing wasted time and computational resources on poor configurations.
+
+\begin{algorithm}
+\caption{Hyperparameter Optimization Framework}
+\label{alg:hyperparameter_optimization_framework}
+\begin{algorithmic}[1]
+\Require Dataset $D$, List of Models $M$, List of Preprocessors $P$, Number of Trials $N$, Random Seed $seed$, Sampler $S$, Pruner $P_r$, Data Partitioning Method $D_p$
+\Ensure Optimized Model and Preprocessor Pipeline with Logged Metrics
+
+\State \textbf{Initialize:} Set random seed for reproducibility if seed is not None \label{step:initialize}
+\For{each trial $t$ from 1 to $N$} \label{step:trial_loop}
+    \State Sample and instantiate a preprocessor $p$ from $P$ \newline \hspace*{1.2em} using hyperparameters $h_p$ sampled by $S$ \label{step:sample_and_instantiate_preprocessor}
+    \State Sample and instantiate a model $m$ from $M$ \newline \hspace*{1.2em} using hyperparameters $h_m$ sampled by $S$ \label{step:sample_and_instantiate_model}
+    \State Apply $p$ to dataset $D$ \label{step:apply_preprocessor}
+    \State Generate folds $f$ using $D_p$ \label{step:generate_folds}
+    \State Perform cross-validation on $m$ using $f$ \label{step:perform_cross_validation}
+    \If{trial $t$ should be pruned by pruner $P_r$} \label{step:check_pruning}
+        \State Prune trial $t$ \label{step:prune_trial}
+        \State \textbf{continue} to the next trial \label{step:continue_to_next_trial}
+    \EndIf
+    \State Save cross-validation metrics \label{step:save_metrics}
+\EndFor
+\State Save the best configuration, hyperparameters, and performance metrics \label{step:save_best_configuration}
+\State \Return the best configuration across all models and preprocessors \label{step:return_best_configuration}
+
+\end{algorithmic}
+\end{algorithm}% This increases the likelyhood at identifying the 
 
 
 % Optuna for its flexibility and efficiency in exploring the vast search space of configurations.
