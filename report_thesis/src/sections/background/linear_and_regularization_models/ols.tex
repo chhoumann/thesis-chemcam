@@ -1,6 +1,14 @@
 \subsubsection{Ordinary Least Squares Regression}
 We briefly cover the \gls{ols} regression algorithm based on \citet{James2023AnIS} to provide context for the subsequent discussions on linear and regularization models.
 \gls{ols} regression is a linear regression technique that fits a linear model to a dataset.
-It does this by estimating the coefficients that minimize the objective function, specifically the sum of squared differences between the observed target values and the predicted values.
-This method is the most common approach used to fit a linear regression model to a dataset and is widely employed in practice.
-\gls{ols} assumes that there is no multicollinearity among the input features.
+It does this by estimating the coefficients that minimize the objective function, specifically the sum of squared differences between the observed target values and the predicted values, known as the \gls{rss}
+
+Let $\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x$ be the linear model, where $\hat{y}$ is the predicted target value, $\hat{\beta}_0$ is the intercept, $\hat{\beta}_1$ is the coefficient for the input feature, and $x$ is the input feature.
+
+The \gls{rss} is defined as:
+$$
+\text{RSS} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2,
+$$
+
+where $y_i$ is the observed target value, $\hat{y}_i$ is the predicted target value, and $n$ is the number of samples in the dataset.
+The objective of \gls{ols} regression is to find the coefficients $\hat{\beta}_0$ and $\hat{\beta}_1$ that minimize the \gls{rss}.

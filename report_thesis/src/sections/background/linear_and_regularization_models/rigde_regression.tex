@@ -1,7 +1,15 @@
 \subsubsection{Ridge Regression}
 Having covered \gls{ols}, we now introduce ridge regression based on \citet{James2023AnIS}.
-Ridge regression extends \gls{ols} regression to handle multicollinearity.
-It introduces a regularization term to the \gls{ols} objective function to prevent overfitting and stabilize the model.
-This regularization term is controlled by a hyperparameter $\lambda$, which determines the strength of the regularization. Consequently, the model usually has a higher bias than one fitted with \gls{ols} regression because the regularization term can cause a worse fit to the training data.
+A major limitation of \gls{ols} regression is that it cannot handle multicollinearity effectively.
+Ridge regression extends \gls{ols} regression to address this limitation.
+It introduces a regularization term to the \gls{ols} objective function to prevent overfitting and reduce the model's variance.
+
+The ridge regression objective function is defined as:
+$$
+\text{RSS} + \lambda \sum_{j=1}^{p} \beta_j^2,
+$$
+
+where $\text{RSS}$ is the residual sum of squares defined in Section~{sec:ols}, $\lambda$ is the regularization parameter, $\beta_j$ are the regression coefficients, and $p$ is the number of features.
+A consequence of introducing this regularization term is that the model usually has a higher bias than one fitted with \gls{ols} regression because the regularization term can cause a worse fit to the training data.
 However, the model has a lower variance, making it less prone to overfitting and more generalizable to unseen data.
 The hyperparameter $\lambda$ is typically chosen using cross-validation to find the optimal value that minimizes the model's error on unseen data while preventing overfitting.
