@@ -6,7 +6,7 @@ Our approach aims to enhance the prediction accuracy and robustness for major ox
 The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features. 
 The output will be Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$.
 
-As the literature highlighted in Section~\ref{sec:related-work} suggests, a variety of models and preprocessing techniques promise to be adept at handling data that exhibit high-dimensionality, multi-collinearity, and matrix effects.
+As highlighted in Section~\ref{sec:related-work}, the literature suggests that various models and preprocessing techniques are adept at handling high-dimensional data, multi-collinearity, and matrix effects.
 The literature also indicates that different machine learning models perform better on some oxides than others.
 These challenges and model-specific strengths suggests that an optimal approach would involve hybrid methodology, integrating multiple models and preprocessing steps tailored to the specific characteristics of the data.
 This could include leveraging ensemble learning techniques to combine the predictions of various models, implementing dimensionality reduction techniques like \gls{pca} to mitigate high-dimensionality issues, and employing robust preprocessing strategies to address multi-collinearity and matrix effects.
@@ -20,12 +20,13 @@ Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a meth
 By combining a diverse set of base models, stacking can correct for the biases of individual models.
 Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
 This approach of leveraging the strength of multiple models that each model the problem differently can lead to better generalization on unseen data by automating and potentially improving upon manual tuning through the use of a meta-learner to discern patterns in the base predictors' outputs. \cite{wolpertstacked_1992, survey_of_ensemble_learning}
-However, some consideration has be made towards training of the base models in order to prevent data leakage and overfitting.
+However, it is crucial to consider the training of the base models to prevent data leakage and overfitting.
 As emphasized by \citet{cvstacking}, if the base models are trained on the same dataset, the meta learner might favor certain base models over others.
 This can cause the meta learner to be influenced by the same patterns and biases that the base models are susceptible to, leading to overfitting.
 To mitigate this risk and ensure generalizability, a cross-validation strategy should be employed to ensure that the meta learner's training data accurately reflects the true performance of the base learners.
 
-We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, to be used in our stacking ensemble, ensuring that our selections were informed by our literature review while also allowing for independent assessment and validation.
+We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques for use in our stacking ensemble. 
+This ensured our selections were informed by the literature review while allowing for independent assessment and validation.
 
 To systematically address the challenges in predicting major oxide compositions from \gls{libs} data, we have devised a comprehensive approach that integrates model and preprocessing selection, an experimental framework, evaluation and comparison, and the construction of a stacking ensemble.
 
