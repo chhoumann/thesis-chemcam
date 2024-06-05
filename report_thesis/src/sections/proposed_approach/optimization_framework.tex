@@ -1,14 +1,20 @@
 \subsection{Optimization Framework}\label{sec:optimization-framework}
 In this section we introduce our optimization framework built on the Optuna framework.
-Our goal...
 Optuna is a hyperparameter optimization framework designed for direct integration with Python. Its dynamic embedding capability allows hyperparameters to be defined and adjusted within the code during execution, providing additional flexibility and ease of debugging. 
 Optuna uses advanced sampling strategies to explore promising areas of the search space and employs pruning techniques to terminate unpromising trials early, optimizing computational resource use. 
 It also supports scaling across multiple machines by distributing the optimization process, allowing for concurrent optimization. 
-Additionally, tools are provided to identify and focus on the most impactful parameters, aiding in the efficient handling of high-dimensional search spaces. 
-Because it is essential for us to identify the optimal configuration of model and preprocessing techniques for that model on a per-oxide basis, these factors make Optuna an ideal choice as the basis of our optimization framework.
-Optunas flexibility meant that it was easy to customize the optimization process to solve this problem and integrate it with our existing codebase.  
+Additionally, tools are provided to identify and focus on the most impactful parameters, aiding in the efficient handling of high-dimensional search spaces. \cite{optuna_2019} 
+Because an essential aspect of our study is to identify the optimal configuration of model and preprocessing techniques for that model on a per-oxide basis, these factors make Optuna an ideal choice as the basis of our optimization framework.
+Optunas flexibility meant that it was easy to customize the optimization process to solve this problem and integrate it with our existing codebase.
 
-Optuna for its flexibility and efficiency in exploring the vast search space of configurations.
+At the core of the framework is what is referred to as the objective function.
+The objective function acts as the primary building block, where the sampling parameters are set for the preprocessing techniques and the models and is the function that is minimized.
+Sampling parameters in this context relate to the range of values or options that the optimizer can choose from.
+
+In our framework we are optimizing 
+
+
+% Optuna for its flexibility and efficiency in exploring the vast search space of configurations.
 % Optuna allows for great flexiblity in exploring various search spaces due to its modular design.
 % In addition to this modularity, Optuna uses a "define-by-run" optimization strategy.
 % Rather than being confined to a fixed order and range of exploration, Optuna can dynamically adjust regions based on the results of previous trials.
@@ -19,8 +25,11 @@ Optuna for its flexibility and efficiency in exploring the vast search space of 
         % Should elaborate on this:
             % This framework facilitates automated hyperparameter optimization, allowing us to  efficiently explore a vast search space of model and preprocessing configurations.
 % how did we do it?
-    % What steps did we take to implement the optimization framework?
-    % What are the key components of the optimization framework?
+    % Maybe talk about how we designed it in this way
+    % pros cons ** maybe
+    % Considerations at the very least
+    % Talk about how the objective function was constructed, the order of things, considerations with this, the fact that we are trying to minimize and what metrics we are minimizing
+    % 
 % show diagram or pseudocode
 % Explain why we did it this way
     % Why did we choose this approach?
