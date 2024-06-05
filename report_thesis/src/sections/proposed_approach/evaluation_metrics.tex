@@ -21,7 +21,15 @@ In addition, we also compute the metrics for the test set to provide a measure o
 Therefore, we have the following metrics for each experiment:
 \begin{enumerate}
     \item \textbf{Fold-specific \gls{rmse} and Standard Deviation:} For each of the $k$ folds, we calculate both the \gls{rmse} and standard deviation, denoted as \texttt{rmse\_cv\_n} and \texttt{std\_dev\_cv\_n}, where \texttt{n} ranges from 1 to $k$.
-    \item \textbf{Average \gls{rmse} and Standard Deviation:} The overall cross-validation \gls{rmse} (\texttt{rmse\_cv}) and standard deviation (\texttt{std\_dev\_cv}) are computed as the mean of the fold-specific values.
+    \item \textbf{Average \gls{rmse} and Standard Deviation:} The overall cross-validation \gls{rmse} (\texttt{rmse\_cv}) and standard deviation (\texttt{std\_dev\_cv}) are computed as the arithmetic mean of the fold-specific values. Formally, if \(\texttt{rmse\_cv\_n}\) and \(\texttt{std\_dev\_cv\_n}\) represent the \gls{rmse} and standard deviation for the \(n\)-th fold respectively, then:
+    \[
+    \texttt{rmse\_cv} = \frac{1}{k} \sum_{n=1}^{k} \texttt{rmse\_cv\_n}
+    \]
+    and
+    \[
+    \texttt{std\_dev\_cv} = \frac{1}{k} \sum_{n=1}^{k} \texttt{std\_dev\_cv\_n}
+    \]
+    where \(k\) is the total number of folds.
     \item \textbf{Test Set \gls{rmse} and Standard Deviation:} The \gls{rmse} and standard deviation are also computed for the test set, denoted as \texttt{rmsep} and \texttt{std\_dev}, to provide a measure of the model's performance on unseen data.
 \end{enumerate}
 
