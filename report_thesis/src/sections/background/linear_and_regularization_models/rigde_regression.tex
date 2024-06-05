@@ -9,7 +9,7 @@ $$
 \text{RSS} + \lambda \sum_{j=1}^{p} \beta_j^2,
 $$
 
-where $\text{RSS}$ is the residual sum of squares defined in Section~{sec:ols}, $\lambda$ is the regularization parameter, $\beta_j$ are the regression coefficients, and $p$ is the number of features.
-A consequence of introducing this regularization term is that the model usually has a higher bias than one fitted with \gls{ols} regression because the regularization term can cause a worse fit to the training data.
+where $\text{RSS}$ is the residual sum of squares defined in Section~\ref{sec:ols}, $\lambda$ is the regularization parameter, $\beta_j$ are the regression coefficients, and $p$ is the number of features.
+Introducing this regularization term usually results in a model with higher bias compared to one fitted with \gls{ols} regression because the regularization can cause a worse fit to the training data.
 However, the model has a lower variance, making it less prone to overfitting and more generalizable to unseen data.
 The hyperparameter $\lambda$ is typically chosen using cross-validation to find the optimal value that minimizes the model's error on unseen data while preventing overfitting.
