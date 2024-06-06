@@ -1,6 +1,6 @@
 \subsubsection{Elastic Net Regression (ENet)}
 Despite \gls{lasso} regression's ability to perform feature selection and its effectiveness in settings with multicollinearity, it can struggle when the dataset contains globally highly correlated features.
-\gls{lasso} tends to select only one feature from a group of highly correlated features and ignores the others.
+\gls{lasso} tends to select only one feature from a group of highly correlated features and ignores the others\cite{zou_regularization_2005}.
 When multiple correlated features are important for the prediction, this can lead to suboptimal performance.
 
 To address this, \citet{zou_regularization_2005} introduced the \gls{enet} regression, a regression method that combines the $L_1$ and $L_2$ regularization terms from ridge and \gls{lasso} regression.
