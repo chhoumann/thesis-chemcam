@@ -5,8 +5,54 @@ These issues complicate the accurate and robust prediction of elemental concentr
 Our approach aims to enhance the prediction accuracy and robustness for major oxides in \gls{libs} data by leveraging specific combinations of machine learning models and preprocessors that are particularly effective at predicting individual oxides.
 The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features. 
 The output will be Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$.
-The effectiveness of our models will be evaluated using metrics such as \gls{rmse} for accuracy and the standard deviation of prediction errors for robustness.
-These metrics will provide a comprehensive assessment of the models' performance in predicting the concentrations of major oxides in geological samples.
 
-\input{sections/proposed_approach/testing_validation.tex}
+As highlighted in Section~\ref{sec:related-work}, the literature suggests that various models and preprocessing techniques are adept at handling high-dimensional data, multi-collinearity, and matrix effects.
+The literature also indicates that different machine learning models perform better on some oxides than others.
+These challenges and model-specific strengths suggests that an optimal approach would involve hybrid methodology, integrating multiple models and preprocessing steps tailored to the specific characteristics of the data.
+This could include leveraging ensemble learning techniques to combine the predictions of various models, implementing dimensionality reduction techniques like \gls{pca} to mitigate high-dimensionality issues, and employing robust preprocessing strategies to address multi-collinearity and matrix effects.
+Furthermore, a systematic evaluation through cross-validation and hyperparameter tuning would be essential to fine-tune the models for the best performance on the specific oxides of interest.
+The notion of using multiple models per oxide is supported by the advent of models such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017} model, which combines the predictions of multiple models using a predetermined weighting for each model's predictions on a per-oxide basis.
+While this approach improved accuracy compared to individual models, it required manual tuning of the weights for each model.
+This manual tuning presents limitations, including the analysis required to determine appropriate weights and the risk of suboptimal weighting.
+Given these limitations, it is reasonable to explore techniques that can automate the weighting process while still leveraging the strengths of multiple models.
+To fulfill these criteria, we chose to adopt a stacking ensemble approach. 
+Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
+By combining a diverse set of base models, stacking can correct for the biases of individual models.
+Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
+Leveraging the strengths of multiple models that each approach the problem differently can lead to better generalization on unseen data.
+This is achieved by using a meta-learner to discern patterns in the base predictors' outputs\cite{wolpertstacked_1992, survey_of_ensemble_learning}, with the added benefit of automating and potentially improving upon the manual tuning employed by the \gls{moc} model.
+However, it is crucial to consider the training of the base models to prevent data leakage and overfitting.
+As emphasized by \citet{cvstacking}, if the base models are trained on the same dataset, the meta learner might favor certain base models over others.
+This can cause the meta learner to be influenced by the same patterns and biases that the base models are susceptible to, leading to overfitting.
+To mitigate this risk and ensure generalizability, a cross-validation strategy should be employed to ensure that the meta learner's training data accurately reflects the true performance of the base learners.
+
+We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques for use in our stacking ensemble. 
+This ensured our selections were informed by the literature review while allowing for independent assessment and validation.
+
+To systematically address the challenges in predicting major oxide compositions from \gls{libs} data, we have devised an approach that integrates model and preprocessing selection, an experimental framework, evaluation and comparison, and the construction of a stacking ensemble.
+
+Firstly, we conducted a literature review and performed preliminary experiments to select a diverse set of machine learning models and preprocessing techniques.
+These include ensemble learning models, linear and regularization models, neural network models, scaling methods, dimensionality reduction techniques, and data transformations.
+This selection process is detailed in Section~\ref{sec:model_selection}.
+
+Next, we implemented an experimental framework using the Optuna optimization library~\cite{optuna_2019}.
+This framework facilitates automated hyperparameter optimization, allowing us to efficiently explore a vast search space of model and preprocessing configurations.
+The specifics of this framework are discussed in Section~\ref{sec:optimization_framework}.
+
+Each configuration is then evaluated using a customized k-fold cross-validation procedure to ensure robust performance assessment, as detailed in Section~\ref{subsec:validation_testing_procedures}.
+This procedure addresses challenges such as data leakage and uneven distribution of extreme values.
+The results from these evaluations are compared to identify the best-performing configurations for each oxide.
+
+We present the metrics we use to evaluate the performance of our models in Section~\ref{subsec:evaluation_metrics}.
+These metrics include the \gls{rmse} for accuracy and the sample standard deviation of prediction errors for robustness.
+By evaluating both cross-validation and test set metrics, we ensure a thorough assessment of the model's generalizability and performance on unseen data.
+
+Finally, the top-performing configurations are used to construct a stacking ensemble.
+This ensemble leverages the strengths of multiple models, with a meta-learner trained to optimize the final predictions.
+The process of constructing and validating this stacking ensemble is described in Section~\ref{sec:evaluation_metrics}.
+
+By following this structured approach, we aim to enhance the prediction accuracy and robustness for major oxides in \gls{libs} data, ultimately leading to more reliable and generalizable models.
+
 \input{sections/proposed_approach/model_selection.tex}
+\input{sections/proposed_approach/optimization_framework.tex}
+\input{sections/proposed_approach/testing_validation.tex}

@@ -1,24 +1,5 @@
 \subsection{Model and Preprocessing Selection}
-
 Choosing the right models and preprocessing techniques for \gls{libs} data analysis is a challenging task. 
-As the literature highlighted in Section~\ref{sec:related-work} suggests, a variety of models and preprocessing techniques promise to be adept at handling data that exhibit high-dimensionality, multi-collinearity, and matrix effects.
-The literature also indicates that different machine learning models perform better on some oxides than others.
-These challenges and model-specific strengths suggests that an optimal approach would involve combining multiple models. 
-This notion is supported by the advent of models such as the \gls{moc}~\cite{cleggRecalibrationMarsScience2017} model, which combines the predictions of multiple models using a predetermined weighting for each model's predictions on a per-oxide basis.
-While this approach improved accuracy compared to individual models, it required manual tuning of the weights for each model.
-This manual tuning presents limitations, including the analysis required to determine appropriate weights and the risk of suboptimal weighting.
-Given these limitations, it is reasonable to explore techniques that can automate the weighting process while still leveraging the strengths of multiple models.
-To fulfill these criteria, we chose to adopt a stacking ensemble approach. 
-Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
-By combining a diverse set of base models, stacking can correct for the biases of individual models.
-Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
-This approach of leveraging the strength of multiple models that each model the problem differently can lead to better generalization on unseen data by automating and potentially improving upon manual tuning through the use of a meta-learner to discern patterns in the base predictors' outputs. \cite{wolpertstacked_1992, survey_of_ensemble_learning}
-However, some consideration has be made towards training of the base models in order to prevent data leakage and overfitting.
-As emphasized by \citet{cvstacking}, if the base models are trained on the same dataset, the meta learner might favor certain base models over others.
-This can cause the meta learner to be influenced by the same patterns and biases that the base models are susceptible to, leading to overfitting.
-To mitigate this risk and ensure generalizability, a cross-validation strategy should be employed to ensure that the meta learner's training data accurately reflects the true performance of the base learners.
-
-We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques, to be used in our stacking ensemble, ensuring that our selections were informed by our literature review while also allowing for independent assessment and validation.
 
 We had several considerations to guide our selection of preprocessing techniques.
 Firstly, our review of the literature revealed that there seems to be no consensus on a single, most effective normalization method for \gls{libs} data.
