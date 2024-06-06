@@ -16,5 +16,6 @@ f_{ridge}(\beta) = \text{RSS} + \lambda L_2
 $$
 
 where $\text{RSS}$ is the residual sum of squares defined in Section~\ref{sec:ols} and $\lambda$ is the regularization parameter --- a hyperparameter that controls the strength of the penalty.
-Introducing this regularization term usually results in a model with higher bias compared to one fitted with \gls{ols} regression because the regularization can cause a worse fit to the training data.
+Introducing this regularization term causes "shrinkage," which means that the estimated regression coefficients are shrunk towards zero, reducing their variance.
+This shrinkage usually results in a model with higher bias compared to one fitted with \gls{ols} regression because the regularization can cause a worse fit to the training data.
 However, the model has a lower variance, making it less prone to overfitting and more generalizable to unseen data.

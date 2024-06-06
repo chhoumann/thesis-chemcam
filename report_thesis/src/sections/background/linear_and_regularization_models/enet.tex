@@ -1,0 +1,15 @@
+\subsubsection{Elastic Net Regression (ENet)}
+Despite \gls{lasso} regression's ability to perform feature selection, it can struggle when the dataset contains highly correlated features.
+\gls{lasso} tends to select only one feature from a group of highly correlated features and ignores the others.
+When multiple correlated features are important for the prediction, this can lead to suboptimal performance.
+
+To address this, \citet{zou_regularization_2005} introduced the \gls{enet} regression, a regression method that combines the $L_1$ and $L_2$ regularization terms from ridge and \gls{lasso} regression.
+The \gls{enet} regression objective function $f_{ENet}(\beta)$ is defined as:
+
+$$
+f_{ENet}(\beta) = \text{RSS} + \lambda_1 L_1 + \lambda_2 L_2,
+$$
+
+where $\text{RSS}$ is the residual sum of squares defined in Section~\ref{sec:ols}, and $\lambda_1$ and $\lambda_2$ are regularization parameters that control the strength of the $L_1$ and $L_2$ penalties, respectively.
+By combining the $L_1$ and $L_2$ regularization terms, \gls{enet} performs feature selection like \gls{lasso} while also shrinking the coefficients of correlated features like ridge regression.
+This way, \gls{enet} can mitigate the limitations of each method when used individually by balancing the trade-offs between the two regularization terms.
