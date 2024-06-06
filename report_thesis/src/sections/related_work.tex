@@ -53,9 +53,10 @@ Dimensionality reduction techniques such as \gls{pca} play a crucial role in man
 Their review highlighted several studies that succesfully deployed \gls{pca}.
 For example, \cite{moncayo_pca} used \gls{pca} to analyze megapixel elemental maps composed of more than 1 million \gls{libs} spectra. 
 \gls{pca} successfully separated the contributions of various minerals, including those present in low amounts, highlighting the power of \gls{pca} in handling highly diverse samples.
-Another example is \citet{porizka_pca} used \gls{pca} to filter outliers and classify samples according to their matrix. 
-This was followed by a univariate calibration of copper (\ce{Cu}) in soil samples, which resulted in a reduced bias. 
-Rather than mitigating the matrix effect, the use of PCA avoided it altogether.
+
+Another example is \citet{porizka_pca} used \gls{pca} to filter outliers and classify samples according to their matrix composition, such as \ce{Al}, \ce{Ca}, \ce{Na}, and \ce{Si}. 
+This classification was followed by a univariate calibration of copper (\ce{Cu}) in soil samples, which resulted in a reduced bias. 
+\gls{pca} was employed to discriminate individual rocks based on their overall elemental composition and they showed that \gls{pca} effectively addressed matrix effects that can significantly impact the accuracy of analytical results.
 These studies among others highlighted by \citet{pca_review_paper} demonstrate the effectiveness of \gls{pca} as a preprocessing technique in \gls{libs} analysis.
 
 \citet{sirven_pca_ann_plsr} investigated the influence of matrix effects on the performance of quantitative analysis of chromium (\ce{Cr}) in soil samples using \gls{libs}. 
