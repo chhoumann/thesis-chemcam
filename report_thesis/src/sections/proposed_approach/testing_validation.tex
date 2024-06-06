@@ -28,7 +28,7 @@ If we were to randomly split the dataset, some locations from a target could end
 This would cause data leakage, as the testing set would no longer consist solely of unseen targets.
 To prevent this, we ensure that each target is represented only once in the dataset by grouping data from all locations on a given target.
 
-Furthermore, the limited availability of data, as mentioned in Section~\ref{sec:problem_definition}, poses another significant challenge due to the difficult collection process.
+Furthermore, the limited availability of data poses another significant challenge due to the difficult collection process.
 The dataset we use consists of 408 samples, which is relatively large by \gls{libs} standards.
 However, there are only a few samples with concentration values for the oxides in the targets that are either very high or very low compared to the rest of the data, which we refer to as \textit{extreme values}.
 These infrequent high and low concentration values can be problematic.
