@@ -95,34 +95,6 @@ The \textit{Target} column corresponds to the sample name, while the \textit{ID}
 \label{tab:final_dataset_example}
 \end{table*}
 
-
-\subsection{Model and Preprocessing Selection}
-For the initial investigative experiments, we selected a range of models for further exploration, namely \gls{svr}, \gls{gbr}, \gls{pls}, \gls{xgboost}, \gls{ngboost}, \gls{etr}, \gls{enet}, and \gls{sgdr}.
-We also included regular \gls{ann} and \gls{cnn} in this phase of experimentation.
-This selection was guided primarily by the literature review but also by exploratory intuition, aiming to discover potentially innovative applications and performances within our specific dataset.
-
-Our literature review highlighted various approaches and their effectiveness in handling the challenges associated with predicting major oxide compositions from \gls{libs} data.
-For instance, \citet{andersonImprovedAccuracyQuantitative2017} discussed the use of multiple regression models, finding that different models excelled with specific oxides, which informed our model-specific approach.
-\citet{song_DF-K-ELM} presented a hybrid model combining domain knowledge with machine learning, which inspired our interest in models that could offer both high performance and interpretability. \citet{rezaei_dimensionality_reduction} demonstrated the beneficial impact of dimensionality reduction techniques like \gls{pca}, which we considered essential for managing our high-dimensional \gls{libs} data.
-
-All models were evaluated for their performance across each of the major oxides relevant to this study. 
-Our preliminary analysis indicated model-specific strengths, suggesting the potential for leveraging different models for specific prediction tasks. 
-This observation motivated us to develop architectural frameworks designed to systematically capitalize on the strengths of each model for specific oxides
-
-An interesting discovery from our literature review was a study on the stacking and chaining of normalization methods initially aimed at classification contexts.
-Inspired by these ideas, we explored the possibility of improving model performance by optimizing the preprocessing chain for each model, per oxide, in order to determine which normalization methods would be most beneficial.
-For this purpose, we considered the following preprocessing techniques: Min-Max normalization, Z-Score normalization, Robust Scaling, Max Absolute Scaling, Norm 3, Quantile Transformer and Power Transformer.
-Additionally, we also considered dimensionality reduction techniques such as \gls{pca} and \gls{kernel-pca}.
-Through experimentation, we identified which preprocessing techniques were most effective for each model and oxide.
-Realizing the potential of this, we decided to further investigate how the predictive accuracy and robustness could be improved by combining the strengths of these models and preprocessing techniques.
-From our investigation, we determined that the stacking ensemble method seemed very promising and novel in the LIBS analysis field, leading us to select it as the primary method for our study.
-
-Stacking ensemble is analogous to the methodologies employed in the original \gls{moc} pipeline, which also tailored predictions for each oxide by blending outputs from the \gls{pls1-sm} and \gls{ica} phases, variably weighting the influence of the \gls{ica} predictions depending on the oxide.
-Unlike the \gls{moc} model, which required manual determination of the model weightings for each oxide, our method utilizes a meta learner to learn optimal parameter settings.
-Stacking ensemble is beneficial as it dynamically adapts to our dataset's characteristics without the need for domain-specific knowledge.
-This approach represents a more sophisticated method, streamlining complex model configurations and potentially enhancing predictive accuracy through dynamically learned integrations, rather than fixed presets.
-
-
 \subsection{Experimental Setup}
 Experiments were conducted on a machine equipped with an Intel Xeon Gold 6242 CPU, featuring 16 cores and 32 threads.
 The CPU has a base clock speed of 2.80 GHz and a maximum turbo frequency of 3.90 GHz.
