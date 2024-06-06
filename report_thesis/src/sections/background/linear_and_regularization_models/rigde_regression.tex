@@ -9,10 +9,10 @@ L_2 = \sum_{j=1}^{p} \beta_j^2,
 $$
 
 where $\beta_j$ are the regression coefficients, and $p$ is the number of features.
-The ridge regression objective function is defined as:
+The ridge regression objective function $f(\beta)$ is defined as:
 
 $$
-\text{RSS} + \lambda L_2
+f_{ridge}(\beta) = \text{RSS} + \lambda L_2
 $$
 
 where $\text{RSS}$ is the residual sum of squares defined in Section~\ref{sec:ols} and $\lambda$ is the regularization parameter --- a hyperparameter that controls the strength of the penalty.
