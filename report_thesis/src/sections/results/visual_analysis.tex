@@ -1,17 +1,15 @@
-\subsubsection{Visual and Statistical Analysis of \ce{SiO_2} Distribution in Partitioned Data}\label{sec:visual_analysis}
-This section presents a detailed visualization and statistical analysis of \ce{SiO_2} concentration distribution across different folds, which are the result of our data partitioning procedure on the dataset we use.
-The analysis focuses on \ce{SiO_2} as a representative example, with similar analyses conducted for other oxides but omitted here for brevity.
+\subsection{Visual and Statistical Analysis of \ce{SiO_2} Distribution in Partitioned Data}\label{sec:visual_analysis}
+This section provides a detailed visualization and statistical analysis of the \ce{SiO_2} concentration distribution across data partitions, following the customized k-fold data partitioning procedure described in Section~\ref{subsec:validation_testing_procedures}.
+We perform this analysis to validate the consistency of our data partitioning method and to provide a visual understanding of the data distribution it creates.
+The analysis focuses on \ce{SiO_2} as a representative example.
+We have conducted similar analyses for other oxides, but they are omitted here for brevity.
 
 Figures \ref{fig:histogram_grid_plot} and \ref{fig:histogram_kde_plot} illustrate the histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each training fold, the test set, and their combined distributions.
-The consistent histograms and \gls{kde} curves across different training folds indicate that the data distribution within each fold closely matches the overall distribution.
-The high degree of overlap among the combined distributions across training folds and the test set further confirms their consistency and representativeness.
+The consistent histograms and \gls{kde} curves across different training folds indicate that the data distribution within each fold closely matches the overall distribution, confirming their consistency and representativeness.
 
 Figure \ref{fig:original_and_post_fold_plot} contrasts the \ce{SiO_2} concentration distribution before and after data partitioning.
 The left plot shows the original distribution, while the right plot displays the fold-assigned distribution, color-coded by fold.
 This visualization highlights that the partitioning strategy maintains the overall data distribution while ensuring balanced representation across folds.
-
-These visual analyses collectively validate our k-fold data partitioning method.
-They demonstrate that each fold provides a reliable estimate of model performance and help prevent overfitting by training and validating on similarly distributed data.
 
 \begin{figure*}[h!]
     \centering
@@ -48,10 +46,6 @@ From Figure~\ref{fig:siO2_distribution}, it is evident that the means and standa
 This quantitative consistency supports the visual evidence that each training fold is representative of the entire dataset.
 Furthermore, we can see that the standard deviation in the training sets is higher than the standard deviation in the test set, which is expected given the reassignment of extreme values to the training sets.
 
-Maintaining balanced and representative distributions in each fold is essential for training robust models.
-It ensures that the models are not biased towards any specific subset of the data, which is crucial for their generalization to unseen data.
-The balanced distributions across folds enable the model to be trained on diverse subsets of data, leading to better generalization.
-This approach reduces the risk of overfitting and ensures that the model performs well on new, unseen data.
-
-By ensuring that each fold is representative of the overall dataset, these visualizations support the validity of our dataset partitioning strategy.
-The consistency observed across folds further supports the claim that the data distribution method works as intended, providing confidence in the generalizability and reliability of our models.
+In conclusion, the visual and statistical analyses presented in this section confirm that our customized k-fold data partitioning procedure effectively maintains balanced and representative distributions across all folds.
+This consistency is crucial for the robustness and generalizability of our models, as discussed in Section~\ref{subsec:validation_testing_procedures}.
+The alignment between the visual evidence and the quantitative measures reinforces the reliability of our approach, ensuring that our models are well-equipped to perform accurately on unseen data.
