@@ -6,7 +6,7 @@ Similar analyses have been conducted for other oxides, and the resulting plots a
 
 As discussed in Section~\ref{subsec:validation_testing_procedures}, it is crucial to determine an optimal value of $p$ for the data partitioning algorithm.
 This value should minimize the number of extreme values in the test set while ensuring the test set remains representative.
-Our general approach is to select the lowest value of $p$ that ensures the test set contains no extreme values while maximizing its general representativeness.
+Our approach is to select the lowest $p$ that excludes extreme values from the test set while maximizing its general representativeness.
 This approach helps avoid overestimating the model's performance due to extreme values while keeping the test set reflective of the majority of the data distribution.
 We developed a web-based platform to evaluate the performance of the data partitioning algorithm for different values of $p$, as shown in Figure~\ref{fig:web_platform} in Appendix~\ref{subsec:web_platform}.
 Using the platform, we conducted analyses for various values of $p$ and determined that the optimal value is $p=5\%$.
