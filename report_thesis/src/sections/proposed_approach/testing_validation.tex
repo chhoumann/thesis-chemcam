@@ -2,14 +2,18 @@
 This section describes the validation and testing procedures our experiments follow.
 Selecting appropriate testing procedures is crucial for ensuring the validity and reliability of the results.
 For that reason, we delineate a methodological approach that ensures our models are accurate and generalizable.
-We start by presenting the data partitioning procedure we use to partition our dataset into training, validation, and testing sets.
-Then we present the evaluation metrics we use to evaluate the performance of our models.
+We start by presenting our general strategy for model evaluation.
+Then we present the data partitioning procedure we use to partition our dataset into training, validation, and testing sets.
+Finally, we present the evaluation metrics we use to evaluate the performance of our models.
 
 We have chosen to test and evaluate all our experiments using both cross-validation and a separate test set.
 Evaluating results solely on the test set could lead to models that are overly specialized to the test set.
 This occurs when searching for the optimal configuration of hyperparameters specifically tailored to the test set.
-However, our objective is to develop models that demonstrate high accuracy and robustness, even on entirely unseen data.
-To achieve this, we employ k-fold cross-validation to ensure our models have high generalizability, thereby increasing the likelihood that they will perform as expected on new data.
+For this reason, it is common to use a validation set to tune hyperparameters and evaluate model performance during experimentation.
+However, further splitting the training set into a validation set exacerbates the challenges of limited data availability we highlight in Section~\ref{subsec:challenges}.
+Our objective is to develop models that demonstrate high accuracy and robustness, even on entirely unseen data.
+To achieve this, we employ $k$-fold cross-validation.
+This allows us to train our models on $k-1$ folds and evaluate them on the remaining fold, which provides a more robust estimate of model performance.
 
 We use an $80\%/20\%$ split for training and testing sets. The training set is further subdivided into $4$ folds, which are used for cross validation.
 
