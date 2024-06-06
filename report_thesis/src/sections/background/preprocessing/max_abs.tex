@@ -8,5 +8,5 @@ x'_i = \frac{x_i}{\max(|\mathbf{x}|)},
 $$
 
 where $x_i$ is the original feature value, $\max(|\mathbf{x}|)$ is the maximum absolute value of the feature vector $\mathbf{x}$, and $x'_i$ is the normalized feature value.
-This scaling method is useful for data that has been centered at zero or data that is sparse, as max absolute scaling does not center the data.
-It maintains the sparsity of the data by not introducing non-zero values in the zero entries of the data~\cite{Vasques2024}.
+This scaling method is particularly useful for data that has been centered at zero or is sparse, as max absolute scaling does not alter the mean of the data.
+Additionally, it preserves the sparsity of the data by ensuring that zero entries remain zero, thereby not introducing any non-zero values~\cite{Vasques2024}.
