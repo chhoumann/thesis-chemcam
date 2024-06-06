@@ -107,7 +107,7 @@ def create_plots_for_oxide(target):
         fold_target = validation[target]
         sns.histplot(fold_target, kde=True, bins=30, label=f'Fold {i+1} ({len(train_full)} / {len(validation)})', alpha=0.5)
 
-    sns.histplot(test_full_target, kde=True, bins=30, label=f'Test Full ({len(test_full)})', alpha=0.5, color='black')
+    sns.histplot(test_full_target, kde=True, bins=30, label=f'Test ({len(test_full)})', alpha=0.5, color='black')
 
     plt.title(f'Histogram and KDE of {target} Distribution in Each Fold')
     plt.xlabel(f"{target} wt. %")
@@ -144,8 +144,8 @@ def create_plots_for_oxide(target):
         plt.legend()
 
     plt.subplot(num_rows, num_cols, num_folds + 1)
-    sns.histplot(test_full_target, kde=True, bins=30, label=f'Test Full ({len(test_full)})', color='black')
-    plt.title('Test Full')
+    sns.histplot(test_full_target, kde=True, bins=30, label=f'Test ({len(test_full)})', color='black')
+    plt.title('Test')
     plt.xlabel(f"{target} wt. %")
     plt.ylabel('Count')
     plt.xlim(x_min, x_max)
