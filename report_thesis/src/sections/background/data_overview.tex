@@ -1,0 +1,24 @@
+\subsection{Data Overview}\label{sec:data-overview}
+Similarly to our previous work (\citet{p9_paper}), we used the publicly available \gls{ccs} data from NASA's \gls{pds}~\cite{PDSGeoscienceNode}.
+\gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis.
+A comprehensive description of this preprocessing procedure is available in \citet{wiensPreflightCalibrationInitial2013}.
+
+\begin{table*}[h]
+\centering
+\begin{tabular}{llllllll}
+\toprule
+     wave &         shot1 &         shot2 &  $\cdots$ &        shot49 &       shot50  & median        & mean          \\
+\midrule
+240.81100 & 6.4026649e+15 & 4.0429349e+15 & $\cdots$  & 1.7922483e+15 & 1.7126615e+15 & 1.9892956e+15 & 1.7561699e+15 \\
+240.86501 & 3.8557462e+12 & 2.2923680e+12 & $\cdots$  & 1.1355429e+12 & 8.6930379e+11 & 7.8172542e+11 & 7.2805052e+11 \\
+$\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$      & $\vdots$      & $\vdots$      \\
+905.38062 & 1.8823427e+08 & 58500403.     & $\cdots$  & -8449286.6    & 8710775.0     & 4.0513312e+09 & 5.2188327e+09 \\
+905.57349 & 1.9864713e+10 & 1.2956832e+10 & $\cdots$  & 1.9785415e+10 & 7.1994239e+09 & 1.1311150e+10 & 1.2201224e+10 \\
+\bottomrule
+\end{tabular}
+\caption{Example of CCS data for a single location (from \citet{p9_paper})}
+\label{tab:ccs_data_example}
+\end{table*}
+
+While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing. 
+Table~\ref{tab:ccs_data_example} shows an example of the \gls{ccs} data for a single location of a sample. This corresponds to shots ($s$) and wavelength ($\lambda$) of the Intensity Tensor \ref{matrix:intensity} for this location.
