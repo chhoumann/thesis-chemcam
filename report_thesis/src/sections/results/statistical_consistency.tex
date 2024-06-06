@@ -1,35 +1,17 @@
 \subsubsection{Statistical Consistency}
 To further validate our visual analysis, we can look at quantitative measures such as the means and standard deviations of \ce{SiO_2} concentrations across the folds and the overall dataset.
-As shown in Table~\ref{tab:siO2_std_means}, the standard deviations and means for \ce{SiO_2} concentrations in each fold are as follows:
 
-\begin{table}[h!]
+\begin{figure*}[htbp]
     \centering
-    \begin{tabular}{|c|c|c|}
-        \hline
-        \textbf{Fold} & \textbf{Standard Deviation} & \textbf{Mean} \\
-        \hline
-        Fold 1 & 16.28 & 55.70 \\
-        \hline
-        Fold 2 & 12.46 & 57.59 \\
-        \hline
-        Fold 3 & 18.01 & 51.51 \\
-        \hline
-        Fold 4 & 15.77 & 55.10 \\
-        \hline
-        Train Full & 15.91 & 54.96 \\
-        \hline
-        Test Full & 9.06 & 56.57 \\
-        \hline
-        Full & 14.94 & 55.25 \\
-        \hline
-    \end{tabular}
-    \caption{Standard deviations and means of \ce{SiO_2} concentrations across different folds' validation sets, the full training set, the full test set, and the entire dataset.}
-    \label{tab:siO2_std_means}
-\end{table}
+    \includegraphics[width=\textwidth]{images/distribution_plot.png}
+    \caption{Distribution of \ce{SiO_2} concentrations across cross-validation folds, training set, test set, and the entire dataset. The mean and standard deviation statistics for each partition are indicated figure.}
+    \label{fig:siO2_distribution}
+\end{figure*}
 
-From the table, it is evident that the means and standard deviations of \ce{SiO_2} concentrations for each fold are consistent with those of the overall dataset.
-These metrics are even more similar across folds for the training sets, indicating that the training sets are also representative of the entire dataset.
-This quantitative consistency supports the visual evidence that each fold is a reliable representative of the entire dataset.
+From Figure~\ref{fig:siO2_distribution}, it is evident that the means and standard deviations of \ce{SiO_2} concentrations for each fold are consistent with those of the overall dataset.
+
+These metrics demonstrate that the means and standard deviations of \ce{SiO_2} concentrations for each fold and the combined training set are consistent with those of the overall dataset.
+This quantitative consistency supports the visual evidence in Section~\ref{sec:visual_analysis} that each fold is a reliable representative of the entire dataset.
 Furthermore, we can see that the standard deviation in the training sets is higher than the standard deviation in the test set, which is expected given the reassignment of extreme values to the training sets.
 
 Maintaining balanced and representative distributions in each fold is essential for training robust models.
