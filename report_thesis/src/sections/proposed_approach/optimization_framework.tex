@@ -1,4 +1,24 @@
 \subsection{Optimization Framework}\label{sec:optimization-framework}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 In this section we introduce our optimization framework built on the Optuna framework.
 Optuna is a hyperparameter optimization framework designed for direct integration with Python. Its dynamic embedding capability allows hyperparameters to be defined and adjusted within the code during execution, providing additional flexibility and ease of debugging. 
 Optuna uses advanced sampling strategies to explore promising areas of the search space and employs pruning techniques to terminate unpromising trials early, optimizing computational resource use. 
@@ -8,11 +28,12 @@ Because an essential aspect of our study is to identify the optimal configuratio
 Optunas flexibility meant that it was easy to customize the optimization process to solve this problem and integrate it with our existing codebase.
 
 At the core of the framework is what is referred to as the objective function.
-The objective function acts as the primary building block, where the sampling parameters are set for the preprocessing techniques and the models and is the function that is minimized.
+The objective function acts as the primary building block, where the sampling parameters are set for the preprocessing techniques and the models and is the function that is minimized. % rephrase
 Sampling parameters in this context relate to the range of values or options that the optimizer can choose from.
 
 Because we want to identify not only the best model configuration, but also the best preprocessing configuration for that model, we have combined the sampling of the model and preprocessing parameters into a single objective function.
 By doing this, we can optimize the entire pipeline in a single step, rather than optimizing the model and preprocessing steps separately.
+% We 
 With such a setup, Optuna will attempt to optimize any permutation of scaler, transformer, dimensionality reduction, and model hyperparameters throughout the optimization process.
 This allows us to fully utilize Optunas sampling and pruning strategies, minimizing wasted time and computational resources on poor configurations.
 
@@ -20,27 +41,45 @@ This allows us to fully utilize Optunas sampling and pruning strategies, minimiz
 \caption{Hyperparameter Optimization Framework}
 \label{alg:hyperparameter_optimization_framework}
 \begin{algorithmic}[1]
-\Require Dataset $D$, List of Models $M$, List of Preprocessors $P$, Number of Trials $N$, Random Seed $seed$, Sampler $S$, Pruner $P_r$, Data Partitioning Method $D_p$
-\Ensure Optimized Model and Preprocessor configuration with Logged Metrics
+\Require Dataset $D$, Model $m$, Number of Trials $N$, Random Seed $seed$, Sampler \texttt{sampler}, Pruner \texttt{pruner}
+\Ensure Trial data, including metrics and configuration for each trial
 
 \State \textbf{Initialize:} Set random seed for reproducibility if seed is not None \label{step:initialize}
 \For{each trial $t$ from 1 to $N$} \label{step:trial_loop}
-    \State Sample and instantiate a preprocessor $p$ from $P$ \newline \hspace*{1.2em} using hyperparameters $h_p$ sampled by $S$ \label{step:sample_and_instantiate_preprocessor}
-    \State Sample and instantiate a model $m$ from $M$ \newline \hspace*{1.2em} using hyperparameters $h_m$ sampled by $S$ \label{step:sample_and_instantiate_model}
-    \State Apply $p$ to dataset $D$ \label{step:apply_preprocessor}
-    \State Generate folds $f$ using $D_p$ \label{step:generate_folds}
-    \State Perform cross-validation on $m$ using $f$ \label{step:perform_cross_validation}
-    \If{trial $t$ should be pruned by pruner $P_r$} \label{step:check_pruning}
-        \State Prune trial $t$ \label{step:prune_trial}
-        \State \textbf{continue} to the next trial \label{step:continue_to_next_trial}
-    \EndIf
-    \State Save cross-validation metrics \label{step:save_metrics}
+    \Statex // Sample hyperparameters for $m$ using \texttt{sampler} and \newline \hspace*{1.2em} instantiate it 
+    \State $m'$ $\gets$ \texttt{sample\_hyperparameters()} \label{step:sample_hyperparameters}
+    \Statex
+    \Statex // Sample and instantiate preprocessors using \texttt{sampler}
+    \State \text{scaler} $\gets$ \texttt{sample\_scaler()}
+    \State \text{transformer} $\gets$ \texttt{sample\_transformer()} \textbf{or} \text{NONE}
+    \State \text{dim\_reduction} $\gets$ \texttt{sample\_dim\_reduction()} \textbf{or} \text{NONE}
+    \Statex
+    \Statex // Construct pipeline of preprocessors in that order
+    \State \text{pipeline} $\gets$ [\text{scaler}, \text{transformer}, \text{dim\_reduction}]
+    \Statex
+    \Statex // Apply data partitioning
+    \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$
+    \Statex
+    \Statex // Apply preprocessing to $D_{train}$ and $T_{cv}$
+    \State $D_{train}'$ $\gets$ \texttt{pipeline\_apply}($D_{train}$, \text{pipeline})
+    \State $T_{cv}'$ $\gets$ \texttt{pipeline\_apply}($T_{cv}$, \text{pipeline})
+    \Statex
+    \State $CV_{metrics}$ $\gets$ \texttt{cross\_validate}($m'$, $T_{cv}'$, \text{pipeline}) 
+    % \State $T_{cv}' \gets \text{pipeline\_apply}(T_{cv}, \text{pipeline})$
+    % % \State $D_{train}' \gets \text{apply preprocessing to } D_{train}$
+    % \State $T_{cv}' \gets \text{apply preprocessing to } T_{cv}$
+    % \Statex
 \EndFor
 \State Save the best configuration, hyperparameters, and performance metrics \label{step:save_best_configuration}
+% Might want to remove below and instead return all configurations
 \State \Return the best configuration across all models and preprocessors \label{step:return_best_configuration}
 
 \end{algorithmic}
 \end{algorithm}% This increases the likelyhood at identifying the 
+
+% create names for evaluation metrics
+% 
+
 
 
 % Optuna for its flexibility and efficiency in exploring the vast search space of configurations.
