@@ -102,7 +102,7 @@ Fold numbers are then assigned sequentially using a modulo operation to ensure a
 This means that, while the assignment process follows a sequence, the resulting distribution of targets is effectively randomized.
 Fold numbers start in 0 and go up to $k-1$, as implied by the modulo operation.
 If a percentile $p$ is provided, extreme value handling is enabled, and the algorithm identifies the top and bottom percentiles of the target values (Line~\ref{line:identify_extremes}).
-These extreme values are then reassigned to the training folds (0 to $k-2$), ensuring they are evenly distributed across these folds (Line~\ref{line:reassign_extremes}).
+These extreme values are then reassigned to the training folds (0 to $k-2$), ensuring they are as evenly distributed as possible across these folds (Line~\ref{line:reassign_extremes}).
 
 The fold assignments are then merged into the original dataset, as described in Line~\ref{line:merge_folds}.
 Essentially, this step enables the partitioning steps that follow, by ensuring each data item has an associated fold number.
