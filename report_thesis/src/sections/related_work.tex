@@ -12,9 +12,9 @@ Their approach involved extensive preprocessing and normalization of \gls{libs} 
 They demonstrated that blending different models, such as \gls{gbr} and \gls{pls} for \ce{SiO2}, could improve prediction accuracy.
 Their study serves as a benchmark for model performance on \gls{libs} spectra and offers insights into model selection for similar datasets.
 
-\citet{shi_svr_libs_2015} compared the performance of \gls{svr} and \gls{plsr} for quantitative analysis of the major elements \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe}, and \ce{Al} in sedimentary rock samples using \gls{libs} data.
+\citet{shi_svr_libs_2015} compared the performance of \gls{svr} and \gls{pls} regression for quantitative analysis of the major elements \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe}, and \ce{Al} in sedimentary rock samples using \gls{libs} data.
 They optimized the \gls{svr} model parameters using a genetic algorithm and cross-validation, selecting 20 characteristic emission lines as input features without dimensionality reduction.
-Their results were evaluated using the \gls{rmse} and \gls{rsd} of predicted versus measured concentrations and showed that the non-linear \gls{svr} model significantly outperformed the linear \gls{plsr} model at predicting elemental concentrations.
+Their results were evaluated using the \gls{rmse} and \gls{rsd} of predicted versus measured concentrations and showed that the non-linear \gls{svr} model significantly outperformed the linear \gls{pls} regression model at predicting elemental concentrations.
 The superior performance of \gls{svr} was attributed to its ability to handle non-linearities and matrix effects in the complex geological samples, demonstrating the potential of this machine learning technique for quantitative \gls{libs} analysis in geoscience applications.
 
 \citet{el_haddad_ann_2013} explored the application of \gls{ann} for quantitative analysis of soil samples using \gls{libs}, employing a three-layer perceptron \gls{ann} architecture to address matrix effects and nonlinearities.
@@ -52,6 +52,6 @@ Dimensionality reduction techniques such as \gls{pca} play a crucial role in man
 \citet{rezaei_dimensionality_reduction} explored various machine learning techniques combined with \gls{pca} for dimensionality reduction. Their results demonstrated that \gls{svr} with \gls{pca} performed the best for different elements, highlighting the effectiveness of dimensionality reduction techniques in improving model performance by managing the complexities of high-dimensional data.
 
 The study by \citet{liuComparisonQuantitativeAnalysis2022} explores the use of \gls{marscode} \gls{libs} for quantitative analysis of olivine in a simulated Martian atmosphere, focusing on multivariate analysis methods to address challenges posed by \gls{libs} data, such as high dimensionality and multicollinearity.
-The methods evaluated include \gls{ulr}, \gls{mvlr}, \gls{pcr}, \gls{plsr}, ridge regression, \gls{lasso}, \gls{enet}, and \gls{bpnn}.
-The findings demonstrate the effectiveness of dimension reduction techniques, especially \gls{plsr}, and nonlinear analysis for improving quantitative analysis accuracy of olivine using \gls{libs} data.
+The methods evaluated include \gls{ulr}, \gls{mvlr}, \gls{pcr}, \gls{pls} regression, ridge regression, \gls{lasso}, \gls{enet}, and \gls{bpnn}.
+The findings demonstrate the effectiveness of dimension reduction techniques, especially \gls{pls} regression, and nonlinear analysis for improving quantitative analysis accuracy of olivine using \gls{libs} data.
 This approach is particularly relevant to our work due to the focus on advanced statistical methods and machine learning algorithms for handling complex, high-dimensional \gls{libs} data, aligning with our objectives of improving accuracy and robustness in predicting major oxide compositions.
