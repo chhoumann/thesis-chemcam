@@ -21,8 +21,9 @@ The superior performance of \gls{svr} was attributed to its ability to handle no
 They demonstrated that \gls{ann} is efficient for predicting the concentrations of \ce{Al}, \ce{Ca}, \ce{Cu}, and \ce{Fe}.
 Incorporating additional spectral lines from other chemical elements, thereby increasing the amount of data input to the model, was also shown to significantly improve predictive accuracy.
 
-\citet{yangConvolutionalNeuralNetwork2022} demonstrated the effectiveness of a deep \gls{cnn} for classifying geochemical samples using \gls{libs} spectra collected at varying distances.
-Their model outperformed traditional machine learning approaches, emphasizing the potential of \gls{cnn}s for geochemical sample identification in planetary exploration missions like China's Tianwen-1.
+\citet{li2020cnn} developed a method for multi-component quantitative analysis of \gls{libs} data using a deep \gls{cnn}.
+Using over 1400 spectra from 23 Chinese standard reference materials, the \gls{cnn} was trained and validated, demonstrating superior performance in regression tasks compared to \gls{bpnn} and \gls{plsr} models.
+The \gls{cnn} achieved lower \gls{rmse} values and higher prediction accuracy, even without removing the continuum background signal from the data, emphasizing the potential of \gls{cnn}s for \gls{libs} data analysis.
 
 \subsection{Hybrid and Domain-Knowledge-Driven Models}
 Incorporating domain knowledge into machine learning models can significantly enhance their interpretability and performance.
