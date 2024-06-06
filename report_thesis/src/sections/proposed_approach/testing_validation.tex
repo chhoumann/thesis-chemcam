@@ -13,7 +13,7 @@ For this reason, it is common to use a validation set to tune hyperparameters an
 However, further splitting the training set into a validation set exacerbates the challenges of limited data availability, as described in Section~\ref{subsec:challenges}.
 Our objective is to develop models that demonstrate high accuracy and robustness, even on entirely unseen data.
 To achieve this, we employ $k$-fold cross-validation.
-This allows us to train our models on $k-1$ folds and evaluate them on the remaining fold, which provides a more robust estimate of model performance.
+This allows us to train our models on $k-1$ folds and evaluate them on the remaining fold, which provides a more robust estimate of model performance, and allows us to use all the data for training.
 Since our approach includes large-scale optimization, we prefer $k$-fold cross-validation over \gls{loocv}.
 \gls{loocv} uses each individual sample as a single test case, resulting in $n$ iterations, where $n$ is the number of samples.
 In each iteration, models and preprocessors would need to be refit, making this approach too computationally expensive and time-consuming for the scope of our study.
