@@ -118,6 +118,10 @@ The final output of this procedure consists of:
 The data partitioning does not modify the original dataset; it merely partitions it.
 For that reason, each of the datasets that are returned has the same structure as shown in Table~\ref{tab:final_dataset_example}.
 
+Given that the data partitioning procedure aims to distribute extreme concentration values evenly among the training folds while minimizing their presence in the test set, it is crucial to determine an optimal value of $p$ that minimizes the number of extreme values in the test set, while still maintaining its general representativeness.
+By general representativeness, we mean ensuring that the test set reflects the general distribution of the dataset without being skewed by extreme values.
+This balance is essential for accurately assessing the model's performance on typical data points.
+
 Our method for handling extreme values ensures that the test set does not include samples outside the range seen in the training set.
 This approach addresses several critical challenges and represents a deliberate trade-off to improve the reliability of our model evaluation:
 
@@ -126,7 +130,7 @@ If extreme values are unevenly distributed between the training and test sets, t
 By redistributing extreme values evenly across the training folds, we ensure a more balanced and fair assessment of the model's capabilities during cross-validation.
 
 Secondly, this trade-off allows for a more stable and reliable assessment of the model's performance on typical data points.
-While the test set may be less representative of the full range of data, particularly regarding rare extreme values, the evaluation focuses on the model's ability to generalize from the training data to new data within the same distribution range.
+While the test set may be less representative of the full range of data, particularly regarding the rare extreme values, the evaluation focuses on the model's ability to generalize from the training data to new data within the same distribution range.
 This is prudent because, in many practical applications, the reliability of the model on typical data points is more critical than its performance on rare extremes.
 By using cross-validation in conjunction with a separate test set, we ensure that the model is robust and performs well under typical conditions.
 
