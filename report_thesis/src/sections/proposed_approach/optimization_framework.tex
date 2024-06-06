@@ -21,7 +21,7 @@ This allows us to fully utilize Optunas sampling and pruning strategies, minimiz
 \label{alg:hyperparameter_optimization_framework}
 \begin{algorithmic}[1]
 \Require Dataset $D$, List of Models $M$, List of Preprocessors $P$, Number of Trials $N$, Random Seed $seed$, Sampler $S$, Pruner $P_r$, Data Partitioning Method $D_p$
-\Ensure Optimized Model and Preprocessor Pipeline with Logged Metrics
+\Ensure Optimized Model and Preprocessor configuration with Logged Metrics
 
 \State \textbf{Initialize:} Set random seed for reproducibility if seed is not None \label{step:initialize}
 \For{each trial $t$ from 1 to $N$} \label{step:trial_loop}
