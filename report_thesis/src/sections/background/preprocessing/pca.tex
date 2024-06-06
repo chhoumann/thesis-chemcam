@@ -1,47 +1,23 @@
 \subsubsection{Principal Component Analysis (PCA)}\label{subsec:pca}
-\gls{pca} is a dimensionality reduction technique that transforms a set of possibly correlated variables into a smaller set of uncorrelated variables called \textit{principal components}.
-We give an overview of the \gls{pca} algorithm based on \citet{James2023AnIS}.
+\gls{pca} is a dimensionality reduction technique used to reduce the number of features in a dataset while retaining as much information as possible.
+We provide an overview of \gls{pca} in this section based on \citet{dataminingConcepts} and \citet{Vasques2024}.
 
-First, the data matrix $\mathbf{X}$ is centered by subtracting the mean of each variable to ensure that the data is centered at the origin:
+\gls{pca} works by identifying the directions in which the\\$n$-dimensional data varies the most and projects the data onto these $k$ dimensions, where $k \leq n$.
+This projection results in a lower-dimensional representation of the data.
+\gls{pca} can reveal the underlying structure of the data, which enables interpretation that would not be possible with the original high-dimensional data.
 
-$$
-\mathbf{\bar{X}} = \mathbf{X} - \mathbf{\mu},
-$$
+\gls{pca} works as follows.
+First, the input data are normalized, which prevents features with larger scales from dominating the analysis.
 
-where $\mathbf{\bar{X}}$ is the centered data matrix and $\mathbf{\mu}$ is the mean of each variable.
+Then, the covariance matrix of the normalized data is computed.
+The covariance matrix captures how each pair of features in the dataset varies together.
+$k$ orthogonal unit vectors, called \textit{principal components}, are then computed from this covariance matrix.
+These vectors are perpendicular to each other and capture the directions of maximum variance in the data.
 
-The covariance matrix of the centered data is then computed:
+The principal components are then sorted such that the first component captures the most variance, the second component captures the second most variance, and so on.
+Variance is assumed by \gls{pca} to be a measure of information.
+In other words, the principal components are sorted based on the amount of information they capture.
 
-$$
-\mathbf{C} = \frac{1}{n-1} \mathbf{\bar{X}}^T \mathbf{\bar{X}},
-$$
-
-where $n$ is the number of samples.
-
-Then, the covariance matrix $\mathbf{C}$ is decomposed into its eigenvectors $\mathbf{V}$ and eigenvalues $\mathbf{D}$:
-
-$$
-\mathbf{C} = \mathbf{V} \mathbf{D} \mathbf{V}^T,
-$$
-
-where $\mathbf{V}$ contains the eigenvectors of $\mathbf{C}$.
-These eigenvectors represent the principal components, indicating the directions of maximum variance in $\mathbf{X}$.
-The interpretation of the principal components is that the first captures the most variance, the second captures the next most variance, and so on.
-The matrix $\mathbf{D}$ is diagonal and contains the eigenvalues, each quantifying the variance captured by its corresponding principal component.
-
-These components are the scores $\mathbf{T}$, calculated as follows:
-
-$$
-\mathbf{T} = \mathbf{\bar{X}} \mathbf{V}_n,
-$$
-
-where $\mathbf{V}_n$ includes only the top $n$ eigenvectors.
-The scores $\mathbf{T}$ are the new, uncorrelated features that reduce the dimensionality of the original data, capturing the most significant patterns and trends.
-
-Finally, the original data points are projected onto the space defined by the top $n$ principal components, which transforms $X$ into a lower-dimensional representation:
-
-$$
-\mathbf{X}_{\text{reduced}} = \mathbf{\bar{X}} \mathbf{V}_n,
-$$
-
-where $\mathbf{V}_n$ is the matrix that only contains the top $n$ eigenvectors.
+After computing and sorting the principal components, the data can be projected onto the most informative principal components.
+This projection results in a lower-dimensional approximation of the original data.
+The number of principal components to keep is a hyperparameter that can be tuned to balance the trade-off between the amount of information retained and the dimensionality of the data.

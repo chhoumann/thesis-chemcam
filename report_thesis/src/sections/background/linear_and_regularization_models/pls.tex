@@ -1,46 +1,25 @@
-\subsubsection{Partial Least Squares (PLS)}
-We now describe \gls{pls} based on \citet{James2023AnIS}.
+\subsubsection{Principal Component Regression (PCR) \& Partial Least Squares (PLS)}\label{subsec:pls}
 In order to understand \gls{pls}, it is helpful to first consider \gls{pcr}, as \gls{pls} is an extension of \gls{pcr} that aims to address some of its limitations.
+We provide provide an overview of both regression techniques based on \citet{James2023AnIS}.
 
 \gls{pcr} extends \gls{pca} in the context of regression analysis.
-In \gls{pcr}, the dataset $\mathbf{X}$ is decomposed using \gls{pca} as:
+First, \gls{pca} is performed to identify the $M$ principal components that capture the most variance in the data.
+These components are then used in a linear regression model to predict the target variable by fitting a linear model via least squares regression.
+The key intuition behind \gls{pcr} is that a small number of principal components are sufficient to capture most of the variance in the data, which can then be used to predict the target variable.
+That is, the directions of the principal components are assumed to be associated with the target variable.
+If this assumption holds, a least squares regression model fitted to the principal components provides better predictions than a model fitted to the original features because the principal components indeed capture the most important information in the data.
 
-$$
-\mathbf{X} = \mathbf{TV}^T + \mathbf{E},
-$$
+One drawback of \gls{pcr} is that it does not consider the target variable in the decomposition of the features and therefore assumes that components with larger variance have a stronger correlation with the target than those with smaller variance.
+The components that capture the most variation may not be the most predictive of the target; some data might be highly variable but irrelevant to the target.
 
-where $\mathbf{T}$ represents the scores, $\mathbf{E}$ represents the residual matrix, and $\mathbf{V}$ represents the loadings.
-\gls{pcr} utilizes these scores $\mathbf{T}$ in a linear regression model to predict the target variable $\mathbf{y}$:
-
-$$
-\mathbf{y} = \mathbf{Tb} + \mathbf{e},
-$$
-
-where $\mathbf{b}$ are the regression coefficients correlating $\mathbf{T}$ to $\mathbf{y}$, and $\mathbf{e}$ is the vector of residuals, capturing the prediction errors.
-
-One drawback of \gls{pcr} is that it does not consider the target in the decomposition of the features and therefore assumes that smaller components have a weaker correlation with the target than the larger ones.
-This assumption does not always hold, which is what \gls{pls} aims to address.
-
+To address this limitation, \gls{pls} extends \gls{pcr} by considering the target variable when identifying the components.
 \gls{pls} uses an iterative method to identify components that maximize the covariance between the features and the target.
-These components, $Z$, are linear combinations of the original features, $\mathbf{X}_j$, weighted by coefficients, $\phi_j$, which are specifically calculated to reflect this covariance.
-The formula for each component is expressed as:
+Similar to \gls{pcr}, \gls{pls} identifies $M$ components that capture the most variance in the data and fits a linear model with least squares regression.
+However, unlike \gls{pcr}, \gls{pls} uses the target variable to identify the components that are most predictive of the target, resulting in components that not only approximate the data but also relate to the target variable.
+In essence, \gls{pls} aims to find components that are both informative about the data and predictive of the target.
 
-$$
-    Z = \sum_{j=1}^{p} \phi_j \mathbf{X}_j,
-$$
-
-where $Z$ represents the component, $\mathbf{X}_j$ is the $j$-th feature, and $\phi_j$ is the weight for the $j$-th feature.
-The weights, $\phi_j$, are determined by the formula:
-
-$$
-    \phi_j = \frac{\text{cov}(\mathbf{X}_j, Y)}{\text{var}(\mathbf{X}_j)}.
-$$
-
-To refine the model iteratively, PLS uses the residuals from the previous components to calculate the next component.
-The $m$-th component, for example, is derived from the residuals of the previous $m-1$ components:
-
-$$
-    Z_m = \sum_{j=1}^{p} \phi_{jm} \hat{\mathbf{X}}_{j, m-1}.
-$$
-
-The components are then used to predict the target variable by fitting a linear model via least squares regression.
+This is an iterative process where the residuals from the previous components are used to calculate the next component.
+Specifically, the $m$-th component is derived from the residuals of the previous $m-1$ components.
+These residuals represent the part of the data that has not been explained by the previous components.
+The iteration can be repeated $M$ times to identify $M$ components, where $M$ is a tunable hyperparameter.
+Afterwards, the components are used to predict the target variable by fitting a linear model via least squares regression, just like in \gls{pcr}.
