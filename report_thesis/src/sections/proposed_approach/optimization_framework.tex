@@ -50,30 +50,31 @@ This allows us to fully utilize Optunas sampling and pruning strategies, minimiz
     \State $m'$ $\gets$ \texttt{sample\_hyperparameters()} \label{step:sample_hyperparameters}
     \Statex
     \Statex // Sample and instantiate preprocessors using \texttt{sampler}
-    \State \text{scaler} $\gets$ \texttt{sample\_scaler()}
-    \State \text{transformer} $\gets$ \texttt{sample\_transformer()} \textbf{or} \text{NONE}
-    \State \text{dim\_reduction} $\gets$ \texttt{sample\_dim\_reduction()} \textbf{or} \text{NONE}
+    \State \texttt{scaler} $\gets$ \texttt{sample\_scaler()}
+    \State \texttt{transformer} $\gets$ \texttt{sample\_transformer()} \textbf{or} \text{NONE}
+    \State \texttt{dim\_reduction} $\gets$ \texttt{sample\_dim\_reduction()} \textbf{or} \text{NONE}
     \Statex
     \Statex // Construct pipeline of preprocessors in that order
-    \State \text{pipeline} $\gets$ [\text{scaler}, \text{transformer}, \text{dim\_reduction}]
+    \State \texttt{pipeline} $\gets$ [\texttt{scaler}, \texttt{transformer}, \texttt{dim\_reduction}]
     \Statex
     \Statex // Apply data partitioning
     \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$
     \Statex
     \Statex // Apply preprocessing to $D_{train}$ and $T_{cv}$
-    \State $D_{train}'$ $\gets$ \texttt{pipeline\_apply}($D_{train}$, \text{pipeline})
-    \State $T_{cv}'$ $\gets$ \texttt{pipeline\_apply}($T_{cv}$, \text{pipeline})
+    \State $D_{train}'$ $\gets$ \texttt{pipeline\_apply}($D_{train}$, \texttt{pipeline})
+    \State $T_{cv}'$ $\gets$ \texttt{pipeline\_apply}($T_{cv}$, \texttt{pipeline})
     \Statex
-    \State $CV_{metrics}$ $\gets$ \texttt{cross\_validate}($m'$, $T_{cv}'$, \text{pipeline}) 
-    % \State $T_{cv}' \gets \text{pipeline\_apply}(T_{cv}, \text{pipeline})$
-    % % \State $D_{train}' \gets \text{apply preprocessing to } D_{train}$
-    % \State $T_{cv}' \gets \text{apply preprocessing to } T_{cv}$
-    % \Statex
+    \State $CV_{metrics} \gets \texttt{cross\_validate}(m', T_{cv}')$
+    \State $rmse_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{rmse\_values})$
+    \State $std\_dev_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{std\_dev\_values})$
+    \Statex
+    \State $m'$ $\gets$ \texttt{train}($m'$, $D_{train}'$)
+    \State $rmsep$, $\sigma_{error, test}$ $\gets$ \texttt{evaluate}($m'$, $D_{test}$)
+    \Statex
+    % function that stores the metrics
+    \State \texttt{store\_metrics}($t$, $m'$, $pipeline$, $rmse\_cv$, \newline \hspace*{8em}$std\_dev\_cv$, $rmsep$, $\sigma_{error, test}$)
 \EndFor
-\State Save the best configuration, hyperparameters, and performance metrics \label{step:save_best_configuration}
-% Might want to remove below and instead return all configurations
-\State \Return the best configuration across all models and preprocessors \label{step:return_best_configuration}
-
+\State \Return \texttt{rmse\_cv}, \texttt{std\_dev\_cv}, \texttt{rmsep}, $\sigma_{error, test}$
 \end{algorithmic}
 \end{algorithm}% This increases the likelyhood at identifying the 
 
