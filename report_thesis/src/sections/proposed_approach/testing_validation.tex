@@ -185,7 +185,7 @@ Our method for partitioning mitigates the risk of uneven distribution of extreme
 If extreme values are unevenly distributed between the training and test sets, the evaluation of the model can be heavily skewed, leading to unreliable and misleading performance metrics.
 By redistributing extreme values evenly across the training folds, we ensure a more balanced and fair assessment of the model's capabilities during cross-validation.
 However, excluding extreme values from the test set may limit the test set's ability to challenge the model fully.
-Our method for handling extreme values ensures that the test set does not include samples outside the range seen in the training set.
+Our method for handling extreme values means that the test set does not include samples outside the range seen in the training set.
 Although the test set may be less representative of the full range of data, particularly concerning the rare extreme values, the evaluation focuses on the model's ability to generalize from the training data to new data within the typical distribution range.
 Essentially, this trade-off ensures that the model is evaluated on data points within the range the model was trained on, thereby providing a fairer assessment.
 However, it is important to recognize the limitation of this approach: excluding extreme values from the test set means we can only confidently assess the model's performance within the test set's range.
