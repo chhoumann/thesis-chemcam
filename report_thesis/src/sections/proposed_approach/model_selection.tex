@@ -34,15 +34,10 @@ Based on these factors, we decided to include \gls{ann} and \gls{cnn} in our exp
 
 To further bolster our selection pool, we included models from the same family as those that showed promise in the literature.
 
-\gls{xgboost} was included in our experiments based on its promising accuracy in various settings.
-For example, \citet{xgboost_in_biomedicie} showed that \gls{xgboost} outperformed models such as \gls{rf} and \gls{svm} in predicting biological activity based on quantitative description of the compound's molecular structure.
-Another example is \citet{xgboost_in_heart_disease}, who used \gls{xgboost} to predict heart disease and found that \gls{xgboost} outperformed \gls{rf} and \gls{etr} in correctly classifying patients with heart disease.
-Due to these factors and the limited study of \gls{xgboost} in the context of \gls{libs} data, we decided to include it in our experiments.
-
-Following the same logic, we included \gls{ngboost}.
-\gls{ngboost} is a recent model introduced by \citet{duan_ngboost_2020} that, according to their work, improves upon \gls{gbr} by using a more sophisticated loss function and a more advanced gradient boosting algorithm.
-Limited research has been conducted using this algorithm in the context of \gls{libs} data.
-However, \citet{ngboost_landslide} showed that \gls{ngboost} outperformed \gls{xgboost} and \gls{rf} in correctly determining landslide-prone fields, with an AUC of 0.898 compared to 0.871 and 0.863 for \gls{xgboost} and \gls{rf}, respectively.
+\gls{xgboost} and \gls{ngboost} both belong to the gradient boosting family, but they approach gradient boosting in distinct ways.
+\gls{xgboost} uses advanced algorithmic optimizations, such as regularization, tree pruning, and parallel processing, to improve performance and prevent overfitting. 
+On the other hand, \gls{ngboost} focuses on sophisticated probabilistic loss functions, optimizing the natural gradient to model the entire probability distribution of the target variable, making it well-suited for tasks requiring uncertainty estimation and probabilistic forecasting.
+Given these differences and the limited studies on their application to \gls{libs} data, we decided to include both in our experiments.
 
 Finally, ridge regression, \gls{enet}, \gls{etr}, and \gls{lasso} were included in various studies and showed promising results, even if they were not the top performers in their respective studies.
 Therefore, we chose to include these in our experiments to further diversify our model selection.
