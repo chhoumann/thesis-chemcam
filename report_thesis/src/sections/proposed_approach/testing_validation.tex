@@ -175,7 +175,7 @@ Therefore, we have the following metrics for each experiment:
     \item \textbf{Test Set \gls{rmse} and Standard Deviation:} The \gls{rmse} and standard deviation are also computed for the test set, denoted as \texttt{rmsep} and \texttt{std\_dev}, to provide a measure of the model's performance on unseen data.
 \end{enumerate}
 
-\subsubsection{Trade-offs in Data Partitioning for Model Evaluation}
+\subsubsection{Discussion of Testing and Validation Strategy}
 Our proposed approach to data partitioning addresses several critical challenges and represents a deliberate trade-off to improve the reliability of our model evaluation.
 The first challenge concerned data leakage. We believe our method effectively handles this issue without significant trade-offs.
 The second challenge we presented is the trade-off between having a representative training set that includes extreme values, thereby avoiding overfitting, and ensuring the test set is sufficiently challenging to accurately assess the model's generalization across the full range of data variability.
@@ -191,13 +191,11 @@ Essentially, this trade-off ensures that the model is evaluated on data points w
 However, it is important to recognize the limitation of this approach: excluding extreme values from the test set means we can only confidently assess the model's performance within the test set's range.
 If predictions fall outside this range, we cannot reliably assert their accuracy, as the model has not been fully evaluated on such data.
 This could potentially reduce the model's usefulness in scenarios where predictions on extreme values are critical.
+Furthermore, since our data partitioning method allocates the most extreme values to the training data, the testing data tends to be closer to the mean of the data distribution, making it easier to predict.
+In practice, this results in lower \texttt{rmsep} and \texttt{std\_dev} values compared to the cross-validation metrics.
+This further emphasizes the importance of evaluating the model's performance using both the cross-validation metrics (\texttt{rmse\_cv} and \texttt{std\_dev\_cv}) and the test set metrics (\texttt{rmsep} and \texttt{std\_dev}).
 
 Therefore, although our approach may render the test set less representative of the full dataset, it is a deliberate trade-off aimed at achieving a more accurate and reliable evaluation of the model's generalization performance.
 By evaluating with both cross-validation and a separate test set, we ensure that the model both generalizes well and performs well under typical conditions.
 Cross-validation allows us to evaluate the model's performance across the entire dataset, including extreme values, while the test set provides a measure of the model's performance on unseen, typical data.
 This combination of cross-validation and a separate test set provides a comprehensive assessment of the model's performance, ultimately helping to ensure that the model is both robust and accurate.
-
-Since our data partitioning method allocates the most extreme values to the training data, the testing data tends to be closer to the mean of the data distribution, making it easier to predict.
-In practice, this results in lower \texttt{rmsep} and \texttt{std\_dev} values compared to the cross-validation metrics.
-This further emphasizes the importance of evaluating the model's performance using both the cross-validation metrics (\texttt{rmse\_cv} and \texttt{std\_dev\_cv}) and the test set metrics (\texttt{rmsep} and \texttt{std\_dev}).
-Cross-validation metrics provide insights into the model's stability across different subsets, while the test set metrics offer a final measure of performance on truly unseen data, providing a comprehensive assessment of the model's generalizability.
