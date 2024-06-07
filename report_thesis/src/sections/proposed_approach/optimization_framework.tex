@@ -1,7 +1,7 @@
 \subsection{Optimization Framework}\label{sec:optimization-framework}
 One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators.
 \citet{wolpert1992stacked} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses.
-In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide and the fact that we are also considering the optimal preprocessing techniques for each base estimator.
+In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide and the fact that we are also considering the optimal preprocessing techniques for each base estimator, as well as, the hyperparameters for each.
 This means, that we are considering an entire pipeline of preprocessing techniques and base estimators for each target oxide.
 Therefore, we need a systematic approach to determine the optimal configuration for each pipeline.
 To guide this process we have developed a working assumption.
@@ -13,7 +13,20 @@ This reduces the problem to finding a selection of preprocessors and models, and
 In Section~\ref{sec:model-selection} we outlined the models and preprocessing techniques that we intend to use and in the following section we will describe the optimization framework that we have developed to address this challenge.
 
 \subsubsection{The Framework}
-The framework developed to address this challenge was constructed based on a set of criteria.
+The framework developed to address this challenge was constructed based on a specific set of criteria.
+The framework had to be able to search through a combined search space of models and preprocessing techniques.
+This could be done by traditional methods such as grid search or random search, but due to the vast search space, these methods would require an infeasible amount of time to correctly identify the optimal pipelines for each oxide.
+This meant that the framework also needed to have an efficient search strategy.
+Ideally, the framework should be able to balance exploration and exploitation of the search space.
+This would allow the framework to identify multiple promising configurations, but also focus on the most promising.
+Additionally, not all configurations will be promising. 
+Some permutations of hyperparameters, combination of models and preprocessing techniques or both, may not be optimal.
+This could to scenarios where the framework is wasting computational resources on configurations that should be terminated early.
+% The first criterion was that the framework should be able to search through a combined search space of models and preprocessing techniques.
+% This means that the number variables to search through is large. 
+% Therefore, traditional methods such as grid search or random search are not feasible, as they would most likely require an infeasible amount of time to correctly identify the optimal pipelines for each oxide.
+% This leads to the next criteria, which is an efficient search strategy and early stopping.
+
 % So: We're doing the search.
 % We need to ensure that this search aligns with our goals defined in problem def. Need models that generalize, are robust, and are accurate. (callback: problem def). Can't be a random search due to the amount of variables to check. Likewise for grid-search. Would take too long for our task.
 % The search should have an objective function that seeks to achieve these goals.
