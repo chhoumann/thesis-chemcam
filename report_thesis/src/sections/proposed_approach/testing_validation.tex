@@ -131,24 +131,25 @@ By general representativeness, we mean ensuring that the test set reflects the g
 This balance is essential for accurately assessing the model's performance on typical data points.
 
 Our proposed approach to data partitioning addresses several critical challenges and represents a deliberate trade-off to improve the reliability of our model evaluation.
+The first challenge concerned data leakage. We believe our method effectively handles this issue without significant trade-offs.
+The second challenge we presented is the trade-off between having a representative training set that includes extreme values, thereby avoiding overfitting, and ensuring the test set is sufficiently challenging to accurately assess the model's generalization across the full range of data variability.
+We will further examine this trade-off below.
 
-Firstly, it mitigates the risk of uneven distribution of extreme values, which can disproportionately affect model performance metrics.
+Our method for partitioning mitigates the risk of uneven distribution of extreme values, which can disproportionately affect model performance metrics.
 If extreme values are unevenly distributed between the training and test sets, the evaluation of the model can be heavily skewed, leading to unreliable and misleading performance metrics.
 By redistributing extreme values evenly across the training folds, we ensure a more balanced and fair assessment of the model's capabilities during cross-validation.
-
-Secondly, this trade-off ensures a more stable and reliable assessment of the model's performance on typical data points.
+However, excluding extreme values from the test set may limit the test set's ability to challenge the model fully.
 Our method for handling extreme values ensures that the test set does not include samples outside the range seen in the training set.
-Although the test set may be less representative of the full range of data, particularly concerning the rare extreme values, the evaluation focuses on the model's ability to generalize from the training data to new data within the same distribution range.
-Essentially, this trade-off ensures that the model is evaluated on data points within the range the model was trained on, which is a more realistic evaluation of the model's performance.
-By using cross-validation in conjunction with a separate test set, we ensure that the model is both robust and performs well under typical conditions.
-
+Although the test set may be less representative of the full range of data, particularly concerning the rare extreme values, the evaluation focuses on the model's ability to generalize from the training data to new data within the typical distribution range.
+Essentially, this trade-off ensures that the model is evaluated on data points within the range the model was trained on, thereby providing a fairer assessment.
 However, it is important to recognize the limitation of this approach: excluding extreme values from the test set means we can only confidently assess the model's performance within the test set's range.
 If predictions fall outside this range, we cannot reliably assert their accuracy, as the model has not been fully evaluated on such data.
 This could potentially reduce the model's usefulness in scenarios where predictions on extreme values are critical.
-Nevertheless, cross-validation partially mitigates this issue by allowing the model to learn from extreme values during the training and validation phases, thereby improving its robustness.
-Metrics obtained from cross-validation provide a broader view of the model's accuracy and robustness across the entire dataset, including extreme values.
 
 Therefore, although our approach may render the test set less representative of the full dataset, it is a deliberate trade-off aimed at achieving a more accurate and reliable evaluation of the model's generalization performance.
+By evaluating with both cross-validation and a separate test set, we ensure that the model both generalizes well and performs well under typical conditions.
+Cross-validation allows us to evaluate the model's performance across the entire dataset, including extreme values, while the test set provides a measure of the model's performance on unseen, typical data.
+This combination of cross-validation and a separate test set provides a comprehensive assessment of the model's performance, ultimately helping to ensure that the model is both robust and accurate.
 
 Our method is inspired by the approach described by \citet{andersonImprovedAccuracyQuantitative2017}.
 They employed a similar strategy to assess the performance of their PLS model, using k-fold cross-validation and a separate test set.
