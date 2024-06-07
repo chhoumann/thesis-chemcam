@@ -1,0 +1,35 @@
+\subsubsection{Power Transformation}
+Power transformations are a class of mathematical functions used to stabilize variance and make data more closely approximate a normal distribution.
+They are particularly useful in statistical modeling and data analysis to meet the assumptions of linear models.
+
+One of the first influential power transformation techniques is the Box-Cox power transform, introduced by \citet{BoxAndCox} in 1964.
+This is defined for positive data and is aimed at normalizing data or making it more symmetric.
+For a feature vector $\mathbf{x}$, the Box-Cox transformation is defined as:
+
+$$
+\psi^{\text{BC}}(\lambda, \mathbf{x}) =
+\begin{cases}
+\frac{\mathbf{x}^\lambda - 1}{\lambda}, & (\lambda \neq 0) \\
+\log(\mathbf{x}), & (\lambda = 0)
+\end{cases},
+$$
+
+where $\lambda$ is the transformation parameter.
+$\lambda$ determines the extend and nature of the transformation, where positive values of $\lambda$ apply a power transformation and $\lambda = 0$ applies a logarithmic transformation.
+
+To overcome the limitations of the Box-Cox transformation, \citet{YeoJohnson} introduced a new family of power transformations that can handle both positive and negative values.
+The Yeo-Johnson power transformation is defined as:
+
+$$
+\psi(\lambda, \mathbf{x}) =
+\begin{cases}
+\frac{(\mathbf{x} + 1)^\lambda - 1}{\lambda} & (\mathbf{x} \geq 0, \lambda \neq 0) \\
+\log(\mathbf{x} + 1) & (\mathbf{x} \geq 0, \lambda = 0) \\
+- \frac{(-\mathbf{x} + 1)^{2 - \lambda} - 1}{2 - \lambda} & (\mathbf{x} < 0, \lambda \neq 2) \\
+-\log(-\mathbf{x} + 1) & (\mathbf{x} < 0, \lambda = 2)
+\end{cases}
+$$
+
+For non-negative values, the Yeo-Johnson transformation simplifies to the Box-Cox transformation, making them equivalent in this context.
+The key benefit of the Yeo-Johnson transformation is its ability to handle any real number, making it a robust choice for transforming data to achieve approximate normality or symmetry.
+This property is particularly beneficial for preparing data for statistical analyses and machine learning models that require normally distributed input data.

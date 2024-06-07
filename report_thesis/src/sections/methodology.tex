@@ -4,29 +4,10 @@ Then, using this knowledge, develop a pipeline that utilizes the strengths of th
 We first describe the datasets used, including their preparation and the method of splitting for model training. Next, we outline the preprocessing steps and the model selection process, followed by a detailed explanation of the experimental setup and evaluation metrics. Finally, we discuss our validation testing procedures and the approach taken to ensure unbiased final model evaluations.
 
 
-\subsection{Data Preparation}
-Similarly to our previous work \citet{p9_paper}, we used the publicly available \gls{ccs} data from NASA's \gls{pds}~\cite{PDSGeoscienceNode}.
-\gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis.
-A comprehensive description of this preprocessing procedure is available in \citet{wiensPreflightCalibrationInitial2013}.
+\subsection{Data Preparation}\label{sec:data-preparation}
+The first step in our methodology is to prepare the datasets for model training and evaluation.
+As mentioned in Section~\ref{sec:data-overview}, the data used in this study was obtained from NASA's \gls{pds} and consists of \gls{ccs} data and major oxide compositions for various samples.
 
-\begin{table*}[h]
-\centering
-\begin{tabular}{llllllll}
-\toprule
-     wave &         shot1 &         shot2 &  $\cdots$ &        shot49 &       shot50  & median        & mean          \\
-\midrule
-240.81100 & 6.4026649e+15 & 4.0429349e+15 & $\cdots$  & 1.7922483e+15 & 1.7126615e+15 & 1.9892956e+15 & 1.7561699e+15 \\
-240.86501 & 3.8557462e+12 & 2.2923680e+12 & $\cdots$  & 1.1355429e+12 & 8.6930379e+11 & 7.8172542e+11 & 7.2805052e+11 \\
-$\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$      & $\vdots$      & $\vdots$      \\
-905.38062 & 1.8823427e+08 & 58500403.     & $\cdots$  & -8449286.6    & 8710775.0     & 4.0513312e+09 & 5.2188327e+09 \\
-905.57349 & 1.9864713e+10 & 1.2956832e+10 & $\cdots$  & 1.9785415e+10 & 7.1994239e+09 & 1.1311150e+10 & 1.2201224e+10 \\
-\bottomrule
-\end{tabular}
-\caption{Example of CCS data for a single location (from \citet{p9_paper})}
-\label{tab:ccs_data_example}
-\end{table*}
-
-While the \gls{ccs} data is in a more suitable form for quantitative analysis, it still requires further preprocessing. Table~\ref{tab:ccs_data_example} shows an example of the \gls{ccs} data for a single location of a sample. This corresponds to shots ($s$) and wavelength ($\lambda$) of the Intensity Tensor \ref{matrix:intensity} for this location.
 The initial five shots from each sample are excluded because they are usually contaminated by dust covering the sample, which is cleared away by the shock waves produced by the laser \cite{cleggRecalibrationMarsScience2017}.
 The remaining 45 shots from each location are then averaged, yielding a single spectrum $s$ per location $l$ in the Averaged Intensity Tensor\ref{matrix:averaged_intensity}, resulting in a total of five spectra for each sample. 
 
@@ -94,34 +75,6 @@ The \textit{Target} column corresponds to the sample name, while the \textit{ID}
 \caption{Excerpt from the final dataset (values have been rounded to two decimal places for brevity).}
 \label{tab:final_dataset_example}
 \end{table*}
-
-
-\subsection{Model and Preprocessing Selection}
-For the initial investigative experiments, we selected a range of models for further exploration, namely \gls{svr}, \gls{gbr}, \gls{pls}, \gls{xgboost}, \gls{ngboost}, \gls{etr}, \gls{enet}, and \gls{sgdr}.
-We also included regular \gls{ann} and \gls{cnn} in this phase of experimentation.
-This selection was guided primarily by the literature review but also by exploratory intuition, aiming to discover potentially innovative applications and performances within our specific dataset.
-
-Our literature review highlighted various approaches and their effectiveness in handling the challenges associated with predicting major oxide compositions from \gls{libs} data.
-For instance, \citet{andersonImprovedAccuracyQuantitative2017} discussed the use of multiple regression models, finding that different models excelled with specific oxides, which informed our model-specific approach.
-\citet{song_DF-K-ELM} presented a hybrid model combining domain knowledge with machine learning, which inspired our interest in models that could offer both high performance and interpretability. \citet{rezaei_dimensionality_reduction} demonstrated the beneficial impact of dimensionality reduction techniques like \gls{pca}, which we considered essential for managing our high-dimensional \gls{libs} data.
-
-All models were evaluated for their performance across each of the major oxides relevant to this study. 
-Our preliminary analysis indicated model-specific strengths, suggesting the potential for leveraging different models for specific prediction tasks. 
-This observation motivated us to develop architectural frameworks designed to systematically capitalize on the strengths of each model for specific oxides
-
-An interesting discovery from our literature review was a study on the stacking and chaining of normalization methods initially aimed at classification contexts.
-Inspired by these ideas, we explored the possibility of improving model performance by optimizing the preprocessing chain for each model, per oxide, in order to determine which normalization methods would be most beneficial.
-For this purpose, we considered the following preprocessing techniques: Min-Max normalization, Z-Score normalization, Robust Scaling, Max Absolute Scaling, Norm 3, Quantile Transformer and Power Transformer.
-Additionally, we also considered dimensionality reduction techniques such as \gls{pca} and \gls{kernel-pca}.
-Through experimentation, we identified which preprocessing techniques were most effective for each model and oxide.
-Realizing the potential of this, we decided to further investigate how the predictive accuracy and robustness could be improved by combining the strengths of these models and preprocessing techniques.
-From our investigation, we determined that the stacking ensemble method seemed very promising and novel in the LIBS analysis field, leading us to select it as the primary method for our study.
-
-Stacking ensemble is analogous to the methodologies employed in the original \gls{moc} pipeline, which also tailored predictions for each oxide by blending outputs from the \gls{pls1-sm} and \gls{ica} phases, variably weighting the influence of the \gls{ica} predictions depending on the oxide.
-Unlike the \gls{moc} model, which required manual determination of the model weightings for each oxide, our method utilizes a meta learner to learn optimal parameter settings.
-Stacking ensemble is beneficial as it dynamically adapts to our dataset's characteristics without the need for domain-specific knowledge.
-This approach represents a more sophisticated method, streamlining complex model configurations and potentially enhancing predictive accuracy through dynamically learned integrations, rather than fixed presets.
-
 
 \subsection{Experimental Setup}
 Experiments were conducted on a machine equipped with an Intel Xeon Gold 6242 CPU, featuring 16 cores and 32 threads.

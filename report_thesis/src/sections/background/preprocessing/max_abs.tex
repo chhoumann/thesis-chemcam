@@ -1,0 +1,12 @@
+\subsubsection{Max Absolute Scaler}
+Max absolute scaling is a normalization technique that scales each feature individually so that the maximum absolute value of each feature is 1.
+This results in the data being normalized to a range between -1 and 1.
+The formula for max absolute scaling is given by:
+
+$$
+x'_i = \frac{x_i}{\max(|\mathbf{x}|)},
+$$
+
+where $x_i$ is the original feature value, $\max(|\mathbf{x}|)$ is the maximum absolute value of the feature vector $\mathbf{x}$, and $x'_i$ is the normalized feature value.
+This scaling method is particularly useful for data that has been centered at zero or is sparse, as max absolute scaling does not alter the mean of the data.
+Additionally, it preserves the sparsity of the data by ensuring that zero entries remain zero, thereby not introducing any non-zero values~\cite{Vasques2024}.
