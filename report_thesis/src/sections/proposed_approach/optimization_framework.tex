@@ -22,50 +22,19 @@ This would allow the framework to identify multiple promising configurations, bu
 Additionally, not all configurations will be promising. 
 Some permutations of hyperparameters, combination of models and preprocessing techniques or both, may not be optimal.
 This could to scenarios where the framework is wasting computational resources on configurations that should be terminated early.
-% The first criterion was that the framework should be able to search through a combined search space of models and preprocessing techniques.
-% This means that the number variables to search through is large. 
-% Therefore, traditional methods such as grid search or random search are not feasible, as they would most likely require an infeasible amount of time to correctly identify the optimal pipelines for each oxide.
-% This leads to the next criteria, which is an efficient search strategy and early stopping.
+Therefore, the framework should have a mechanism to terminate unpromising trials early.
+Finally, the framework should be able to optimize for multiple metrics simultaneously, because as outlined in Section~\ref{subsec:validation_testing_procedures} evaluating solely on the RMSEP may lead to misleading and poor results.
+For these reasons, we chose to use Optuna as the basis of our optimization framework.
 
-% So: We're doing the search.
-% We need to ensure that this search aligns with our goals defined in problem def. Need models that generalize, are robust, and are accurate. (callback: problem def). Can't be a random search due to the amount of variables to check. Likewise for grid-search. Would take too long for our task.
-% The search should have an objective function that seeks to achieve these goals.
-% We have established our process for determining whether models (configurations!) are robust & accurate based on the metrics we define. (callback: testing-validation). This includes both CV & eval on a test set.
-% We emphasize the importance of evaluating performance based on cross validation metrics. As mentioned in the testing-validation section, searching for RMSEP will lead to misleading & poor results!
-% So we define the objective function we wish to optimize as a Multi-objective Optimization on minimizing the rmse_cv and std_dev_cv metrics.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Optuna is a hyperparameter optimization framework designed for direct integration with Python. Its dynamic embedding capability allows hyperparameters to be defined and adjusted within the code during execution, providing additional flexibility and ease of debugging. 
-Optuna uses advanced sampling strategies to explore promising areas of the search space and employs pruning techniques to terminate unpromising trials early, optimizing computational resource use. 
-It also supports scaling across multiple machines by distributing the optimization process, allowing for concurrent optimization. 
-Additionally, tools are provided to identify and focus on the most impactful parameters, aiding in the efficient handling of high-dimensional search spaces. \cite{optuna_2019} 
-Because an essential aspect of our study is to identify the optimal configuration of model and preprocessing techniques for that model on a per-oxide basis, these factors make Optuna an ideal choice as the basis of our optimization framework.
-Optunas flexibility meant that it was easy to customize the optimization process to solve this problem and integrate it with our existing codebase.
-
-At the core of the framework is what is referred to as the objective function.
-The objective function acts as the primary building block, where the sampling parameters are set for the preprocessing techniques and the models and is the function that is minimized. % rephrase
-Sampling parameters in this context relate to the range of values or options that the optimizer can choose from.
-
-Because we want to identify not only the best model configuration, but also the best preprocessing configuration for that model, we have combined the sampling of the model and preprocessing parameters into a single objective function.
-By doing this, we can optimize the entire pipeline in a single step, rather than optimizing the model and preprocessing steps separately.
-% We 
-With such a setup, Optuna will attempt to optimize any permutation of scaler, transformer, dimensionality reduction, and model hyperparameters throughout the optimization process.
-This allows us to fully utilize Optunas sampling and pruning strategies, minimizing wasted time and computational resources on poor configurations.
+Optuna is a hyperparameter optimization framework designed for direct integration with Python.
+The framework's flexible search space definition allows it to dynamically adjust and optimize hyperparameters during execution. 
+This flexibility enables the exploration of a wide range of hyperparameter configurations, adapting to the specific needs and complexities of different modeling scenarios. 
+By supporting conditional and dependent hyperparameters, the framework can handle more sophisticated models and optimization strategies, ensuring that the best possible configurations are identified even in highly complex spaces.
+Additionally, Optuna uses advanced sampling strategies to explore promising areas of the search space and employs pruning techniques to terminate unpromising trials early, optimizing computational resource use. These combined features enable efficient and effective hyperparameter optimization, balancing exploration and exploitation while conserving computational resources. \cite{optuna_2019}
+However, it should be noted that while Optuna is an ideal choice for our optimization framework, it is not without its limitations.
+Because there is no one-size-fits-all solution for selecting the search strategy, how frequently to explore versus exploiting the search space and which pruning strategy to use there will still be choices that are heuristic in nature.
+Nevertheless, Optuna provides solid options for all of these and the framework makes adjusting these choices easy.
+Therefore, using Optuna as the basis for our optimization framework, combining it with our data partitioning and cross-validation strategy, we have a systematic approach to identifying the top-$n$ best pipelines for each oxide.
 
 \begin{algorithm}
 \caption{Hyperparameter Optimization Framework}
@@ -76,35 +45,35 @@ This allows us to fully utilize Optunas sampling and pruning strategies, minimiz
 
 \State \textbf{Initialize:} Set random seed for reproducibility if seed is not None \label{step:initialize}
 \For{each trial $t$ from 1 to $N$} \label{step:trial_loop}
-    \State $hp \gets \texttt{sample\_hyperparameters}(m, \texttt{sampler})$
+    \State $hp \gets \texttt{sample\_hyperparameters}(m, \texttt{sampler})$ \label{step:sample_hyperparameters}
     \State $m' \gets \texttt{instantiate\_model}(m, hp)$ \label{step:instantiate_model}
     \Statex
-    \State $s\_params \gets \texttt{sample\_scaler\_params}(\texttt{sampler})$ \State $s \gets \texttt{instantiate\_scaler}(s\_params)$
-    \State $t\_params \gets \texttt{sample\_transformer\_params}(\texttt{sampler})$
-    \State $t \gets \texttt{instantiate\_transformer}(t\_params)$ \newline \hspace*{3em} \textbf{or} NONE
-    \State $dr\_params \gets \texttt{sample\_dim\_reduction\_params}(\texttt{sampler})$
-    \State $dr \gets \texttt{instantiate\_dim\_reduction}(dr\_params)$ \newline \hspace*{3em}\textbf{or} NONE
+    \State $s\_params \gets \texttt{sample\_scaler\_params}(\texttt{sampler})$ \label{step:sample_scaler_params}
+    \State $s \gets \texttt{instantiate\_scaler}(s\_params)$ \label{step:instantiate_scaler}
+    \State $t\_params \gets \texttt{sample\_transformer\_params}(\texttt{sampler})$ \label{step:sample_transformer_params}
+    \State $t \gets \texttt{instantiate\_transformer}(t\_params)$ \newline \hspace*{3em} \textbf{or} NONE \label{step:instantiate_transformer}
+    \State $dr\_params \gets \texttt{sample\_dim\_reduction\_params}(\texttt{sampler})$ \label{step:sample_dim_reduction_params}
+    \State $dr \gets \texttt{instantiate\_dim\_reduction}(dr\_params)$ \newline \hspace*{3em}\textbf{or} NONE \label{step:instantiate_dim_reduction}
     \Statex     
-    \State $pipeline \gets [s, t, dr]$ \textbf{or} $[s, NONE, NONE]$
-    \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$
+    \State $pipeline \gets [s, t, dr]$ \textbf{or} $[s, NONE, NONE]$ \label{step:construct_pipeline}
+    \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$ \label{step:data_partitioning}
     \Statex
-    \State $D_{train}'$ $\gets$ \texttt{pipeline\_apply}($D_{train}$, \texttt{pipeline})
-    \State $T_{cv}'$ $\gets$ \texttt{pipeline\_apply}($T_{cv}$, \texttt{pipeline})
+    \State $D_{train}'$ $\gets$ \texttt{pipeline\_apply}($D_{train}$, \texttt{pipeline}) \label{step:apply_pipeline_train}
+    \State $T_{cv}'$ $\gets$ \texttt{pipeline\_apply}($T_{cv}$, \texttt{pipeline}) \label{step:apply_pipeline_cv}
     \Statex
-    \State $CV_{metrics} \gets \texttt{cross\_validate}(m', T_{cv}')$
-    \State $rmse_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{rmse\_values})$
-    \State $std\_dev_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{std\_dev\_values})$
+    \State $CV_{metrics} \gets \texttt{cross\_validate}(m', T_{cv}')$ \label{step:cross_validate}
+    \State $rmse_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{rmse\_values})$ \label{step:average_rmse_cv}
+    \State $std\_dev_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{std\_dev\_values})$ \label{step:average_std_dev_cv}
     \Statex
-    \State $m'_{train}$ $\gets$ \texttt{train}($m'$, $D_{train}'$)
-    \State $rmsep$, $\sigma_{error, test}$ $\gets$ \texttt{evaluate}($m'_{train}$, $D_{test}$)
+    \State $m'_{train}$ $\gets$ \texttt{train}($m'$, $D_{train}'$) \label{step:train_model}
+    \State $rmsep$, $\sigma_{error, test}$ $\gets$ \texttt{evaluate}($m'_{train}$, $D_{test}$) \label{step:evaluate_model}
     \Statex
     % function that stores the metrics
-    \State \texttt{store\_metrics}($t$, $m'$, $pipeline$, $rmse\_cv$, \newline \hspace*{8em}$std\_dev\_cv$, $rmsep$, $\sigma_{error, test}$)
+    \State \texttt{store\_metrics}($t$, $m'$, $pipeline$, $rmse\_cv$, \newline \hspace*{8em}$std\_dev\_cv$, $rmsep$, $\sigma_{error, test}$) \label{step:store_metrics}
 \EndFor
-\State \Return \texttt{rmse\_cv}, \texttt{std\_dev\_cv}, \texttt{rmsep}, $\sigma_{error, test}$
+\State \Return \texttt{rmse\_cv}, \texttt{std\_dev\_cv}, \texttt{rmsep}, $\sigma_{error, test}$ \label{step:return_metrics}
 \end{algorithmic}
-\end{algorithm}% This increases the likelyhood at identifying the 
-
+\end{algorithm}
 % create names for evaluation metrics
 % 
 
