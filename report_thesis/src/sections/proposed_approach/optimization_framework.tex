@@ -1,4 +1,20 @@
 \subsection{Optimization Framework}\label{sec:optimization-framework}
+One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators.
+\citet{wolpert1992stacked} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses.
+In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide and the fact that we are also considering the optimal preprocessing techniques for each base estimator.
+This means, that we are considering an entire pipeline of preprocessing techniques and base estimators for each target oxide.
+Therefore, we need a systematic approach to determine the optimal configuration for each pipeline.
+To guide this process we have developed a working assumption.
+Namely, that we assume that selecting the top-$n$ best pipelines for each oxide, given different preprocessors and models per pipeline, will yield the best pipelines for a given oxide in our stacking ensemble.
+Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{sec:evaluation_metrics}.
+This reduces the problem to finding a selection of preprocessors and models, and a method of testing multiple permutations of these to find the top-$n$ best pipeline for each oxide.
+In Section~\ref{sec:model-selection} we outlined the models and preprocessing techniques that we intend to use and in the following section we will describe the optimization framework that we have developed to address this challenge.
+% To address this challenge we have developed a working assumption, namely; that the top-n best performing pipelines for each oxide, given different preprocessors and models per pipeline, are the best pipelines for a given oxide in our stacking ensemble.
+% How to determine the optimal configuration for predictor (model & preprocessors) that we can use in our stacking pipeline?
+% Assumption: finding the top-n best predictors, given different models per predictor, is assumed to be the best configuration per-oxide for our stacking pipeline.
+% Maybe call back to original stacking paper (Wolpert) regarding there not being a tried-and-true method for determining the best models for a stacking approach
+% What about doing a search that checks as many configurations as feasible for their performance?! ← Our approach
+% But you'd still need an initial list of models and preprocessors to consider (← lit review + initial experiments – model selection callback)
 
 
 
@@ -17,9 +33,6 @@
 
 
 
-
-
-In this section we introduce our optimization framework built on the Optuna framework.
 Optuna is a hyperparameter optimization framework designed for direct integration with Python. Its dynamic embedding capability allows hyperparameters to be defined and adjusted within the code during execution, providing additional flexibility and ease of debugging. 
 Optuna uses advanced sampling strategies to explore promising areas of the search space and employs pruning techniques to terminate unpromising trials early, optimizing computational resource use. 
 It also supports scaling across multiple machines by distributing the optimization process, allowing for concurrent optimization. 
