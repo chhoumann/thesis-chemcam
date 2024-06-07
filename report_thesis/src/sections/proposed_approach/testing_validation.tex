@@ -123,7 +123,7 @@ The final output of this procedure consists of:
     \item The test set \(\mathbf{D}_\text{test}\), distinct from the training set.
 \end{itemize}
 
-The data partitioning does not modify the original dataset; it merely partitions it.
+The data partitioning procedure does not modify the original dataset; it merely partitions it.
 For that reason, each of the datasets that are returned has the same structure as shown in Table~\ref{tab:final_dataset_example}.
 
 Given that the data partitioning procedure aims to distribute extreme concentration values evenly among the training folds while minimizing their presence in the test set, it is crucial to determine an optimal value of $p$ that minimizes the number of extreme values in the test set while still maintaining its general representativeness.
