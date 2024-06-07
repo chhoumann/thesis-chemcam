@@ -7,15 +7,19 @@ Therefore, we need a systematic approach to determine the optimal configuration 
 To guide this process we have developed a working assumption.
 Namely, that we assume that selecting the top-$n$ best pipelines for each oxide, given different preprocessors and models per pipeline, will yield the best pipelines for a given oxide in our stacking ensemble.
 Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{sec:evaluation_metrics}.
-This reduces the problem to finding a selection of preprocessors and models, and a method of testing multiple permutations of these to find the top-$n$ best pipeline for each oxide.
+Additionaly, each permutation will utilize our proposed data partitioning and cross-validation strategy outlined in Section~\ref{subsec:validation_testing_procedures}.
+Utilizing our proposed data partitioning and cross-validation strategy, along with the aformentioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem-definition}.
+This reduces the problem to finding a selection of preprocessors and models, and a method of testing multiple permutations of these to identify the top-$n$ best pipeline for each oxide.
 In Section~\ref{sec:model-selection} we outlined the models and preprocessing techniques that we intend to use and in the following section we will describe the optimization framework that we have developed to address this challenge.
-% To address this challenge we have developed a working assumption, namely; that the top-n best performing pipelines for each oxide, given different preprocessors and models per pipeline, are the best pipelines for a given oxide in our stacking ensemble.
-% How to determine the optimal configuration for predictor (model & preprocessors) that we can use in our stacking pipeline?
-% Assumption: finding the top-n best predictors, given different models per predictor, is assumed to be the best configuration per-oxide for our stacking pipeline.
-% Maybe call back to original stacking paper (Wolpert) regarding there not being a tried-and-true method for determining the best models for a stacking approach
-% What about doing a search that checks as many configurations as feasible for their performance?! ← Our approach
-% But you'd still need an initial list of models and preprocessors to consider (← lit review + initial experiments – model selection callback)
 
+\subsubsection{The Framework}
+The framework developed to address this challenge was constructed based on a set of criteria.
+% So: We're doing the search.
+% We need to ensure that this search aligns with our goals defined in problem def. Need models that generalize, are robust, and are accurate. (callback: problem def). Can't be a random search due to the amount of variables to check. Likewise for grid-search. Would take too long for our task.
+% The search should have an objective function that seeks to achieve these goals.
+% We have established our process for determining whether models (configurations!) are robust & accurate based on the metrics we define. (callback: testing-validation). This includes both CV & eval on a test set.
+% We emphasize the importance of evaluating performance based on cross validation metrics. As mentioned in the testing-validation section, searching for RMSEP will lead to misleading & poor results!
+% So we define the objective function we wish to optimize as a Multi-objective Optimization on minimizing the rmse_cv and std_dev_cv metrics.
 
 
 
