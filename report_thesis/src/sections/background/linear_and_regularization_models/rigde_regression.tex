@@ -1,6 +1,8 @@
 \subsubsection{Ridge Regression}
-A limitation of \gls{ols} regression is that it cannot handle multicollinearity effectively\cite{Maddala1992}.
-We now provide an overview of ridge regression, an extension of \gls{ols} regression designed to address this limitation, based on \citet{James2023AnIS}.
+As an alternative to \gls{ols}, one can fit a model with all $N$ features by applying techniques that constrain or regularize the coefficient estimates, effectively shrinking them towards zero.
+Although it may seem counterintuitive, this constraint can significantly reduce variance in the estimates.
+One of the most well-known techniques for this purpose are is ridge regression, which we now provide an overview of, based on \citet{James2023AnIS}.
+
 Ridge regression introduces a regularization term to the \gls{ols} regression objective function to prevent overfitting and reduce the model's variance.
 This regularization term is known as the $L_2$ norm and is defined as the sum of the squared regression coefficients:
 
