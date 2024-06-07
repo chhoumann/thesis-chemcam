@@ -36,6 +36,8 @@ Because there is no one-size-fits-all solution for selecting the search strategy
 Nevertheless, Optuna provides solid options for all of these and the framework makes adjusting these choices easy.
 Therefore, using Optuna as the basis for our optimization framework, combining it with our data partitioning and cross-validation strategy, we have a systematic approach to identifying the top-$n$ best pipelines for each oxide.
 
+The complete optimization framework is outlined in Algorithm~\ref{alg:hyperparameter_optimization_framework}.
+
 \begin{algorithm}
 \caption{Hyperparameter Optimization Framework}
 \label{alg:hyperparameter_optimization_framework}
@@ -74,60 +76,22 @@ Therefore, using Optuna as the basis for our optimization framework, combining i
 \State \Return \texttt{rmse\_cv}, \texttt{std\_dev\_cv}, \texttt{rmsep}, $\sigma_{error, test}$ \label{step:return_metrics}
 \end{algorithmic}
 \end{algorithm}
-% create names for evaluation metrics
-% 
 
+Before describing the algorithm, we will first explain the details that are not covered in the algorithm.
+Two central constructs of the Optuna framework is the \texttt{Study} object and the objective function.
+This \texttt{Study} object is responsible for orchestrating the optimization process and is responsible for instantiating the search strategy, the pruning strategy, and the objective for the objective function, which are hyperparameters.
+Because we are trying to identify the top-$n$ best pipelines on a per-oxide basis and since we are optimizing with one model at a time, we will have one \texttt{Study} object per model.
+This means that each oxide will be optimizied for, with one model at a time, but with many permutations of preprocessors and hyperparameters. 
+The objective function contains the logic for our optimization process and has a hyperparameter that controls the number of trials to be run.
+It is also the objective which we are trying to minimize, which in our case is the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
-
-% Optuna for its flexibility and efficiency in exploring the vast search space of configurations.
-% Optuna allows for great flexiblity in exploring various search spaces due to its modular design.
-% In addition to this modularity, Optuna uses a "define-by-run" optimization strategy.
-% Rather than being confined to a fixed order and range of exploration, Optuna can dynamically adjust regions based on the results of previous trials.
-% Introduction of the optimization framework
-    % What is the goal of the optimization framework?
-    % Why Optuna?
-        % Explanation of what optuna is and why it is useful for our purposes
-        % Should elaborate on this:
-            % This framework facilitates automated hyperparameter optimization, allowing us to  efficiently explore a vast search space of model and preprocessing configurations.
-% how did we do it?
-    % Maybe talk about how we designed it in this way
-    % pros cons ** maybe
-    % Considerations at the very least
-    % Talk about how the objective function was constructed, the order of things, considerations with this, the fact that we are trying to minimize and what metrics we are minimizing
-    % 
-% show diagram or pseudocode
-% Explain why we did it this way
-    % Why did we choose this approach?
-    % What are the benefits of this approach?
-    % How does this approach help us achieve our goal?
-
-   
-    
-% Next, we implemented an experimental framework using the Optuna optimization library~\cite{optuna_2019}.
-% This framework facilitates automated hyperparameter optimization, allowing us to efficiently explore a vast search space of model and preprocessing configurations.
-% The specifics of this framework are discussed in Section~\ref{sec:optimization_framework}.
-
-
-% Optuna uses python syntax instead of some propriety syntax
-% Optuna brings the optimization into the space of the program rather than outside
-    % Meaning you can embed it directly in functions etc.
-    % Easier to debug
-    % Can use python language such as looping etc.
-% Instead of having parameters set you change them so they are sampled using the suggest_* methods
-    % This is also helpful because it allows you to optimize any parameter, even for preprocessing etc. in the same objective function
-% There are two parts of the hyperparameters optimizer: Sampling strategy and Pruning strategy
-    % Sampling strategy determines where to look
-        % Uses bayesian filtering to find places where it has had the best results and focus in on those
-        % As Optuna tries to minimize/maximize the objective function it focuses in on the best areas and makes more trials there
-        % There are multiple samplers - Even the traditional ones
-        % Choosing the right sampler is sort of a heuristic 
-    % Pruning strategy can terminate trials early that are not promising so that the compute can be dedicated to more promising trials
-        % Basically trials that have a slow start and will never be able to make up for that slow start, are pruned
-% Optuna is very easy to scale up. It allows you to use a single database across multiple machines
-    % This means that Optuna will let you use multiple computers to optimize over the search space at the same time
-    % Its called asynchronous parallelization of trials - One trial could start later than the other
-    % Near linear scaling with the number of machines
-% Has tools to help you determine most important parameters to avoid curse of dimensionality
-    % get_param_importances
-    % It works by running a small number of trials and then returns this information to you
-    % Helps you dial in where optuna should be focusing to get most optimal results
+The algorithm starts by initializing the random seed for reproducibility (line~\ref{step:initialize}).
+For each trial, the algorithm samples hyperparameters for the model (line~\ref{step:sample_hyperparameters}) and instantiates the model with the sampled hyperparameters (line~\ref{step:instantiate_model}).
+Next, it samples hyperparameters for the scaler (line~\ref{step:sample_scaler_params}), transformer (line~\ref{step:sample_transformer_params}), and dimensionality reduction (line~\ref{step:sample_dim_reduction_params}) techniques and instantiates them (lines~\ref{step:instantiate_scaler} to \ref{step:instantiate_dim_reduction}).
+The algorithm constructs the preprocessor pipeline in the order that they are defined (line~\ref{step:construct_pipeline}).
+The data is partitioned using our partitioning strategy, yielding the cross-validation folds, as well as, the training and test set (line~\ref{step:data_partitioning}).
+Recall that, to ensure that we are able to evaluate the models generalizability and accuracy on unseen data, we have to generate both the cross-validation folds and the training and test set.
+It then applies the pipeline to the training and cross-validation data (lines~\ref{step:apply_pipeline_train} and~\ref{step:apply_pipeline_cv}).
+Next, it cross-validates the model (line~\ref{step:cross_validate}) and calculates the average RMSE and standard deviation of the RMSE (lines~\ref{step:average_rmse_cv} and~\ref{step:average_std_dev_cv}).
+The model is then trained on the training data (line~\ref{step:train_model}) and evaluated on the test data (line~\ref{step:evaluate_model}).
+Finally, the metrics for the trial are stored (line~\ref{step:store_metrics}) and the metrics for all trials are returned (line~\ref{step:return_metrics}).

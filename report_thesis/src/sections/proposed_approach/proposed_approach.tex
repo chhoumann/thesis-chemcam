@@ -35,17 +35,16 @@ Firstly, we conducted a literature review and performed preliminary experiments 
 These include ensemble learning models, linear and regularization models, neural network models, scaling methods, dimensionality reduction techniques, and data transformations.
 This selection process is detailed in Section~\ref{sec:model_selection}.
 
-Next, we implemented an experimental framework using the Optuna optimization library~\cite{optuna_2019}.
-This framework facilitates automated hyperparameter optimization, allowing us to efficiently explore a vast search space of model and preprocessing configurations.
-The specifics of this framework are discussed in Section~\ref{sec:optimization_framework}.
-
-Each configuration is then evaluated using a customized k-fold cross-validation procedure to ensure robust performance assessment, as detailed in Section~\ref{subsec:validation_testing_procedures}.
-This procedure addresses challenges such as data leakage and uneven distribution of extreme values.
-The results from these evaluations are compared to identify the best-performing configurations for each oxide.
+Next, we introduce our validation and testing procedures in Section~\ref{subsec:validation_testing_procedures}, where we outline and introduce our data partitioning and cross-validation strategy.
+These were developed to ensure robust performance assessment and generalizability of the models by addressing challenges such as data leakage and uneven distribution of extreme values.
 
 We present the metrics we use to evaluate the performance of our models in Section~\ref{subsec:evaluation_metrics}.
 These metrics include the \gls{rmse} for accuracy and the sample standard deviation of prediction errors for robustness.
 By evaluating both cross-validation and test set metrics, we ensure a thorough assessment of the model's generalizability and performance on unseen data.
+
+Next, we implemented an experimental framework using the Optuna optimization library~\cite{optuna_2019}.
+This framework facilitates automated hyperparameter optimization, allowing us to efficiently explore a vast search space of model and preprocessing configurations.
+The specifics of this framework are discussed in Section~\ref{sec:optimization_framework}.
 
 Finally, the top-performing configurations are used to construct a stacking ensemble.
 This ensemble leverages the strengths of multiple models, with a meta-learner trained to optimize the final predictions.
