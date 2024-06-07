@@ -1,0 +1,56 @@
+\begin{table*}[]
+\centering
+\resizebox{1\textwidth}{!}{%
+\begin{tabular}{l|cccc|cccc|cccc}
+Model & \multicolumn{4}{c}{Ridge} & \multicolumn{4}{c}{\gls{lasso}} & \multicolumn{4}{c}{\gls{enet}} \\
+Metric & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} \\
+\hline
+$SiO2$ & 4.1039 & 5.0045 & 4.1077 & 5.0051 & 4.4120 & 5.4308 & 4.4173 & 5.4373 & 5.6271 & 9.5671 & 5.6336 & 9.4796 \\
+$TiO2$ & 0.4241 & 0.4697 & 0.4127 & 0.4685 & 0.3983 & 0.5558 & 0.3894 & 0.5547 & 0.4622 & 0.6863 & 0.4514 & 0.6852 \\
+$Al2O3$ & 1.9998 & 3.1153 & 2.0022 & 3.0942 & 2.3486 & 3.0633 & 2.3517 & 3.0442 & 3.8116 & 4.6990 & 3.8114 & 4.6493 \\
+$FeOT$ & 1.7518 & 3.3846 & 1.7463 & 3.3347 & 2.2362 & 3.4899 & 2.2381 & 3.4401 & 2.6272 & 5.2213 & 2.5964 & 5.1772 \\
+$MgO$ & 1.1504 & 1.5089 & 1.1518 & 1.4917 & 1.2666 & 1.6824 & 1.2488 & 1.6612 & 1.8904 & 2.9862 & 1.7510 & 2.9826 \\
+$CaO$ & 1.8089 & 1.5127 & 1.7920 & 1.4956 & 1.9632 & 1.5542 & 1.9617 & 1.5495 & 2.3180 & 2.8512 & 2.3059 & 2.8518 \\
+$Na2O$ & 0.5640 & 1.2210 & 0.5648 & 1.2147 & 0.6675 & 1.1264 & 0.6675 & 1.1199 & 0.7380 & 1.2153 & 0.7342 & 1.2154 \\
+$K2O$ & 0.6505 & 0.6682 & 0.6452 & 0.6676 & 0.6384 & 0.8587 & 0.6291 & 0.8556 & 0.7262 & 1.0905 & 0.7017 & 1.0848 \\
+\hline
+Model & \multicolumn{4}{c}{\gls{pls}} & \multicolumn{4}{c}{\gls{svr}} & \multicolumn{4}{c}{\gls{rf}} \\
+Metric & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} \\
+\hline
+$SiO2$ & 4.1410 & 5.7010 & 4.1454 & 5.6931 & 3.5516 & 4.9077 & 3.5553 & 4.9080 & 3.7154 & 5.3043 & 3.6988 & 5.2916 \\
+$TiO2$ & 0.4520 & 0.5308 & 0.4406 & 0.5302 & 0.4612 & 0.4628 & 0.4553 & 0.4621 & 0.3315 & 0.4267 & 0.3208 & 0.4252 \\
+$Al2O3$ & 2.0731 & 3.3216 & 2.0609 & 3.3018 & 1.9312 & 2.7002 & 1.9338 & 2.6927 & 2.0764 & 2.4425 & 2.0792 & 2.4333 \\
+$FeOT$ & 3.2216 & 3.1174 & 3.2211 & 3.1140 & 1.8231 & 2.8471 & 1.8136 & 2.8090 & 2.0910 & 3.0911 & 2.0729 & 3.0534 \\
+$MgO$ & 1.1058 & 1.2961 & 1.1035 & 1.2955 & 0.7888 & 1.4256 & 0.7853 & 1.4185 & 0.9112 & 1.7424 & 0.9043 & 1.7314 \\
+$CaO$ & 1.9365 & 1.8131 & 1.9229 & 1.7916 & 1.6264 & 1.5318 & 1.5939 & 1.5080 & 1.7648 & 1.5030 & 1.7541 & 1.4985 \\
+$Na2O$ & 0.5449 & 0.9082 & 0.5358 & 0.9065 & 0.7416 & 1.0957 & 0.7255 & 1.0860 & 0.4203 & 1.0277 & 0.4207 & 1.0231 \\
+$K2O$ & 0.7736 & 0.6500 & 0.7723 & 0.6461 & 0.5671 & 0.6898 & 0.5550 & 0.6889 & 0.5242 & 0.6809 & 0.4763 & 0.6757 \\
+\hline
+Model & \multicolumn{4}{c}{\gls{ngboost}} & \multicolumn{4}{c}{\gls{gbr}} & \multicolumn{4}{c}{\gls{xgboost}} \\
+Metric & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} \\
+\hline
+$SiO2$ & 4.1116 & 5.0713 & 4.0815 & 5.0096 & 3.5762 & 4.9950 & 3.4786 & 4.9219 & 3.9533 & 4.8975 & 3.9261 & 4.8760 \\
+$TiO2$ & 0.3401 & 0.4327 & 0.3330 & 0.4303 & 0.4744 & 0.4490 & 0.4726 & 0.4463 & 0.3336 & 0.4369 & 0.3276 & 0.4358 \\
+$Al2O3$ & 1.9313 & 2.2909 & 1.9330 & 2.2823 & 1.8937 & 2.5180 & 1.8911 & 2.5114 & 1.9115 & 2.1978 & 1.9131 & 2.1927 \\
+$FeOT$ & 1.5876 & 3.5614 & 1.5899 & 3.5295 & 1.5943 & 3.0691 & 1.5963 & 3.0681 & 1.8480 & 3.0198 & 1.8383 & 3.0020 \\
+$MgO$ & 0.8488 & 1.5776 & 0.8447 & 1.5744 & 0.9643 & 1.7661 & 0.9605 & 1.7630 & 0.9051 & 1.7806 & 0.9007 & 1.7715 \\
+$CaO$ & 1.7396 & 1.6098 & 1.7228 & 1.6024 & 1.7682 & 1.4681 & 1.7686 & 1.4679 & 1.7655 & 1.4668 & 1.7493 & 1.4574 \\
+$Na2O$ & 0.4156 & 0.9205 & 0.4145 & 0.9155 & 0.4809 & 1.1304 & 0.4815 & 1.1227 & 0.3874 & 1.0710 & 0.3870 & 1.0616 \\
+$K2O$ & 0.5818 & 0.6751 & 0.5447 & 0.6732 & 0.7266 & 0.6091 & 0.7190 & 0.6096 & 0.5467 & 0.6578 & 0.5113 & 0.6572 \\
+\hline
+Model & \multicolumn{4}{c}{\gls{etr}} & \multicolumn{4}{c}{\gls{ann}} & \multicolumn{4}{c}{\gls{cnn}} \\
+Metric & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} & \multicolumn{1}{c}{RMSEP} & \multicolumn{1}{c}{RMSECV} & \multicolumn{1}{c}{Std. dev.} & \multicolumn{1}{c}{Std. dev. CV} \\
+\hline
+$SiO2$ & 3.9946 & 5.2304 & 3.9702 & 5.2248 & - & - & - & - & - & - & - & - \\
+$TiO2$ & 0.3297 & 0.4392 & 0.3208 & 0.4382 & - & - & - & - & - & - & - & - \\
+$Al2O3$ & 1.8454 & 2.3682 & 1.8467 & 2.3589 & - & - & - & - & - & - & - & - \\
+$FeOT$ & 2.1438 & 3.2992 & 2.1259 & 3.2574 & - & - & - & - & - & - & - & - \\
+$MgO$ & 0.9060 & 1.7551 & 0.8955 & 1.7378 & - & - & - & - & - & - & - & - \\
+$CaO$ & 1.8368 & 1.5146 & 1.8307 & 1.5097 & - & - & - & - & - & - & - & - \\
+$Na2O$ & 0.4113 & 1.0309 & 0.4086 & 1.0281 & - & - & - & - & - & - & - & - \\
+$K2O$ & 0.5906 & 0.6425 & 0.5403 & 0.6358 & - & - & - & - & - & - & - & - \\
+\hline
+\end{tabular}%
+}
+\caption{Initial results for the different models and metrics.}
+\end{table*}
