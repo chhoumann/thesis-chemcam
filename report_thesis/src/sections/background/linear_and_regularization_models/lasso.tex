@@ -1,9 +1,9 @@
 \subsubsection{Least Absolute Shrinkage and Selection Operator (LASSO) Regression}
 A disadvantage of ridge regression is that it includes all features in the final model.
-While it does shrink the coefficients towards zero, it does not eliminate any.
+While it shrinks the coefficients towards zero, it does not eliminate any by setting them exactly to zero.
 This may not impact prediction accuracy but makes interpretation harder, especially with many variables.
 For example, in datasets with numerous features, one might prefer a model that includes only the most important ones.
-However, ridge regression includes all features, and while increasing the penalty reduces coefficient sizes, it does not exclude variables\cite{James2023AnIS}.
+However, ridge regression includes all features, and while increasing the penalty reduces coefficient sizes, it does not set any coefficients to zero\cite{James2023AnIS}.
 
 We therefore introduce \gls{lasso} regression based on \citet{James2023AnIS}, a regression technique which addresses this issue by adding a different regularization term to the \gls{ols} regression objective function.
 While ridge regression uses the $L_2$ norm, \gls{lasso} uses the $L_1$ norm, which has the distinct effect of performing feature selection by shrinking some coefficients to exactly zero:
