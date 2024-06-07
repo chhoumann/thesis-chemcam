@@ -46,21 +46,18 @@ This allows us to fully utilize Optunas sampling and pruning strategies, minimiz
 
 \State \textbf{Initialize:} Set random seed for reproducibility if seed is not None \label{step:initialize}
 \For{each trial $t$ from 1 to $N$} \label{step:trial_loop}
-    \Statex // Sample hyperparameters for $m$ using \texttt{sampler} and \newline \hspace*{1.2em} instantiate it 
-    \State $m'$ $\gets$ \texttt{sample\_hyperparameters()} \label{step:sample_hyperparameters}
+    \State $hp \gets \texttt{sample\_hyperparameters}(m, \texttt{sampler})$
+    \State $m' \gets \texttt{instantiate\_model}(m, hp)$ \label{step:instantiate_model}
     \Statex
-    \Statex // Sample and instantiate preprocessors using \texttt{sampler}
-    \State \texttt{scaler} $\gets$ \texttt{sample\_scaler()}
-    \State \texttt{transformer} $\gets$ \texttt{sample\_transformer()} \textbf{or} \text{NONE}
-    \State \texttt{dim\_reduction} $\gets$ \texttt{sample\_dim\_reduction()} \textbf{or} \text{NONE}
-    \Statex
-    \Statex // Construct pipeline of preprocessors in that order
-    \State \texttt{pipeline} $\gets$ [\texttt{scaler}, \texttt{transformer}, \texttt{dim\_reduction}]
-    \Statex
-    \Statex // Apply data partitioning
+    \State $s\_params \gets \texttt{sample\_scaler\_params}(\texttt{sampler})$ \State $s \gets \texttt{instantiate\_scaler}(s\_params)$
+    \State $t\_params \gets \texttt{sample\_transformer\_params}(\texttt{sampler})$
+    \State $t \gets \texttt{instantiate\_transformer}(t\_params)$ \newline \hspace*{3em} \textbf{or} NONE
+    \State $dr\_params \gets \texttt{sample\_dim\_reduction\_params}(\texttt{sampler})$
+    \State $dr \gets \texttt{instantiate\_dim\_reduction}(dr\_params)$ \newline \hspace*{3em}\textbf{or} NONE
+    \Statex     
+    \State $pipeline \gets [s, t, dr]$ \textbf{or} $[s, NONE, NONE]$
     \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$
     \Statex
-    \Statex // Apply preprocessing to $D_{train}$ and $T_{cv}$
     \State $D_{train}'$ $\gets$ \texttt{pipeline\_apply}($D_{train}$, \texttt{pipeline})
     \State $T_{cv}'$ $\gets$ \texttt{pipeline\_apply}($T_{cv}$, \texttt{pipeline})
     \Statex
@@ -68,8 +65,8 @@ This allows us to fully utilize Optunas sampling and pruning strategies, minimiz
     \State $rmse_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{rmse\_values})$
     \State $std\_dev_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{std\_dev\_values})$
     \Statex
-    \State $m'$ $\gets$ \texttt{train}($m'$, $D_{train}'$)
-    \State $rmsep$, $\sigma_{error, test}$ $\gets$ \texttt{evaluate}($m'$, $D_{test}$)
+    \State $m'_{train}$ $\gets$ \texttt{train}($m'$, $D_{train}'$)
+    \State $rmsep$, $\sigma_{error, test}$ $\gets$ \texttt{evaluate}($m'_{train}$, $D_{test}$)
     \Statex
     % function that stores the metrics
     \State \texttt{store\_metrics}($t$, $m'$, $pipeline$, $rmse\_cv$, \newline \hspace*{8em}$std\_dev\_cv$, $rmsep$, $\sigma_{error, test}$)
