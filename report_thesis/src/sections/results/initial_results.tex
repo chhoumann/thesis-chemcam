@@ -37,7 +37,14 @@ The standard deviation of the cross-validation for \gls{etr} is particularly low
 For $\ce{K2O}$, \gls{etr} again shows strong performance with the lowest \gls{rmsecv} of 0.681, with \gls{svr} having an \gls{rmsecv} of 0.690 and ridge regression having an \gls{rmsecv} of 0.668 also performing well.
 The standard deviation analysis supports these findings, indicating reliable performance for these models.
 
-To summarize, \gls{svr} stands out as the best overall model based on its average performance, with a mean \gls{rmsecv} of 1.958, closely followed by \gls{ngboost} with a mean \gls{rmsecv} of 2.017 and ridge regression with a mean \gls{rmsecv} of 2.111. \gls{svr}, ridge regression, and \gls{ngboost} are consistently among the top-performing models for multiple oxides.
-Additionally, \gls{etr} performs exceptionally well for specific oxides such as $\ce{TiO2}$, $\ce{Na2O}$, and $\ce{K2O}$, suggesting that it may be a strong candidate for predicting these oxides.
+To summarize, \gls{svr} stands out as the best overall model based on its average performance, with a mean \gls{rmsecv} of 1.958. This is closely followed by \gls{ngboost} with a mean \gls{rmsecv} of 2.017 and ridge regression with a mean \gls{rmsecv} of 2.111.
+When examining the \gls{rmsep} values, \gls{svr} also demonstrates strong predictive accuracy on independent test sets, reinforcing its effectiveness.
+Additionally, the standard deviation of the cross-validation for \gls{svr} is generally low, indicating stable and consistent performance across different subsets of data.
+
+\gls{ngboost} and ridge regression also show robust performance, with relatively low standard deviations.
+Specifically, \gls{ngboost} exhibits consistent performance with low variability, making it a dependable model for various oxides.
+Ridge regression, while slightly higher in \gls{rmsecv}, still maintains good performance with low standard deviation values.
+
+Overall, \gls{svr}, ridge regression, and \gls{ngboost} are consistently among the top-performing models for multiple oxides, as evidenced by their low \gls{rmsecv}, \gls{rmsep}, and standard deviation values.
 
 \input{sections/results/init_results_table.tex}
