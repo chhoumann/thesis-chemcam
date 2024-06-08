@@ -1,2 +1,44 @@
-\subsubsection{Initial Results}
+\subsection{Initial Results}
+% - This ties together with our proprosed approach - Specifically the model selection and how we conduct the initial experiments
+% - This section should be a contiunation of that story by basically:
+%     - Introducing the results and,
+%     - Discussing our findings
+%     - Note ANN & CNN are basically out by default
+
+% Ideas:
+
+% - Describe which models perform well per oxide - Mostly based on \gls{rmsecv} (but RMSEP is not entirely irrelevant)
+% - We used Norm3 preprocessing for everything
+
+As described in Section~\ref{sec:proposed_approach}, we conducted a series of initial experiments to evaluate the performance of various machine learning models on the prediction of major oxide compositions from our \gls{libs} dataset.
+These experiments aimed to provide a preliminary assessment of the models' performance.
+All models were trained on the same preprocessed data using the Norm 3 preprocessing method described in Section~\ref{sec:norm3}.
+This ensured that the models' performance could be evaluated under consistent and comparable conditions.
+
+Table~\ref{tab:init_results} presents the results of these experiments, including the RMSEP, \gls{rmsecv}, standard deviation, standard deviation of the cross-validation, and the mean of these metrics for each model and oxide.
+The primary metric of interest is the \gls{rmsecv}, as it provides a measure of the model's predictive accuracy during cross-validation, reflecting its generalization performance on unseen data.
+
+Ridge regression and \gls{svr} generally exhibit strong performance across different oxides, as evidenced by their relatively low \gls{rmsecv} values.
+In contrast, \gls{enet}, \gls{ann} and \gls{cnn} tend to perform the worst, with higher \gls{rmsecv} values.
+Models such as \gls{rf} and \gls{gbr} exhibit moderate performance, often surpassing simpler linear models but not as consistently as \gls{svr}.
+
+For $\ce{SiO2}$, \gls{svr} demonstrates the lowest \gls{rmsecv} of 4.908.
+Ridge regression and \gls{rf} also perform well, with \gls{rmsecv} values of 5.005 and 5.304, respectively.
+
+In the case of $\ce{TiO2}$, \gls{etr} exhibits the lowest \gls{rmsecv} of 0.427, signifying exceptional performance, with \gls{svr} and \gls{ngboost} also showing strong predictive capabilities, with \gls{rmsecv} values of 0.463 and 0.433, respectively.
+
+For $\ce{Al2O3}$, \gls{ngboost} with an \gls{rmsecv} of 2.291 and ridge regression with an \gls{rmsecv} of 3.115 achieve relatively low \gls{rmsecv}, highlighting their effectiveness in predicting this oxide, with \gls{svr} also performing well with an \gls{rmsecv} of 2.700.
+
+\gls{svr} emerges as the best-performing model for $\ce{FeO_T}$ with the lowest \gls{rmsecv} of 2.847, while ridge regression with an \gls{rmsecv} of 3.385 and \gls{ngboost} with an \gls{rmsecv} of 3.561 also demonstrate competent performance.
+For $\ce{MgO}$, \gls{svr} exhibits the best performance with the lowest \gls{rmsecv} of 1.426, and ridge regression with an \gls{rmsecv} of 1.509 and \gls{ngboost} with an \gls{rmsecv} of 1.578 are also effective.
+\gls{gbr} shows the lowest \gls{rmsecv} of 1.468 for $\ce{CaO}$, indicating strong performance, with ridge regression having an \gls{rmsecv} of 1.513 and ETR having an \gls{rmsecv} of 1.503 also performing well.
+
+\gls{etr} demonstrates the best performance for $\ce{Na2O}$ with the lowest \gls{rmsecv} of 1.028, while ridge regression with an \gls{rmsecv} of 1.221 and \gls{svr} with an \gls{rmsecv} of 1.096 also perform reasonably well.
+
+For $\ce{K2O}$, \gls{etr} again shows strong performance with the lowest \gls{rmsecv} of 0.681, with \gls{svr} having an \gls{rmsecv} of 0.690 and ridge regression having an \gls{rmsecv} of 0.668 also performing well.
+
+To summarize, \gls{svr} stands out as the best overall model based on its average performance, with a mean \gls{rmsecv} of 1.958, closely followed by \gls{ngboost} with a mean \gls{rmsecv} of 2.017 and ridge regression with a mean \gls{rmsecv} of 2.111.
+\gls{svr}, ridge regression, and \gls{ngboost} are consistently among the top-performing models for multiple oxides.
+Additionally, \gls{etr} performs exceptionally well for specific oxides such as $\ce{TiO2}$, $\ce{Na2O}$, and $\ce{K2O}$, suggesting that it may be a strong candidate for predicting these oxides.
+
 \input{sections/results/init_results_table.tex}
