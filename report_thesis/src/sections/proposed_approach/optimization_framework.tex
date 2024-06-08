@@ -1,9 +1,19 @@
 \subsection{Optimization Framework}\label{sec:optimization_framework}
 One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators.
-\citet{wolpert1992stacked} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses.
-In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide and the fact that we are also considering the optimal preprocessing techniques for each base estimator, as well as, the hyperparameters for each.
-This means, that we are considering an entire pipeline of preprocessing techniques and base estimators for each target oxide.
-Therefore, we need a systematic approach to determine the optimal configuration for each pipeline.
+\citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses.
+In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide
+The complexity of the problem is further increased by the fact that each base estimator may require different preprocessing depending on the oxide in question.
+Different target oxides might have varied data characteristics.
+This means that for some oxides an estimator might require the data to be preprocessed, while for other oxides it may be able to handle raw data.
+The estimator may even require different variations of preprocessing depending on the oxide.
+Choosing the appropriate preprocessing steps for each base estimator is crucial, as improper preprocessing can lead to suboptimal performance or even render the model useless.
+Adding to the complexity is the fact that different estimators have different hyperparameters that need to be fine-tuned.
+Adding to the complexity is the fact that similar challenges arise when discussing the choice of hyperparameters for each base estimator.
+Some estimators might require very little tuning, while others might require extensive tuning, depending on the target oxide.
+Not only that, but hyperparameters within the same estimator may conflict with each other, whereby prioritization of one hyperparameter may for example lead to reduced bias but result in overfitting.
+Finally, hyperparameters cannot be considered in isolation, because depending on the preprocessing steps applied to the data, the optimal hyperparameters may vary.
+These are just some of the challenges that needs to be considered and so therefore, we need a systematic approach to determine the optimal configuration of hyperparameters for each estimator and preprocessing steps for each oxide. 
+
 To guide this process we have developed a working assumption.
 Namely, that we assume that selecting the top-$n$ best pipelines for each oxide, given different preprocessors and models per pipeline, will yield the best pipelines for a given oxide in our stacking ensemble.
 Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{sec:evaluation_metrics}.
