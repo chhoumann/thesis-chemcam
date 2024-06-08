@@ -1,42 +1,41 @@
-\subsubsection{Visual Analysis of \ce{SiO_2} Distribution in Folds}
-This section aims to provide a detailed visual and statistical analysis of the \ce{SiO_2} concentration distribution across different folds used in our custom k-fold data partitioning procedure.
-The purpose is to demonstrate the effectiveness of our strategy in maintaining balanced and representative datasets, which is crucial for developing robust predictive models.
+\subsection{Visual and Statistical Analysis of \ce{SiO_2} Distribution in Partitioned Data}\label{sec:visual_analysis}
+This section provides a detailed visualization and statistical analysis of the \ce{SiO_2} concentration distribution across data partitions, following the customized k-fold data partitioning procedure described in Section~\ref{subsec:validation_testing_procedures}.
+This analysis is conducted to validate the consistency of our data partitioning method and to provide a visual understanding of the resulting data distribution.
+The analysis focuses on \ce{SiO_2} as a representative example.
+Similar analyses have been conducted for other oxides, and the resulting plots are shown in Appendix~\ref{subsec:cv_plots}.
 
-We focus specifically on \ce{SiO_2} as a representative example to illustrate our methodology.
-Similar analyses were conducted for other oxides; however, the plots and figures for these are omitted here for brevity.
+As discussed in Section~\ref{subsec:validation_testing_procedures}, it is crucial to determine an optimal value of $p$ for the data partitioning algorithm.
+This value should minimize the number of extreme values in the test set while ensuring the test set remains representative.
+Our approach is to select the lowest $p$ that excludes extreme values from the test set while maximizing its general representativeness.
+This approach helps avoid overestimating the model's performance due to extreme values while keeping the test set reflective of the majority of the data distribution.
+We developed a web-based platform to evaluate the performance of the data partitioning algorithm for different values of $p$, as shown in Figure~\ref{fig:web_platform} in Appendix~\ref{subsec:web_platform}.
+Using the platform, we conducted analyses for various values of $p$ and determined that the optimal value is $p=5\%$.
+Furthermore, the 5\% threshold has proven effective across all oxides within our dataset, and consequently, it has been uniformly applied throughout this study.
+This methodology is adaptable and can be employed to determine an optimal value for $p$ tailored to various targets, depending on the specific dataset in use.
+Finally, we use a $k=5$ for our data partitioning algorithm.
+This results in five folds, with four folds used for cross-validation training and one fold designated as the test set.
+Consequently, the full training set comprises the first four folds.
+
+Figures~\ref{fig:histogram_grid_plot} and \ref{fig:histogram_kde_plot} illustrate the histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each training fold, the test set, and their combined distributions.
+The consistent histograms and \gls{kde} curves across different training folds indicate that the data distribution within each fold closely matches the overall distribution, confirming their consistency and representativeness.
+
+Figure~\ref{fig:original_and_post_fold_plot} contrasts the \ce{SiO_2} concentration distribution before and after data partitioning.
+The left plot shows the original distribution, while the right plot displays the fold-assigned distribution, color-coded by fold.
+This visualization highlights that the partitioning strategy maintains the overall data distribution while ensuring balanced representation across folds.
 
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=\textwidth]{images/histogram_grid_plot.png}
-    \caption{Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold.}
+    \caption{Histogram and \gls{kde} of \ce{SiO_2} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{SiO_2} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
     \label{fig:histogram_grid_plot}
 \end{figure*}
-
-Figure \ref{fig:histogram_grid_plot} presents individual histograms and \gls{kde} curves for \ce{SiO_2} concentrations in each of the four cross-validation folds' validation sets and the full test set.
-Each subplot shows the count of samples per bin (y-axis) as a function of \ce{SiO_2} concentration (x-axis).
-The overlaid \gls{kde} curves provide a smoothed estimate of the probability density function for \ce{SiO_2} concentrations.
-
-The histograms and \gls{kde} curves for each fold are remarkably similar, indicating that the data distribution within each fold closely matches the overall data distribution.
-This similarity ensures that each fold is representative of the entire dataset, which is crucial for developing models that can generalize well.
-The central tendency (mean) and spread (standard deviation) of \ce{SiO_2} concentrations appear consistent across all folds.
-The \gls{kde} curves highlight that the density peaks and the tails of the distributions align well, suggesting that no fold is disproportionately skewed or biased.
-
-These consistent distributions across folds validate our k-fold cross-validation method, confirming that each fold can provide a reliable estimate of model performance.
-This balance helps in preventing overfitting, as the model is trained and validated on similarly distributed data in each fold.
 
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=\textwidth]{images/histogram_kde_plot.png}
-    \caption{Combined Histogram and \gls{kde} of \ce{SiO_2} Distribution in Each Fold.}
+    \caption{Combined Histogram and \gls{kde} of \ce{SiO_2} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{SiO_2} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
     \label{fig:histogram_kde_plot}
 \end{figure*}
-
-Figure \ref{fig:histogram_kde_plot} combines the histograms and \gls{kde} curves of \ce{SiO_2} values from each fold and the full test set into a single plot, using different colors to represent each fold and the test set.
-This visualization enables direct comparison of the distributions across the folds and the test set.
-
-The combined histograms and \gls{kde} curves show a high degree of overlap, reinforcing the observation that the distributions are consistent across different folds and the test set.
-The test set distribution closely follows the overall pattern observed in the folds, indicating that the test set is also representative of the overall dataset.
-The presence of extreme values is evident in the tails of the distributions, particularly in the training folds.
 
 \begin{figure*}[h!]
     \centering
@@ -45,7 +44,20 @@ The presence of extreme values is evident in the tails of the distributions, par
     \label{fig:original_and_post_fold_plot}
 \end{figure*}
 
-Figure \ref{fig:original_and_post_fold_plot} contrasts the distribution of \ce{SiO_2} concentrations before and after the data partitioning process.
-The left plot displays the original distribution of \ce{SiO_2} concentrations in the full dataset.
-The right plot presents the distribution with assigned folds, using different colors to denote each fold.
-This visualization highlights how the partitioning strategy maintains the overall data distribution while ensuring balanced representation across folds.
+
+To further validate our visual analysis, we can examine quantitative measures such as the means and standard deviations of \ce{SiO_2} concentrations across the folds and the overall dataset.
+
+\begin{figure*}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/distribution_plot.png}
+    \caption{Distribution of \ce{SiO_2} concentrations across cross-validation folds, training set, test set, and the entire dataset. The mean and standard deviation statistics for each partition are indicated figure.}
+    \label{fig:siO2_distribution}
+\end{figure*}
+
+Figure~\ref{fig:siO2_distribution} shows that the means and standard deviations of \ce{SiO_2} concentrations for each fold, as well as the combined training set, are consistent with those of the full dataset.
+This quantitative consistency supports the visual evidence that each training fold is representative of the entire dataset.
+Furthermore, we observe that the standard deviation in the training sets is higher than in the test set, which is expected given the reassignment of extreme values to the training sets.
+
+In conclusion, the visual and statistical analyses presented in this section confirm that our customized k-fold data partitioning procedure effectively maintains balanced and representative distributions across all folds.
+This consistency is crucial for the robustness and generalizability of our models, as discussed in Section~\ref{subsec:validation_testing_procedures}.
+The alignment between the visual evidence and the quantitative measures reinforces the reliability of our approach, ensuring that our models are well-equipped to perform accurately on unseen data.

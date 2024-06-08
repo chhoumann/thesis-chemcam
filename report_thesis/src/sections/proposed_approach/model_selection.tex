@@ -4,15 +4,15 @@ Choosing the right models and preprocessing techniques for \gls{libs} data analy
 We had several considerations to guide our selection of preprocessing techniques.
 Firstly, our review of the literature revealed that there seems to be no consensus on a single, most effective normalization method for \gls{libs} data.
 Therefore, we included traditional normalization methods in our experiments, such as z-score normalization, Min-Max scaling, and Max Absolute scaling.
-This approach allowed us to determine which normalization method was most effective for our dataset. 
-Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality. 
-Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}. 
+This approach allowed us to determine which normalization method was most effective for our dataset.
+Additionally, dimensionality reduction techniques are considered by the literature to be effective techniques for \gls{libs} data due to its high dimensionality.
+Specifically, \gls{pca} has been widely adopted by the spectroscopic community as an established dimensionality reduction technique~\cite{pca_review_paper}.
 However, \citet{pca_review_paper} argue that the assumptions of \gls{pca} regarding the linearity of the data are only valid up to a certain point, beyond which they break down.
-They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data. 
-Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data. 
-Therefore, we decided to include this in our experiments to further assess its potential. 
-In addition to the non-linearity, \citet{pca_review_paper} also argue that the assumptions of normality in the data are not always met in \gls{libs} data. 
-For this reason, we decided to include power transformation and quantile transformation in our experiments, as models such as \gls{pca} benefit from a normal distribution of the data. 
+They argue that this non-linearity inherent in the data makes \gls{kernel-pca} a valid candidate for \gls{libs} data.
+Based on their review of the field, and our own review of the literature, not many have studied the effectiveness of \gls{kernel-pca} in the context of \gls{libs} data.
+Therefore, we decided to include this in our experiments to further assess its potential.
+In addition to the non-linearity, \citet{pca_review_paper} also argue that the assumptions of normality in the data are not always met in \gls{libs} data.
+For this reason, we decided to include power transformation and quantile transformation in our experiments, as models such as \gls{pca} benefit from a normal distribution of the data.
 We assume that models such as \gls{pls} may also benefit from a more Gaussian-like data distribution, given that the model is partly based on \gls{pca}.
 
 While these preprocessing techniques are not an exhaustive list, they represent a diverse set of methods.
@@ -20,32 +20,27 @@ Techniques such as feature selection were not considered in this study to limit 
 
 We also had several requirements for the model selection.
 The selected models for experimentation had to be diverse to ensure sufficient breadth in our results, enabling informed decisions about which models to include in the final stacking ensemble pipeline.
-Additionally, the models had to be suitable for regression tasks. 
+Additionally, the models had to be suitable for regression tasks.
 In the absence of research specific to \gls{libs} data, we selected models that have shown promise in other domains.
 Our literature review found that a variety of models fit this criteria.
-For example, \citet{andersonPostlandingMajorElement2022} demonstrated that models such as \gls{gbr}, \gls{pls}, \gls{lasso}, and \gls{rf} were each effective at predicting different major oxides from \gls{libs} data. 
-Additionally, \citet{svrforlibs} showed that \gls{svr} outperforms \gls{plsr} in predicting \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe}, and \ce{Al} using \gls{libs} data.
+For example, \citet{andersonPostlandingMajorElement2022} demonstrated that models such as \gls{gbr}, \gls{pls}, \gls{lasso}, and \gls{rf} were each effective at predicting different major oxides from \gls{libs} data.
+Additionally, \citet{svrforlibs} showed that \gls{svr} outperforms \gls{pls} regression in predicting \ce{Si}, \ce{Ca}, \ce{Mg}, \ce{Fe}, and \ce{Al} using \gls{libs} data.
 As a result, we included \gls{gbr}, \gls{pls}, \gls{lasso}, \gls{rf}, and \gls{svr} in our experiments.
 
-In the neural network domain, \citet{ann_libs_soil_analysis} demonstrated that their 3-layer \gls{ann} achieved a relative prediction error below 20\% for \ce{Ca}, \ce{Fe}, and \ce{Al} using \gls{libs} data. 
+In the neural network domain, \citet{ann_libs_soil_analysis} demonstrated that their 3-layer \gls{ann} achieved a relative prediction error below 20\% for \ce{Ca}, \ce{Fe}, and \ce{Al} using \gls{libs} data.
 Similarly, \citet{yangConvolutionalNeuralNetwork2022} showed that \gls{cnn} outperformed methods such as \gls{logreg}, \gls{svm}, and linear discriminant analysis in correctly classifying twelve different types of rocks based on \gls{libs} data.
 While this example for \gls{cnn} involves a classification task, \gls{cnn} can be adapted for regression by changing the loss function and output layer.
 Based on these factors, we decided to include \gls{ann} and \gls{cnn} in our experiments to further increase the diversity of our model selection.
 
 To further bolster our selection pool, we included models from the same family as those that showed promise in the literature.
 
-\gls{xgboost} was included in our experiments based on its promising accuracy in various settings.
-For example, \citet{xgboost_in_biomedicie} showed that \gls{xgboost} outperformed models such as \gls{rf} and \gls{svm} in predicting biological activity based on quantitative description of the compound's molecular structure. 
-Another example is \citet{xgboost_in_heart_disease}, who used \gls{xgboost} to predict heart disease and found that \gls{xgboost} outperformed \gls{rf} and \gls{etr} in correctly classifying patients with heart disease.
-Due to these factors and the limited study of \gls{xgboost} in the context of \gls{libs} data, we decided to include it in our experiments.
-
-Following the same logic, we included \gls{ngboost}. 
-\gls{ngboost} is a recent model introduced by \citet{duan_ngboost_2020} that, according to their work, improves upon \gls{gbr} by using a more sophisticated loss function and a more advanced gradient boosting algorithm.
-Limited research has been conducted using this algorithm in the context of \gls{libs} data. 
-However, \citet{ngboost_landslide} showed that \gls{ngboost} outperformed \gls{xgboost} and \gls{rf} in correctly determining landslide-prone fields, with an AUC of 0.898 compared to 0.871 and 0.863 for \gls{xgboost} and \gls{rf}, respectively.
+\gls{xgboost} and \gls{ngboost} both belong to the gradient boosting family, but they approach gradient boosting in distinct ways.
+\gls{xgboost} uses advanced algorithmic optimizations, such as regularization, tree pruning, and parallel processing, to improve performance and prevent overfitting. 
+On the other hand, \gls{ngboost} focuses on sophisticated probabilistic loss functions, optimizing the natural gradient to model the entire probability distribution of the target variable, making it well-suited for tasks requiring uncertainty estimation and probabilistic forecasting.
+Given these differences and the limited studies on their application to \gls{libs} data, we decided to include both in our experiments.
 
 Finally, ridge regression, \gls{enet}, \gls{etr}, and \gls{lasso} were included in various studies and showed promising results, even if they were not the top performers in their respective studies.
-Therefore, we chose to include these in our experiments to further diversify our model selection. 
+Therefore, we chose to include these in our experiments to further diversify our model selection.
 
 Table~\ref{tab:preprocessing-models} summarizes the preprocessing techniques and models selected for our experimentation.
 
