@@ -1,0 +1,16 @@
+\subsection{Design for Initial Experiment}\label{sec:initial-experiment}
+The goal of the initial experiment is to identify the most promising models for further evaluation.
+This experiment was designed to give an initial indication of the performance of the models on the \gls{ccs} dataset.
+
+To conduct the initial experiment and evaluate the twelve selected models shown in Table~\ref{tab:preprocessing-models} we wanted to ensure that the models were evaluated on a consistent basis.
+We achieve this by setting the following conditions for the experiment.
+The only preprocessor used for all models was \texttt{Norm 3} normalization.
+This normalization technique was developed specifically by \citet{cleggRecalibrationMarsScience2017} for accomodating the characteristics of the \gls{libs} data, whereby the data represents the readings of three different spectrometers, as outlined in Section~\ref{sec:norm3}.
+Therefore, \texttt{Norm 3} represents the most \gls{libs}-specific normalization technique available in from the pool of selected preprocessors and is the most appropriate choice for this experiment.
+All models were trained using our data partitioning and cross-validation strategy, as described in Section~\ref{subsec:validation_testing_procedures}. 
+To ensure as fair of a comparison between models as possible, all models were trained using as many default hyperparameters as possible and those hyperparameters that did not have default options were selected based on values found in the literature.
+However, due to the nature of the neural network models architecture, some extra time was spent on tuning the models to ensure a fair comparison.
+Finally, all the models ran only one trial. 
+Although running multiple trials would allow for an average performance evaluation, we argue that the variability of the results in each trial would be small enough that an average performance would not change the ranking of the models. 
+Additionally, as stated, the goal of this experiment is merely to get an initial indication of the performance of the models.
+Therefore, along with the choice of hyperparameters, it was not meaningful to run multiple trials for each model.
