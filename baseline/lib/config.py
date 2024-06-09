@@ -11,6 +11,7 @@ _ENV_VARS = [
     "DATA_CACHE_DIR",
     "CCAM_MASTER_LIST_FILE_NAME",
     "DISCORD_WEBHOOK_URL",
+    "EXPERIMENT_RESULTS_PATH",
 ]
 
 
@@ -74,3 +75,12 @@ class AppConfig:
     @property
     def discord_webhook_url(self):
         return self._config["DISCORD_WEBHOOK_URL"]
+
+    @property
+    def optimization_experiment_results_path(self):
+        path = self._config["EXPERIMENT_RESULTS_PATH"]
+        if os.path.isdir(path):
+            return os.path.join(path, "optimization_results.csv")
+        if not path.endswith(".csv"):
+            return f"{path}.csv"
+        return path
