@@ -4,13 +4,22 @@ These experiments aimed to provide a preliminary assessment of the models' perfo
 All models were trained on the same preprocessed data using the Norm 3 preprocessing method described in Section~\ref{sec:norm3}.
 This ensured that the models' performance could be evaluated under consistent and comparable conditions.
 
-Table~\ref{tab:init_results} presents the results of these experiments, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, standard deviation of the cross-validation, and the mean of these metrics for each model and oxide.
+Table~\ref{tab:init_results} presents the results of these experiments, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, standard deviation of cross-validation, and the mean of these metrics for each model and oxide.
 Figure~\ref{fig:init_results_rmses} shows the mean \gls{rmsep} and \gls{rmsecv} for each model sorted in ascending order.
+
+Notes on the results:
+\begin{itemize}
+    \item \textbf{Best performing models}: XGBoost, SVR and GBR perform the best.
+    \item \textbf{Worst performing models}: Elastic Net, CNN and ANN perform the worst.
+    \item \textbf{Oxide specific performance}: \ce{SiO2} and \ce{FeO_T} generally have higher \gls{rmsep} and \gls{rmsecv} values across most models, which is expected based on previous results. These oxides are known to be difficult to predict. On the other hand, \ce{MgO} and \ce{Na2O} have lower \gls{rmsep} and \gls{rmsecv} values across most models.
+    \item \textbf{Mention mean values}: The mean values for RMSEP and RMSECV provide an overall performance indicator for each model. For example, XGBoost, GBR, and SVR have the lowest mean RMSEP and RMSECV values. The mean standard deviation values for these models are also lower - underscores reliability.
+    \item \textbf{Relative performance}: Discuss this - mention that the jump between the three worst models is really high. Use this as an argument to justify the exclusion of these models from further experiments.
+\end{itemize}
 
 \begin{figure*}[h]
     \centering
-    \includegraphics[width=\textwidth]{images/init_results_rmses.png}
-    \caption{Mean \gls{rmsep} and \gls{rmsecv} for each model sorted in ascending order.}
+    \includegraphics[width=\textwidth]{images/init_results_means.png}
+    \caption{Mean \gls{rmsep}, \gls{rmsecv}, standard deviation, and standard deviation of cross-validation for each model sorted in ascending order.}
     \label{fig:init_results_rmses}
 \end{figure*}
 
