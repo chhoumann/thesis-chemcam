@@ -37,8 +37,8 @@ It is generally more efficient than grid search and can cover a broader area of 
 However, random search can miss optimal regions, especially in high-dimensional spaces where the probability of sampling near-optimal configurations by chance is low. 
 
 These limitations make the traditional methods unsuitable for our problem and highlight the need for a more sophisticated optimization methods.
-Both grid search and random search could be enhanced using adaptive techniques, such as Bayesian optimization, to mitigate these issues.
-However, while very feasible, implementing such enhancements and integrating it with our existing data partioning and cross-validation strategy would time-consuming.
+Both grid search and random search could be enhanced using adaptive techniques, such as Bayesian optimization, to greatly improve on these approaches.
+However, while very feasible, implementing such enhancements and integrating it with our existing data partioning and cross-validation strategy would be time-consuming.
 The ambition was therefore to find tools that would provide similar or better hyperparameter optimization capabilities, while being easy to integrate with our existing framework.
 For this reason we chose to use Optuna as the basis for our optimization framework.
 
