@@ -8,7 +8,7 @@ Table~\ref{tab:init_results} presents the results of these experiments, includin
 Figure~\ref{fig:init_results_rmses} shows the mean \gls{rmsep}, \gls{rmsecv}, standard deviation of prediction errors, and standard deviation of cross-validation prediction errors for each model across all oxides.
 
 The results show that the \gls{xgboost} and \gls{svr} models perform the best across all oxides.
-This is further underscored by Tables~\ref{best_results} and \ref{tab:best_model_occurrences}, which show the best performing model for each oxide and the number of times each model was the best performing model, respectively.
+This is further underscored by Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences}, which show the best performing model for each oxide and the number of times each model was the best performing model, respectively.
 These models have the lowest mean \gls{rmsep} and \gls{rmsecv} values, indicating high accuracy across all oxides.
 In addition, the mean standard deviation values for these models are also among the lowest, which underscores their robustness.
 
@@ -61,9 +61,25 @@ Ridge & 108.74 & 2.92 \\
 %     \item \textbf{Oxide specific performance}: \ce{SiO2} and \ce{FeO_T} generally have higher \gls{rmsep} and \gls{rmsecv} values across most models, which is expected based on previous results. These oxides are known to be difficult to predict. On the other hand, \ce{MgO} and \ce{Na2O} have lower \gls{rmsep} and \gls{rmsecv} values across most models.
 %     \item \textbf{Mention mean values}: The mean values for RMSEP and RMSECV provide an overall performance indicator for each model. For example, XGBoost, GBR, and SVR have the lowest mean RMSEP and RMSECV values. The mean standard deviation values for these models are also lower - underscores robustness.
 %     \item \textbf{Relative performance}: Discuss this - mention that the jump between the three worst models is really high. Use this as an argument to justify the exclusion of these models from further experiments.
+% Make it clear that we do not use Table 12 for a 'winner by majority' approach. We use it to provide a general overview of the best performing models. Just because XGBoost appears the most does not mean it is the best model for every oxide.
 % \end{itemize}
 
 
 \input{sections/results/init_results_table.tex}
-\input{sections/results/best_results_table.tex}
-\input{sections/results/best_model_occurrences_table.tex}
+
+\begin{table*}[h]
+\centering
+\begin{minipage}{.7\textwidth}
+  \centering
+  \input{sections/results/best_results_table.tex}
+  \caption{Lowest metric and corresponding model for each oxide.}
+  \label{tab:best_results}
+\end{minipage}%
+\hspace{0.03\textwidth}
+\begin{minipage}{.25\textwidth}
+  \centering
+  \input{sections/results/best_model_occurrences_table.tex}
+  \caption{Occurrences of the best model for each oxide.}
+  \label{tab:best_model_occurrences}
+\end{minipage}
+\end{table*}
