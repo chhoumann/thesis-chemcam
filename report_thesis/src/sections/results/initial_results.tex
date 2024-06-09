@@ -4,16 +4,26 @@ These experiments aimed to provide a preliminary assessment of the models' perfo
 All models were trained on the same preprocessed data using the Norm 3 preprocessing method described in Section~\ref{sec:norm3}.
 This ensured that the models' performance could be evaluated under consistent and comparable conditions.
 
-Table~\ref{tab:init_results} presents the results of these experiments, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, standard deviation of cross-validation, and the mean of these metrics for each model and oxide.
-Figure~\ref{fig:init_results_rmses} shows the mean \gls{rmsep}, \gls{rmsecv}, standard deviation of prediction errors, and standard deviation of cross-validation prediction errors for each model across all oxides.
+Table~\ref{tab:init_results} presents the results of these experiments, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, and standard deviation of cross-validation prediction errors for each model across all oxides.
+The means of each metric are also provided to give an overall indication of the models' performance.
+Furthermore, we present an overview of these mean values in Figure~\ref{fig:init_results_rmses} to facilitate a visual comparison of the models' general performance.
 
 The results show that the \gls{xgboost} and \gls{svr} models perform the best across all oxides.
-This is further underscored by Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences}, which show the best performing model for each oxide and the number of times each model was the best performing model, respectively.
-These models have the lowest mean \gls{rmsep} and \gls{rmsecv} values, indicating high accuracy across all oxides.
-In addition, the mean standard deviation values for these models are also among the lowest, which underscores their robustness.
+These models exhibit the lowest mean \gls{rmsep} and \gls{rmsecv} values, indicating their high accuracy.
+Additionally, their mean standard deviation values are among the lowest, underscoring their robustness.
+Their good performance is further underscored by Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences}, which show the best performing model for each oxide and the number of times each model was the best performing model according to any of the metrics, respectively.
 
-On the other hand, the \gls{enet}, \gls{cnn}, and \gls{ann} models perform the worst across all oxides.
-These models have the highest mean \gls{rmsep} and \gls{rmsecv} values, and their standard deviation values are also the highest.
+Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences} which list the best-performing model for each oxide and the frequency with which each model achieves top performance according to various metrics, respectively.
+It is essential to clarify that these tables are intended to provide a comprehensive overview of model performance rather than to determine an overall 'winner by majority'.
+Their purpose is to illustrate the general trends and behavior of different models across various metrics and oxides.
+Although \gls{xgboost} and \gls{svr} appear the most frequently in Table~\ref{tab:best_model_occurrences}, this does not imply that they are the best models for every oxide.
+
+On the other hand, the \gls{enet}, \gls{cnn}, and \gls{ann} models perform the worst across all oxides, exhibiting the highest mean \gls{rmsep} and \gls{rmsecv} values, as well as the highest standard deviation values.
+This poor performance is further highlighted in Table~\ref{tab:relative_performance}, which shows the relative performance of each model compared to the best-performing model, \gls{xgboost}.
+The table also includes the difference in performance relative to the next best model, with \gls{xgboost} serving as the baseline for comparison, assigned a relative performance of 100\%.
+From this table, it is evident that the \gls{enet}, \gls{cnn}, and \gls{ann} models experience significant drops in performance compared to the top-performing models.
+Consequently, based on their high errors, large standard deviations, and overall poor accuracy and robustness across all oxides, we decided to exclude these models from further experiments.
+This decision was made to maintain focus and prevent unnecessary expansion of the study's scope, ensuring that subsequent analyses remain targeted and manageable.
 
 \begin{figure*}[h]
     \centering
@@ -21,12 +31,6 @@ These models have the highest mean \gls{rmsep} and \gls{rmsecv} values, and thei
     \caption{Mean \gls{rmsep}, \gls{rmsecv}, standard deviation of prediction errors, and standard deviation of cross-validation prediction errors for each model across all oxides.}
     \label{fig:init_results_rmses}
 \end{figure*}
-
-Table~\ref{tab:relative_performance} shows the relative performance of each model compared to the best performing model, \gls{xgboost}.
-The table also shows the difference in performance compared to the next best model.
-The \gls{xgboost} model is used as the baseline for comparison, with a relative performance of 100\%.
-From this table, it is evident that the \gls{enet}, \gls{cnn}, and \gls{ann} models make drastic jumps in performance compared to the best performing models.
-Based on this and the aforementioned poor accuracy and robustness observed across all oxides as evidenced by the high errors and standard deviations, we decided to exclude these models from further experiments.
 
 \begin{table}[ht]
 \centering
@@ -51,19 +55,6 @@ Ridge & 108.74 & 2.92 \\
 \caption{Relative performance of each model compared to the best performing model, and the difference in performance compared to the next best model.}
 \label{tab:relative_performance}
 \end{table}
-
-% Table of the best performing model for each oxide and the RMSECV, RMSE,
-
-% Notes on the results:
-% \begin{itemize}.
-%     \item \textbf{Best performing models}: XGBoost, SVR and GBR perform the best.
-%     \item \textbf{Worst performing models}: Elastic Net, CNN and ANN perform the worst.
-%     \item \textbf{Oxide specific performance}: \ce{SiO2} and \ce{FeO_T} generally have higher \gls{rmsep} and \gls{rmsecv} values across most models, which is expected based on previous results. These oxides are known to be difficult to predict. On the other hand, \ce{MgO} and \ce{Na2O} have lower \gls{rmsep} and \gls{rmsecv} values across most models.
-%     \item \textbf{Mention mean values}: The mean values for RMSEP and RMSECV provide an overall performance indicator for each model. For example, XGBoost, GBR, and SVR have the lowest mean RMSEP and RMSECV values. The mean standard deviation values for these models are also lower - underscores robustness.
-%     \item \textbf{Relative performance}: Discuss this - mention that the jump between the three worst models is really high. Use this as an argument to justify the exclusion of these models from further experiments.
-% Make it clear that we do not use Table 12 for a 'winner by majority' approach. We use it to provide a general overview of the best performing models. Just because XGBoost appears the most does not mean it is the best model for every oxide.
-% \end{itemize}
-
 
 \input{sections/results/init_results_table.tex}
 
