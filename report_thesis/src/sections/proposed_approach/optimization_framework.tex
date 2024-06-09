@@ -9,18 +9,20 @@ The estimator may even require different variations of preprocessing depending o
 Choosing the appropriate preprocessing steps for each base estimator is crucial, as improper preprocessing can lead to suboptimal performance or even render the model useless.
 Adding to the complexity is the fact that different estimators have different hyperparameters that need to be fine-tuned.
 Adding to the complexity is the fact that similar challenges arise when discussing the choice of hyperparameters for each base estimator.
-Some estimators might require very little tuning, while others might require extensive tuning, depending on the target oxide.
+Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide.
 Not only that, but hyperparameters within the same estimator may conflict with each other, whereby prioritization of one hyperparameter may for example lead to reduced bias but result in overfitting.
 Finally, hyperparameters cannot be considered in isolation, because depending on the preprocessing steps applied to the data, the optimal hyperparameters may vary.
-These are just some of the challenges that needs to be considered and so therefore, we need a systematic approach to determine the optimal configuration of hyperparameters for each estimator and preprocessing steps for each oxide. 
+These are just some of the challenges that needs to be considered and so therefore, we need a systematic approach to determine the optimal configuration of hyperparameters and preprocessing steps for each estimator for each oxide. 
 
 To guide this process we have developed a working assumption.
 Namely, that we assume that selecting the top-$n$ best pipelines for each oxide, given different preprocessors and models per pipeline, will yield the best pipelines for a given oxide in our stacking ensemble.
-Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{sec:evaluation_metrics}.
+Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{subsec:evaluation_metrics}.
 Additionaly, each permutation will utilize our proposed data partitioning and cross-validation strategy outlined in Section~\ref{subsec:validation_testing_procedures}.
-Utilizing our proposed data partitioning and cross-validation strategy, along with the aformentioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem-definition}.
-This reduces the problem to finding a selection of preprocessors and models, and a method of testing multiple permutations of these to identify the top-$n$ best pipeline for each oxide.
-In Section~\ref{sec:model-selection} we outlined the models and preprocessing techniques that we intend to use and in the following section we will describe the optimization framework that we have developed to address this challenge.
+Utilizing our proposed data partitioning and cross-validation strategy, along with the aformentioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem_definition}.
+This reduces the problem to finding a selection of preprocessors and models, and a means for doing a guided search that evaluates multiple permutations of these to identify the top-$n$ best pipeline for each oxide.
+
+To address the first part of this challenge, we selected a diverse set of models and preprocessing techniques, as outlined in Section~\ref{sec:model-selection}.
+In order to address the second part of the problem, we have developed an optimization framework, which will be described in the following section.
 
 \subsubsection{The Framework}
 The framework developed to address this challenge was constructed based on a specific set of criteria.
