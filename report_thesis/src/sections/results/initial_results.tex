@@ -14,4 +14,28 @@ Figure~\ref{fig:init_results_rmses} shows the mean \gls{rmsep} and \gls{rmsecv} 
     \label{fig:init_results_rmses}
 \end{figure*}
 
+\begin{table}[ht]
+\centering
+\begin{tabularx}{\linewidth}{lll}
+\toprule
+Model & Relative Performance (\%) & Diff. vs Next (\%) \\
+\midrule
+\gls{xgboost} & 100.00 & 0.85 \\
+\gls{svr} & 100.85 & 2.22 \\
+\gls{gbr} & 103.07 & 0.87 \\
+\gls{ngboost} & 103.94 & 0.51 \\
+\gls{rf} & 104.45 & 0.39 \\
+\gls{etr} & 104.84 & 3.89 \\
+Ridge & 108.74 & 2.92 \\
+\gls{pls} & 111.66 & 2.73 \\
+\gls{lasso} & 114.38 & 13.44 \\
+\gls{ann} & 127.82 & 15.36 \\
+\gls{cnn} & 143.18 & 39.18 \\
+\gls{enet} & 182.36 & - \\
+\bottomrule
+\end{tabularx}
+\caption{Relative performance of each model compared to the best performing model, and the difference in performance compared to the next best model.}
+\label{tab:relative_performance}
+\end{table}
+
 \input{sections/results/init_results_table.tex}
