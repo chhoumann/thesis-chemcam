@@ -19,40 +19,30 @@ Namely, that we assume that selecting the top-$n$ best pipelines for each oxide,
 Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{subsec:evaluation_metrics}.
 Additionaly, each permutation will utilize our proposed data partitioning and cross-validation strategy outlined in Section~\ref{subsec:validation_testing_procedures}.
 Utilizing our proposed data partitioning and cross-validation strategy, along with the aformentioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem_definition}.
-This reduces the problem to finding a selection of preprocessors and models, and a means for doing a guided search that evaluates multiple permutations of these to identify the top-$n$ best pipeline for each oxide.
-
-To address the first part of this challenge, we selected a diverse set of models and preprocessing techniques, as outlined in Section~\ref{sec:model-selection}.
-In order to address the second part of the problem, we have developed an optimization framework, which will be described in the following section.
+This narrows our focus to two key tasks: selecting suitable preprocessors and models, and devising a guided search strategy to evaluate various permutations and identify the top-$n$ pipelines for each oxide. 
+First, we curated a diverse set of models and preprocessing techniques, as detailed in Section~\ref{sec:model-selection}.
+Next, we developed an optimization framework to systematically explore and optimize these pipeline configurations, which will be described in the following section.
 
 \subsubsection{The Framework}
-% Introduce the fact that we needed a tool that fulfills several criteria
-    % Easy to use
-    % Lots of possible configurations
-    % Efficient search strategy
-    % Ability to balance exploration and exploitation
-    % Configurable
-    % Integrate well with your exisiting code (data partitioning and cross-validation strategy)
+A fundamental criteria for an exploration and optimization procedure is the alignment with our goals of generalization, robustness, and accuracy, as outlined in Section~\ref{sec:problem_definition}.
+To achieve this, the search process should be guided by an ojective function achieves thse goals.
+Based on the evaluation process outlined in Section~\ref{subsec:validation_testing_procedures}, whereby we argue that solely evaluating on the RMSEP may lead to misleading and poor results, we define the objective function we wish to optimize as a multi-objective optimization on minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}. 
 
-To develop a framework to address this challenge meant that several criteria had to be fulfilled.
-Namely, the framework had to be able to search through a combined search space of models and preprocessing techniques.
-It should also be able to integrate with our existing tools, such as the data partitioning and cross-validation strategy.
-The framework
-Finally, time and computational resources should be managed efficiently, while still arriving at well performing configurations.
-The first and second criteria could be fulfilled by most hyperparameter optimization methods,
+Given these goals, traditional methods like grid search and random search could be used, but they often fall short due to several inherent limitations. 
+Grid search involves exhaustively evaluating all possible combinations of hyperparameters within specified ranges. 
+While thorough, this method quickly becomes computationally prohibitive as the number of hyperparameters increases. 
+The curse of dimensionality means that the search space grows exponentially, making it impractical for models with many hyperparameters or when fine granularity in parameter values is needed. 
 
+Random search, on the other hand, selects hyperparameter values at random within predefined ranges. 
+It is generally more efficient than grid search and can cover a broader area of the hyperparameter space. 
+However, random search can miss optimal regions, especially in high-dimensional spaces where the probability of sampling near-optimal configurations by chance is low. 
 
+These limitations make the traditional methods unsuitable for our problem and highlight the need for a more sophisticated optimization methods.
+Both grid search and random search could be enhanced using adaptive techniques, such as Bayesian optimization, to mitigate these issues.
+However, while very feasible, implementing such enhancements and integrating it with our existing data partioning and cross-validation strategy would time-consuming.
+The ambition was therefore to find tools that would provide similar or better hyperparameter optimization capabilities, while being easy to integrate with our existing framework.
+For this reason we chose to use Optuna as the basis for our optimization framework.\cite{optuna_2019}
 
-The framework had to be able to search through a combined search space of models and preprocessing techniques.
-This could be done by traditional methods such as grid search or random search, but due to the vast search space, these methods would require an infeasible amount of time to correctly identify the optimal pipelines for each oxide.
-This meant that the framework also needed to have an efficient search strategy.
-Ideally, the framework should be able to balance exploration and exploitation of the search space.
-This would allow the framework to identify multiple promising configurations, but also focus on the most promising.
-Additionally, not all configurations will be promising. 
-Some permutations of hyperparameters, combination of models and preprocessing techniques or both, may not be optimal.
-This could to scenarios where the framework is wasting computational resources on configurations that should be terminated early.
-Therefore, the framework should have a mechanism to terminate unpromising trials early.
-Finally, the framework should be able to optimize for multiple metrics simultaneously, because as outlined in Section~\ref{subsec:validation_testing_procedures} evaluating solely on the RMSEP may lead to misleading and poor results.
-For these reasons, we chose to use Optuna as the basis of our optimization framework.
 
 Optuna is a hyperparameter optimization framework designed for direct integration with Python.
 The framework's flexible search space definition allows it to dynamically adjust and optimize hyperparameters during execution. 
