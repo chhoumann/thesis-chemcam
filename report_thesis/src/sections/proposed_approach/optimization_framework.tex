@@ -1,18 +1,18 @@
 \subsection{Optimization Framework}\label{sec:optimization_framework}
-One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators.
-\citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses.
-In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide
-The complexity of the problem is further increased by the fact that each base estimator may require different preprocessing depending on the oxide in question.
-Different target oxides might have varied data characteristics.
-This means that for some oxides an estimator might require the data to be preprocessed, while for other oxides it may be able to handle raw data.
-The estimator may even require different variations of preprocessing depending on the oxide.
-Choosing the appropriate preprocessing steps for each base estimator is crucial, as improper preprocessing can lead to suboptimal performance or even render the model useless.
-Adding to the complexity is the fact that different estimators have different hyperparameters that need to be fine-tuned.
-Adding to the complexity is the fact that similar challenges arise when discussing the choice of hyperparameters for each base estimator.
-Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide.
-Not only that, but hyperparameters within the same estimator may conflict with each other, whereby prioritization of one hyperparameter may for example lead to reduced bias but result in overfitting.
+One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators. \citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses. 
+In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide. 
+The complexity of the problem is increased because different oxides require different models, and the optimal preprocessing techniques will depend on both the model and the specific oxide being predicted. 
+Additionally, each estimator may require different variations of preprocessing depending on the oxide. 
+Due to challenges such as matrix effects, multicollinearity, and high dimensionality caused by very complex physical processes, it is difficult to determine which configuration is optimal.
+Selecting the appropriate preprocessing steps for each base estimator is essential, as incorrect preprocessing can significantly degrade performance and undermine the model's effectiveness
+Furthermore, choosing the right hyperparameters for each base estimator introduces additional complexity, as these decisions also significantly impact model performance and must be carefully tuned for each specific oxide. 
+Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide. 
+For instance, simpler models like Elastic Net and Ridge Regression might quickly yield satisfactory results with minimal hyperparameter adjustments. 
+In contrast, more complex models like Convolutional Neural Networks or Gradient Boosting Regression involve a larger number of hyperparameters that need fine-tuning to perform well. 
+The extent of tuning required is also influenced by the characteristics of the target oxide, such as its data distribution, noise levels, and feature interactions. 
+These factors can affect how sensitive an estimator is to its hyperparameters.
 Finally, hyperparameters cannot be considered in isolation, because depending on the preprocessing steps applied to the data, the optimal hyperparameters may vary.
-These are just some of the challenges that needs to be considered and so therefore, we need a systematic approach to determine the optimal configuration of hyperparameters and preprocessing steps for each estimator for each oxide. 
+Given these complexities, we need a systematic approach to determine the optimal configuration of hyperparameters and preprocessing steps tailored to each estimator and oxide.
 
 To guide this process we have developed a working assumption.
 Namely, that we assume that selecting the top-$n$ best pipelines for each oxide, given different preprocessors and models per pipeline, will yield the best pipelines for a given oxide in our stacking ensemble.
@@ -25,7 +25,23 @@ To address the first part of this challenge, we selected a diverse set of models
 In order to address the second part of the problem, we have developed an optimization framework, which will be described in the following section.
 
 \subsubsection{The Framework}
-The framework developed to address this challenge was constructed based on a specific set of criteria.
+% Introduce the fact that we needed a tool that fulfills several criteria
+    % Easy to use
+    % Lots of possible configurations
+    % Efficient search strategy
+    % Ability to balance exploration and exploitation
+    % Configurable
+    % Integrate well with your exisiting code (data partitioning and cross-validation strategy)
+
+To develop a framework to address this challenge meant that several criteria had to be fulfilled.
+Namely, the framework had to be able to search through a combined search space of models and preprocessing techniques.
+It should also be able to integrate with our existing tools, such as the data partitioning and cross-validation strategy.
+The framework
+Finally, time and computational resources should be managed efficiently, while still arriving at well performing configurations.
+The first and second criteria could be fulfilled by most hyperparameter optimization methods,
+
+
+
 The framework had to be able to search through a combined search space of models and preprocessing techniques.
 This could be done by traditional methods such as grid search or random search, but due to the vast search space, these methods would require an infeasible amount of time to correctly identify the optimal pipelines for each oxide.
 This meant that the framework also needed to have an efficient search strategy.
