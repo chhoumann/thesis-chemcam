@@ -70,6 +70,7 @@ def _get_runs_across_oxides(df):
     for oxide in df.columns:
         experiment_ids = df[oxide].dropna().tolist()
         runs = mlflow.search_runs(experiment_ids=experiment_ids)
+        runs['params.oxide'] = oxide  # type: ignore
         oxide_runs[oxide] = runs
     return oxide_runs
 
@@ -91,3 +92,9 @@ def get_full_runs_df(path_to_runs_file: str):
     )
 
     return _get_full_runs_df(df, path_to_runs_file)
+
+
+def clean_experiment_data(runs: pd.DataFrame):
+    filtered_runs = runs[~runs["params.model_type"].isna()]  # Remove runs without model type (parent runs)
+    filtered_runs = filtered_runs[filtered_runs["status"] != "FAILED"]  # Remove failed runs
+    return filtered_runs
