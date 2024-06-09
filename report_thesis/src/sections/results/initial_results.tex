@@ -5,46 +5,13 @@ All models were trained on the same preprocessed data using the Norm 3 preproces
 This ensured that the models' performance could be evaluated under consistent and comparable conditions.
 
 Table~\ref{tab:init_results} presents the results of these experiments, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, standard deviation of the cross-validation, and the mean of these metrics for each model and oxide.
-The primary metric of interest is the \gls{rmsecv}, as it provides a measure of the model's predictive accuracy during cross-validation, reflecting its generalization performance on unseen data.
-Additionally, the standard deviation of the cross-validation offers insight into the variability of the model's performance across different folds, and the \gls{rmsep} indicates the model's predictive accuracy on a separate test set.
+Figure \ref{fig:init_results_rmses} shows the mean \gls{rmsep} and \gls{rmsecv} for each model sorted in ascending order.
 
-Ridge regression and \gls{svr} generally exhibit strong performance across different oxides, as evidenced by their relatively low \gls{rmsecv} values.
-In contrast, \gls{enet}, \gls{ann}, and \gls{cnn} tend to perform the worst, with higher \gls{rmsecv} values.
-Models such as \gls{rf} and \gls{gbr} exhibit moderate performance, often surpassing simpler linear models but not as consistently as \gls{svr}.
-
-For $\ce{SiO2}$, \gls{svr} demonstrates the lowest \gls{rmsecv} of 4.908.
-Ridge regression and \gls{rf} also perform well, with \gls{rmsecv} values of 5.005 and 5.304, respectively.
-The standard deviations for these models are relatively low, indicating stable performance.
-
-In the case of $\ce{TiO2}$, \gls{etr} exhibits the lowest \gls{rmsecv} of 0.427, signifying exceptional performance, with \gls{svr} and \gls{ngboost} also showing strong predictive capabilities, with \gls{rmsecv} values of 0.463 and 0.433, respectively.
-The low standard deviation of the cross-validation for these models indicates consistent performance across folds.
-
-For $\ce{Al2O3}$, \gls{ngboost} with an \gls{rmsecv} of 2.291 and ridge regression with an \gls{rmsecv} of 3.115 achieve relatively low \gls{rmsecv}, highlighting their effectiveness in predicting this oxide, with \gls{svr} also performing well with an \gls{rmsecv} of 2.700.
-The standard deviation analysis reveals that \gls{ngboost} has the least variability, making it a more reliable model for this oxide.
-
-\gls{svr} emerges as the best-performing model for $\ce{FeO_T}$ with the lowest \gls{rmsecv} of 2.847, while ridge regression with an \gls{rmsecv} of 3.385 and \gls{ngboost} with an \gls{rmsecv} of 3.561 also demonstrate competent performance.
-The standard deviation values indicate that while \gls{svr} has lower variability, the other models also maintain reasonable consistency.
-
-For $\ce{MgO}$, \gls{svr} exhibits the best performance with the lowest \gls{rmsecv} of 1.426, and ridge regression with an \gls{rmsecv} of 1.509 and \gls{ngboost} with an \gls{rmsecv} of 1.578 are also effective.
-The standard deviation metrics suggest that these models are more stable, with \gls{svr} showing the least variation.
-
-\gls{gbr} shows the lowest \gls{rmsecv} of 1.468 for $\ce{CaO}$, indicating strong performance, with ridge regression having an \gls{rmsecv} of 1.513 and \gls{etr} having an \gls{rmsecv} of 1.503 also performing well.
-Standard deviation values also highlight \gls{gbr} and \gls{etr} as having consistent performance.
-
-\gls{etr} demonstrates the best performance for $\ce{Na2O}$ with the lowest \gls{rmsecv} of 1.028, while ridge regression with an \gls{rmsecv} of 1.221 and \gls{svr} with an \gls{rmsecv} of 1.096 also perform reasonably well.
-The standard deviation of the cross-validation for \gls{etr} is particularly low, underscoring its robustness.
-
-For $\ce{K2O}$, \gls{etr} again shows strong performance with the lowest \gls{rmsecv} of 0.681, with \gls{svr} having an \gls{rmsecv} of 0.690 and ridge regression having an \gls{rmsecv} of 0.668 also performing well.
-The standard deviation analysis supports these findings, indicating reliable performance for these models.
-
-To summarize, \gls{svr} stands out as the best overall model based on its average performance, with a mean \gls{rmsecv} of 1.958. This is closely followed by \gls{ngboost} with a mean \gls{rmsecv} of 2.017 and ridge regression with a mean \gls{rmsecv} of 2.111.
-When examining the \gls{rmsep} values, \gls{svr} also demonstrates strong predictive accuracy on independent test sets, reinforcing its effectiveness.
-Additionally, the standard deviation of the cross-validation for \gls{svr} is generally low, indicating stable and consistent performance across different subsets of data.
-
-\gls{ngboost} and ridge regression also show robust performance, with relatively low standard deviations.
-Specifically, \gls{ngboost} exhibits consistent performance with low variability, making it a dependable model for various oxides.
-Ridge regression, while slightly higher in \gls{rmsecv}, still maintains good performance with low standard deviation values.
-
-Overall, \gls{svr}, ridge regression, and \gls{ngboost} are consistently among the top-performing models for multiple oxides, as evidenced by their low \gls{rmsecv}, \gls{rmsep}, and standard deviation values.
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/init_results_rmses.png}
+    \caption{Mean \gls{rmsep} and \gls{rmsecv} for each model sorted in ascending order.}
+    \label{fig:init_results_rmses}
+\end{figure*}
 
 \input{sections/results/init_results_table.tex}
