@@ -9,6 +9,7 @@ The means of each metric are also provided to give an overall indication of the 
 Furthermore, we present an overview of these mean values in Figure~\ref{fig:init_results_rmses} to facilitate a visual comparison of the models' general performance.
 
 The results indicate that the gradient boosting models, \gls{xgboost}, \gls{gbr}, and \gls{ngboost}, consistently perform well across all oxides, with \gls{xgboost} generally outperforming the other two gradient boosting models.
+Interestingly, \gls{gbr} has the lowest \gls{rmsep}, while \gls{xgboost} achieves the lowest \gls{rmsecv}, suggesting that the regularization in \gls{xgboost} may improve the model's generalizability.
 These models exhibit both low mean \gls{rmsep} and \gls{rmsecv} values, indicating high accuracy, as well as low standard deviation values, underscoring their robustness.
 \gls{svr} is also among the top-performing models, with mean \gls{rmsep} and \gls{rmsecv} values close to those of \gls{xgboost} and low standard deviation values.
 
@@ -19,7 +20,7 @@ We observe that \gls{enet} performs between ridge and \gls{lasso} in terms of bo
 The \gls{cnn} and \gls{ann} models perform the worst across all oxides, exhibiting the highest mean \gls{rmsep} and \gls{rmsecv} values, as well as the highest standard deviation values.
 This poor performance is further highlighted in Table~\ref{tab:relative_performance}, which shows the relative performance of each model compared to the best-performing model, \gls{xgboost}.
 The table also includes the difference in performance relative to the next best model, with \gls{xgboost} serving as the baseline for comparison, assigned a relative performance of 100\%.
-From this table, it is evident that the \gls{cnn} and \gls{ann} models experience significant drops in performance compared to the top-performing models.
+From this table, it is evident that the \gls{cnn} and \gls{ann} models experience notable drops in performance compared to the top-performing models.
 While deep learning models such as these have the theoretical potential to perform well with \gls{libs} data, given their ability to learn complex patterns and relationships, the relatively small size of our dataset may limit their efficacy.
 Furthermore, achieving optimal performance with these models necessitates extensive tuning of both their architectures and hyperparameters, which involves exploring a vast space of potential configurations and design choices.
 Although methods for systematic hyperparameter optimization, as detailed in Section~\ref{sec:optimization_framework}, could be employed, the associated computational cost would be prohibitively high.
@@ -67,7 +68,7 @@ ANN & 127.82 & 13.52 \\
 CNN & 143.18 & 15.36 \\
 \bottomrule
 \end{tabular}
-\caption{Relative performance of each model compared to the best performing model, and the difference in performance compared to the next best model.}
+\caption{Relative performance of each model compared to the best performing model, measured by normalized RMSECV and multiplied by 100 for percentage. A higher percentage indicates worse performance. The 'Diff. vs Prev.' column shows the difference in performance compared to the next best model, measured in percentage points.}
 \label{tab:relative_performance}
 \end{table}
 
