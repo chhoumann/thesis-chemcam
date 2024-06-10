@@ -8,41 +8,30 @@ Table~\ref{tab:init_results} presents the results of these experiments, includin
 The means of each metric are also provided to give an overall indication of the models' performance.
 Furthermore, we present an overview of these mean values in Figure~\ref{fig:init_results_rmses} to facilitate a visual comparison of the models' general performance.
 
-The results show that the \gls{xgboost} and \gls{svr} models perform the best across all oxides.
-These models exhibit the lowest mean \gls{rmsep} and \gls{rmsecv} values, indicating their high accuracy.
-Additionally, their mean standard deviation values are among the lowest, underscoring their robustness.
-Their good performance is further underscored by Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences}, which show the best performing model for each oxide and the number of times each model was the best performing model according to any of the metrics, respectively.
+
+
+The results indicate that the gradient boosting models, \gls{xgboost}, \gls{gbr}, and \gls{ngboost}, consistently perform well across all oxides, with \gls{xgboost} generally outperforming the other two gradient boosting models.
+These models exhibit both low mean \gls{rmsep} and \gls{rmsecv} values, indicating high accuracy, as well as low standard deviation values, underscoring their robustness.
+\gls{svr} is also among the top-performing models, with mean \gls{rmsep} and \gls{rmsecv} values close to those of \gls{xgboost} and low standard deviation values.
+
+While usually outperformed by gradient boosting models and \gls{svr}, the ensemble models, \gls{rf} and \gls{etr}, also exhibit good performance.
+The \gls{pls}, ridge, \gls{lasso}, and \gls{enet} models typically seem to perform worse than the other models, with higher mean \gls{rmsep} and \gls{rmsecv} values and higher standard deviation values.
+We observe that \gls{enet} performs between ridge and \gls{lasso} in terms of both error and standard deviation, which aligns with expectations since \gls{enet} combines the regularization techniques of both models.
+This consistent placement underscores the reliability of our results and the soundness of our model evaluations.
+
+The \gls{cnn} and \gls{ann} models perform the worst across all oxides, exhibiting the highest mean \gls{rmsep} and \gls{rmsecv} values, as well as the highest standard deviation values.
+This poor performance is further highlighted in Table~\ref{tab:relative_performance}, which shows the relative performance of each model compared to the best-performing model, \gls{xgboost}.
+The table also includes the difference in performance relative to the next best model, with \gls{xgboost} serving as the baseline for comparison, assigned a relative performance of 100\%.
+From this table, it is evident that the \gls{cnn} and \gls{ann} models experience significant drops in performance compared to the top-performing models.
+While deep learning models such as these have the theoretical potential to perform well with \gls{libs} data, given their ability to learn complex patterns and relationships, the relatively small size of our dataset may limit their effectiveness.
+In addition, this would require more effective tuning of hyperparameters, which is challenging due to the vast number of possible permutations.
+Hyperparameter tuning akin to the method detailed in Section~{ref:optuna} could be pursued, but the required computational time would be prohibitive.
+For these reasons, we decided to exclude the \gls{cnn} and \gls{ann} models from further experimentation.
 
 Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences} which list the best-performing model for each oxide and the frequency with which each model achieves top performance according to various metrics, respectively.
 It is essential to clarify that these tables are intended to provide a comprehensive overview of model performance rather than to determine an overall 'winner by majority'.
 Their purpose is to illustrate the general trends and behavior of different models across various metrics and oxides.
 Although \gls{xgboost} and \gls{svr} appear the most frequently in Table~\ref{tab:best_model_occurrences}, this does not imply that they are the best models for every oxide.
-
-On the other hand, the \gls{enet}, \gls{cnn}, and \gls{ann} models perform the worst across all oxides, exhibiting the highest mean \gls{rmsep} and \gls{rmsecv} values, as well as the highest standard deviation values.
-This poor performance is further highlighted in Table~\ref{tab:relative_performance}, which shows the relative performance of each model compared to the best-performing model, \gls{xgboost}.
-The table also includes the difference in performance relative to the next best model, with \gls{xgboost} serving as the baseline for comparison, assigned a relative performance of 100\%.
-From this table, it is evident that the \gls{enet}, \gls{cnn}, and \gls{ann} models experience significant drops in performance compared to the top-performing models.
-
-While deep learning models such as \gls{cnn} and \gls{ann} have the theoretical potential to perform well with \gls{libs} data, given their ability to learn complex patterns and relationships, the relatively small size of our dataset may limit their effectiveness.
-Furthermore, these models could potentially outperform the other models if tuned more effectively.
-However, the sheer number of potential hyperparameters, configurations, architectures, and techniques makes it impractical to conduct a comprehensive search.
-Hyperparameter tuning akin to the method detailed in Section~{ref:optuna} could be pursued, but the required computational time would be prohibitive.
-
-% The unexpectedly poor performance of the \gls{enet} model is particularly notable.
-% Given that \gls{enet} is designed as a combination of Ridge and \gls{lasso} regression, leveraging both $L_1$ and $L_2$ regularization to balance the benefits of each, it was anticipated to perform at least as well as, if not better than, its individual components.
-% Surprisingly, both ridge and \gls{lasso} models outperformed \gls{enet}.
-% We expected \gls{enet} to perform better than or at least as well as ridge and \gls{lasso} regression, so this result was unexpected.
-% One possible explanation for this anomaly could be the selection of hyperparameters
-
-% We don't know why enet performed so poorly! Ridge and Lasso performed better than enet, which is surprising because enet is supposed to be a combination of the two. Maybe the hyperparameters used were very bad. We keep this in mind for the optimization phase.
-
-% We have a few thoughts on this:
-% Deep learning models such as \gls{cnn} and \gls{ann} should in theory work well for LIBS data, given their ability to learn complex patterns and relationships in data, but because the dataset is relatively small, they may not have enough data to learn these patterns effectively.
-% Also, it is possible that these models could outperform the other models if they were tuned more effectively, but because of the all the possible permutations of hyperparameters, configurations, architectures and techniques, the search space is too large to explore exhaustively.
-% While we could have done hyperparameter tuning similar to what we described in the Optuna section, it would have taken way too long.
-
-% Consequently, based on their high errors, large standard deviations, and overall poor accuracy and robustness across all oxides, we decided to exclude these models from further experiments.
-% This decision was made to maintain focus and prevent the inclusion of models that are unlikely to yield significant improvements in performance.
 
 \begin{figure*}[h]
     \centering
