@@ -50,3 +50,32 @@ Ridge                          & alpha                       & $10^{-3}$ - $10^{
 \label{tab:optuna_model_configurations}
 \caption{Optuna Model Configuration Ranges}
 \end{table*}
+
+
+\begin{table*}[h]
+\centering
+\begin{tabular}{@{}l>{\ttfamily}lp{0.5\textwidth}@{}}
+\toprule
+\textbf{Model}                       & \textbf{Parameter}                & \textbf{Range}                           \\ \midrule
+\multirow{2}{*}{PCA}                 & n\_components                     & 1 - 50                                   \\ \cmidrule{2-3}
+                                     & whiten                            & \{True, False\}                          \\ \midrule
+\multirow{4}{*}{KernelPCA}           & n\_components                     & 1 - 100                                  \\ \cmidrule{2-3}
+                                     & kernel                            & \{linear, poly, rbf, sigmoid, cosine\}   \\ \cmidrule{2-3}
+                                     & gamma                             & $10^{-3}$ - $10^{1}$ (log scale)         \\ \cmidrule{2-3}
+                                     & degree                            & 1 - 5                                    \\ \midrule
+\multirow{2}{*}{RobustScaler}        & quantile\_range                   & \{25-75, 10-90, 5-95, 35-65, 30-70, 40-60\} \\ \cmidrule{2-3}
+                                     & with\_centering                   & \{True, False\}                          \\ \midrule
+\multirow{2}{*}{StandardScaler}      & with\_mean                        & \{True, False\}                          \\ \cmidrule{2-3}
+                                     & with\_std                         & \{True, False\}                          \\ \midrule
+MinMaxScaler                         & feature\_range                    & \{0,1\}, \{-1,1\}                        \\ \midrule
+\multirow{2}{*}{PowerTransformer}    & method                            & yeo-johnson                              \\ \cmidrule{2-3}
+                                     & standardize                       & \{True, False\}                          \\ \midrule
+\multirow{3}{*}{QuantileTransformer} & n\_quantiles                      & 100 - 1000                               \\ \cmidrule{2-3}
+                                     & output\_distribution              & \{uniform, normal\}                      \\ \cmidrule{2-3}
+                                     & subsample                         & 10000 - 100000                           \\ \midrule
+MaxAbsScaler                         & -                                 & -                                        \\ \midrule
+Norm3Scaler                          & -                                 & -                                        \\ \midrule
+\end{tabular}
+\label{tab:optuna_model_configurations}
+\caption{Optuna Model Configuration Ranges}
+\end{table*}
