@@ -25,13 +25,18 @@ In addition, this would require more effective tuning of hyperparameters, which 
 Hyperparameter tuning akin to the method detailed in Section~{ref:optuna} could be pursued, but the required computational time would be prohibitive.
 For these reasons, we decided to exclude the \gls{cnn} and \gls{ann} models from further experimentation.
 
-Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences} which list the best-performing model for each oxide and the frequency with which each model achieves top performance according to various metrics, respectively.
-It is essential to clarify that these tables are intended to provide an overview of model performance rather than to determine an overall 'winner by majority'.
+Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences} list the best-performing model for each oxide and the frequency with which each model achieves top performance according to various metrics, respectively.
+These tables are intended to provide an overview of model performance rather than to determine an overall 'winner by majority'.
 Their purpose is to illustrate the general trends and behavior of different models across various metrics and oxides.
 Although \gls{xgboost} and \gls{svr} appear the most frequently in Table~\ref{tab:best_model_occurrences}, this does not imply that they are the best models for every oxide.
-These tables also demonstrates the importance of judging model performance per oxide.
+The tables also demonstrates the importance of judging model performance per oxide.
 For example, if one were to only consider the mean of the performance metrics, \gls{pls} would be considered among the worst performing models, as shown in Figure~\ref{fig:init_results_rmses}.
-However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits the lowest \gls{rmsecv} for both \ce{MgO} and \ce{Na2O}.
+However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits the lowest \gls{rmsecv} and standard deviation of prediction errors for both \ce{MgO} and \ce{Na2O}, indicating that it is the most accurate and robust model for these oxides.
+
+To summarize, the initial results indicate that gradient boosting models, particularly \gls{xgboost}, demonstrated the most consistent and accurate performance across all oxides.
+\gls{svr} also performed well, with similar accuracy and robustness to the gradient boosting models.
+In contrast, deep learning models such as \gls{cnn} and \gls{ann} underperformed, likely due to the small dataset size and insufficient hyperparameter tuning.
+Inspecting individual model performance per oxide revealed that the best model varied depending on the oxide, highlighting the importance of evaluating model performance on a per-oxide basis and supporting our decision to pursue a stacking ensemble approach to leverage the strengths of multiple models.
 
 \begin{figure*}[h]
     \centering
