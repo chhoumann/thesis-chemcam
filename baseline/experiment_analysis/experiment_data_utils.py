@@ -70,7 +70,7 @@ def _get_runs_across_oxides(df):
     for oxide in df.columns:
         experiment_ids = df[oxide].dropna().tolist()
         runs = mlflow.search_runs(experiment_ids=experiment_ids)
-        runs['params.oxide'] = oxide  # type: ignore
+        runs["params.oxide"] = oxide  # type: ignore
         oxide_runs[oxide] = runs
     return oxide_runs
 
@@ -99,58 +99,115 @@ def clean_experiment_data(runs: pd.DataFrame):
     filtered_runs = filtered_runs[filtered_runs["status"] != "FAILED"]  # Remove failed runs
     return filtered_runs
 
+
 PARAMETER_MAPPINGS = {
     "gbr": ["gbr_n_estimators", "gbr_learning_rate", "gbr_max_depth", "gbr_subsample", "gbr_max_features"],
-    "svr": ["svr_C", "svr_epsilon", "svr_kernel", "svr_degree", "svr_gamma", "svr_coef0", "max_iter"],
-    "xgboost": ["xgb_n_estimators", "xgb_learning_rate", "xgb_max_depth", "xgb_subsample", "xgb_colsample_bytree", "xgb_gamma", "xgb_reg_alpha", "xgb_reg_lambda"],
-    "extra_trees": ["et_n_estimators", "et_max_depth", "et_min_samples_split", "et_min_samples_leaf", "et_max_features"],
+    "svr": ["svr_C", "svr_epsilon", "svr_kernel", "svr_degree", "svr_gamma", "svr_coef0", "svr_max_iter"],
+    "xgboost": [
+        "xgboost_n_estimators",
+        "xgboost_learning_rate",
+        "xgboost_max_depth",
+        "xgboost_subsample",
+        "xgboost_colsample_bytree",
+        "xgboost_gamma",
+        "xgboost_reg_alpha",
+        "xgboost_reg_lambda",
+    ],
+    "extra_trees": [
+        "extra_trees_n_estimators",
+        "extra_trees_max_depth",
+        "extra_trees_min_samples_split",
+        "extra_trees_min_samples_leaf",
+        "extra_trees_max_features",
+    ],
     "pls": ["pls_n_components"],
-    "ngboost": ["Dist", "max_iter", "Score", "Base", "natural_gradient", "n_estimators", "learning_rate", "minibatch_frac", "col_sample", "tol", "random_state", "validation_fraction", "early_stopping_rounds"],
+    "ngboost": [
+        "ngboost_Dist",
+        "ngboost_max_depth",
+        "ngboost_natural_gradient",
+        "ngboost_n_estimators",
+        "ngboost_learning_rate",
+        "ngboost_minibatch_frac",
+        "ngboost_col_sample",
+        "ngboost_tol",
+        "ngboost_random_state",
+        "ngboost_validation_fraction",
+        "ngboost_early_stopping_rounds",
+        "ngboost_Score",
+        "ngboost_Base",
+    ],
     "lasso": ["lasso_alpha"],
     "ridge": ["ridge_alpha"],
     "elasticnet": ["elasticnet_alpha", "elasticnet_l1_ratio"],
-    "random_forest": ["rf_n_estimators", "rf_max_depth", "rf_min_samples_split", "rf_min_samples_leaf", "rf_max_features"],
-    "robust_scaler": ["quantile_range", "with_centering"],
-    "standard_scaler": ["with_mean", "with_std"],
-    "min_max_scaler": ["feature_range"],
+    "random_forest": [
+        "random_forest_n_estimators",
+        "random_forest_max_depth",
+        "random_forest_min_samples_split",
+        "random_forest_min_samples_leaf",
+        "random_forest_max_features",
+    ],
+    "robust_scaler": ["robust_scaler_quantile_range", "robust_scaler_with_centering"],
+    "standard_scaler": ["standard_scaler_with_mean", "standard_scaler_with_std"],
+    "min_max_scaler": ["min_max_scaler_feature_range"],
     "max_abs_scaler": [],
     "power_transformer": ["method", "standardize"],
     "quantile_transformer": ["n_quantiles", "output_distribution", "subsample", "random_state"],
     "norm3_scaler": [],
     "norm1_scaler": [],
-    "pca": ["pca_n_components", "pca_whiten"],
-    "kernel_pca": ["kernel_pca_n_components", "kernel_pca_kernel", "kernel_pca_gamma", "kernel_pca_degree"],
+    "pca": ["n_components", "whiten"],
+    "kernel_pca": ["n_components", "kernel", "gamma", "degree"],
 }
 
-def pretty_print_params(row):
+
+def pretty_format_params(row):
     model_type = row.get("params.model_type", "Unknown model")
     scaler_type = row.get("params.scaler_type", "Unknown scaler")
     transformer_type = row.get("params.transformer_type", "None")
     pca_type = row.get("params.pca_type", "None")
 
-    model_params = {k.replace("params.", ""): v for k, v in row.items() if k.replace("params.", "") in PARAMETER_MAPPINGS.get(model_type, [])}
-    scaler_params = {k.replace("params.", ""): v for k, v in row.items() if k.replace("params.", "") in PARAMETER_MAPPINGS.get(scaler_type, [])}
-    transformer_params = {k.replace("params.", ""): v for k, v in row.items() if k.replace("params.", "") in PARAMETER_MAPPINGS.get(transformer_type, [])}
-    pca_params = {k.replace("params.", ""): v for k, v in row.items() if k.replace("params.", "") in PARAMETER_MAPPINGS.get(pca_type, [])}
+    model_params = {
+        k.replace("params.", ""): v
+        for k, v in row.items()
+        if k.replace("params.", "") in PARAMETER_MAPPINGS.get(model_type, [])
+    }
+    scaler_params = {
+        k.replace("params.", ""): v
+        for k, v in row.items()
+        if k.replace("params.", "") in PARAMETER_MAPPINGS.get(scaler_type, [])
+    }
+    transformer_params = {
+        k.replace("params.", ""): v
+        for k, v in row.items()
+        if k.replace("params.", "") in PARAMETER_MAPPINGS.get(transformer_type, [])
+    }
+    pca_params = {
+        k.replace("params.", ""): v
+        for k, v in row.items()
+        if k.replace("params.", "") in PARAMETER_MAPPINGS.get(pca_type, [])
+    }
 
-    print(f"Model: {model_type}")
-    print("Model Parameters:")
+    result = []
+
+    result.append(f"Model: {model_type}")
+    result.append("Model Parameters:")
     for param, value in model_params.items():
-        print(f"  {param}: {value}")
+        result.append(f"  {param}: {value}")
 
-    print(f"\nScaler: {scaler_type}")
-    print("Scaler Parameters:")
+    result.append(f"\nScaler: {scaler_type}")
+    result.append("Scaler Parameters:")
     for param, value in scaler_params.items():
-        print(f"  {param}: {value}")
+        result.append(f"  {param}: {value}")
 
     if transformer_type != "none":
-        print(f"\nTransformer: {transformer_type}")
-        print("Transformer Parameters:")
+        result.append(f"\nTransformer: {transformer_type}")
+        result.append("Transformer Parameters:")
         for param, value in transformer_params.items():
-            print(f"  {param}: {value}")
+            result.append(f"  {param}: {value}")
 
     if pca_type != "none":
-        print(f"\nPCA: {pca_type}")
-        print("PCA Parameters:")
+        result.append(f"\nPCA: {pca_type}")
+        result.append("PCA Parameters:")
         for param, value in pca_params.items():
-            print(f"  {param}: {value}")
+            result.append(f"  {param}: {value}")
+
+    return "\n".join(result)
