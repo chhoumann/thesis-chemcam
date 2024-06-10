@@ -36,7 +36,8 @@ However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits
 To summarize, the initial results indicate that gradient boosting models, particularly \gls{xgboost}, demonstrated the most consistent and accurate performance across all oxides.
 \gls{svr} also performed well, with similar accuracy and robustness to the gradient boosting models.
 In contrast, deep learning models such as \gls{cnn} and \gls{ann} underperformed, likely due to the small dataset size and insufficient hyperparameter tuning.
-Inspecting individual model performance per oxide revealed that the best model varied depending on the oxide, emphasizing the need to evaluate model performance on a per-oxide basis and supporting our decision to pursue a stacking ensemble approach to leverage the strengths of multiple models.
+Inspecting the model performances per oxide revealed that the best model varied depending on the oxide, and several models performed well for each oxide.
+This emphasizes the need for further evaluation of model performances on a per-oxide basis to identify suitable configurations for our stacking ensemble approach, which aims to leverage the strengths of multiple models.
 
 \begin{figure*}[h]
     \centering
