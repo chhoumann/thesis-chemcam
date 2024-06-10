@@ -1,0 +1,52 @@
+\begin{table*}[h]
+\centering
+\begin{tabular}{@{}l>{\ttfamily}lp{0.5\textwidth}@{}}
+\toprule
+\textbf{Model}                 & \textbf{Parameter}          & \textbf{Range}                           \\ \midrule
+\multirow{5}{*}{\gls{gbr}}     & n\_estimators               & 100 - 1000                                \\ \cmidrule{2-3}
+                               & learning\_rate              & $10^{-3}$ - $10^{0}$ (log scale)          \\ \cmidrule{2-3}
+                               & max\_depth                  & 3 - 10                                    \\ \cmidrule{2-3}
+                               & subsample                   & 0.5 - 1.0                                 \\ \cmidrule{2-3}
+                               & max\_features               & \{sqrt, log2\}                            \\ \midrule
+\multirow{6}{*}{\gls{svr}}     & C                           & $10^{-3}$ - $10^{3}$ (log scale)          \\ \cmidrule{2-3}
+                               & epsilon                     & $10^{-3}$ - $10^{1}$ (log scale)          \\ \cmidrule{2-3}
+                               & kernel                      & \{linear, poly, rbf, sigmoid\}            \\ \cmidrule{2-3}
+                               & degree                      & 1 - 5                                     \\ \cmidrule{2-3}
+                               & gamma                       & \{scale, auto\}                           \\ \cmidrule{2-3}
+                               & coef0                       & 0 - 10                                    \\ \midrule
+\multirow{8}{*}{\gls{xgboost}} & n\_estimators               & 100 - 1000                                \\ \cmidrule{2-3}
+                               & learning\_rate              & $10^{-3}$ - $10^{0}$ (log scale)          \\ \cmidrule{2-3}
+                               & max\_depth                  & 2 - 15                                    \\ \cmidrule{2-3}
+                               & subsample                   & 0.3 - 1.0                                 \\ \cmidrule{2-3}
+                               & colsample\_bytree           & 0.5 - 1.0                                 \\ \cmidrule{2-3}
+                               & gamma                       & $10^{-3}$ - $10^{1}$ (log scale)          \\ \cmidrule{2-3}
+                               & reg\_alpha                  & $10^{-3}$ - $10^{3}$ (log scale)          \\ \cmidrule{2-3}
+                               & reg\_lambda                 & $10^{-3}$ - $10^{3}$ (log scale)          \\ \midrule
+\multirow{5}{*}{\gls{etr}}     & n\_estimators               & 100 - 1000                                \\ \cmidrule{2-3}
+                               & max\_depth                  & 2 - 15                                    \\ \cmidrule{2-3}
+                               & min\_samples\_split         & 2 - 20                                    \\ \cmidrule{2-3}
+                               & min\_samples\_leaf          & 1 - 25                                    \\ \cmidrule{2-3}
+                               & max\_features               & \{sqrt, log2\}                            \\ \midrule
+PLS                            & n\_components               & 1 - 30                                    \\ \midrule
+\multirow{8}{*}{\gls{ngboost}} & max\_depth                  & 2 - 10                                    \\ \cmidrule{2-3}
+                               & natural\_gradient           & \{True, False\}                           \\ \cmidrule{2-3}
+                               & n\_estimators               & 50 - 1000                                 \\ \cmidrule{2-3}
+                               & learning\_rate              & 0.01 - 0.5 (log scale)                    \\ \cmidrule{2-3}
+                               & minibatch\_frac             & 0.5 - 1.0                                 \\ \cmidrule{2-3}
+                               & col\_sample                 & 0.5 - 1.0                                 \\ \cmidrule{2-3}
+                               & tol                         & $10^{-5}$ - $10^{-3}$ (log scale)         \\ \cmidrule{2-3}
+                               & validation\_fraction        & 0.1 - 0.5                                 \\ \cmidrule{2-3}
+                               & early\_stopping\_rounds     & 10 - 100                                  \\ \midrule
+Lasso                          & alpha                       & $10^{-3}$ - $10^{3}$ (log scale)          \\ \midrule
+Ridge                          & alpha                       & $10^{-3}$ - $10^{3}$ (log scale)          \\ \midrule
+\multirow{2}{*}{\gls{enet}}    & alpha                       & $10^{-3}$ - $10^{3}$ (log scale)          \\ \cmidrule{2-3}
+                               & l1\_ratio                   & 0 - 1                                     \\ \midrule
+\multirow{5}{*}{\gls{rf}}      & n\_estimators               & 100 - 300                                 \\ \cmidrule{2-3}
+                               & max\_depth                  & 2 - 15                                    \\ \cmidrule{2-3}
+                               & min\_samples\_split         & 2 - 10                                    \\ \cmidrule{2-3}
+                               & min\_samples\_leaf          & 1 - 10                                    \\ \cmidrule{2-3}
+                               & max\_features               & \{sqrt, log2\}                            \\ \bottomrule
+\end{tabular}
+\label{tab:optuna_model_configurations}
+\caption{Optuna Model Configuration Ranges}
+\end{table*}
