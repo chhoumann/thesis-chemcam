@@ -50,18 +50,21 @@ Using Optuna as the foundation for our optimization framework, we were able to d
 Using this framework, we are able to effeciently compute the aforementioned objective function, which is the minimization of the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
 The framework we developed can be divided into two main components.
-The function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and the function containing the optimization logic, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
+A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function containing the optimization logic, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
 
 The purpose of the \nameref{alg:study_function} function is to ensure that the optimization process is done for one model at a time, for each oxide.
 By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
 This means that each model is being evaluated fairly against each oxide and that the resulting configurations are optimized specifically for the model and oxide in question.
 We believe that this approach will allow us to best identify the top-$n$ pipelines to be used in our stacking ensemble.
+
 To manage the optimization process the function receives the number of trials to run, a list of models, and a list of oxides, seen in line~\ref{step:initialize_run_process}, and initializes the optimization environment by setting up the sampler, pruner, and the objective function, seen in lines~\ref{step:initialize_sampler} to~\ref{step:initialize_objective}.
 
 The sampler is responsible for managing the search space of the hyperparameters for the optimization process.
 This means that any hyperparameters being evaluated, for any preprocessor or model, will be managed by this sampler, which allows us to optimize for all hyperparameters at the same time.
-In Line~\ref{step:initialize_sampler} we initialize the sampler with a set of parameters.
-In practice, there are several options for the sampler, which means that the choice of sampler parameters is dependent on which sampler is chosen.
+Optuna provides several options for samplers that have different characteristics and each have their strengths and weaknesses.
+However, because we require multi-objective optimization, this naturally limits the choice of sampler to those that support this.
+For our framework we chose to use the Tree-structured Parzen Estimator (TPE) sampler, due to its stated optimization efficiency and its ability to handle all use cases. 
+Additionally, the TPE sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large. \cite{optuna_2019}
 
 The pruner is responsible for stopping unpromising trials early, to reduce the computational costs of the optimization process and is initialized in line~\ref{step:initialize_pruner}.
 Similar to the sampler, there exist several options for the choice of pruner, and as such the choice of parameters is dependent on the pruner chosen.
