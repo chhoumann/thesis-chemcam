@@ -38,7 +38,7 @@ However, random search can miss optimal regions, especially in high-dimensional 
 
 These limitations make the traditional methods unsuitable for our problem and highlight the need for a more sophisticated optimization methods.
 Both grid search and random search could be enhanced using adaptive techniques, such as Bayesian optimization, to greatly improve on these approaches.
-However, while very feasible, implementing such enhancements and integrating it with our existing data partioning and cross-validation strategy would be time-consuming.
+However, while very feasible, implementing such enhancements and integrating it with our existing tooling would be time-consuming.
 The ambition was therefore to find tools that would provide similar or better hyperparameter optimization capabilities, while being easy to integrate with our existing framework.
 For this reason we chose to use Optuna as the basis for our optimization framework.
 
@@ -46,45 +46,81 @@ Optuna provides well-defined abstraction which allowed us to more quickly constr
 Optuna provides Bayesian optimization search algorithms, but with additional configurable parameters that allow us to customize the search process to our specific needs.
 Optuna also provides a pruning mechanism that provides early stopping, if the evaluation of a set of hyperparameters is not promising, which reduces the computational costs of the optimization process.
 
+Using Optuna as the foundation for our optimization framework, we were able to design an end-to-end system for \gls{libs} data that handles the entire process from data preparation to partitioning, cross-validation, and hyperparameter optimization.
+Using this framework, we are able to effeciently compute the aforementioned objective function, which is the minimization of the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
+% Start up trials should be explained when introducing sampler params in the text
+% Need to clarify that m' gets its learned hyperparameters reset in each iteration of CV and again before train() 
+% Make a point about why we fetch the data for every trial
+\subsection{New Algorithm}
+\begin{algorithm}
+\caption{Run Optimization Process}
+\label{alg:study_function}
+\begin{algorithmic}[1]
+\Require Number of Trials $N$, List of Models $M$, List Oxides $O$
+\Ensure The optimization process is run for each model and oxide. 
+\State \textbf{Initialize:} $\texttt{sampler} \gets \texttt{Sampler(\texttt{sampler\_params})}$ \label{step:initialize_sampler}
+\State \textbf{Initialize:} $\texttt{pruner} \gets \texttt{Pruner(\texttt{pruner\_params})}$ \label{step:initialize_pruner}
+\State \textbf{Initialize:} $\texttt{objective} \gets \texttt{Minimize}(\texttt{rmse\_cv}, \texttt{std\_dev\_cv})$ \label{step:initialize_objective}
 
+\For{each oxide $o$ in $O$} \label{step:oxide_loop}
+    \For{each model $m$ in $M$} \label{step:model_loop}
+        \State \texttt{objective}(\texttt{Optimize\_Combined\_Objective}(
+        \State \hspace{1.5em} $m$,
+        \State \hspace{1.5em} $N$,
+        \State \hspace{1.5em} $o$,
+        \State \hspace{1.5em} \texttt{sampler},
+        \State \hspace{1.5em} \texttt{pruner},
+        \State )) \label{step:optimize_combined_objective}
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
 
 \begin{algorithm}
-\caption{Hyperparameter Optimization Framework}
+\caption{Combined Objective}
 \label{alg:hyperparameter_optimization_framework}
 \begin{algorithmic}[1]
-\Require Dataset $D$, Model $m$, Number of Trials $N$, Random Seed $seed$, Sampler \texttt{sampler}, Pruner \texttt{pruner}
-\Ensure Trial data, including metrics and configuration for each trial
+\Require Model $m$, Number of Trials $N$, Sampler \texttt{sampler}, Pruner \texttt{pruner}
+\Ensure Returns $rmse_{cv}$ and $std\_dev_{cv}$ for each trial
 
-\State \textbf{Initialize:} Set random seed for reproducibility if seed is not None \label{step:initialize}
 \For{each trial $t$ from 1 to $N$} \label{step:trial_loop}
-    \State $hp \gets \texttt{sample\_hyperparameters}(m, \texttt{sampler})$ \label{step:sample_hyperparameters}
-    \State $m' \gets \texttt{instantiate\_model}(m, hp)$ \label{step:instantiate_model}
+    \State $hp \gets \texttt{sample\_hyperparameters}(\texttt{sampler})$ \label{step:sample_hyperparameters}
+    \State $m \gets \texttt{instantiate\_model}(m, hp)$ \label{step:instantiate_model}
     \Statex
     \State $s\_params \gets \texttt{sample\_scaler\_params}(\texttt{sampler})$ \label{step:sample_scaler_params}
     \State $s \gets \texttt{instantiate\_scaler}(s\_params)$ \label{step:instantiate_scaler}
     \State $t\_params \gets \texttt{sample\_transformer\_params}(\texttt{sampler})$ \label{step:sample_transformer_params}
-    \State $t \gets \texttt{instantiate\_transformer}(t\_params)$ \newline \hspace*{3em} \textbf{or} NONE \label{step:instantiate_transformer}
-    \State $dr\_params \gets \texttt{sample\_dim\_reduction\_params}(\texttt{sampler})$ \label{step:sample_dim_reduction_params}
-    \State $dr \gets \texttt{instantiate\_dim\_reduction}(dr\_params)$ \newline \hspace*{3em}\textbf{or} NONE \label{step:instantiate_dim_reduction}
+    \State $t \gets \texttt{instantiate\_transformer}(t\_params)$ \label{step:instantiate_transformer}
+    \Statex \hspace{3em} \textbf{or} \texttt{Identity}
+    \State $dim\_params \gets \texttt{sample\_dim\_reduction\_params}(\texttt{sampler})$ \label{step:sample_dim_reduction_params}
+    \State $dim \gets \texttt{instantiate\_dim\_reduction}(dim\_params)$ \label{step:instantiate_dim_reduction}
+    \Statex \hspace{3em} \textbf{or} \texttt{Identity}
     \Statex     
-    \State $pipeline \gets [s, t, dr]$ \textbf{or} $[s, NONE, NONE]$ \label{step:construct_pipeline}
+    \State $pipeline \gets [s, t, dim]$ \label{step:construct_pipeline}
+    \Statex
+    \State \textbf{Dataset: }$D \gets \texttt{get\_data}()$ \label{step:get_data} 
     \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$ \label{step:data_partitioning}
     \Statex
     \State $D_{train}'$ $\gets$ \texttt{pipeline\_apply}($D_{train}$, \texttt{pipeline}) \label{step:apply_pipeline_train}
     \State $T_{cv}'$ $\gets$ \texttt{pipeline\_apply}($T_{cv}$, \texttt{pipeline}) \label{step:apply_pipeline_cv}
     \Statex
-    \State $CV_{metrics} \gets \texttt{cross\_validate}(m', T_{cv}')$ \label{step:cross_validate}
-    \State $rmse_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{rmse\_values})$ \label{step:average_rmse_cv}
-    \State $std\_dev_{cv} \gets \texttt{average}(CV_{metrics}.\texttt{std\_dev\_values})$ \label{step:average_std_dev_cv}
+    \State $CV_{metrics} \gets \texttt{cross\_validate}(m, T_{cv}')$ \label{step:cross_validate}
+    \State $rmse_{cv} \gets \texttt{mean}(CV_{metrics}.\texttt{rmse\_values})$ \label{step:mean_rmse_cv}
+    \State $std\_dev_{cv} \gets \texttt{std}(CV_{metrics}.\texttt{rmse\_values})$ \label{step:std_dev_cv}
     \Statex
-    \State $m'_{train}$ $\gets$ \texttt{train}($m'$, $D_{train}'$) \label{step:train_model}
-    \State $rmsep$, $\sigma_{error, test}$ $\gets$ \texttt{evaluate}($m'_{train}$, $D_{test}$) \label{step:evaluate_model}
+    \State $m' \gets \texttt{train}(m, D_{train}')$ \label{step:train_model}
+    \State $rmsep, std\_dev_{test} \gets \texttt{evaluate}(m', D_{test})$ \label{step:evaluate_model}
     \Statex
-    % function that stores the metrics
-    \State \texttt{store\_metrics}($t$, $m'$, $pipeline$, $rmse\_cv$, \newline \hspace*{8em}$std\_dev\_cv$, $rmsep$, $\sigma_{error, test}$) \label{step:store_metrics}
+    \State \texttt{store\_metrics}($t$, $m$, $pipeline$, $rmse_{cv}$, 
+    \Statex \hspace{8em} $std\_dev_{cv}$, $rmsep$, $std\_dev_{test}$) \label{step:store_metrics}
+    \Statex
+    \State $\texttt{should\_prune} \gets \texttt{pruner}(rmse_{cv}, std\_dev_{cv})$ \label{step:prune_check}
+    \If{$\texttt{should\_prune}$} \label{step:prune}
+        \State \textbf{continue}
+    \EndIf
 \EndFor
-\State \Return \texttt{rmse\_cv}, \texttt{std\_dev\_cv}, \texttt{rmsep}, $\sigma_{error, test}$ \label{step:return_metrics}
+\State \Return $rmse_{cv}$, $std\_dev_{cv}$ \label{step:return_metrics}
 \end{algorithmic}
 \end{algorithm}
 
