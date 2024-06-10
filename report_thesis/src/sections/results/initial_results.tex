@@ -22,8 +22,27 @@ On the other hand, the \gls{enet}, \gls{cnn}, and \gls{ann} models perform the w
 This poor performance is further highlighted in Table~\ref{tab:relative_performance}, which shows the relative performance of each model compared to the best-performing model, \gls{xgboost}.
 The table also includes the difference in performance relative to the next best model, with \gls{xgboost} serving as the baseline for comparison, assigned a relative performance of 100\%.
 From this table, it is evident that the \gls{enet}, \gls{cnn}, and \gls{ann} models experience significant drops in performance compared to the top-performing models.
-Consequently, based on their high errors, large standard deviations, and overall poor accuracy and robustness across all oxides, we decided to exclude these models from further experiments.
-This decision was made to maintain focus and prevent the inclusion of models that are unlikely to yield significant improvements in performance.
+
+While deep learning models such as \gls{cnn} and \gls{ann} have the theoretical potential to perform well with \gls{libs} data, given their ability to learn complex patterns and relationships, the relatively small size of our dataset may limit their effectiveness.
+Furthermore, these models could potentially outperform the other models if tuned more effectively.
+However, the sheer number of potential hyperparameters, configurations, architectures, and techniques makes it impractical to conduct a comprehensive search.
+Hyperparameter tuning akin to the method detailed in Section~{ref:optuna} could be pursued, but the required computational time would be prohibitive.
+
+% The unexpectedly poor performance of the \gls{enet} model is particularly notable.
+% Given that \gls{enet} is designed as a combination of Ridge and \gls{lasso} regression, leveraging both $L_1$ and $L_2$ regularization to balance the benefits of each, it was anticipated to perform at least as well as, if not better than, its individual components.
+% Surprisingly, both ridge and \gls{lasso} models outperformed \gls{enet}.
+% We expected \gls{enet} to perform better than or at least as well as ridge and \gls{lasso} regression, so this result was unexpected.
+% One possible explanation for this anomaly could be the selection of hyperparameters
+
+% We don't know why enet performed so poorly! Ridge and Lasso performed better than enet, which is surprising because enet is supposed to be a combination of the two. Maybe the hyperparameters used were very bad. We keep this in mind for the optimization phase.
+
+% We have a few thoughts on this:
+% Deep learning models such as \gls{cnn} and \gls{ann} should in theory work well for LIBS data, given their ability to learn complex patterns and relationships in data, but because the dataset is relatively small, they may not have enough data to learn these patterns effectively.
+% Also, it is possible that these models could outperform the other models if they were tuned more effectively, but because of the all the possible permutations of hyperparameters, configurations, architectures and techniques, the search space is too large to explore exhaustively.
+% While we could have done hyperparameter tuning similar to what we described in the Optuna section, it would have taken way too long.
+
+% Consequently, based on their high errors, large standard deviations, and overall poor accuracy and robustness across all oxides, we decided to exclude these models from further experiments.
+% This decision was made to maintain focus and prevent the inclusion of models that are unlikely to yield significant improvements in performance.
 
 \begin{figure*}[h]
     \centering
