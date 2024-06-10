@@ -8,8 +8,6 @@ Table~\ref{tab:init_results} presents the results of these experiments, includin
 The means of each metric are also provided to give an overall indication of the models' performance.
 Furthermore, we present an overview of these mean values in Figure~\ref{fig:init_results_rmses} to facilitate a visual comparison of the models' general performance.
 
-
-
 The results indicate that the gradient boosting models, \gls{xgboost}, \gls{gbr}, and \gls{ngboost}, consistently perform well across all oxides, with \gls{xgboost} generally outperforming the other two gradient boosting models.
 These models exhibit both low mean \gls{rmsep} and \gls{rmsecv} values, indicating high accuracy, as well as low standard deviation values, underscoring their robustness.
 \gls{svr} is also among the top-performing models, with mean \gls{rmsep} and \gls{rmsecv} values close to those of \gls{xgboost} and low standard deviation values.
@@ -17,7 +15,6 @@ These models exhibit both low mean \gls{rmsep} and \gls{rmsecv} values, indicati
 While usually outperformed by gradient boosting models and \gls{svr}, the ensemble models, \gls{rf} and \gls{etr}, also exhibit good performance.
 The \gls{pls}, ridge, \gls{lasso}, and \gls{enet} models typically seem to perform worse than the other models, with higher mean \gls{rmsep} and \gls{rmsecv} values and higher standard deviation values.
 We observe that \gls{enet} performs between ridge and \gls{lasso} in terms of both error and standard deviation, which aligns with expectations since \gls{enet} combines the regularization techniques of both models.
-This consistent placement underscores the reliability of our results and the soundness of our model evaluations.
 
 The \gls{cnn} and \gls{ann} models perform the worst across all oxides, exhibiting the highest mean \gls{rmsep} and \gls{rmsecv} values, as well as the highest standard deviation values.
 This poor performance is further highlighted in Table~\ref{tab:relative_performance}, which shows the relative performance of each model compared to the best-performing model, \gls{xgboost}.
@@ -29,9 +26,12 @@ Hyperparameter tuning akin to the method detailed in Section~{ref:optuna} could 
 For these reasons, we decided to exclude the \gls{cnn} and \gls{ann} models from further experimentation.
 
 Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences} which list the best-performing model for each oxide and the frequency with which each model achieves top performance according to various metrics, respectively.
-It is essential to clarify that these tables are intended to provide a comprehensive overview of model performance rather than to determine an overall 'winner by majority'.
+It is essential to clarify that these tables are intended to provide an overview of model performance rather than to determine an overall 'winner by majority'.
 Their purpose is to illustrate the general trends and behavior of different models across various metrics and oxides.
 Although \gls{xgboost} and \gls{svr} appear the most frequently in Table~\ref{tab:best_model_occurrences}, this does not imply that they are the best models for every oxide.
+These tables also demonstrates the importance of judging model performance per oxide.
+For example, if one were to only consider the mean of the performance metrics, \gls{pls} would be considered among the worst performing models, as shown in Figure~\ref{fig:init_results_rmses}.
+However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits the lowest \gls{rmsecv} for both \ce{MgO} and \ce{Na2O}.
 
 \begin{figure*}[h]
     \centering
