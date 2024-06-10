@@ -1,9 +1,9 @@
-\section{Proposed Approach}
+\section{Proposed Approach}\label{sec:proposed_approach}
 To address the challenges in predicting major oxide compositions from \gls{libs} data, we propose the development of advanced computational models capable of effectively handling the multifaceted challenges we describe in \ref{subsec:challenges}.
-These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies. 
+These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies.
 
 Our approach aims to enhance the prediction accuracy and robustness for major oxides in \gls{libs} data by leveraging specific combinations of machine learning models and preprocessors that are particularly effective at predicting individual oxides.
-The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features. 
+The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features.
 The output will be Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$.
 
 As highlighted in Section~\ref{sec:related-work}, the literature suggests that various models and preprocessing techniques are adept at handling high-dimensional data, multi-collinearity, and matrix effects.
@@ -15,7 +15,7 @@ The notion of using multiple models per oxide is supported by the advent of mode
 While this approach improved accuracy compared to individual models, it required manual tuning of the weights for each model.
 This manual tuning presents limitations, including the analysis required to determine appropriate weights and the risk of suboptimal weighting.
 Given these limitations, it is reasonable to explore techniques that can automate the weighting process while still leveraging the strengths of multiple models.
-To fulfill these criteria, we chose to adopt a stacking ensemble approach. 
+To fulfill these criteria, we chose to adopt a stacking ensemble approach.
 Stacking, as described in Section~\ref{subsec:stacked-generalization}, is a method that utilizes multiple base estimators trained on the same data, whose predictions are then used to train a meta-learner.
 By combining a diverse set of base models, stacking can correct for the biases of individual models.
 Since each model focuses on different patterns within the data, stacking mitigates the inherent biases of individual models by estimating and correcting for these biases.
@@ -26,7 +26,7 @@ As emphasized by \citet{cvstacking}, if the base models are trained on the same 
 This can cause the meta learner to be influenced by the same patterns and biases that the base models are susceptible to, leading to overfitting.
 To mitigate this risk and ensure generalizability, a cross-validation strategy should be employed to ensure that the meta learner's training data accurately reflects the true performance of the base learners.
 
-We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques for use in our stacking ensemble. 
+We adopted an experimental approach to empirically evaluate the potential of various models and preprocessing techniques for use in our stacking ensemble.
 This ensured our selections were informed by the literature review while allowing for independent assessment and validation.
 
 To systematically address the challenges in predicting major oxide compositions from \gls{libs} data, we have devised an approach that integrates model and preprocessing selection, an experimental framework, evaluation and comparison, and the construction of a stacking ensemble.
