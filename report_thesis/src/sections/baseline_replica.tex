@@ -56,9 +56,9 @@ Differences might also stem from varied implementation specifics, such as progra
 \begin{table*}
 	\centering
 	\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllllll}
-		\hline
+		\toprule
 		Element    & \gls{pls1-sm} (original) & PLS1-SM (replica) & \gls{ica} (original) & ICA (replica) & \gls{moc} (original) & \gls{moc} (replica) \\
-		\hline
+		\midrule
 		\ce{SiO2}  & 4.33                     & 4.52              & 8.31                 & 8.63          & 5.30                 & 5.61                \\
 		\ce{TiO2}  & 0.94                     & 0.49              & 1.44                 & 0.54          & 1.03                 & 0.61                \\
 		\ce{Al2O3} & 2.85                     & 1.79              & 4.77                 & 3.18          & 3.47                 & 2.47                \\
@@ -67,7 +67,7 @@ Differences might also stem from varied implementation specifics, such as progra
 		\ce{CaO}   & 2.65                     & 1.73              & 3.07                 & 3.28          & 2.72                 & 2.09                \\
 		\ce{Na2O}  & 0.62                     & 0.80              & 2.29                 & 1.39          & 0.62                 & 1.33                \\
 		\ce{K2O}   & 0.72                     & 0.72              & 0.98                 & 1.38          & 0.82                 & 1.91                \\
-		\hline
+		\bottomrule
 	\end{tabular*}
 	\caption{\gls{rmse}s of the original and our replicas of the \gls{pls1-sm}, \gls{ica}, and \gls{moc} models.}
 	\label{tab:replica_results_rmses}
