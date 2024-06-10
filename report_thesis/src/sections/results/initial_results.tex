@@ -21,7 +21,7 @@ This poor performance is further highlighted in Table~\ref{tab:relative_performa
 The table also includes the difference in performance relative to the next best model, with \gls{xgboost} serving as the baseline for comparison, assigned a relative performance of 100\%.
 From this table, it is evident that the \gls{cnn} and \gls{ann} models experience significant drops in performance compared to the top-performing models.
 While deep learning models such as these have the theoretical potential to perform well with \gls{libs} data, given their ability to learn complex patterns and relationships, the relatively small size of our dataset may limit their efficacy.
-Furthermore, achieving optimal performance with these models necessitates extensive hyperparameter tuning, which involves exploring a vast space of potential configurations and design choices.
+Furthermore, achieving optimal performance with these models necessitates extensive tuning of both their architectures and hyperparameters, which involves exploring a vast space of potential configurations and design choices.
 Although methods for systematic hyperparameter optimization, as detailed in Section~\ref{sec:optimization_framework}, could be employed, the associated computational cost would be prohibitively high.
 Additionally, there are numerous architectural design decisions and advanced techniques that could potentially enhance model performance, but their inclusion would expand the scope of this study beyond feasible limits.
 For these reasons, we decided to exclude the \gls{cnn} and \gls{ann} models from further experimentation.
