@@ -51,8 +51,7 @@ This emphasizes the need for further evaluation of model performances on a per-o
 \end{figure*}
 
 \begin{table}[ht]
-\label{tab:relative_performance}
-\begin{tabular}{lrr}
+\begin{tabularx}{lrr}
 \toprule
 Model & Relative Performance (\%) & Diff. vs Next (\%) \\
 \midrule
@@ -69,8 +68,9 @@ LASSO & 114.30 & 0.19 \\
 ANN & 127.82 & 13.52 \\
 CNN & 143.18 & 15.36 \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Relative performance of each model compared to the best performing model, and the difference in performance compared to the next best model.}
+\label{tab:relative_performance}
 \end{table}
 
 \input{sections/results/init_results_table.tex}
