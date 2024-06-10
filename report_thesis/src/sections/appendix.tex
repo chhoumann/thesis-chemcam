@@ -146,3 +146,53 @@
 \caption{Explictly set hyperparameters for the \gls{gbr} and \gls{xgboost} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:subsec:experimental_setup} are used. The \gls{ngboost} model does not have any explicitly set hyperparameters.}
 \label{tab:combined_hyperparameters}
 \end{table*}
+
+\begin{table*}[h!]
+\centering
+\begin{minipage}{.45\textwidth}
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Layer} & \textbf{Output Shape} \\ \midrule
+    Input & (\textit{input\_dim},) \\
+    Dense & (1024,) \\
+    Dropout & (1024,) \\
+    Dense & (512,) \\
+    Dropout & (512,) \\
+    Dense & (256,) \\
+    Dense & (128,) \\
+    Output & (\textit{output\_dim},) \\ \bottomrule
+  \end{tabular}
+  \caption{Summary of the Neural Network Architecture}
+  \label{tab:nn_architecture}
+\end{minipage}%
+\hspace{0.04\textwidth}
+\begin{minipage}{.45\textwidth}
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Layer} & \textbf{Output Shape} \\ \midrule
+    Input & (\textit{input\_dim},) \\
+    Reshape & (48, 128, 1) \\
+    Conv2D & (48, 128, 32) \\
+    BatchNormalization & (48, 128, 32) \\
+    MaxPooling2D & (24, 64, 32) \\
+    Conv2D & (24, 64, 32) \\
+    BatchNormalization & (24, 64, 32) \\
+    MaxPooling2D & (12, 32, 32) \\
+    Conv2D & (12, 32, 64) \\
+    BatchNormalization & (12, 32, 64) \\
+    MaxPooling2D & (6, 16, 64) \\
+    Conv2D & (6, 16, 128) \\
+    BatchNormalization & (6, 16, 128) \\
+    MaxPooling2D & (3, 8, 128) \\
+    Flatten & (3072,) \\
+    Dense & (256,) \\
+    Dropout & (256,) \\
+    Dense & (\textit{output\_dim},) \\
+    Dense & (\textit{output\_dim},) \\ \bottomrule
+  \end{tabular}
+  \caption{Summary of the Convolutional Neural Network Architecture}
+  \label{tab:cnn_architecture}
+\end{minipage}
+\end{table*}
