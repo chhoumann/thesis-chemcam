@@ -1,15 +1,3 @@
-This section details the parameter ranges used for various preprocessing techniques and models in our Optuna optimization framework.
-Our aim is to explore a wide range of preprocessing techniques and model combinations to identify the best-performing configurations for use in the stacking ensemble.
-
-For preprocessing, we include a range of parameters for various transformers and scalars, as shown in Table~\ref{tab:optuna_model_configurations}.
-The goal is to explore both conventionally used and novel preprocessing techniques with a wide range of parameters to maximize coverage while avoiding excessive search space expansion.
-For instance, the number of components for \gls{pca} (1-50) and \gls{kernel-pca} (1-100) ensures essential feature capture while balancing computational load.
-Flexibility is provided by including various categorical choices and numerical ranges, such as different kernel types in \gls{kernel-pca}, and logarithmic scales for gamma values ($10^{-3}$ to $10^{1}$), allowing models to adapt to diverse data characteristics.
-Efficiency is maintained by using logarithmic scales for parameters that span several orders of magnitude, optimizing the search process.
-Scaler parameters, such as the quantile ranges in \texttt{RobustScaler}, are designed to accommodate different data distributions.
-Similarly, the transformation methods in \texttt{PowerTransformer} and \texttt{QuantileTransformer} are selected to handle a variety of data distributions.
-
-\begin{table*}[h]
 \centering
 \begin{tabular}{@{}l>{\ttfamily}lp{0.5\textwidth}@{}}
 \toprule
@@ -36,15 +24,6 @@ Norm3Scaler                          & -                                 & -    
 \label{tab:optuna_model_configurations}
 \caption{Optuna preprocessing configuration ranges.}
 \end{table*}
-
-
-For the models, we include a range of parameters for various regressors, as shown in Table~\ref{tab:optuna_model_configurations}.
-Similar to the preprocessing parameters, we aim to cover a wide range of regressors and their respective hyperparameters while maintaining a balance between coverage and computational efficiency.
-Parameters like the number of estimators for \gls{gbr} and \gls{xgboost} (100-1000) provide flexibility in controlling the model complexity and training duration.
-The learning rate parameter, ranging from $10^{-3}$ to $10^{0}$ in logarithmic scale, allows fine-tuning of the model's convergence speed and accuracy.
-Maximum depth settings for tree-based models (\gls{gbr}, \gls{xgboost}, \gls{rf}, and \gls{etr}) range from 2 to 15, ensuring sufficient depth to capture complex patterns while avoiding overfitting.
-Moreover, the inclusion of different kernel types for \gls{svr} (linear, poly, rbf, sigmoid) and the use of logarithmic scales for parameters such as \texttt{C}, \texttt{epsilon}, and \texttt{gamma}, help in adapting the models to various data characteristics and distributions.
-The parameter ranges are chosen to span multiple orders of magnitude, such as the regularization parameters \texttt{alpha} in \gls{lasso}, \gls{ridge}, and \gls{enet}, which range from $10^{-3}$ to $10^{3}$.
 
 
 \begin{table*}[h]
