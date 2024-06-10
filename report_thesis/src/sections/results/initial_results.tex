@@ -32,7 +32,10 @@ Their purpose is to illustrate the general trends and behavior of different mode
 Although \gls{xgboost} and \gls{svr} appear the most frequently in Table~\ref{tab:best_model_occurrences}, this does not imply that they are the best models for every oxide.
 The tables also demonstrates the importance of judging model performance per oxide.
 For example, if one were to only consider the mean of the performance metrics, \gls{pls} would be considered among the worst performing models, as shown in Figure~\ref{fig:init_results_rmses}.
-However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits the lowest \gls{rmsecv} and standard deviation of prediction errors for both \ce{MgO} and \ce{Na2O}, indicating that it is the most accurate and robust model for these oxides.
+However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits the lowest \gls{rmsecv} and standard deviation of prediction errors for both \ce{MgO} and \ce{Na2O}.
+
+This indicates that \gls{pls} is the most accurate and robust model for these oxides, underscoring the importance of evaluating model performance on a per-oxide basis, as discussed in Section~\ref{sec:proposed_approach}.
+Moreover, for some oxides, multiple models perform similarly well, such as \gls{xgboost}, \gls{gbr}, and ridge for \ce{CaO}, which further emphasizes the need to leverage the strengths of multiple models.
 
 To summarize, the initial results indicate that gradient boosting models, particularly \gls{xgboost}, demonstrated the most consistent and accurate performance across all oxides.
 \gls{svr} also performed well, with similar accuracy and robustness to the gradient boosting models.
