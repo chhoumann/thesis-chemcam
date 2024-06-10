@@ -67,19 +67,60 @@ For our framework we chose to use the Tree-structured Parzen Estimator (TPE) sam
 Additionally, the TPE sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large. \cite{optuna_2019}
 
 The pruner is responsible for stopping unpromising trials early, to reduce the computational costs of the optimization process and is initialized in line~\ref{step:initialize_pruner}.
-Similar to the sampler, there exist several options for the choice of pruner, and as such the choice of parameters is dependent on the pruner chosen.
+Similar to the sampler, there exist several options for the choice of pruner.
+In our case we chose to use the Hyperband pruner, due to its balanced approach when pruning.
+Initially, the pruner will consider more configurations, but allow them to run for a shorter time.
+Through several iterations, it will gradually reduce the number of configurations being considered, but allow them to run for a longer time.
+This provides a higher likelihood that promising configurations are not pruned too early, while still reducing the computational costs.\cite{optuna_2019}
 
 Guiding both the sampler and the pruner is the objective function, which evaluates the performance of each trial, seeking to either minimize or maximize some specified metrics.
 In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}, defined previously.
-By informing the sampler and pruner of the performance of each trial, the objective function allows the search strategy to be dynamically adjusted. 
-This information helps the sampler focus on promising regions of the hyperparameter space to exploit, while still exploring new regions. 
-Simultaneously, the pruner can terminate underperforming trials early, optimizing the use of computational resources.
+This can be seen in line~\ref{step:initialize_objective}.
 
+The role of the objective function is to provide the metric data that the sampler and pruner need to make informed decisions.
+As we step through each oxide and model in Lines~\ref{step:oxide_loop} to~\ref{step:model_loop}, we call the $objective$ function with the $Optimize\_Combined\_Objective$ function, seen in Line~\ref{step:optimize_combined_objective}.
+The $Optimize\_Combined\_Objective$ is returning the metrics for each trial, which the objective function then uses to guide the optimization process.
 
-It receives the number of trials to run, a list of models, and a list of oxides, set by the user, as seen in line~\ref{step:initialize_run_process}.
-% Start up trials should be explained when introducing sampler params in the text
-% Need to clarify that m' gets its learned hyperparameters reset in each iteration of CV and again before train() 
-% Make a point about why we fetch the data for every trial
+This leads us to the \nameref{alg:combined_objective} function which, as previously mentioned, contains the optimization logic.
+It defines the systematic process of hyperparameter tuning, model training, and evaluation across multiple trials.
+
+To this function we supply the current model $M$, the number of trials to run $N$, the sampler, and the pruner, seen in Line~\ref{step:combined_objective_params}.
+The number of trials determines how many times the optimization process will be run for each model and oxide.
+This is an important parameter, as it regulates how much time the framework has to optimize a given model.
+In an ideal scenario, this number would be very high to ensure that the optimization process has identified the best possible configuration.
+However, depending on the number of models in consideration the number of trials can quickly become computationally prohibitive.
+
+In Lines~\ref{step:sample_hyperparameters} to~\ref{step:instantiate_dim_reduction} we instantiate the model and the preprocessors with the hyperparameters sampled by the sampler.
+The sampling process of these is what is being guided by the objective function based on the metrics returned.
+In our setup, we always require that a scaler is instantiated, to ensure that the data is correctly scaled, however, data transformation and dimensionality reduction are not always beneficial, therefore these can be set to the identity function.
+
+Once the preprocessors are instantiated, we construct a pipeline of these to ensure that the data is processed in the order these are defined, seen in Line~\ref{step:construct_pipeline}.
+The order is important, as the preprocessing steps are to a degree interdependent: scaling ensures that all features are on a similar range, which is ensures that transformations are applied uniformly.
+Similarly, dimensionality reduction techniques typically also produce better results if the data has been scaled.
+However, dimensionality reduction may not always be beneficial or may not always produce better results if the data has been transformed.
+As such, we allow for the optimization framework to optionally use these if they are beneficial.
+
+In Line~\ref{step:get_data} to Line~\ref{step:apply_pipeline_cv} we fetch the data, apply our data partitioning strategy to generate four folds, a training set and a test set, and apply the preprocessing to the folds and the training set.
+The purpose of fetching the data for each trial is to ensure that the data is in its default state for each trial.
+This prevents any form of double preprocessing from occuring and potential issues with the generated folds, training set and test set.
+
+As mentioned in Section~\ref{subsec:validation_testing_procedures} we use both cross validation and a test set to evaluate the model.
+This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}.
+Its important to note, that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation and again before the model is trained.
+
+Finally, the pruner is being applied in Line~\ref{step:prune_check}.
+In practice, the pruner is being supplied the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} through the objective function, but effectively this amounts to the pruner receiving these metrics directly, as illustrated.
+If the pruner determines that the current trial is unpromising, it stops the trial early, and the optimization process continues to the next trial.
+
+Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the objective function, which then determines the next steps in the optimization process.
+
+In summary, using this framework we are able to systematically explore and optimize preprocessing, model and hyperparameter configurations for each model on a per-oxide basis.
+This allows us to identify the top-$n$ pipelines for each oxide, which we can then use in our stacking ensemble. 
+
+In summary, using this framework, we are able to systematically explore and optimize preprocessing, model, and hyperparameter configurations for each model on a per-oxide basis. 
+By leveraging Optuna as a foundation, with its TPE sampler and Hyperband pruner, we can efficiently explore a large search space of hyperparameters while ensuring that promising configurations are not pruned too early. 
+This approach allows us to identify the top-$n$ pipelines for each oxide, aligning with our goals of generalization, robustness, and accuracy, which can then be used in our stacking ensemble.
+
 \begin{algorithm}
 \caption{Run Optimization Process}
 \label{alg:study_function}
@@ -92,12 +133,12 @@ It receives the number of trials to run, a list of models, and a list of oxides,
 
 \For{each oxide $o$ in $O$} \label{step:oxide_loop}
     \For{each model $m$ in $M$} \label{step:model_loop}
-        \State \texttt{objective}(\texttt{Optimize\_Combined\_Objective}(
-        \State \hspace{1.5em} $m$,
-        \State \hspace{1.5em} $N$,
-        \State \hspace{1.5em} $o$,
-        \State \hspace{1.5em} \texttt{sampler},
-        \State \hspace{1.5em} \texttt{pruner},
+        \State \texttt{objective}(\texttt{Optimize\_Combined\_Objective}( \label{step:optimize_combined_objective}
+        \State \hspace{1.5em} $m$, \label{step:model_param_study}
+        \State \hspace{1.5em} $N$, \label{step:trials_param_study}
+        \State \hspace{1.5em} $o$, \label{step:oxide_param_study}
+        \State \hspace{1.5em} \texttt{sampler}, \label{step:sampler_param_study}
+        \State \hspace{1.5em} \texttt{pruner}, \label{step:pruner_param_study}
         \State )) \label{step:optimize_combined_objective}
     \EndFor
 \EndFor
@@ -108,7 +149,7 @@ It receives the number of trials to run, a list of models, and a list of oxides,
 \caption{Combined Objective}
 \label{alg:combined_objective}
 \begin{algorithmic}[1]
-\Require Model $m$, Number of Trials $N$, Sampler \texttt{sampler}, Pruner \texttt{pruner}
+\Require Model $m$, Number of Trials $N$, Sampler \texttt{sampler}, Pruner \texttt{pruner} \label{step:combined_objective_params}
 \Ensure Returns $rmse_{cv}$ and $std\_dev_{cv}$ for each trial
 
 \For{each trial $t$ from 1 to $N$} \label{step:trial_loop}
@@ -146,7 +187,7 @@ It receives the number of trials to run, a list of models, and a list of oxides,
     \If{$\texttt{should\_prune}$} \label{step:prune}
         \State \textbf{continue}
     \EndIf
+    \State \Return $rmse_{cv}$, $std\_dev_{cv}$ \label{step:return_metrics}
 \EndFor
-\State \Return $rmse_{cv}$, $std\_dev_{cv}$ \label{step:return_metrics}
 \end{algorithmic}
 \end{algorithm}
