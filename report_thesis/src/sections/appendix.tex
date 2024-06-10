@@ -46,245 +46,103 @@
 }
 
 \subsection{Initial Experiment: Model Hyperparameters}\label{subsec:initial_experiment_hyperparameters}
-This section provides a detailed overview of the hyperparameters used for the models in the initial experiment.
-
-\begin{table}[H]
+\begin{table*}[h]
 \centering
-\caption{Hyperparameters for Partial Least Squares}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Number of Components & 34 \\
-    Scale & True \\
-    Max Iter & 500 \\
-    \bottomrule
+\begin{tabular}{@{}llp{0.5\textwidth}@{}}
+\toprule
+\textbf{Model} & \textbf{Hyperparameter} & \textbf{Value} \\
+\midrule
+\multirow{3}{*}{\gls{pls}}
+& \texttt{n\_components} & 34 \\
+& \texttt{scale} & True \\
+& \texttt{max\_iter} & 500 \\
+\midrule
+\multirow{6}{*}{\gls{svr}}
+& \texttt{kernel} & poly \\
+& \texttt{C} & 100 \\
+& \texttt{epsilon} & 0.1 \\
+& \texttt{gamma} & scale \\
+& \texttt{degree} & 2 \\
+& \texttt{coef0} & 1.0 \\
+\midrule
+\multirow{3}{*}{Ridge Regression}
+& \texttt{alphas} & \{$10^{-4}$, $10^{-3}$, $10^{-2}$, $10^{-1}$, 1, 10, $10^2$, $10^3$\} \\
+& \texttt{max\_iter} & 1000 \\
+& \texttt{tol} & $10^{-4}$ \\
+\midrule
+\multirow{3}{*}{\gls{lasso}}
+& \texttt{alphas} & \{$10^{-4}$, $10^{-3}$, $10^{-2}$, $10^{-1}$, 1, 10, $10^2$, $10^3$\} \\
+& \texttt{max\_iter} & 1000 \\
+& \texttt{tol} & $10^{-4}$ \\
+\midrule
+\multirow{4}{*}{\gls{enet}}
+& \texttt{alphas} & \{$10^{-4}$, $10^{-3}$, $10^{-2}$, $10^{-1}$, 1, 10, $10^2$, $10^3$\} \\
+& \texttt{l1\_ratio} & \{0.1, 0.5, 0.7, 0.9, 1.0\} \\
+& \texttt{max\_iter} & 1000 \\
+& \texttt{tol} & $10^{-4}$ \\
+\midrule
+\multirow{6}{*}{\gls{rf}}
+& \texttt{n\_estimators} & 100 \\
+& \texttt{max\_depth} & 10 \\
+& \texttt{min\_samples\_split} & 2 \\
+& \texttt{min\_samples\_leaf} & 1 \\
+& \texttt{max\_features} & sqrt \\
+& \texttt{random\_state} & 42 \\
+\midrule
+\multirow{5}{*}{\gls{etr}}
+& \texttt{n\_estimators} & 100 \\
+& \texttt{max\_depth} & 10 \\
+& \texttt{min\_samples\_split} & 2 \\
+& \texttt{min\_samples\_leaf} & 1 \\
+& \texttt{random\_state} & 42 \\
+\midrule
 \end{tabular}
-\label{tab:pls_hyperparameters}
-\end{table}
-\FloatBarrier
+\caption{Explictly set hyperparameters for the \gls{pls}, \gls{svr}, ridge, \gls{lasso}, \gls{enet}, \gls{rf}, and \gls{etr} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:subsec:experimental_setup} are used.}
+\label{tab:combined_hyperparameters}
+\end{table*}
 
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Support Vector Regression}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Kernel & poly \\
-    C & 100 \\
-    Epsilon & 0.1 \\
-    Gamma & scale \\
-    Degree & 2 \\
-    Coef0 & 1.0 \\
-    \bottomrule
-\end{tabular}
-\label{tab:svr_hyperparameters}
-\end{table}
-\FloatBarrier
 
-\begin{table}[H]
+\begin{table*}[h]
 \centering
-\caption{Hyperparameters for Elastic Nets}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Alphas & [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000] \\
-    L1 Ratio & [0.1, 0.5, 0.7, 0.9, 1.0] \\
-    Max Iter & 1000 \\
-    Tolerance & 1e-4 \\
-    \bottomrule
+\begin{tabular}{@{}llp{0.5\textwidth}@{}}
+\toprule
+\textbf{Model} & \textbf{Hyperparameter} & \textbf{Value} \\
+\midrule
+\multirow{14}{*}{\gls{gbr}}
+& \texttt{n\_estimators} & 100 \\
+& \texttt{max\_depth} & 3 \\
+& \texttt{min\_samples\_split} & 2 \\
+& \texttt{min\_samples\_leaf} & 1 \\
+& \texttt{max\_features} & None \\
+& \texttt{loss} & squared\_error \\
+& \texttt{learning\_rate} & 0.1 \\
+& \texttt{subsample} & 1.0 \\
+& \texttt{criterion} & friedman\_mse \\
+& \texttt{random\_state} & 42 \\
+& \texttt{verbose} & 0 \\
+& \texttt{validation\_fraction} & 0.1 \\
+& \texttt{n\_iter\_no\_change} & None \\
+& \texttt{tol} & $10^{-4}$ \\
+& \texttt{ccp\_alpha} & 0.0 \\
+\midrule
+\gls{ngboost} & - & - \\
+\midrule
+\multirow{14}{*}{\gls{xgboost}}
+& \texttt{max\_depth} & 4 \\
+& \texttt{min\_child\_weight} & 5 \\
+& \texttt{gamma} & 0.1 \\
+& \texttt{subsample} & 0.7 \\
+& \texttt{colsample\_bytree} & 0.5 \\
+& \texttt{colsample\_bylevel} & 0.5 \\
+& \texttt{colsample\_bynode} & 0.5 \\
+& \texttt{lambda} & 1 \\
+& \texttt{alpha} & 0.5 \\
+& \texttt{learning\_rate} & 0.05 \\
+& \texttt{n\_estimators} & 100 \\
+& \texttt{objective} & reg:squarederror \\
+& \texttt{eval\_metric} & rmse \\
+\bottomrule
 \end{tabular}
-\label{tab:elasticnet_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Lasso}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Alphas & [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000] \\
-    Max Iter & 1000 \\
-    Tolerance & 1e-4 \\
-    \bottomrule
-\end{tabular}
-\label{tab:lasso_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Ridge Regression}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Alphas & [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000] \\
-    Max Iter & 1000 \\
-    Tolerance & 1e-4 \\
-    \bottomrule
-\end{tabular}
-\label{tab:ridge_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Random Forest}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Number of Estimators & 100 \\
-    Max Depth & 10 \\
-    Min Samples Split & 2 \\
-    Min Samples Leaf & 1 \\
-    Max Features & sqrt \\
-    Random State & 42 \\
-    \bottomrule
-\end{tabular}
-\label{tab:randomforest_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Gradient Boosting Regression}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Number of Estimators & 100 \\
-    Max Depth & 3 \\
-    Min Samples Split & 2 \\
-    Min Samples Leaf & 1 \\
-    Max Features & None \\
-    Loss & squared\_error \\
-    Learning Rate & 0.1 \\
-    Subsample & 1.0 \\
-    Criterion & friedman\_mse \\
-    Random State & 42 \\
-    Verbose & 0 \\
-    Validation Fraction & 0.1 \\
-    Number of Iterations No Change & None \\
-    Tolerance & 1e-4 \\
-    CCP Alpha & 0.0 \\
-    \bottomrule
-\end{tabular}
-\label{tab:gbr_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Extra Trees Regression}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Number of Estimators & 100 \\
-    Max Depth & 10 \\
-    Min Samples Split & 2 \\
-    Min Samples Leaf & 1 \\
-    Random State & 42 \\
-    \bottomrule
-\end{tabular}
-\label{tab:extratrees_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for XGBoost}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Max Depth & 4 \\
-    Min Child Weight & 5 \\
-    Gamma & 0.1 \\
-    Subsample & 0.7 \\
-    Colsample Bytree & 0.5 \\
-    Colsample Bylevel & 0.5 \\
-    Colsample Bynode & 0.5 \\
-    Lambda & 1 \\
-    Alpha & 0.5 \\
-    Learning Rate & 0.05 \\
-    Number of Estimators & 100 \\
-    Objective & reg:squarederror \\
-    Eval Metric & rmse \\
-    \bottomrule
-\end{tabular}
-\label{tab:xgboost_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for NGBoost}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    n/a & n/a \\
-    \bottomrule
-\end{tabular}
-\label{tab:ngboost_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Artificial Neural Networks}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Layer 1: Dense & (1024 units) \\
-    Layer 2: Dropout & (rate: 0.5) \\
-    Layer 3: Dense & (512 units) \\
-    Layer 4: Dropout & (rate: 0.5) \\
-    Layer 5: Dense & (256 units) \\
-    Layer 6: Dense & (128 units) \\
-    Layer 7: Dense & (1 unit) \\
-    \bottomrule
-\end{tabular}
-\label{tab:ann_hyperparameters}
-\end{table}
-\FloatBarrier
-
-\clearpage
-\begin{table}[H]
-\centering
-\caption{Hyperparameters for Convolutional Neural Networks}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Hyperparameter} & \textbf{Value} \\
-    \midrule
-    Layer 1: InputLayer & (6144, 1) \\
-    Layer 2: BatchNormalization & (axis: -1) \\
-    Layer 3: Conv1D & (filters: 64, kernel size: 3, activation: relu) \\
-    Layer 4: MaxPooling1D & (pool size: 2) \\
-    Layer 5: Conv1D & (filters: 64, kernel size: 3, activation: relu) \\
-    Layer 6: MaxPooling1D & (pool size: 2) \\
-    Layer 7: Conv1D & (filters: 64, kernel size: 3, activation: relu) \\
-    Layer 8: Add & (merge with layer 6 output) \\
-    Layer 9: Conv1D & (filters: 128, kernel size: 3, activation: relu) \\
-    Layer 10: MaxPooling1D & (pool size: 2) \\
-    Layer 11: Conv1D & (filters: 128, kernel size: 3, activation: relu) \\
-    Layer 12: MaxPooling1D & (pool size: 2) \\
-    Layer 13: Conv1D & (filters: 128, kernel size: 3, activation: relu) \\
-    Layer 14: Add & (merge with layer 12 output) \\
-    Layer 15: Flatten & (output) \\
-    Layer 16: Dropout & (rate: 0.5) \\
-    Layer 17: Dense & (512 units, activation: relu) \\
-    Layer 18: Dense & (1 unit, activation: linear) \\
-    \bottomrule
-\end{tabular}
-\label{tab:cnn_hyperparameters}
-\end{table}
-\FloatBarrier
+\caption{Explictly set hyperparameters for the \gls{gbr} and \gls{xgboost} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:subsec:experimental_setup} are used. The \gls{ngboost} model does not have any explicitly set hyperparameters.}
+\label{tab:combined_hyperparameters}
+\end{table*}
