@@ -30,7 +30,6 @@ Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences} list the best
 These tables are intended to provide an overview of model performance rather than to determine an overall 'winner by majority'.
 Their purpose is to illustrate the general trends and behavior of different models across various metrics and oxides.
 Although \gls{xgboost} and \gls{svr} appear the most frequently in Table~\ref{tab:best_model_occurrences}, this does not imply that they are the best models for every oxide.
-The tables also demonstrates the importance of judging model performance per oxide.
 For example, if one were to only consider the mean of the performance metrics, \gls{pls} would be considered among the worst performing models, as shown in Figure~\ref{fig:init_results_rmses}.
 However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits the lowest \gls{rmsecv} and standard deviation of prediction errors for both \ce{MgO} and \ce{Na2O}.
 This indicates that \gls{pls} is the most accurate and robust model for these oxides, underscoring the importance of evaluating model performance on a per-oxide basis, as discussed in Section~\ref{sec:proposed_approach}.
