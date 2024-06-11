@@ -97,7 +97,7 @@ Once the preprocessors are instantiated, we construct a pipeline of these to ens
 The order is important, as the preprocessing steps are to a degree interdependent: scaling ensures that all features are on a similar range, which is ensures that transformations are applied uniformly.
 Similarly, dimensionality reduction techniques typically also produce better results if the data has been scaled.
 However, it may not always be advantageous or yield better results if the data has already been transformed.
-As such, we allow for the optimization framework to optionally use these if they are beneficial.
+As such, we allow for the optimization framework to optionally use these if they are deemed to be beneficial.
 
 In Line~\ref{step:get_data} to Line~\ref{step:apply_pipeline_cv} we fetch the data, apply our data partitioning strategy to generate four folds, a training set and a test set, and apply the preprocessing to the folds and the training set.
 The purpose of fetching the data for each trial is to ensure that the data is in its default state for each trial.
