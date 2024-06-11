@@ -51,7 +51,7 @@ A function responsible for running and managing the optimization process, as see
 
 The purpose of the \nameref{alg:study_function} is to perform and facilitate the optimization process, doing so for each oxide and model combination.
 By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
-This means that each model is being evaluated fairly against each oxide and that the resulting configurations are optimized specifically for the model and oxide in question.
+This means that each model is evaluated fairly against each oxide and that the resulting configurations are optimized specifically for the model and oxide in question.
 We believe that this approach will allow us to best identify the top-$n$ pipelines to be used in our stacking ensemble.
 
 To manage the optimization process, the function receives the number of trials to run, a list of models, and a list of oxides, as seen in line~\ref{step:initialize_run_process}, and initializes the sampler, as seen in line~\ref{step:initialize_sampler}.
