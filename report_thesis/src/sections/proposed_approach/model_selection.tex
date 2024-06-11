@@ -1,4 +1,4 @@
-\subsection{Model and Preprocessing Selection}\label{sec:model-selection}
+\subsection{Model and Preprocessing Selection}\label{sec:model_selection}
 Choosing the right models and preprocessing techniques for \gls{libs} data analysis is a challenging task.
 
 We had several considerations to guide our selection of preprocessing techniques.
@@ -35,7 +35,7 @@ Based on these factors, we decided to include \gls{ann} and \gls{cnn} in our exp
 To further bolster our selection pool, we included models from the same family as those that showed promise in the literature.
 
 \gls{xgboost} and \gls{ngboost} both belong to the gradient boosting family, but they approach gradient boosting in distinct ways.
-\gls{xgboost} uses advanced algorithmic optimizations, such as regularization, tree pruning, and parallel processing, to improve performance and prevent overfitting. 
+\gls{xgboost} uses advanced algorithmic optimizations, such as regularization, tree pruning, and parallel processing, to improve performance and prevent overfitting.
 On the other hand, \gls{ngboost} focuses on sophisticated probabilistic loss functions, optimizing the natural gradient to model the entire probability distribution of the target variable, making it well-suited for tasks requiring uncertainty estimation and probabilistic forecasting.
 Given these differences and the limited studies on their application to \gls{libs} data, we decided to include both in our experiments.
 

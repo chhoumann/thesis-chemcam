@@ -20,7 +20,7 @@ This underscores the need for continued research into more adaptive and robust m
 This thesis aims to improve upon previous work in the field of \gls{libs} data analysis.
 Our goal is to develop a machine learning pipeline that is tailored to the unique characteristics of \gls{libs} data, with the goal of achieving higher prediction accuracy and robustness.
 
-To achieve these objectives, we build upon the baseline established in~\cite{p9_paper} and systematically explore ten different machine learning models. 
+To achieve these objectives, we build upon the baseline established in~\cite{p9_paper} and systematically explore ten different machine learning models.
 These models were identified and selected through a combination of extensive literature review and the consideration of unconventional approaches not typically covered in the \gls{libs}-based calibration literature.
 The ten models fall into three categories: Ensemble learning models, linear and regularization models, and neural network models.
 In addition to model exploration, we also investigate a selection of preprocessing techniques: scaling (including normalization), dimensionality reduction, and data transformation.
@@ -45,8 +45,10 @@ The remainder of this paper is organized as follows:
 Section~\ref{sec:background} provides background on the onoging Mars exploration missions, the \gls{libs} technique, and the baseline \gls{moc} model.
 Section~\ref{sec:problem_definition} formally defines the problem addressed in this work.
 Section~\ref{sec:methodology} describes our proposed methodology, including data preprocessing, dimensionality reduction, and machine learning models.
-Section~\ref{sec:experiments} presents our experimental setup and results.
-Finally, Section~\ref{sec:conclusion} concludes the paper and discusses future work.
+Section~\ref{sec:methodology} presents our experimental design and setup.
+Section~\ref{sec:results} presents the results of our experiments.
+Section~\ref{sec:future_work} discusses potential future work.
+Finally, Section~\ref{sec:conclusion} concludes the paper by summarizing our findings and discussing the implications of our work.
 
 Due to the overlapping nature of terminology used in \gls{libs} data analysis and machine learning, we provide a list of terms in Table~\ref{tab:terms} to clarify their meaning.
 
@@ -57,10 +59,10 @@ Due to the overlapping nature of terminology used in \gls{libs} data analysis an
 Term & Definition \\
 \midrule
 Sample & A physical specimen of rock, soil, or other material collected for scientific analysis.\\
-Location & The specific point on a sample where a LIBS laser is targeted. There are typically multiple locations per sample. \\ 
+Location & The specific point on a sample where a LIBS laser is targeted. There are typically multiple locations per sample. \\
 Target & Refers to the variable that a machine learning model is trained to predict. \\
 \bottomrule
-\end{tabularx}  
+\end{tabularx}
 \caption{Table of Terms}
 \label{tab:terms}
 \end{table}

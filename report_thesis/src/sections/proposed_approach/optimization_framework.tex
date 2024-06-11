@@ -1,14 +1,14 @@
 \subsection{Optimization Framework}\label{sec:optimization_framework}
-One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators. \citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses. 
-In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide. 
-The complexity of the problem is increased because different oxides require different models, and the optimal preprocessing techniques will depend on both the model and the specific oxide being predicted. 
+One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators. \citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses.
+In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide.
+The complexity of the problem is increased because different oxides require different models, and the optimal preprocessing techniques will depend on both the model and the specific oxide being predicted.
 Due to the challenges highligted in \ref{subsec:challenges}, namely high dimensionality, multicollinearity, and matrix effects, it is difficult to determine which configuration is optimal.
 Selecting the appropriate preprocessing steps for each base estimator is essential, as incorrect preprocessing can significantly degrade performance and undermine the model's effectiveness
-Furthermore, choosing the right hyperparameters for each base estimator introduces additional complexity, as these decisions also significantly impact model performance and must be carefully tuned for each specific oxide. 
-Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide. 
+Furthermore, choosing the right hyperparameters for each base estimator introduces additional complexity, as these decisions also significantly impact model performance and must be carefully tuned for each specific oxide.
+Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide.
 For instance, simpler approaches like \gls{enet} and ridge regression may quickly reach their optimal performance with minimal hyperparameter adjustments. However, due to their simplicity, they often fail to capture the complex patterns in the data that more advanced models can, making them less competitive despite their ease of tuning.
 In contrast, more complex models like \gls{cnn} or \gls{gbr} involve both a larger number of hyperparameters and architectural considerations that need fine-tuning to perform well.
-The extent of tuning required is also influenced by the characteristics of the target oxide, such as its data distribution, noise levels, and feature interactions. 
+The extent of tuning required is also influenced by the characteristics of the target oxide, such as its data distribution, noise levels, and feature interactions.
 These factors can affect how sensitive an estimator is to its hyperparameters.
 Finally, hyperparameters cannot be considered in isolation, because depending on the preprocessing steps applied to the data, the optimal hyperparameters may vary.
 Given these complexities, we need a systematic approach to determine the optimal configuration of hyperparameters and preprocessing steps tailored to each estimator and oxide.
@@ -19,20 +19,20 @@ Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in 
 Additionaly, each permutation will utilize our proposed data partitioning and cross-validation strategy outlined in Section~\ref{subsec:validation_testing_procedures}.
 Utilizing our proposed data partitioning and cross-validation strategy, along with the aformentioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem_definition}.
 This narrows our focus to three key tasks: selecting suitable preprocessors and models, finding the optimal hyperparameters, and devising a guided search strategy to evaluate various permutations and identify the top-$n$ pipelines for each oxide.
-First, we curated a diverse set of models and preprocessing techniques, as detailed in Section~\ref{sec:model-selection}.
+First, we curated a diverse set of models and preprocessing techniques, as detailed in Section~\ref{sec:model_selection}.
 Next, we developed an optimization framework to systematically explore and optimize these pipeline configurations, which will be described in the following section.
 
 \subsubsection{The Framework}
 To systematically explore and optimize pipeline configurations, the search process should be guided by an ojective function.
-Based on the evaluation process outlined in Section~\ref{subsec:validation_testing_procedures}, whereby we argue that solely evaluating on the \gls{rmsep} may lead to misleading and poor results, we define the objective function we wish to optimize as a multi-objective optimization on minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}. 
+Based on the evaluation process outlined in Section~\ref{subsec:validation_testing_procedures}, whereby we argue that solely evaluating on the \gls{rmsep} may lead to misleading and poor results, we define the objective function we wish to optimize as a multi-objective optimization on minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
-Given these goals, traditional methods like grid search and random search could be used, but they often fall short due to several inherent limitations. 
-Grid search involves exhaustively evaluating all possible combinations of hyperparameters within specified ranges. 
+Given these goals, traditional methods like grid search and random search could be used, but they often fall short due to several inherent limitations.
+Grid search involves exhaustively evaluating all possible combinations of hyperparameters within specified ranges.
 While thorough, this method quickly becomes computationally prohibitive as the number of hyperparameters increases. The expansion of the search space, driven by the increasing number and finer granularity of hyperparameters, renders the approach impractical.
 
-Random search, on the other hand, selects hyperparameter values at random within predefined ranges. 
-It is generally more efficient than grid search and can cover a broader area of the hyperparameter space. 
-However, random search can miss optimal regions, especially in high-dimensional spaces where the probability of sampling near-optimal configurations by chance is low. 
+Random search, on the other hand, selects hyperparameter values at random within predefined ranges.
+It is generally more efficient than grid search and can cover a broader area of the hyperparameter space.
+However, random search can miss optimal regions, especially in high-dimensional spaces where the probability of sampling near-optimal configurations by chance is low.
 
 These limitations make the traditional methods unsuitable for our problem and highlight the need for a more sophisticated optimization method.
 Both grid search and random search could be enhanced using adaptive techniques, such as Bayesian optimization, to greatly improve on these approaches.
@@ -71,7 +71,7 @@ As we step through each oxide and model in Lines~\ref{step:oxide_loop} to~\ref{s
 The number of trials is an important parameter, as it specifies the number of iterations the optimization framework will execute to refine and optimize a given model.
 In an ideal scenario, this number would be very high to ensure that the optimization process has identified the best possible configuration.
 However, depending on the number of models in consideration, a high number of trials can quickly become computationally prohibitive with our approach.
-The \texttt{optimize} function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler. 
+The \texttt{optimize} function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler.
 
 This leads us to the \nameref{alg:combined_objective} function which, as previously mentioned, returns the evaluation metrics for the given trial.
 
@@ -100,19 +100,19 @@ It is important to note that in practice, the model $m$ is being reinstantiated 
 Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the \texttt{optimize} function in the \nameref{alg:study_function}, which then determines the next steps in the optimization process.
 
 In summary, using this framework we are able to systematically explore and optimize preprocessing, model and hyperparameter configurations for each model on a per-oxide basis.
-This allows us to identify the top-$n$ pipelines for each oxide, which we can then use in our stacking ensemble. 
+This allows us to identify the top-$n$ pipelines for each oxide, which we can then use in our stacking ensemble.
 
 \begin{algorithm}
 \caption{Optimizer}
 \label{alg:study_function}
 \begin{algorithmic}[1]
 \Require Number of Trials $N$, List of Models $M$, List of Target Oxides $O$ \label{step:initialize_run_process}
-\Ensure The optimization process is run for each model and oxide. 
+\Ensure The optimization process is run for each model and oxide.
 \State \textbf{Initialize:} $\texttt{sampler} \gets \texttt{Sampler(\texttt{sampler\_params})}$ \label{step:initialize_sampler}
 
 \For{each oxide $o$ in $O$} \label{step:oxide_loop}
     \For{each model $m$ in $M$} \label{step:model_loop}
-        \State \texttt{optimize}($N$, $\texttt{lambda}()$ 
+        \State \texttt{optimize}($N$, $\texttt{lambda}()$ \label{step:optimize_objective}
             \State \hspace{1.5em} return\texttt{ objective(}
                 \State \hspace{2.5em} $m$, \label{step:model_param_study}
                 \State \hspace{2.5em} $o$, \label{step:oxide_param_study}
@@ -142,10 +142,10 @@ This allows us to identify the top-$n$ pipelines for each oxide, which we can th
 \State $dim\_params \gets \texttt{sample\_dim\_reduction\_params}(\texttt{sampler})$ \label{step:sample_dim_reduction_params}
 \State $dim \gets \texttt{instantiate\_dim\_reduction}(dim\_params)$ \label{step:instantiate_dim_reduction}
 \Statex \hspace{3em} \textbf{or} \texttt{Identity}
-\Statex     
+\Statex
 \State $pipeline \gets [s, t, dim]$ \label{step:construct_pipeline}
 \Statex
-\State \textbf{Dataset: }$D \gets \texttt{get\_data}()$ \label{step:get_data} 
+\State \textbf{Dataset: }$D \gets \texttt{get\_data}()$ \label{step:get_data}
 \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$ \label{step:data_partitioning}
 \Statex
 \State $T_{cv}, D_{train}, D_{test} \gets \text{apply pipeline to } T_{cv}, D_{train}, D_{test}$ \label{step:apply_pipeline}
@@ -157,7 +157,7 @@ This allows us to identify the top-$n$ pipelines for each oxide, which we can th
 \State $m' \gets \texttt{train}(m, D_{train}, o)$ \label{step:train_model}
 \State $rmsep, std\_dev_{test} \gets \texttt{evaluate}(m', D_{test}, o)$ \label{step:evaluate_model}
 \Statex
-\State \texttt{store\_metrics}($t$, $m$, $pipeline$, $rmse_{cv}$, 
+\State \texttt{store\_metrics}($t$, $m$, $pipeline$, $rmse_{cv}$,
 \Statex \hspace{8em} $std\_dev_{cv}$, $rmsep$, $std\_dev_{test}$) \label{step:store_metrics}
 \Statex
 \State \Return $rmse_{cv}$, $std\_dev_{cv}$ \label{step:return_metrics}
