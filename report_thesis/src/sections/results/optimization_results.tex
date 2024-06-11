@@ -1,0 +1,31 @@
+\subsection{Optimization Results}\label{sec:optimization_results}
+In this section, we present and analyze the results of running the Optimization experiment that we described in Section~\ref{subsec:optimization_experiment_design}.
+As mentioned, our primary objective was to identify the optimal configurations for predicting the concentration of various oxides in our dataset.
+We systematically evaluated a range of machine learning models, preprocessing techniques, and hyperparameter settings to determine the most effective combinations for each oxide.
+
+The results of the experiment were ~$16.000$ trials worth of data on the configurations used, hyperparameters, as well as metrics.
+
+Our data cleaning for this dataset primarily included filtering out failed runs, which was caused by configurations that did not work well together, as well as filtering out extreme error values.
+We filter out any runs that had a \gls{rmsecv} above 50.
+Approaches like \gls{svr} could occasionally yield this kind of outlier result in specific configurations.
+We selected 50 as threshold to include as many trials that were not obvious outliers.
+
+Our experiment underwent mostly without issues.
+Some issues are to be expected given the scale of the experiment.
+Unfortunately, we encountered an issue with a server we were using, resulting in some oxides and models having to be re-run.
+We managed to recover and re-run most of these.
+However, \gls{ngboost} for \ce{MgO} was only partially finished.
+Given that each model of the ten models would undergo 200 trials, for each oxide, this resulted in 2000 runs per oxide.
+The exception is \ce{MgO}, for which \gls{ngboost} ran 143 trials, making the total trials for \ce{MgO} 1943.
+After the filtering process, we are left with a total of 15245 trials to analyze.
+
+Given that we stored the configurations as well as each hyperparameter value for the trials, we had \~100 variables to consider during our analysis.
+Of these, the primary variables of interest are the metrics, as well as overall configuration variables, namely \texttt{Model Type}, \texttt{Scaler Type}, \texttt{PCA Type}, \texttt{Transformer Type}.
+
+% - Show figures/tables showing how the various configuration elements fared
+% - Show table with Optuna model, preprocessor, etc., counts
+% 	- The larger, more granular versions may be excessive. We could just show the total counts across oxides and preprocessing methods.
+% - Present best model configurations
+% 	- Already have these in the appendix. May want to just include them in the main report.
+% 	- Need to clarify in the text that they represent the single best performing configuration for each oxide as measured by RMSECV.
+
