@@ -10,7 +10,7 @@ Therefore, we decided to perform 200 iterations per model for each oxide, result
 We deemed this to be a reasonable number of iterations to obtain a reliable indication of the performance of each configuration.
 As mentioned in Section~\ref{sec:optimization_framework}, we used the \gls{tpe} algorithm for the optimization process.
 For this sampler, we set the number of startup trials to 25\%.
-The number of startup trials controls the number of random samples that are drawn before the \gls{tpe} sampler engages. 
+The number of startup trials determines the number of random samples drawn before the \gls{tpe} sampler engages.
 By choosing 25\%, we would reserve the first quarter of the iterations for exploration.
 We believed that this would allow the sampler enough time to explore the search space while still providing enough iterations for refinement. 
 
