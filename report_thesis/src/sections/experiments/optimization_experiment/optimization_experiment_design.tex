@@ -1,26 +1,42 @@
 \subsection{Optimization Experiment Design}\label{subsec:optimization_experiment_design}
 Using the remaining ten models, we conducted an extended experiment to further refine their performance for each oxide. 
-The goal was to identify which preprocessing techniques and hyperparameters would yield the best performance for each model, by doing a thorough search for each configuration.
+The goal was to identify which preprocessing techniques and hyperparameters would yield the best performance for each model by doing a thorough search for each configuration. 
 To achieve this, we evaluated multiple permutations of each model with various preprocessors and hyperparameter configurations. 
-Each configuration included a mandatory scaler, while data transformation and dimensionality reduction techniques were optional.
-The optimization process was conducted using our optimization framework, outlined in Section~\ref{subsec:optimization_framework}.
+Each configuration included a mandatory scaler, while data transformation and dimensionality reduction techniques were optional. 
+The optimization process was conducted using our optimization framework, outlined in Section~\ref{subsec:optimization_framework}
 
-To obtain a fair assesment of each configuration, we needed to strike a balance between doing enough iterations for the optimization to converge and what was feasible given the time constraints.
-Therefore, we decided to do 200 iterations per model for each oxide, totalling 16000 iterations given ten models and eight oxides. 
-This we deemed to be a reasonable number of iterations to get a good indication of the performance of each configuration.
+To obtain a fair assessment of each configuration, we needed to strike a balance between doing enough iterations for the optimization to converge and what was feasible given the time constraints. 
+Therefore, we decided to do 200 iterations per model for each oxide, totaling 16,000 iterations given ten models and eight oxides. 
+We deemed this to be a reasonable number of iterations to get a good indication of the performance of each configuration.
 As mentioned in Section~\ref{subsec:optimization_framework}, we used the \gls{tpe} algorithm for the optimization process.
-This sampler has multiple parameters, but we used the default values for all, except the number of startup trials and the amount of candidate hyperparameters that the sampler considers as potential choices for the next iteration.
-The number of startup trials controls the number of random samples that are drawn before the \gls{tpe} sampler engages.
-In this experiment we set that number to 25\%, meaning the first quarter of the experiments would be reserved for exploration.
-We believed that this would allow the sampler enough time to explore the search space, while still providing enough iterations for refinement.
-For the second parameters we chose to consider 20 candidates for each iteration.
-This number is somewhat counterintuitive, given the large search space, as a higher number would allow the sampler to evaluate more configurations per iteration.
-However, a larger number also increases the time it would take to evaluate each iteration.
+This sampler has multiple parameters, but we used the default values for all except the number of startup trials and the number of candidate hyperparameters that the sampler considers as potential choices for the next iteration. 
+The number of startup trials controls the number of random samples that are drawn before the \gls{tpe} sampler engages. 
+In this experiment, we set that number to 25\%, meaning the first quarter of the experiments would be reserved for exploration. 
+We believed that this would allow the sampler enough time to explore the search space while still providing enough iterations for refinement. 
+For the second parameter, we chose to consider 20 candidates for each iteration. 
+This number is somewhat counterintuitive, given the large search space, as a higher number would allow the sampler to evaluate more configurations per iteration. 
+However, a larger number also increases the time it would take to evaluate each iteration. 
 Understanding the trade-off between finding the best possible configuration and finishing the optimization experiment in a reasonable time frame, we decided to use 20 candidates per iteration.
 
-For each of the ten models used in the experiment, we defined a range or a set of options depending on the hyperparameter.
-These can be found in Table~\ref{}.
-Likewise, for the preprocessors used we also defined a range or set of options, which can be found in Table~\ref{}.
+For the experiment, we defined a range or set of discrete values in each hyperparameter for the models and preprocessors. 
+To determine these ranges, we used a mixture of what was represented in the literature, our own analysis, or the default values for each hyperparameter as a starting point. 
+Our methodology was then to expand the hyperparameters that had value ranges to include some reasonable lower and upper extremes. 
+For hyperparameters with a discrete set of possible values, we included all options. 
+As an example, for the \gls{pls} model, we used the elbow method to approximate the optimal number of components. 
+Based on this, we defined the lower extreme as 1 and the upper extreme as 30, as we believed that the optimal number of components would be somewhere within this range. 
+A similar approach was used for the preprocessor \gls{kernel-pca}, where we defined the number of components to be between 1 and 100.
 
+A different example is \gls{gbr}, which was based on the default values for the hyperparameters.
+The default value for the number of estimators is 100, so we defined this to be the bottom of the range and 1000 as the upper extreme. 
+Given the complexity of the patterns in \gls{libs} data, we believed that the ideal number of weak learners would likely be above 100, and therefore believed that 100 was a reasonable lower bound. 
+Determining the upper bound was more difficult, but we believed that 1000 was a reasonable upper bound, as it would allow the model to sufficiently capture the patterns in the data. 
+Given that we allow for a relatively large number of estimators, we wanted to balance this with a relatively low bound for the learning rate. 
+We did this to ensure the search space included a learning rate that could scale with the number of estimators and reduce the likelihood of overfitting. 
+The default value for the learning rate is 0.1, so we defined the lower bound to be $10^{-3}$ and the upper bound to be 1. 
+The max depth of each weak learner was set between 3 and 10, allowing for varying levels of complexity depending on what is needed based on the number of estimators. 
+The subsample parameter was set between 0.5 and 1.0, to accommodate random sampling of the data when fitting each weak learner. 
+Finally, the max features parameter was set to either \textit{sqrt} or \textit{log2}. Since this parameter has a discrete set of possible values, we included all options.
 
-These ranges and options for hyperparameters, for the models and preprocessors, were   
+Using this approach of considering reasonable lower and upper bounds for each hyperparameter or using all options for discrete hyperparameters, we defined the ranges for each model and preprocessor.
+
+The selected hyperparameter ranges for each model and preprocessor can be found in Table~\ref{tab:optuna_model_configurations} and Table~\ref{tab:optuna_preprocessing_configurations}, respectively.
