@@ -49,18 +49,18 @@ Using this framework, we can find the best configurations by optimizing our obje
 The framework we developed can be divided into two main components.
 A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function responsible for measuring the objective, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
 
-The purpose of the \nameref{alg:study_function} is to ensure that the optimization process is done for one model at a time, for each oxide.
+The purpose of the \nameref{alg:study_function} is to perform and facilitate the optimization process, doing so for each oxide and model combination.
 By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
 This means that each model is being evaluated fairly against each oxide and that the resulting configurations are optimized specifically for the model and oxide in question.
 We believe that this approach will allow us to best identify the top-$n$ pipelines to be used in our stacking ensemble.
 
-To manage the optimization process the function receives the number of trials to run, a list of models, and a list of oxides, seen in line~\ref{step:initialize_run_process}, and initializes the sampler, seen in lines~\ref{step:initialize_sampler}.
+To manage the optimization process, the function receives the number of trials to run, a list of models, and a list of oxides, as seen in line~\ref{step:initialize_run_process}, and initializes the sampler, as seen in line~\ref{step:initialize_sampler}.
 
 The sampler is responsible for managing the search space of the hyperparameters for the optimization process.
 This means that any hyperparameters being evaluated, for any preprocessor or model, will be managed by this sampler, which allows us to optimize for all hyperparameters at the same time.
 Optuna provides several options for samplers that have different characteristics and each have their strengths and weaknesses.
 However, because we require multi-objective optimization, this naturally limits the choice of sampler to those that support this.
-For our framework we chose to use the \gls{tpe} sampler, due to its stated optimization efficiency and its ability to handle all use cases. 
+For our framework, we chose to use the \gls{tpe} sampler due to its stated optimization efficiency and its ability to handle all use cases.
 Additionally, the TPE sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large\cite{optuna_2019}.
 
 Guiding the optimization process is the \nameref{alg:combined_objective} function, which evaluates the performance of each trial.
@@ -68,12 +68,12 @@ In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_de
 
 The role of the \nameref{alg:combined_objective} function is to provide the metric data to an $optimize$ function, seen in Line~\ref{step:optimize_objective}.
 As we step through each oxide and model in Lines~\ref{step:oxide_loop} to~\ref{step:model_loop}, we call the $optimize$ function with the number of trials to run and the \nameref{alg:combined_objective} function.
-The number of trials is an important parameter, as it regulates how much time the framework has to optimize a given model.
+The number of trials is an important parameter, as it regulates how many trials the framework has to optimize a given model.
 In an ideal scenario, this number would be very high to ensure that the optimization process has identified the best possible configuration.
-However, depending on the number of models in consideration the number of trials can quickly become computationally prohibitive.
+However, depending on the number of models in consideration, a high number of trials can quickly become computationally prohibitive with our approach.
 The $optimize$ function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler. 
 
-This leads us to the \nameref{alg:combined_objective} function which, as previously mentioned, contains the optimization logic.
+This leads us to the \nameref{alg:combined_objective} function which, as previously mentioned, returns the evaluation metrics for the given trial.
 
 To this function we supply the current model $m$, the Target Oxide $o$, and the sampler.
 
