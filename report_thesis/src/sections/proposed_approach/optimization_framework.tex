@@ -47,7 +47,7 @@ Using Optuna as the foundation for our optimization framework, we designed a com
 Using this framework, it is possible to find the best configurations by optimizing the objective function: minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
 The framework we developed can be divided into two main components.
-A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function responsible for measuring the objective, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
+A function responsible for running and managing the optimization process, as seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function responsible for measuring the objective, as seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
 
 The purpose of the \nameref{alg:study_function} is to perform and facilitate the optimization process, doing so for each oxide and model combination.
 By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
