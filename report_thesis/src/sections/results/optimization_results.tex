@@ -35,7 +35,7 @@ The optimization results indicate that configurations with the highest total val
 This outcome was expected, as the method was specifically designed for this type of \gls{libs} dataset, as discussed in Section~\ref{sec:norm3}.
 For dimensionality reduction, we see that \texttt{None}, indicating no \gls{pca}, was used in 9419 trials, constituting approximately 59\% of all trials.
 This suggests that either no dimensionality reduction is optimal, or a more suitable method should be identified.
-Neither \gls{pca} nor \gls{kernel-pca} are very effective for this dataset.
+Neither \gls{pca} nor \gls{kernel-pca} appear to be effective for this dataset.
 \texttt{QuantileTransformer} was used in 5710 trials, indicating that it may be the most optimal transformer.
 We observe that \texttt{PowerTransformer} was employed in 5277 trials, while no transformer was used in 4956 trials. Unlike other preprocessing method types, there does not appear to be a clear winner for the transformers.
 
