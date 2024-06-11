@@ -107,7 +107,7 @@ This prevents any form of double preprocessing from occuring, leading to potenti
 
 As mentioned in Section~\ref{subsec:validation_testing_procedures} we use both cross validation and a test set to evaluate the model.
 This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}.
-Its important to note, that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation and again before the model is trained.
+It is important to note, that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation, and again before the model is trained, so no learned parameters are carried over between them.
 
 Finally, the pruner is being applied in Line~\ref{step:prune_check}.
 In practice, the pruner is being supplied the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} through the objective function, but effectively this amounts to the pruner receiving these metrics directly, as illustrated.
