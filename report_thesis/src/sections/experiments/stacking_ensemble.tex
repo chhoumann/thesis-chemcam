@@ -2,20 +2,20 @@
 Given the results of the optimization process, we implemented a stacking ensemble to combine the predictions of the top-performing configurations.
 As with all our experiments, we follow the procedure outlined in Section~\ref{subsec:validation_testing_procedures} to evaluate the performance of the stacking ensemble.
 
-For each oxide, we first identified the top-performing methods to use in the stacking ensemble.
-We then created the preprocessing pipelines for each oxide, as outlined in Section~\ref{subsec:pipelines}.
-
-To identify the top-performing methods to use in the stacking ensemble, we developed a category-based method, which categorizes models into distinct groups for systematic comparison.
+For each oxide, we first identified the top-performing configurations to use in the stacking ensemble.
+To identify the top-performing configurations to use in the stacking ensemble, we developed a category-based method, which categorizes models into distinct groups for systematic comparison.
 This approach aids in selecting models that perform optimally for specific tasks, and ensures diversity in the ensemble.
 We also briefly developed and employed a grid search to find the optimal ensemble of configurations, but time constraints prevented its full implementation.
+Finally, we employed the stacking model and evaluated its performance.
+We present the results as well as the 1:1 plots in Section~\ref{subsec:stacking_ensemble_results}.
 
-\subsubsection{Category Method}
+\subsubsection{Category Method \& Pipeline Selection}\label{subsec:category_method}
 The category-based method organizes models into the following groups:
 
 \begin{itemize}
     \item Gradient Boosting: \gls{gbr}, \gls{xgboost}, \gls{ngboost}
     \item Tree-Based: \gls{etr}, \gls{rf}
-    \item Linear Models: \gls{lasso}, \gls{ridge}, \gls{enet}
+    \item Linear and Regularized Models: \gls{lasso}, \gls{ridge}, \gls{enet}
     \item SVM: \gls{svr}
     \item PLS: \gls{pls}
 \end{itemize}
@@ -31,35 +31,46 @@ To ensure diversity and limit scope, we set a maximum of 1 models per category a
 For each oxide, we developed pipelines to preprocess the data in accordance with the given configuration, as well as use the models with their optimal hyperparameters.
 These pipelines represent the optimal configurations for each oxide, and are used as base estimators in the stacking ensemble.
 
-\subsubsection{Stacking Ensemble}
+\subsubsection{Grid Search}\label{subsec:grid_search}
+To identify the optimal stacking ensemble configuration, we briefly developed and employed a grid search methodology.
+This approach systematically evaluates combinations of top-performing models to determine the best ensemble based on cross-validation metrics.
 
-We implemented a stacking ensemble method to combine predictions from various base estimators.
-This approach, encapsulated in the \texttt{Stacker} class, includes methods for cross-validation fitting, final fitting, and prediction.
-The meta-features generated from the base estimators were used to train the final estimator.
+The grid search process begins by generating all possible combinations of the selected models.
+Specifically, we generate combinations of models with at least two models, and a configurable maximum number of models.
 
-The cross-validation process involved splitting the data into training and testing sets, fitting the base estimators on the training set, and predicting the meta-features on the testing set.
-The final estimator was then trained on these meta-features.
-Performance metrics were computed using various evaluation functions to assess the ensemble's effectiveness.
+For each oxide, we constructed a pipeline for each of the top model configurations identified in Section~\ref{sec:optimization_results}.
+The evaluation function iterates over each combination of base estimators, constructs a stacking ensemble pipeline, and assesses its performance using cross-validation.
 
-\subsubsection{Performance of Meta-Learners}
+The evaluation function prepares the pipeline with the current combination of base estimators and splits the data into training and testing sets using our data partitioning method.
+The stacking ensemble is then fitted on the training set.
+The meta-features generated from the base estimators are used to train the final estimator.
 
-Our investigation revealed that different meta-learners exhibited varying performance levels across different oxides.
-This was particularly evident from the 1:1 prediction plots, which highlighted the critical importance of selecting an appropriate meta-learner.
-This behavior was consistently observed across all model configurations within the ensemble.
-This consistency suggests either a systematic issue that we have yet to identify, despite extensive troubleshooting, or that our hypothesis is correct: changing only the meta-learner significantly impacts the \gls{rmsecv} and prediction outcomes.
+We compute the evaluation metrics to assess the ensemble's effectiveness.
+The best combination is identified based on the lowest \gls{rmsecv} value.
 
-Specifically, we identified potential issues with small value predictions.
-For example, most values for \ce{TiO2} fell between 0 and 2.5, as shown in the distribution plot in the Testing-Validation section.
-The regularization term likely dominated the fitting process, leading to underfitting and nearly constant predictions.
-This hypothesis was confirmed by adjusting the regularization parameters in the \gls{enet} Regression.
-Lowering these parameters produced better outcomes, indicating that regularization adversely affected the predicted values.
+It is possible to vary the meta-learner for this process, which represents another variable to tune as part of the search process.
+
+While our grid search implementation was limited to the \ce{TiO2} oxide, the methodology demonstrates the potential for identifying optimal stacking ensembles by systematically evaluating model combinations and their configurations.
+We chose not to further pursue this method due to the time constraints of this project, but believe that it is a promising approach for future work.
 
 
-\subsubsection{Results}
+\subsubsection{Results}\label{subsec:stacking_ensemble_results}
 
 For each major oxide, we ran the stacking ensemble and evaluated its performance.
 The results, including \gls{rmsep} and standard deviations, were logged and visualized using actual versus predicted plots.
 The stacking approach demonstrated significant improvements in prediction accuracy, validating the efficacy of our methodology.
+
+Our investigation revealed that different meta-learners exhibited varying performance levels across different oxides.
+We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions unreliable, if the wrong meta-learner was chosen.
+This observation was made because we observed \ce{TiO2} predictions that were consistently near-constant values, despite varying the combination of model configurations in the \ce{TiO2} ensemble.
+In fact, this was the reason for our implementation of the grid search process.
+The consistency we observed suggests that our hypothesis is correct: changing only the meta-learner significantly impacts the \gls{rmsecv} and prediction outcomes.
+Specifically, we identified potential issues with small value predictions when using a \gls{enet} meta-learner.
+For example, most values for \ce{TiO2} fell between 0 and 2.5, as shown in Figure~\ref{fig:oxide_distributions}.
+The regularization term likely dominated the fitting process, leading to underfitting, which resulted in nearly constant predictions.
+This hypothesis was confirmed by adjusting the regularization parameter, \texttt{alpha}, in the \gls{enet} Regression.
+Lowering \texttt{alpha} produced better outcomes, indicating that regularization adversely affected the predicted values.
+This leads us to conclude that the meta-learner's choice significantly impacts the \gls{rmsecv} and prediction outcomes.
 
 % Show results for each meta-learner
 % Show 1:1 plots for each meta-learner
