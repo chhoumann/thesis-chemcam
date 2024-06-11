@@ -10,6 +10,8 @@
     \label{fig:web_platform}
 \end{figure*}
 
+\FloatBarrier
+
 \subsection{Cross-Validation Fold Plots for Major Oxides}\label{subsec:cv_plots}
 
 % Loop through each major oxide and add a subsubsection with figures
@@ -44,6 +46,8 @@
         \label{fig:distribution_plot_\oxide}
     \end{figure*}
 }
+
+\FloatBarrier
 
 \subsection{Initial Experiment: Model Hyperparameters}\label{subsec:initial_experiment_hyperparameters}
 \begin{table*}
@@ -101,6 +105,7 @@
 \label{tab:combined_hyperparameters}
 \end{table*}
 
+\FloatBarrier
 
 \begin{table*}
 \centering
@@ -146,6 +151,8 @@
 \caption{Explictly set hyperparameters for the \gls{gbr} and \gls{xgboost} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used. The \gls{ngboost} model does not have any explicitly set hyperparameters.}
 \label{tab:combined_hyperparameters}
 \end{table*}
+
+\FloatBarrier
 
 \begin{table*}
   \centering
@@ -205,15 +212,19 @@
   \label{tab:cnn_architecture}
 \end{table*}
 
-% \subsection{Overview of best performing model configurations}\label{subsec:best_model_configurations}
-% \input{sections/appendix/tables/SiO2_overview.tex}
-% \input{sections/appendix/tables/TiO2_overview.tex}
-% \input{sections/appendix/tables/Al2O3_overview.tex}
-% \input{sections/appendix/tables/FeOT_overview.tex}
-% \input{sections/appendix/tables/MgO_overview.tex}
-% \input{sections/appendix/tables/CaO_overview.tex}
-% \input{sections/appendix/tables/Na2O_overview.tex}
-% \input{sections/appendix/tables/K2O_overview.tex} % TODO: Doesn't built
+\FloatBarrier
+
+\subsection{Overview of best performing model configurations}\label{subsec:best_model_configurations}
+\input{sections/appendix/tables/SiO2_overview.tex}
+\input{sections/appendix/tables/TiO2_overview.tex}
+\input{sections/appendix/tables/Al2O3_overview.tex}
+\input{sections/appendix/tables/FeOT_overview.tex}
+\input{sections/appendix/tables/MgO_overview.tex}
+\input{sections/appendix/tables/CaO_overview.tex}
+\input{sections/appendix/tables/Na2O_overview.tex}
+\input{sections/appendix/tables/K2O_overview.tex}
+
+\FloatBarrier
 
 \subsection{Stacking Ensemble 1:1 Plots}\label{subsec:1_1_plots}
 \begin{figure*}
@@ -250,7 +261,6 @@
     \label{fig:elasticnet_one_to_one}
 \end{figure*}
 
-
 \begin{figure*}
     \centering
     \resizebox{0.75\textwidth}{!}{
@@ -284,7 +294,6 @@
     \caption{One-to-one plots for the stacking ensemble model with the \gls{enet} as the meta-learner with $\alpha = 0.1$.}
     \label{fig:enetalpha01_one_to_one}
 \end{figure*}
-
 
 \begin{figure*}
     \centering
