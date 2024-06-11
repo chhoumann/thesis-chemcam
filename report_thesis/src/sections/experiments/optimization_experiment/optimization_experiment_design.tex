@@ -29,7 +29,7 @@ Determining the upper bound was more difficult, but we believed that 1000 was a 
 Given that we allow for a relatively large number of estimators, we wanted to balance this with a relatively low bound for the learning rate. 
 We did this to ensure the search space included a learning rate that could scale with the number of estimators and reduce the likelihood of overfitting. 
 The default value for the learning rate is 0.1, so we defined the lower bound to be $10^{-3}$ and the upper bound to be 1. 
-The max depth of each weak learner was set between 3 and 10, allowing for varying levels of complexity depending on what is needed based on the number of estimators. 
+The max depth of each weak learner was set between 3 and 10, allowing for varying levels of complexity.
 The subsample parameter was set between 0.5 and 1.0, to accommodate random sampling of the data when fitting each weak learner. 
 Finally, the max features parameter was set to either \textit{sqrt} or \textit{log2}. Since this parameter has a discrete set of possible values, we included all options.
 
