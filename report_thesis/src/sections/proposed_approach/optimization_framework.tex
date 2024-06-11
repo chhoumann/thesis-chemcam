@@ -68,7 +68,7 @@ In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_de
 
 The role of the \nameref{alg:combined_objective} function is to provide the metric data to an $optimize$ function, seen in Line~\ref{step:optimize_objective}.
 As we step through each oxide and model in Lines~\ref{step:oxide_loop} to~\ref{step:model_loop}, we call the \texttt{optimize} function with the number of trials to run and the \nameref{alg:combined_objective} function.
-The number of trials is an important parameter, as it regulates how many trials the framework has to optimize a given model.
+The number of trials is an important parameter, as it specifies the number of iterations the optimization framework will execute to refine and optimize a given model.
 In an ideal scenario, this number would be very high to ensure that the optimization process has identified the best possible configuration.
 However, depending on the number of models in consideration, a high number of trials can quickly become computationally prohibitive with our approach.
 The $optimize$ function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler. 
