@@ -22,13 +22,14 @@ As an example, for the \gls{pls} model, we used the elbow method to approximate 
 Based on this, we defined the lower extreme as 1 and the upper extreme as 30, as we believed that the optimal number of components would be somewhere within this range. 
 A similar approach was used for the preprocessor \gls{kernel-pca}, where we defined the number of components to be between 1 and 100.
 
-A different example is \gls{gbr}, which was based on the default values for the hyperparameters.
-The default value for the number of estimators is 100, so we defined this to be the bottom of the range and 1000 as the upper extreme. 
-Given the complexity of the patterns in \gls{libs} data, we believed that the ideal number of weak learners would likely be above 100, and therefore believed that 100 was a reasonable lower bound. 
-Determining the upper bound was more difficult, but we believed that 1000 was a reasonable upper bound, as it would allow the model to sufficiently capture the patterns in the data. 
+A different example is \gls{gbr}, for which we based the hyperparameters on their default values.
+The default value for the number of estimators is 100, so we defined this as the lower bound and set 1000 as the upper bound.
+Given the complexity of the patterns in \gls{libs} data, we believed that the ideal number of weak learners would likely be above 100.
+Therefore, we considered 100 to be a reasonable lower bound. 
+Determining the upper bound was more challenging, but we considered 1000 to be a reasonable upper bound, as it would allow the model to sufficiently capture the patterns in the data.
 Given that we allow for a relatively large number of estimators, we wanted to balance this with a relatively low bound for the learning rate. 
-We did this to ensure the search space included a learning rate that could scale with the number of estimators and reduce the likelihood of overfitting. 
-The default value for the learning rate is 0.1, so we defined the lower bound to be $10^{-3}$ and the upper bound to be 1. 
+We did this to ensure that the search space included a learning rate capable of scaling with the number of estimators, thereby reducing the likelihood of overfitting.
+The default value for the learning rate is 0.1, so we defined the lower bound as $10^{-3}$ and the upper bound as 1. 
 The max depth of each weak learner was set between 3 and 10, allowing for varying levels of complexity.
 The subsample parameter was set between 0.5 and 1.0, to accommodate random sampling of the data when fitting each weak learner. 
 Finally, the max features parameter was set to either \textit{sqrt} or \textit{log2}. Since this parameter has a discrete set of possible values, we included all options.
