@@ -2,7 +2,6 @@
 One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators. \citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses. 
 In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide. 
 The complexity of the problem is increased because different oxides require different models, and the optimal preprocessing techniques will depend on both the model and the specific oxide being predicted. 
-Additionally, each estimator may require different variations of preprocessing depending on the oxide. 
 Due to challenges such as matrix effects, multicollinearity, and high dimensionality caused by very complex physical processes, it is difficult to determine which configuration is optimal.
 Selecting the appropriate preprocessing steps for each base estimator is essential, as incorrect preprocessing can significantly degrade performance and undermine the model's effectiveness
 Furthermore, choosing the right hyperparameters for each base estimator introduces additional complexity, as these decisions also significantly impact model performance and must be carefully tuned for each specific oxide. 
