@@ -71,7 +71,7 @@ As we step through each oxide and model in Lines~\ref{step:oxide_loop} to~\ref{s
 The number of trials is an important parameter, as it specifies the number of iterations the optimization framework will execute to refine and optimize a given model.
 In an ideal scenario, this number would be very high to ensure that the optimization process has identified the best possible configuration.
 However, depending on the number of models in consideration, a high number of trials can quickly become computationally prohibitive with our approach.
-The $optimize$ function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler. 
+The \texttt{optimize} function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler. 
 
 This leads us to the \nameref{alg:combined_objective} function which, as previously mentioned, returns the evaluation metrics for the given trial.
 
