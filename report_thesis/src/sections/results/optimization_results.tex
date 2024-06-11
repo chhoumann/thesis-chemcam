@@ -22,6 +22,10 @@ After the filtering process, we are left with a total of 15245 trials to analyze
 Given that we stored the configurations as well as each hyperparameter value for the trials, we had \~100 variables to consider during our analysis.
 Of these, the primary variables of interest are the metrics, as well as overall configuration variables, namely \texttt{Model Type}, \texttt{Scaler Type}, \texttt{PCA Type}, \texttt{Transformer Type}.
 
+We use this data to identify the best configurations for each oxide, as measured by \gls{rmsecv}.
+Our analysis starts broad, examining the usage of preprocessors across trials. Then we narrow in and look at the top 100 trials for each oxide to identify the best model, scaler, and transformer for each oxide.
+Finally, we look at the single best performing configurations across oxides, showing one configuration per model, for each oxide.
+
 As we described in Section~\ref{sec:optimization_framework}, our optimization system searches for the best configurations by through multi-objective optimization.
 The optimization process is facilitated by adjusting the configuration and hyperparameters of the machine learning model and preprocessing pipeline, therefore minimizing the objective.
 Because the sampler will do initial exploration, and then attempt to find the optimal configuration through exploitation, we'll see that the values of variables that frequently appear in the results are the ones that are most likely to be optimal.
@@ -37,9 +41,31 @@ We note that \texttt{PowerTransformer} was used in 5277 trials, with and no tran
 
 \input{sections/results/oxide_comparison_table.tex}
 
+We wish to examine how the top 100 trials performed for each configuration.
+We present the results in Figure~\ref{fig:top100_models}, \ref{fig:top100_scalers}, \ref{fig:top100_transformers}, and \ref{fig:top100_pca}.
+These figures and their corresponding subplots illustrate the performance of various configuration elements (models, scalers, transformers, PCA techniques) for each oxide, based on their \gls{rmsecv}.
+Any elements that do not appear in a subplot were not used in the top 100 trials for the given oxide.
+It is important to note that the variance in performance is influenced by multiple factors, not solely by the variable depicted in each plot.
+Factors such as the interaction between different preprocessing techniques, the specific hyperparameter settings, and the inherent variability in the data can all contribute to the observed performance.
+Therefore, while the plots provide valuable insights into the effectiveness of individual configuration elements, the overall performance is a result of complex interactions within the entire machine learning pipeline.
+We therefore emphasize the top performing trials and analyze a larger sample of these to draw generalizable conclusions about the optimal configurations for each oxide.
 
+From Figure~\ref{fig:top100_models}, it becomes clear that \gls{svr}, gradient boosting methods, and \gls{pls} perform the best.
+Figure~\ref{fig:top100_pca} confirms our previous hypothesis that not using any \gls{pca} or \gls{kernel-pca} results in the lowest \gls{rmsecv} values.
+We do, however, see some form of \gls{pca} or \gls{kernel-pca} appear in four of the plots, with \gls{kernel-pca} being the most frequently used of them.
+This indicates that they do see use among the top performing configurations.
+Interestingly, Figure~\ref{fig:top100_scalers} shows that, while \texttt{Norm3Scaler} is the most frequently used scaler and often best-performing scaler, it isn't always the case.
+Min-max scaling seems to produce better results for \ce{SiO2} and \ce{CaO}, and robust scaling for \ce{MgO}.
+In \ce{Al2O3}, Norm 3 scaling has the lowest \gls{rmsecv} values, but a worse mean \gls{rmsecv} value than the other scalers.
+Finally, Figure~\ref{fig:top100_transformers} another nuanced result.
+Power transformations seem to most frequently produce the best result across oxides, with the quantile transformation or none being showing the lowest \gls{rmsecv} values for the remaining oxides.
+
+These results seem to further reinforce our hypothesis that a tailored configuration is needed for each oxide, and there isn't a single configuration that works well for all oxides.
 
 \input{sections/results/top100.tex}
+
+We conclude our analysis by showing the best configurations for each oxide in Section~\ref{subsec:best_model_configurations}.
+These are the single top-performing configurations, shown for each model, for each oxide.
 
 
 % - [ ] Show figures/tables showing how the various configuration elements fared
