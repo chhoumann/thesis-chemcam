@@ -93,9 +93,9 @@ In Lines~\ref{step:get_data} to~\ref{step:apply_pipeline}, we fetch the data, ap
 The purpose of fetching the data for each trial is to ensure no modifications leak through trials, corrupting the dataset over time.
 This prevents any form of double preprocessing from occuring, which would lead to potential issues.
 
-As mentioned in Section~\ref{subsec:validation_testing_procedures}, we use both cross validation and a test set to evaluate the model.
-This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}, where cross validation, training, and evaluation are performed with respect to the current oxide.
-It is important to note, that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation, and again before the model is trained, so no learned parameters are carried over between them.
+As mentioned in Section~\ref{subsec:validation_testing_procedures}, we use both cross-validation and a test set to evaluate the model.
+This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}, where cross-validation, training, and evaluation are performed with respect to the current oxide.
+It is important to note that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation, and again before the model is trained, so no learned parameters are carried over between them.
 
 Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the \texttt{optimize} function in the \nameref{alg:study_function}, which then determines the next steps in the optimization process.
 
