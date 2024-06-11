@@ -65,12 +65,18 @@ These results seem to further reinforce our hypothesis that a tailored configura
 \input{sections/results/top100.tex}
 
 We conclude our analysis by showing the best configurations for each oxide in Section~\ref{subsec:best_model_configurations}.
-These are the single top-performing configurations, shown for each model, for each oxide.
+The section shows the single top-performing configurations, shown for each model, for each oxide, via tables~\ref{tab:SiO2_best_configurations} through~\ref{tab:K2O_best_configurations}.
+Like the previous plots, we use the \gls{rmsecv} values to determine the best configurations.
+Notably, these tables illustrate how some configurations can have low \gls{rmsecv} values, but relatively high \gls{rmsep} values.
+This could indicate that they generalize well to the dataset containing extreme values, yet struggle values closer to the mean.
+For instance, the top performing \ce{SiO2} configuration is \gls{pls} with \gls{kernel-pca} and \texttt{MinMaxScaler}.
+This configuration has the lowest \gls{rmsecv} value of 4.55, but a relatively high \gls{rmsep} value of 4.08.
+The next best performing configuration for \ce{SiO2} is \gls{svr} with \texttt{MinMaxScaler}.
+This configuration has a \gls{rmsecv} value of 4.59, but a \gls{rmsep} value of 3.53.
+The difference in \gls{rmsecv} is negligible, however the \gls{rmsep} value is much lower than the \gls{rmsecv} value for the \gls{pls} configuration.
+This indicates that the \gls{svr} configuration is likely a better overall predictor for \ce{SiO2} than the \gls{pls} configuration.
 
+The analysis of the best configurations for each oxide reveals that certain models and preprocessing techniques consistently outperform others. SVR and PLS models, in particular, frequently appear among the top configurations. The use of transformers such as the Power Transformer and scalers like Norm3 and Min-Max Scaler are also common among the best configurations.
 
-% - [ ] Show figures/tables showing how the various configuration elements fared
-% - [x] Show table with Optuna model, preprocessor, etc., counts
-% - [ ] Present best model configurations
-% 	- Already have these in the appendix. May want to just include them in the main report.
-% 	- Need to clarify in the text that they represent the single best performing configuration for each oxide as measured by RMSECV.
-
+Finally, we use a combination of these top-performing configurations by selecting the top-$n$ performing configurations per oxide for our stacking ensemble.
+This will be further described in Section~\ref{subsec:stacking_ensemble}.
