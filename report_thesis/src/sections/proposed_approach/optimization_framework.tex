@@ -90,7 +90,7 @@ In an ideal scenario, this number would be very high to ensure that the optimiza
 However, depending on the number of models in consideration the number of trials can quickly become computationally prohibitive.
 
 In Lines~\ref{step:sample_hyperparameters} to~\ref{step:instantiate_dim_reduction} we instantiate the model and the preprocessors with the hyperparameters sampled by the sampler.
-The sampling process of these is what is being guided by the objective function based on the metrics returned.
+The sampling process is being guided by the objective function, via the returned metrics from the previous trial.
 In our setup, we always require that a scaler is instantiated, to ensure that the data is correctly scaled.
 However, to measure the impact of data transformation and dimensionality reduction, we allow for these to be initialized as an identity function, which does not modify the data.
 Whether to instantiate a specific preprocessor or an identity function is determined by the sampler.
