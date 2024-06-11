@@ -3,7 +3,16 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 
 
-def plot_actual_vs_predicted(actual_values, predicted_values, rmse, std_dev, oxide, full_page=False, subplot_index=1):
+def plot_actual_vs_predicted(
+    actual_values,
+    predicted_values,
+    rmse,
+    std_dev,
+    oxide,
+    full_page=False,
+    subplot_index=1,
+    plot_path="/home/christian/projects/p9/baseline/plots/_one_to_one",
+):
     plt.figure(figsize=(12, 24) if full_page else (24, 12))
     plt.subplot(4, 2, subplot_index) if full_page else plt.subplot(2, 4, subplot_index)
 
@@ -51,5 +60,5 @@ def plot_actual_vs_predicted(actual_values, predicted_values, rmse, std_dev, oxi
     plt.grid(True)
 
     plt.tight_layout()
-    plt.savefig(f"/home/christian/projects/p9/baseline/plots/_one_to_one/{oxide}.png")
+    plt.savefig(f"{plot_path}/{oxide}.png")
     plt.show()
