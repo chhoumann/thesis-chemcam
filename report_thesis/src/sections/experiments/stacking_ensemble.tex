@@ -1,0 +1,78 @@
+\subsection{Stacking Ensemble}\label{subsec:stacking_ensemble}
+Given the results of the optimization process, we implemented a stacking ensemble to combine the predictions of the top-performing configurations.
+As with all our experiments, we follow the procedure outlined in Section~\ref{subsec:validation_testing_procedures} to evaluate the performance of the stacking ensemble.
+
+For each oxide, we first identified the top-performing methods to use in the stacking ensemble.
+We then created the preprocessing pipelines for each oxide, as outlined in Section~\ref{subsec:pipelines}.
+
+To identify the top-performing methods to use in the stacking ensemble, we developed a category-based method, which categorizes models into distinct groups for systematic comparison.
+This approach aids in selecting models that perform optimally for specific tasks, and ensures diversity in the ensemble.
+We also briefly developed and employed a grid search to find the optimal ensemble of configurations, but time constraints prevented its full implementation.
+
+\subsubsection{Category Method}
+
+The category method organizes models into the following groups:
+
+\begin{itemize}
+    \item Gradient Boosting: \gls{gbr}, \gls{xgboost}, \gls{ngboost}
+    \item Tree-Based: \gls{etr}, \gls{rf}
+    \item Linear Models: \gls{lasso}, \gls{ridge}, \gls{enet}
+    \item SVM: \gls{svr}
+    \item PLS: \gls{pls}
+\end{itemize}
+
+For each oxide, we filtered the trial runs from the optimization experiment, described in Section~\ref{sec:optimization_results}, to create a dataset containing configuration information and performance metrics.
+These datasets were sorted by \gls{rmsecv}, and unique model types were selected for further analysis.
+
+To ensure diversity, we set a maximum of 1 models per category and 3 models per stacking ensemble, with one ensemble for each oxide.
+For each oxide, we developed pipelines to preprocess the data in accordance with the given configuration.
+
+% We implemented the stacking ensemble in the \texttt{Stacker} class, which includes methods for cross-validation fitting, final fitting, and prediction.
+% The cross-validation process involves splitting the data into training and testing sets, fitting the base estimators on the training set, and predicting the meta-features on the testing set.
+% The final estimator was then trained on these meta-features.
+% Performance metrics were computed using various evaluation functions to assess the ensemble's effectiveness.
+
+% For each oxide, we ran the stacking ensemble and evaluated its performance.
+% The results, including \gls{rmsep} and standard deviations, were logged and visualized using actual versus predicted plots.
+% The stacking approach demonstrated significant improvements in prediction accuracy, validating the efficacy of our methodology.
+
+\subsection{Performance of Meta-Learners}
+
+Our investigation revealed that different meta-learners exhibited varying performance levels across different oxides.
+This was particularly evident from the 1:1 prediction plots, which highlighted the critical importance of selecting an appropriate meta-learner.
+This behavior was consistently observed across all model configurations within the ensemble.
+This consistency suggests either a systematic issue that we have yet to identify, despite extensive troubleshooting, or that our hypothesis is correct: changing only the meta-learner significantly impacts the \gls{rmsecv} and prediction outcomes.
+
+Specifically, we identified potential issues with small value predictions.
+For example, most values for \ce{TiO2} fell between 0 and 2.5, as shown in the distribution plot in the Testing-Validation section.
+The regularization term likely dominated the fitting process, leading to underfitting and nearly constant predictions.
+This hypothesis was confirmed by adjusting the regularization parameters in the Elastic Net Regression.
+Lowering these parameters produced better outcomes, indicating that regularization adversely affected the predicted values.
+
+
+
+\subsection{Pipelines}
+
+Based on the selected configurations, we devised preprocessing pipelines tailored to different models.
+These pipelines included steps such as scaling, \gls{pca}, and model-specific preprocessing to optimize performance.
+
+\subsection{Stacking Ensemble}
+
+We implemented a stacking ensemble method to combine predictions from various base estimators.
+This approach, encapsulated in the \texttt{Stacker} class, includes methods for cross-validation fitting, final fitting, and prediction.
+The meta-features generated from the base estimators were used to train the final estimator.
+
+The cross-validation process involved splitting the data into training and testing sets, fitting the base estimators on the training set, and predicting the meta-features on the testing set.
+The final estimator was then trained on these meta-features.
+Performance metrics were computed using various evaluation functions to assess the ensemble's effectiveness.
+
+\subsection{Results}
+
+For each major oxide, we ran the stacking ensemble and evaluated its performance.
+The results, including \gls{rmsep} and standard deviations, were logged and visualized using actual versus predicted plots.
+The stacking approach demonstrated significant improvements in prediction accuracy, validating the efficacy of our methodology.
+
+\subsection{Conclusion}
+
+Our approach to stacking, leveraging category-based model selection and pipeline optimization, proved effective in enhancing prediction accuracy for different oxides.
+Future work will focus on further exploring the impact of different meta-learners and refining the grid search for hyperparameter tuning.
