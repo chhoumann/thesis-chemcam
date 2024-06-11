@@ -3,7 +3,7 @@
 
 \subsection{Web-Based Platform for Data Partitioning Evaluation}\label{subsec:web_platform}
 
-\begin{figure*}[h]
+\begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{images/web_platform.png}
     \caption{Web-based platform used to determine the optimal value of $p$ for the data partitioning algorithm.}
@@ -16,28 +16,28 @@
 \foreach \oxide in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
     \subsubsection{\oxide}
 
-    \begin{figure*}[h!]
+    \begin{figure*}
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/histogram_grid_plot.png}
         \caption{Histogram and \gls{kde} of \ce{\oxide} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{\oxide} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
         \label{fig:histogram_grid_plot_\oxide}
     \end{figure*}
 
-    \begin{figure*}[h!]
+    \begin{figure*}
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/histogram_kde_plot.png}
         \caption{Combined Histogram and \gls{kde} of \ce{\oxide} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{\oxide} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
         \label{fig:histogram_kde_plot_\oxide}
     \end{figure*}
 
-    \begin{figure*}[h!]
+    \begin{figure*}
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/original_and_post_fold.png}
         \caption{Distribution of \ce{\oxide} concentrations before and after fold assignment. The left plot shows the original distribution of \ce{\oxide}, while the right plot shows the distribution with folds assigned, color-coded to indicate the different folds.}
         \label{fig:original_and_post_fold_plot_\oxide}
     \end{figure*}
 
-    \begin{figure*}[htbp]
+    \begin{figure*}
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/distribution_plot.png}
         \caption{Distribution of \ce{\oxide} concentrations across cross-validation folds, training set, test set, and the entire dataset. The mean and standard deviation statistics for each partition are indicated figure.}
@@ -46,7 +46,7 @@
 }
 
 \subsection{Initial Experiment: Model Hyperparameters}\label{subsec:initial_experiment_hyperparameters}
-\begin{table*}[h]
+\begin{table*}
 \centering
 \begin{tabular}{@{}llp{0.5\textwidth}@{}}
 \toprule
@@ -102,7 +102,7 @@
 \end{table*}
 
 
-\begin{table*}[h]
+\begin{table*}
 \centering
 \begin{tabular}{@{}llp{0.5\textwidth}@{}}
 \toprule
@@ -147,7 +147,7 @@
 \label{tab:combined_hyperparameters}
 \end{table*}
 
-\begin{table*}[h!]
+\begin{table*}
   \centering
   \begin{tabular}{lll}
     \toprule
@@ -169,7 +169,7 @@
   \label{tab:nn_architecture}
 \end{table*}
 
-\begin{table*}[h!]
+\begin{table*}
   \centering
   \begin{tabular}{lll}
     \toprule
