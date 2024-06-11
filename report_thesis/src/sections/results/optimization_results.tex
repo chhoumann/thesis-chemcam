@@ -11,9 +11,8 @@ Approaches like \gls{svr} could occasionally yield this kind of outlier result i
 We chose a threshold of 50 to include as many trials that were not clearly outliers.
 
 Our experiment proceeded mostly without encountering any issues.
-Some issues are to be expected given the scale of the experiment.
-Unfortunately, we encountered an issue with a server we were using, resulting in some oxides and models having to be re-run.
-We managed to recover and re-run most of these.
+Given the scale of the experiment, some issues were expected.
+A server issue required re-running some oxides and models. We successfully recovered and re-ran most of these.
 However, \gls{ngboost} for \ce{MgO} was only partially finished.
 Given that each of the ten models would undergo 200 trials for each oxide, this resulted in 2000 runs per oxide.
 The exception is \ce{MgO}, for which \gls{ngboost} ran 143 trials, making the total trials for \ce{MgO} 1943.
@@ -24,7 +23,7 @@ Among these, the primary variables of interest are the metrics and overall confi
 
 We used this data to identify the best configurations for each oxide, as measured by \gls{rmsecv}.
 We began our analysis broadly by examining the usage of preprocessors across trials. Subsequently, we narrowed our focus and reviewed the top 100 trials for each oxide to identify the optimal model, scaler, and transformer for each oxide.
-Finally, we examined the single best-performing configurations across oxides, showing one configuration per model for each oxide.
+Finally, we examined the single best-performing configurations across oxides, showing each of the 10 models with their corresponding best configuration for each oxide.
 
 As described in Section~\ref{sec:optimization_framework}, our optimization system searches for the best configurations through multi-objective optimization.
 The optimization process involves adjusting the configuration and hyperparameters of the machine learning model and preprocessing pipeline to minimize the objective.
@@ -57,7 +56,8 @@ Therefore, we prioritize the analysis of the top-performing trials and examine a
 From Figure~\ref{fig:top100_models}, it is evident that \gls{svr}, gradient boosting methods, and \gls{pls} demonstrate the best performance.
 Figure~\ref{fig:top100_pca} confirms our earlier hypothesis that not using any \gls{pca} or \gls{kernel-pca} yields the lowest \gls{rmsecv} values.
 However, we do observe that either \gls{pca} or \gls{kernel-pca} appear in four of the plots, with \gls{kernel-pca} being the most frequently used among them.
-This indicates that they are indeed used in some of the top-performing configurations.
+This indicates that they are indeed used in some top-performing configurations. 
+However, based on the results in Table~\ref{tab:pca_comparison}, we did not expect them to be as prevalent as they are, suggesting that while they are not the most frequently used, they can still be highly effective in specific scenarios.
 Interestingly, Figure~\ref{fig:top100_scalers} shows that, although \texttt{Norm3Scaler} is the most frequently used and best-performing scaler, this is not always the case.
 Min-max scaling appears to yield better results for \ce{SiO2} and \ce{CaO}, while robust scaling seems more effective for \ce{MgO}.
 For \ce{Al2O3}, Norm 3 scaling exhibits the lowest \gls{rmsecv} values but a higher mean \gls{rmsecv} value compared to the other scalers.
