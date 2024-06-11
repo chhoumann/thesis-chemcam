@@ -73,7 +73,7 @@ Through several iterations, it will gradually reduce the number of configuration
 This provides a higher likelihood that promising configurations are not pruned too early, while still reducing the computational costs.\cite{optuna_2019}
 
 Guiding both the sampler and the pruner is the objective function, which evaluates the performance of each trial, seeking to either minimize or maximize some specified metrics.
-In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}, defined previously.
+In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}, as mentioned previously.
 This can be seen in line~\ref{step:initialize_objective}.
 
 The role of the objective function is to provide the metric data that the sampler and pruner need to make informed decisions.
