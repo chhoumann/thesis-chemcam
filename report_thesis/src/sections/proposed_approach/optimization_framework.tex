@@ -24,7 +24,7 @@ Next, we developed an optimization framework to systematically explore and optim
 
 \subsubsection{The Framework}
 To systematically explore and optimize pipeline configurations, the search process should be guided by an ojective function.
-Based on the evaluation process outlined in Section~\ref{subsec:validation_testing_procedures}, whereby we argue that solely evaluating on the RMSEP may lead to misleading and poor results, we define the objective function we wish to optimize as a multi-objective optimization on minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}. 
+Based on the evaluation process outlined in Section~\ref{subsec:validation_testing_procedures}, whereby we argue that solely evaluating on the \gls{rmsep} may lead to misleading and poor results, we define the objective function we wish to optimize as a multi-objective optimization on minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}. 
 
 Given these goals, traditional methods like grid search and random search could be used, but they often fall short due to several inherent limitations. 
 Grid search involves exhaustively evaluating all possible combinations of hyperparameters within specified ranges. 
