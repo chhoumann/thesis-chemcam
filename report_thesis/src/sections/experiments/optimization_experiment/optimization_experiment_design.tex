@@ -11,7 +11,7 @@ We deemed this to be a reasonable number of iterations to obtain a reliable indi
 As mentioned in Section~\ref{sec:optimization_framework}, we used the \gls{tpe} algorithm for the optimization process.
 For this sampler, we set the number of startup trials to 25\%.
 The number of startup trials determines the number of random samples drawn before the \gls{tpe} sampler engages.
-By choosing 25\%, we would reserve the first quarter of the iterations for exploration.
+By choosing 25\%, we would reserved the first quarter of the iterations for exploration.
 We believed that this would allow the sampler enough time to explore the search space while still providing enough iterations for refinement. 
 
 For the experiment, we defined a range or set of discrete values in each hyperparameter for the models and preprocessors. 
