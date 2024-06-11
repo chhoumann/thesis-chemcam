@@ -11,6 +11,7 @@ _ENV_VARS = [
     "DATA_CACHE_DIR",
     "CCAM_MASTER_LIST_FILE_NAME",
     "DISCORD_WEBHOOK_URL",
+    "OPTIMIZATION_EXPERIMENT_RESULTS_PATH",
 ]
 
 
@@ -24,9 +25,7 @@ class AppConfig:
         missing_vars = [var for var in _ENV_VARS if var not in os.environ]
 
         if missing_vars:
-            raise ValueError(
-                f"Missing environment variables: {', '.join(missing_vars)}"
-            )
+            raise ValueError(f"Missing environment variables: {', '.join(missing_vars)}")
 
         return {var: os.environ[var] for var in _ENV_VARS}
 
@@ -74,3 +73,12 @@ class AppConfig:
     @property
     def discord_webhook_url(self):
         return self._config["DISCORD_WEBHOOK_URL"]
+
+    @property
+    def optimization_experiment_results_path(self):
+        path = self._config["OPTIMIZATION_EXPERIMENT_RESULTS_PATH"]
+        if os.path.isdir(path):
+            return os.path.join(path, "optimization_results.csv")
+        if not path.endswith(".csv"):
+            return f"{path}.csv"
+        return path

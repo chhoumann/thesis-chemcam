@@ -62,7 +62,7 @@ class Norm3Scaler(BaseEstimator, TransformerMixin):
     def __init__(self):
         super().__init__()
 
-    def fit(self, df):
+    def fit(self, df, *args, **kwargs):
         """
         Compute the total intensity for each spectrometer range.
         """

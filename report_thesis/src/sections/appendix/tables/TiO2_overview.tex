@@ -1,0 +1,21 @@
+\begin{table*}
+\centering
+\begin{tabular}{llllllll}
+\toprule
+\ce{TiO2} & Model Type & Transformer Type & PCA Type & Scaler Type & \gls{rmsecv} & Std. dev. CV & \gls{rmsep} \\
+\midrule
+ & \texttt{svr} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 0.409 & 0.406 & 0.397 \\
+ & \texttt{gbr} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 0.410 & 0.409 & 0.332 \\
+ & \texttt{xgboost} & \texttt{none} & \texttt{none} & \texttt{robust\_scaler} & 0.411 & 0.410 & 0.317 \\
+ & \texttt{random\_forest} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 0.422 & 0.421 & 0.334 \\
+ & \texttt{elasticnet} & \texttt{none} & \texttt{none} & \texttt{robust\_scaler} & 0.423 & 0.423 & 0.351 \\
+ & \texttt{extra\_trees} & \texttt{power\_transformer} & \texttt{none} & \texttt{standard\_scaler} & 0.426 & 0.426 & 0.338 \\
+ & \texttt{ridge} & \texttt{none} & \texttt{none} & \texttt{min\_max\_scaler} & 0.428 & 0.427 & 0.359 \\
+ & \texttt{lasso} & \texttt{power\_transformer} & \texttt{none} & \texttt{standard\_scaler} & 0.431 & 0.430 & 0.372 \\
+ & \texttt{ngboost} & \texttt{none} & \texttt{none} & \texttt{robust\_scaler} & 0.431 & 0.431 & 0.355 \\
+ & \texttt{pls} & \texttt{power\_transformer} & \texttt{kernel\_pca} & \texttt{robust\_scaler} & 0.441 & 0.441 & 0.411 \\
+\bottomrule
+\end{tabular}
+\caption{Overview of model types for \ce{TiO2} oxide}
+\label{tab:TiO2_overview}
+\end{table*}

@@ -1,0 +1,21 @@
+\begin{table*}
+\centering
+\begin{tabular}{llllllll}
+\toprule
+\ce{K2O} & Model Type & Transformer Type & PCA Type & Scaler Type & \gls{rmsecv} & Std. dev. CV & \gls{rmsep} \\
+\midrule
+ & \texttt{pls} & \texttt{none} & \texttt{none} & \texttt{norm3\_scaler} & 0.587 & 0.586 & 0.724 \\
+ & \texttt{gbr} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{min\_max\_scaler} & 0.590 & 0.587 & 0.423 \\
+ & \texttt{svr} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 0.593 & 0.593 & 0.594 \\
+ & \texttt{xgboost} & \texttt{power\_transformer} & \texttt{none} & \texttt{standard\_scaler} & 0.600 & 0.599 & 0.455 \\
+ & \texttt{elasticnet} & \texttt{power\_transformer} & \texttt{none} & \texttt{robust\_scaler} & 0.602 & 0.602 & 0.650 \\
+ & \texttt{ngboost} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{max\_abs\_scaler} & 0.602 & 0.600 & 0.420 \\
+ & \texttt{lasso} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 0.607 & 0.606 & 0.624 \\
+ & \texttt{ridge} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 0.611 & 0.611 & 0.629 \\
+ & \texttt{random\_forest} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 0.675 & 0.669 & 0.515 \\
+ & \texttt{extra\_trees} & \texttt{power\_transformer} & \texttt{none} & \texttt{robust\_scaler} & 0.714 & 0.709 & 0.464 \\
+\bottomrule
+\end{tabular}
+\caption{Overview of model types for \ce{K2O} oxide}
+\label{tab:K2O_overview}
+\end{table*}

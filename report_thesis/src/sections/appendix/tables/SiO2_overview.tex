@@ -1,0 +1,21 @@
+\begin{table*}
+\centering
+\begin{tabular}{llllllll}
+\toprule
+\ce{SiO2} & Model Type & Transformer Type & PCA Type & Scaler Type & \gls{rmsecv} & Std. dev. CV & \gls{rmsep} \\
+\midrule
+ & \texttt{pls} & \texttt{none} & \texttt{kernel\_pca} & \texttt{min\_max\_scaler} & 4.552 & 4.551 & 4.084 \\
+ & \texttt{svr} & \texttt{none} & \texttt{none} & \texttt{min\_max\_scaler} & 4.592 & 4.588 & 3.533 \\
+ & \texttt{gbr} & \texttt{none} & \texttt{none} & \texttt{norm3\_scaler} & 4.652 & 4.646 & 3.720 \\
+ & \texttt{lasso} & \texttt{power\_transformer} & \texttt{pca} & \texttt{norm3\_scaler} & 4.737 & 4.738 & 4.248 \\
+ & \texttt{xgboost} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 4.791 & 4.781 & 3.968 \\
+ & \texttt{elasticnet} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 4.841 & 4.844 & 3.947 \\
+ & \texttt{ngboost} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 4.860 & 4.851 & 4.148 \\
+ & \texttt{ridge} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 4.940 & 4.938 & 3.816 \\
+ & \texttt{extra\_trees} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 5.141 & 5.118 & 3.821 \\
+ & \texttt{random\_forest} & \texttt{none} & \texttt{none} & \texttt{norm3\_scaler} & 5.204 & 5.192 & 3.788 \\
+\bottomrule
+\end{tabular}
+\caption{Overview of model types for \ce{SiO2} oxide}
+\label{tab:SiO2_overview}
+\end{table*}
