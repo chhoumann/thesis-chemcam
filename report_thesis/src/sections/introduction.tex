@@ -27,10 +27,12 @@ In addition to model exploration, we also investigate a selection of preprocessi
 Specifically, we designed and implemented a framework for experimental analysis using the automated hyperparameter optimization framework Optuna~\cite{optuna_2019}.
 We then used this framework to determine the most effective combinations of preprocessing methods and models for each regression target.
 We began by identifying the most promising models from the literature, after which we evaluated various preprocessing techniques to understand their impact on model performance, selecting those that demonstrated the highest impact on improving the performance of each model.
-Following preprocessing, we optimized the chosen models through hyperparameter tuning to ensure optimal performance tailored to the specific data characteristics of each oxide.
-Once the best hyperparameters were identified, a stacking ensemble method was employed to create a meta learner for each oxide, significantly enhancing prediction accuracy and robustness beyond the capabilities of individual models.
-% TODO: Superior performance needs to be replaced with actual numbers
-Through extensive experiments on \gls{libs} data, we systematically assessed and demonstrated the superior performance of our approach compared to existing methods, focusing on significant improvements in prediction accuracy and robustness.
+Following this, we optimized the chosen models along with various preprocessors, using our hyperparameter optimization framework, to ensure optimal performance tailored to the specific data characteristics of each oxide.
+
+As a result, we have developed a comprehensive catalog of models and preprocessing techniques that can be used to predict major oxide compositions in \gls{libs} data.
+This catalog features configurations of various preprocessing methods and machine learning models for each of the eight major oxides examined in this study, all of which have demonstrated high effectiveness.
+Additionally, to investigate the potential for further performance enhancement, we used the developed catalog to experiment with stacking ensemble using the best performing configurations for each oxide and three different meta-learners.
+Though limited in scope, this approach demonstrated improved performance of approximately 24\%-34\% over baseline \gls{rmsep}.
 
 Our key contributions are as follows:
 \begin{itemize}
