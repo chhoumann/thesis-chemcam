@@ -28,19 +28,10 @@ Specifically, we designed and implemented a framework for experimental analysis 
 We then used this framework to determine the most effective combinations of preprocessing methods and models for each regression target.
 We began by identifying the most promising models from the literature, after which we evaluated various preprocessing techniques to understand their impact on model performance, selecting those that demonstrated the highest impact on improving the performance of each model.
 Following preprocessing, we optimized the chosen models through hyperparameter tuning to ensure optimal performance tailored to the specific data characteristics of each oxide.
-As a result, we have developed a comprehensive catalog of models and preprocessing techniques that can be used to predict major oxide compositions in \gls{libs} data.
+As a result, we have developed a catalog of models and preprocessing techniques that can be used to predict major oxide compositions in \gls{libs} data.
 This catalog features configurations of various preprocessing methods and machine learning models for each of the eight major oxides examined in this study, all of which have demonstrated high effectiveness.
-Additionally, to demonstrate the potential for further performance enhancement, we experimented with stacking ensemble methods by using the developed catalog of models and investigated the impact of using a different meta learner for each oxide.
-While these initial experiments indicate promising results, we did not fully explore all possible combinations of models and preprocessing techniques due to time constraints.
-This suggests a fruitful area for future research to optimize and expand upon our findings.
-These promising results highlight potential for future research to optimize and expand model and preprocessing technique combinations.
-
-% Instead of mentioning that we have superior performance, we should instead focus on the fact that we have a catalog of models and preprocessing techniques that can be used to predict major oxide compositions in LIBS data. And this is what we should mention above instead.
-% Then, we can mention that one could further improve the performance by using stacking ensemble methods to create a meta learner for each oxide, which we briefly experiment with in this work too in order to demonstrate the idea, however we do not have the time to fully explore this by testing all possible combinations of models and preprocessing techniques.
-
-% Once the best hyperparameters were identified, a stacking ensemble method was employed to create a meta learner for each oxide, significantly enhancing prediction accuracy and robustness beyond the capabilities of individual models.
-% TODO: Superior performance needs to be replaced with actual numbers
-% Through extensive experiments on \gls{libs} data, we systematically assessed and demonstrated the superior performance of our approach compared to existing methods, focusing on significant improvements in prediction accuracy and robustness.
+Additionally, to investigate the potential for further performance enhancement, we used the developed catalog to experiment with stacking ensemble.
+Though limited in scope, this approach demonstrated improved performance on {X} oxides over baseline results.
 
 Our key contributions are as follows:
 \begin{itemize}
