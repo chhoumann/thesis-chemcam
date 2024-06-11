@@ -49,7 +49,7 @@ Using this framework, we can find the best configurations by optimizing our obje
 The framework we developed can be divided into two main components.
 A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function containing the optimization logic, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
 
-The purpose of the \nameref{alg:study_function} function is to ensure that the optimization process is done for one model at a time, for each oxide.
+The purpose of the \nameref{alg:study_function} is to ensure that the optimization process is done for one model at a time, for each oxide.
 By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
 This means that each model is being evaluated fairly against each oxide and that the resulting configurations are optimized specifically for the model and oxide in question.
 We believe that this approach will allow us to best identify the top-$n$ pipelines to be used in our stacking ensemble.
@@ -90,19 +90,15 @@ Similarly, dimensionality reduction techniques typically also produce better res
 However, it may not always be advantageous or yield better results if the data has already been transformed.
 As such, we allow for the optimization framework to optionally use these if they are deemed to be beneficial.
 
-In Line~\ref{step:get_data} to Line~\ref{step:apply_pipeline_cv} we fetch the data, apply our data partitioning strategy to generate four cross-validation sets, a training set and a test set, and apply the preprocessing to the datasets.
+In Line~\ref{step:get_data} to~\ref{step:apply_pipeline} we fetch the data, apply our data partitioning strategy to generate four cross-validation sets, a training set and a test set, and apply the preprocessing to the datasets.
 The purpose of fetching the data for each trial is to ensure no modifications leak through trials, corrupting the dataset over time.
 This prevents any form of double preprocessing from occuring, leading to potential issues.
 
 As mentioned in Section~\ref{subsec:validation_testing_procedures} we use both cross validation and a test set to evaluate the model.
-This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}.
+This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}, where cross validation, training, and evaluation are performed with respect to the current oxide.
 It is important to note, that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation, and again before the model is trained, so no learned parameters are carried over between them.
 
-Finally, the pruner is being applied in Line~\ref{step:prune_check}.
-In practice, the pruner is being supplied the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} through the objective function, but effectively this amounts to the pruner receiving these metrics directly, as illustrated.
-If the pruner determines that the current trial is unpromising, it stops the trial early, and the optimization process continues to the next trial.
-
-Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the objective function, which then determines the next steps in the optimization process.
+Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the $optimize$ function in the \nameref{alg:study_function}, which then determines the next steps in the optimization process.
 
 In summary, using this framework we are able to systematically explore and optimize preprocessing, model and hyperparameter configurations for each model on a per-oxide basis.
 This allows us to identify the top-$n$ pipelines for each oxide, which we can then use in our stacking ensemble. 
@@ -151,7 +147,7 @@ This allows us to identify the top-$n$ pipelines for each oxide, which we can th
 \State \textbf{Dataset: }$D \gets \texttt{get\_data}()$ \label{step:get_data} 
 \State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$ \label{step:data_partitioning}
 \Statex
-\State $T_{cv}, D_{train}, D_{test} \gets \text{apply pipeline to } T_{cv}, D_{train}, D_{test}$ \label{step:apply_pipeline_train}
+\State $T_{cv}, D_{train}, D_{test} \gets \text{apply pipeline to } T_{cv}, D_{train}, D_{test}$ \label{step:apply_pipeline}
 \Statex
 \State $CV_{metrics} \gets \texttt{cross\_validate}(m, T_{cv}, o)$ \label{step:cross_validate}
 \State $rmse_{cv} \gets \texttt{mean}(CV_{metrics}.\texttt{rmse\_values})$ \label{step:mean_rmse_cv}
