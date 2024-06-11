@@ -97,7 +97,7 @@ As mentioned in Section~\ref{subsec:validation_testing_procedures}, we use both 
 This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}, where cross validation, training, and evaluation are performed with respect to the current oxide.
 It is important to note, that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation, and again before the model is trained, so no learned parameters are carried over between them.
 
-Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the $optimize$ function in the \nameref{alg:study_function}, which then determines the next steps in the optimization process.
+Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the \texttt{optimize} function in the \nameref{alg:study_function}, which then determines the next steps in the optimization process.
 
 In summary, using this framework we are able to systematically explore and optimize preprocessing, model and hyperparameter configurations for each model on a per-oxide basis.
 This allows us to identify the top-$n$ pipelines for each oxide, which we can then use in our stacking ensemble. 
