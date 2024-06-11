@@ -44,7 +44,7 @@ Optuna provides well-defined abstraction which allowed us to more quickly constr
 Optuna provides Bayesian optimization search algorithms, but with additional configurable parameters that allowed us to customize the search process to our specific needs.
 
 Using Optuna as the foundation for our optimization framework, we designed a comprehensive system for \gls{libs} data that handles the entire process, from \gls{ccs} data to partitioning, cross-validation, and hyperparameter optimization.
-Using this framework, we can find the best configurations by optimizing our objective function: minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
+Using this framework, it is possible to find the best configurations by optimizing the objective function: minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
 The framework we developed can be divided into two main components.
 A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function responsible for measuring the objective, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
