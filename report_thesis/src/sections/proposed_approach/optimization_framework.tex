@@ -118,10 +118,6 @@ Once a trial is complete, the metrics are returned in Line~\ref{step:return_metr
 In summary, using this framework we are able to systematically explore and optimize preprocessing, model and hyperparameter configurations for each model on a per-oxide basis.
 This allows us to identify the top-$n$ pipelines for each oxide, which we can then use in our stacking ensemble. 
 
-In summary, using this framework, we are able to systematically explore and optimize preprocessing, model, and hyperparameter configurations for each model on a per-oxide basis. 
-By leveraging Optuna as a foundation, with its TPE sampler and Hyperband pruner, we can efficiently explore a large search space of hyperparameters while ensuring that promising configurations are not pruned too early. 
-This approach allows us to identify the top-$n$ pipelines for each oxide, aligning with our goals of generalization, robustness, and accuracy, which can then be used in our stacking ensemble.
-
 \begin{algorithm}
 \caption{Run Optimization Process}
 \label{alg:study_function}
