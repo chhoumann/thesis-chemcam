@@ -5,7 +5,7 @@ To achieve this, we evaluated multiple permutations of each model with various p
 Each configuration included a mandatory scaler, while data transformation and dimensionality reduction techniques were optional. 
 The optimization process was conducted using our optimization framework, outlined in Section~\ref{sec:optimization_framework}
 
-To obtain a fair assessment of each configuration, we needed to strike a balance between doing enough iterations for the optimization to converge and what was feasible given the time constraints. 
+To ensure a fair assessment of each configuration, we needed to balance conducting enough iterations for the optimization to converge with the practical limitations imposed by our time constraints.
 Therefore, we decided to do 200 iterations per model for each oxide, totaling 16,000 iterations given ten models and eight oxides. 
 We deemed this to be a reasonable number of iterations to get a good indication of the performance of each configuration.
 As mentioned in Section~\ref{sec:optimization_framework}, we used the \gls{tpe} algorithm for the optimization process.
