@@ -47,7 +47,7 @@ Using Optuna as the foundation for our optimization framework, we designed a com
 Using this framework, we can find the best configurations by optimizing our objective function: minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
 The framework we developed can be divided into two main components.
-A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function containing the optimization logic, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
+A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function responsible for measuring the objective, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
 
 The purpose of the \nameref{alg:study_function} is to ensure that the optimization process is done for one model at a time, for each oxide.
 By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
@@ -63,7 +63,7 @@ However, because we require multi-objective optimization, this naturally limits 
 For our framework we chose to use the \gls{tpe} sampler, due to its stated optimization efficiency and its ability to handle all use cases. 
 Additionally, the TPE sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large\cite{optuna_2019}.
 
-Guiding the optimization process is the \nameref{alg:combined_objective} function, which evaluates the performance of each trial, seeking to either minimize or maximize some specified metrics.
+Guiding the optimization process is the \nameref{alg:combined_objective} function, which evaluates the performance of each trial.
 In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}, as mentioned previously.
 
 The role of the \nameref{alg:combined_objective} function is to provide the metric data to an $optimize$ function, seen in Line~\ref{step:optimize_objective}.
@@ -74,9 +74,8 @@ However, depending on the number of models in consideration the number of trials
 The $optimize$ function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler. 
 
 This leads us to the \nameref{alg:combined_objective} function which, as previously mentioned, contains the optimization logic.
-It defines the systematic process of hyperparameter tuning, model training, and evaluation across multiple trials.
 
-To this function we supply the current model $M$, the Target Oxide $o$, and the sampler, seen in Line~\ref{step:combined_objective_params}.
+To this function we supply the current model $m$, the Target Oxide $o$, and the sampler.
 
 In Lines~\ref{step:sample_hyperparameters} to~\ref{step:instantiate_dim_reduction} we instantiate the model and the preprocessors with the hyperparameters sampled by the sampler.
 The sampling process is being guided by the objective function, via the returned metrics from the previous trial.
@@ -94,7 +93,7 @@ In Line~\ref{step:get_data} to~\ref{step:apply_pipeline} we fetch the data, appl
 The purpose of fetching the data for each trial is to ensure no modifications leak through trials, corrupting the dataset over time.
 This prevents any form of double preprocessing from occuring, leading to potential issues.
 
-As mentioned in Section~\ref{subsec:validation_testing_procedures} we use both cross validation and a test set to evaluate the model.
+As mentioned in Section~\ref{subsec:validation_testing_procedures}, we use both cross validation and a test set to evaluate the model.
 This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}, where cross validation, training, and evaluation are performed with respect to the current oxide.
 It is important to note, that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation, and again before the model is trained, so no learned parameters are carried over between them.
 
@@ -113,13 +112,15 @@ This allows us to identify the top-$n$ pipelines for each oxide, which we can th
 
 \For{each oxide $o$ in $O$} \label{step:oxide_loop}
     \For{each model $m$ in $M$} \label{step:model_loop}
-        \State \texttt{optimize}($N$, \texttt{objective}( \label{step:optimize_objective}
-        \State \hspace{1.5em} $m$, \label{step:model_param_study}
-        \State \hspace{1.5em} $o$, \label{step:oxide_param_study}
-        \State \hspace{1.5em} \texttt{sampler}, \label{step:sampler_param_study}
-        \State )) \label{step:optimize_combined_objective}
+        \State \texttt{optimize}($N$, $\texttt{lambda}()$ 
+            \State \hspace{1.5em} return\texttt{ objective(}
+                \State \hspace{2.5em} $m$, \label{step:model_param_study}
+                \State \hspace{2.5em} $o$, \label{step:oxide_param_study}
+                \State \hspace{2.5em} \texttt{sampler} \label{step:sampler_param_study}
+            \State \texttt{))} \label{step:optimize_combined_objective}
     \EndFor
 \EndFor
+
 \end{algorithmic}
 \end{algorithm}
 
