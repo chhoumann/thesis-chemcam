@@ -218,20 +218,106 @@
 % }
 
 % \subsection{Stacker 1:1 Plots}\label{subsec:stacker_1_1_plots}
+\begin{figure*}
+    \centering
+    \resizebox{0.75\textwidth}{!}{
+        \begin{tabular}{cc}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/SiO2.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/TiO2.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/Al2O3.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/FeOT.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/MgO.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/CaO.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/Na2O.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/K2O.png}
+            \end{subfigure}
+        \end{tabular}
+    }
+    \caption{One-to-one plots for the stacking ensemble model with the \gls{enet} as the meta-learner with $\alpha = 1$}
+    \label{fig:elasticnet_one_to_one}
+\end{figure*}
 
-% \foreach \method in {elasticnet, enetalpha01, svr} {
-%     \begin{figure*}
-%         \centering
-%         \foreach \oxide [count=\i] in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
-%             \begin{subfigure}[b]{0.45\textwidth}
-%                 \centering
-%                 \includegraphics[width=\textwidth]{images/one_to_one/\method/\oxide.png}
-%                 \caption{\oxide}
-%                 \label{fig:\method_\oxide}
-%             \end{subfigure}
-%             \ifnum\i=4 \columnbreak \fi
-%         }
-%         \caption{\method}
-%         \label{fig:\method}
-%     \end{figure*}
-% }
+
+\begin{figure*}
+    \centering
+    \resizebox{0.75\textwidth}{!}{
+        \begin{tabular}{cc}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/SiO2.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/TiO2.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/Al2O3.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/FeOT.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/MgO.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/CaO.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/Na2O.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/K2O.png}
+            \end{subfigure}
+        \end{tabular}
+    }
+    \caption{One-to-one plots for the stacking ensemble model with the \gls{enet} as the meta-learner with $\alpha = 0.1$.}
+    \label{fig:enetalpha01_one_to_one}
+\end{figure*}
+
+
+\begin{figure*}
+    \centering
+    \resizebox{0.75\textwidth}{!}{
+        \begin{tabular}{cc}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/SiO2.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/TiO2.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/Al2O3.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/FeOT.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/MgO.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/CaO.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/Na2O.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/K2O.png}
+            \end{subfigure}
+        \end{tabular}
+    }
+    \caption{One-to-one plots for the stacking ensemble model with the \gls{svr} as the meta-learner}
+    \label{fig:svr_one_to_one}
+\end{figure*}
