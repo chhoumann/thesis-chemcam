@@ -70,7 +70,7 @@ Similar to the sampler, there exist several options for the choice of pruner.
 In our case we chose to use the Hyperband pruner, due to its balanced approach when pruning.
 Initially, the pruner will consider more configurations, but allow them to run for a shorter time.
 Through several iterations, it will gradually reduce the number of configurations being considered, but allow them to run for a longer time.
-This provides a higher likelihood that promising configurations are not pruned too early, while still reducing the computational costs.\cite{optuna_2019}
+This provides a higher likelihood that promising configurations are not pruned too early, while still reducing the computational costs\cite{optuna_2019}.
 
 Guiding both the sampler and the pruner is the objective function, which evaluates the performance of each trial, seeking to either minimize or maximize some specified metrics.
 In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}, as mentioned previously.
