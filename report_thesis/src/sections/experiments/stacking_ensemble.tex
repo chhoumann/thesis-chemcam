@@ -15,7 +15,7 @@ The category-based method organizes models into the following groups:
 \begin{itemize}
     \item Gradient Boosting: \gls{gbr}, \gls{xgboost}, \gls{ngboost}
     \item Tree-Based: \gls{etr}, \gls{rf}
-    \item Linear and Regularized Models: \gls{lasso}, \gls{ridge}, \gls{enet}
+    \item Linear and Regularized Models: \gls{lasso}, ridge, \gls{enet}
     \item SVM: \gls{svr}
     \item PLS: \gls{pls}
 \end{itemize}
@@ -59,6 +59,67 @@ We chose not to further pursue this method due to the time constraints of this p
 For each major oxide, we ran the stacking ensemble and evaluated its performance.
 The results, including \gls{rmsep} and standard deviations, were logged and visualized using actual versus predicted plots.
 The stacking approach demonstrated significant improvements in prediction accuracy, validating the efficacy of our methodology.
+% WIP
+
+\begin{table}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
+\midrule
+\ce{Na2O}      & 0.470       & 0.462  & 1.075 $\pm$ 0.706    & 1.067 $\pm$ 0.710     \\
+\ce{FeO_T}     & 1.794       & 1.789  & 2.792 $\pm$ 0.649    & 2.745 $\pm$ 0.646     \\
+\ce{MgO}       & 0.711       & 0.711  & 1.660 $\pm$ 0.525    & 1.635 $\pm$ 0.516     \\
+\ce{SiO2}      & 3.588       & 3.582  & 4.680 $\pm$ 0.500    & 4.670 $\pm$ 0.516     \\
+\ce{Al2O3}     & 1.656       & 1.657  & 2.211 $\pm$ 0.023    & 2.199 $\pm$ 0.226     \\
+\ce{CaO}       & 1.636       & 1.619  & 1.307 $\pm$ 0.205    & 1.290 $\pm$ 0.202     \\
+\ce{K2O}       & 0.476       & 0.462  & 0.653 $\pm$ 0.195    & 0.652 $\pm$ 0.193     \\
+\ce{TiO2}      & 0.571       & 0.565  & 0.818 $\pm$ 0.111    & 0.814 $\pm$ 0.117     \\
+\bottomrule
+\end{tabular}
+\label{tab:stacking_ensemble_results_enet}
+\caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with default hyperparameters.}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
+\midrule
+\ce{K2O}       & 0.494       & 0.477  & 0.556 $\pm$ 0.155    & 0.553 $\pm$ 0.153     \\
+\ce{Na2O}      & 0.442       & 0.433  & 1.093 $\pm$ 0.690    & 1.079 $\pm$ 0.692     \\
+\ce{CaO}       & 1.647       & 1.627  & 1.310 $\pm$ 0.213    & 1.291 $\pm$ 0.211     \\
+\ce{MgO}       & 0.768       & 0.768  & 1.632 $\pm$ 0.531    & 1.608 $\pm$ 0.518     \\
+\ce{FeO_T}     & 1.841       & 1.840  & 2.781 $\pm$ 0.664    & 2.731 $\pm$ 0.659     \\
+\ce{Al2O3}     & 1.658       & 1.660  & 2.192 $\pm$ 0.235    & 2.180 $\pm$ 0.238     \\
+\ce{TiO2}      & 0.319       & 0.310  & 0.450 $\pm$ 0.083    & 0.448 $\pm$ 0.083     \\
+\ce{SiO2}      & 3.598       & 3.591  & 4.686 $\pm$ 0.489    & 4.677 $\pm$ 0.505     \\
+\bottomrule
+\end{tabular}
+\label{tab:stacking_ensemble_results_enet_01}
+\caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with $\alpha = 0.1$.}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
+\midrule
+\ce{K2O}       & 0.511       & 0.497  & 0.669 $\pm$ 0.199    & 0.666 $\pm$ 0.196     \\
+\ce{Na2O}      & 0.369       & 0.368  & 0.978 $\pm$ 0.885    & 0.971 $\pm$ 0.887     \\
+\ce{CaO}       & 1.594       & 1.574  & 1.475 $\pm$ 0.294    & 1.456 $\pm$ 0.304     \\
+\ce{MgO}       & 0.819       & 0.820  & 2.569 $\pm$ 1.274    & 2.559 $\pm$ 1.271     \\
+\ce{FeO_T}     & 1.693       & 1.681  & 4.821 $\pm$ 1.490    & 4.768 $\pm$ 1.495     \\
+\ce{Al2O3}     & 1.729       & 1.732  & 2.285 $\pm$ 0.226    & 2.274 $\pm$ 0.233     \\
+\ce{TiO2}      & 0.340       & 0.333  & 0.442 $\pm$ 0.087    & 0.442 $\pm$ 0.087     \\
+\ce{SiO2}      & 3.473       & 3.478  & 5.064 $\pm$ 0.932    & 5.061 $\pm$ 0.926     \\
+\bottomrule
+\end{tabular}
+\label{tab:stacking_ensemble_results_svr}
+\caption{Stacking ensemble results using the \gls{svr} model as the meta-learner with default hyperparameters.}
+\end{table}
 
 Our investigation revealed that different meta-learners exhibited varying performance levels across different oxides.
 We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions unreliable, if the wrong meta-learner was chosen.
@@ -72,8 +133,107 @@ This hypothesis was confirmed by adjusting the regularization parameter, \texttt
 Lowering \texttt{alpha} produced better outcomes, indicating that regularization adversely affected the predicted values.
 This leads us to conclude that the meta-learner's choice significantly impacts the \gls{rmsecv} and prediction outcomes.
 
-% Show results for each meta-learner
-% Show 1:1 plots for each meta-learner
+\begin{figure*}
+    \centering
+    \resizebox{0.75\textwidth}{!}{
+        \begin{tabular}{cc}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/SiO2.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/TiO2.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/Al2O3.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/FeOT.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/MgO.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/CaO.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/Na2O.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/K2O.png}
+            \end{subfigure}
+        \end{tabular}
+    }
+    \caption{One-to-one plots for the stacking ensemble model with the \gls{enet} as the meta-learner with $\alpha = 1$}
+    \label{fig:elasticnet_one_to_one}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \resizebox{0.75\textwidth}{!}{
+        \begin{tabular}{cc}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/SiO2.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/TiO2.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/Al2O3.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/FeOT.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/MgO.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/CaO.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/Na2O.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/K2O.png}
+            \end{subfigure}
+        \end{tabular}
+    }
+    \caption{One-to-one plots for the stacking ensemble model with the \gls{enet} as the meta-learner with $\alpha = 0.1$.}
+    \label{fig:enetalpha01_one_to_one}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \resizebox{0.75\textwidth}{!}{
+        \begin{tabular}{cc}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/SiO2.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/TiO2.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/Al2O3.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/FeOT.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/MgO.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/CaO.png}
+            \end{subfigure} \\
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/Na2O.png}
+            \end{subfigure} & \hspace{3cm}
+            \begin{subfigure}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{images/one_to_one/svr/K2O.png}
+            \end{subfigure}
+        \end{tabular}
+    }
+    \caption{One-to-one plots for the stacking ensemble model with the \gls{svr} as the meta-learner}
+    \label{fig:svr_one_to_one}
+\end{figure*}
 
 \subsubsection{Conclusion}
 
