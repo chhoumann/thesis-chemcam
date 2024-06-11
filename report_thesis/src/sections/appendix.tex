@@ -209,3 +209,29 @@
 \foreach \oxide in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
     \input{sections/appendix/tables/\oxide_overview.tex}
 }
+
+% \subsection{Stacker 1:1 Plots}\label{subsec:stacker_1_1_plots}
+% \foreach \method in {elasticnet, enet_a_01, svr} {
+%   \foreach \oxide in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
+%       % images/plots/one_to_one/\method/\oxide.png
+%   }
+% }
+
+% \subsection{Stacker 1:1 Plots}\label{subsec:stacker_1_1_plots}
+
+% \foreach \method in {elasticnet, enetalpha01, svr} {
+%     \begin{figure*}
+%         \centering
+%         \foreach \oxide [count=\i] in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
+%             \begin{subfigure}[b]{0.45\textwidth}
+%                 \centering
+%                 \includegraphics[width=\textwidth]{images/one_to_one/\method/\oxide.png}
+%                 \caption{\oxide}
+%                 \label{fig:\method_\oxide}
+%             \end{subfigure}
+%             \ifnum\i=4 \columnbreak \fi
+%         }
+%         \caption{\method}
+%         \label{fig:\method}
+%     \end{figure*}
+% }
