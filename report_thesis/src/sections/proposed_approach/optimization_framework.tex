@@ -49,7 +49,7 @@ Using this framework, we can find the best configurations by optimizing our obje
 The framework we developed can be divided into two main components.
 A function responsible for running and managing the optimization process, seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function containing the optimization logic, seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
 
-The purpose of the \nameref{alg:study_function} is to ensure that the optimization process is done for one model at a time, for each oxide.
+The purpose of the \nameref{alg:study_function} is to perform and facilitate the optimization process, doing so for each oxide and model combination.
 By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
 This means that each model is being evaluated fairly against each oxide and that the resulting configurations are optimized specifically for the model and oxide in question.
 We believe that this approach will allow us to best identify the top-$n$ pipelines to be used in our stacking ensemble.
