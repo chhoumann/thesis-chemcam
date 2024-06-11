@@ -3,7 +3,7 @@ The first step in our methodology is to prepare the datasets for model training 
 As mentioned in Section~\ref{sec:data-overview}, the data used in this study was obtained from NASA's \gls{pds} and consists of \gls{ccs} data and major oxide compositions for various samples.
 
 The initial five shots from each sample are excluded because they are usually contaminated by dust covering the sample, which is cleared away by the shock waves produced by the laser \cite{cleggRecalibrationMarsScience2017}.
-The remaining 45 shots from each location are then averaged, yielding a single spectrum $s$ per location $l$ in the Averaged Intensity Tensor\ref{matrix:averaged_intensity}, resulting in a total of five spectra for each sample. 
+The remaining 45 shots from each location are then averaged, yielding a single spectrum $s$ per location $l$ in the Averaged Intensity Tensor\ref{matrix:averaged_intensity}, resulting in a total of five spectra for each sample.
 
 At this stage, the data still contains noise at the edges of the spectrometers.
 These edges correspond to the boundaries of the three spectrometers, which collectively cover the \gls{uv}, \gls{vio}, and \gls{vnir} light spectra.
@@ -15,8 +15,8 @@ Additionally, as a result of the aforementioned preprocessing applied to the raw
 These negative values are not physically meaningful, since you cannot have negative light intensity \cite{p9_paper}.
 Similar to the noisy edges, these negative values are also masked by zeroing out the values.
 
-We transpose the data so that each row represents a location and each column represents a wavelength feature. 
-Each location is now represented as a vector of wavelengths, with the corresponding average intensity values for each wavelength. 
+We transpose the data so that each row represents a location and each column represents a wavelength feature.
+Each location is now represented as a vector of wavelengths, with the corresponding average intensity values for each wavelength.
 These vectors are then concatenated to form a tensor, giving us the full Averaged Intensity Tensor.
 
 For each sample, we have a corresponding set of major oxide compositions in weight percentage (wt\%).
@@ -25,7 +25,7 @@ An excerpt of this data is shown in Table \ref{tab:composition_data_example}.
 While the \textit{Target}, \textit{Spectrum Name}, and \textit{Sample Names} are part of the dataset, our analysis focuses primarily on the \textit{Sample Names}.
 The concentrations of the eight oxides \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeO_T}, \ce{MnO}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O} represent the expected values for these oxides in the sample, serving as our ground truth. The \textit{MOC total} is not utilized in this study.
 
-\begin{table*}[h]
+\begin{table*}
 \centering
 \begin{tabular}{lllllllllllll}
 \toprule
@@ -46,7 +46,7 @@ The major oxide weight percentages are appended to the matrix of spectral data, 
 This dataset is shown in Table~\ref{tab:final_dataset_example}.
 The \textit{Target} column corresponds to the sample name, while the \textit{ID} column contains the unique identifier for each location.
 
-\begin{table*}[h]
+\begin{table*}
 \centering
 \footnotesize
 \begin{tabular}{llllllllllllllllllllll}

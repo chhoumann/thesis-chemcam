@@ -38,14 +38,14 @@ In contrast, deep learning models such as \gls{cnn} and \gls{ann} underperformed
 Inspecting the model performances per oxide revealed that the best model varied depending on the oxide, and several models performed well for each oxide.
 This emphasizes the need for further evaluation of model performances on a per-oxide basis to identify suitable configurations for our stacking ensemble approach, which aims to leverage the strengths of multiple models.
 
-\begin{figure*}[h]
+\begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{images/init_results_means.png}
     \caption{Mean \gls{rmsep}, \gls{rmsecv}, standard deviation of prediction errors, and standard deviation of cross-validation prediction errors for each model across all oxides.}
     \label{fig:init_results_rmses}
 \end{figure*}
 
-\begin{table}[ht]
+\begin{table}
 \begin{tabular}{lrr}
 \toprule
 Model & Relative Performance (\%) & Diff. vs Prev. \\
@@ -70,7 +70,7 @@ CNN & 143.18 & 15.36 \\
 
 \input{sections/experiments/inital_experiments/init_results_table.tex}
 
-\begin{table*}[h]
+\begin{table*}
 \centering
 \begin{minipage}{.7\textwidth}
   \centering

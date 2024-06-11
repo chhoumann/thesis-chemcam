@@ -23,21 +23,21 @@ Figure~\ref{fig:original_and_post_fold_plot} contrasts the \ce{SiO_2} concentrat
 The left plot shows the original distribution, while the right plot displays the fold-assigned distribution, color-coded by fold.
 This visualization highlights that the partitioning strategy maintains the overall data distribution while ensuring balanced representation across folds.
 
-\begin{figure*}[h!]
+\begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{images/histogram_grid_plot.png}
     \caption{Histogram and \gls{kde} of \ce{SiO_2} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{SiO_2} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
     \label{fig:histogram_grid_plot}
 \end{figure*}
 
-\begin{figure*}[h!]
+\begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{images/histogram_kde_plot.png}
     \caption{Combined Histogram and \gls{kde} of \ce{SiO_2} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{SiO_2} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
     \label{fig:histogram_kde_plot}
 \end{figure*}
 
-\begin{figure*}[h!]
+\begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{images/original_and_post_fold.png}
     \caption{Distribution of \ce{SiO_2} concentrations before and after fold assignment. The left plot shows the original distribution of \ce{SiO_2}, while the right plot shows the distribution with folds assigned, color-coded to indicate the different folds.}
@@ -47,7 +47,7 @@ This visualization highlights that the partitioning strategy maintains the overa
 
 To further validate our visual analysis, we can examine quantitative measures such as the means and standard deviations of \ce{SiO_2} concentrations across the folds and the overall dataset.
 
-\begin{figure*}[htbp]
+\begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{images/distribution_plot.png}
     \caption{Distribution of \ce{SiO_2} concentrations across cross-validation folds, training set, test set, and the entire dataset. The mean and standard deviation statistics for each partition are indicated figure.}

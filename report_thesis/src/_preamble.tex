@@ -1,4 +1,4 @@
-\documentclass[nonacm,acmtog,border=5pt]{acmart}
+\documentclass[nonacm,acmtog,border=5pts]{acmart}
 \usepackage{natbib}
 \usepackage{todonotes}
 \usepackage{listings}
@@ -10,6 +10,7 @@
 \usepackage{mhchem}
 \usepackage{dblfloatfix}
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{subcaption}
 \usepackage{afterpage}
 \usepackage[acronym]{glossaries}
@@ -19,6 +20,17 @@
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{placeins}
+
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.7}
+\renewcommand{\textfraction}{.15}
+\renewcommand{\floatpagefraction}{.66}
+\renewcommand{\dbltopfraction}{.66}
+\renewcommand{\dblfloatpagefraction}{.66}
+\setcounter{topnumber}{9}
+\setcounter{bottomnumber}{9}
+\setcounter{totalnumber}{20}
+\setcounter{dbltopnumber}{9}
 
 \setmainfont{texgyrepagella}[
   Extension = .otf,
