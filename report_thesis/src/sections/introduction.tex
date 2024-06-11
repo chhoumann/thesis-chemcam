@@ -20,7 +20,7 @@ This underscores the need for continued research into more adaptive and robust m
 This thesis aims to improve upon previous work in the field of \gls{libs} data analysis.
 Our goal is to develop a machine learning pipeline that is tailored to the unique characteristics of \gls{libs} data, with the goal of achieving higher prediction accuracy and robustness.
 
-To achieve these objectives, we build upon the baseline established in~\cite{p9_paper} and systematically explore ten different machine learning models. 
+To achieve these objectives, we build upon the baseline established in~\cite{p9_paper} and systematically explore ten different machine learning models.
 These models were identified and selected through a combination of extensive literature review and the consideration of unconventional approaches not typically covered in the \gls{libs}-based calibration literature.
 The ten models fall into three categories: Ensemble learning models, linear and regularization models, and neural network models.
 In addition to model exploration, we also investigate a selection of preprocessing techniques: scaling (including normalization), dimensionality reduction, and data transformation.
@@ -34,9 +34,8 @@ Through extensive experiments on \gls{libs} data, we systematically assessed and
 
 Our key contributions are as follows:
 \begin{itemize}
-    \item We develop a novel machine learning pipeline that demonstrates improved accuracy and robustness in predicting major oxide compositions in \gls{libs} data.
-    \item We have developed a novel optimization approach and tool for tuning and evaluating machine learning models along with preprocessing techniques, providing a systematic and efficient method for selecting the best configuration.
-    \item By outperforming existing methods, our approach has established new benchmarks for accuracy and robustness in \gls{libs} data analysis.
+    \item We have developed a comprehensive catalog of machine learning models and preprocessing techniques for predicting major oxide compositions in \gls{libs} data. This catalog presents highly effective configurations of several preprocessing methods and machine learning models for each of the eight major oxides examined in this study, allowing for a more informed selection of models and preprocessing techniques in future work.
+    \item We have contributed directly to the development of \gls{pyhat}, a Python-based toolset by \gls{usgs} for machine learning and data analysis on hyperspectral data. Our work has been integrated into the toolset, further enhancing its capabilities for the scientific community.
 \end{itemize}
 
 
@@ -45,8 +44,10 @@ The remainder of this paper is organized as follows:
 Section~\ref{sec:background} provides background on the onoging Mars exploration missions, the \gls{libs} technique, and the baseline \gls{moc} model.
 Section~\ref{sec:problem_definition} formally defines the problem addressed in this work.
 Section~\ref{sec:methodology} describes our proposed methodology, including data preprocessing, dimensionality reduction, and machine learning models.
-Section~\ref{sec:experiments} presents our experimental setup and results.
-Finally, Section~\ref{sec:conclusion} concludes the paper and discusses future work.
+Section~\ref{sec:methodology} presents our experimental design and setup.
+Section~\ref{sec:results} presents the results of our experiments.
+Section~\ref{sec:future_work} discusses potential future work.
+Finally, Section~\ref{sec:conclusion} concludes the paper by summarizing our findings and discussing the implications of our work.
 
 Due to the overlapping nature of terminology used in \gls{libs} data analysis and machine learning, we provide a list of terms in Table~\ref{tab:terms} to clarify their meaning.
 
@@ -57,10 +58,10 @@ Due to the overlapping nature of terminology used in \gls{libs} data analysis an
 Term & Definition \\
 \midrule
 Sample & A physical specimen of rock, soil, or other material collected for scientific analysis.\\
-Location & The specific point on a sample where a LIBS laser is targeted. There are typically multiple locations per sample. \\ 
+Location & The specific point on a sample where a LIBS laser is targeted. There are typically multiple locations per sample. \\
 Target & Refers to the variable that a machine learning model is trained to predict. \\
 \bottomrule
-\end{tabularx}  
+\end{tabularx}
 \caption{Table of Terms}
 \label{tab:terms}
 \end{table}
