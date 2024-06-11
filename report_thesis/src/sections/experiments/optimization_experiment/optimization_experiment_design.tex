@@ -14,9 +14,9 @@ The number of startup trials determines the number of random samples drawn befor
 By choosing 25\%, we would reserved the first quarter of the iterations for exploration.
 We believed this approach would allow sufficient time for the sampler to explore the search space while still providing enough iterations for refinement.
 
-For the experiment, we defined a range or set of discrete values in each hyperparameter for the models and preprocessors. 
-To determine these ranges, we used a mixture of what was represented in the literature, our own analysis, or the default values for each hyperparameter as a starting point. 
-Our methodology was then to expand the hyperparameters that had value ranges to include some reasonable lower and upper extremes. 
+For the experiment, we defined a range or set of discrete values for each hyperparameter of the models and preprocessors.
+To determine these ranges, we used a combination of values reported in the literature, our own analysis, and the default values for each hyperparameter as a starting point.
+Our methodology involved expanding the hyperparameters with value ranges to include reasonable lower and upper extremes.
 For hyperparameters with a discrete set of possible values, we included all options. 
 As an example, for the \gls{pls} model, we used the elbow method to approximate the optimal number of components. 
 Based on this, we defined the lower extreme as 1 and the upper extreme as 30, as we believed that the optimal number of components would be somewhere within this range. 
