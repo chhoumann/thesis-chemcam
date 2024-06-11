@@ -10,7 +10,7 @@
     \label{fig:web_platform}
 \end{figure*}
 
-\subsection{Cross-Validation Plots for Major Oxides}\label{subsec:cv_plots}
+\subsection{Cross-Validation Fold Plots for Major Oxides}\label{subsec:cv_plots}
 
 % Loop through each major oxide and add a subsubsection with figures
 \foreach \oxide in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
@@ -43,10 +43,6 @@
         \caption{Distribution of \ce{\oxide} concentrations across cross-validation folds, training set, test set, and the entire dataset. The mean and standard deviation statistics for each partition are indicated figure.}
         \label{fig:distribution_plot_\oxide}
     \end{figure*}
-}
-
-\foreach \oxide in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
-    \input{sections/appendix/tables/\oxide_overview.tex}
 }
 
 \subsection{Initial Experiment: Model Hyperparameters}\label{subsec:initial_experiment_hyperparameters}
@@ -208,3 +204,8 @@
   \caption{Summary of the Convolutional Neural Network Architecture}
   \label{tab:cnn_architecture}
 \end{table*}
+
+\subsection{Overview of best performing model configurations}\label{subsec:best_model_configurations}
+\foreach \oxide in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
+    \input{sections/appendix/tables/\oxide_overview.tex}
+}
