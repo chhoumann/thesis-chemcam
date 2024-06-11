@@ -63,7 +63,7 @@ This means that any hyperparameters being evaluated, for any preprocessor or mod
 Optuna provides several options for samplers that have different characteristics and each have their strengths and weaknesses.
 However, because we require multi-objective optimization, this naturally limits the choice of sampler to those that support this.
 For our framework we chose to use the Tree-structured Parzen Estimator (TPE) sampler, due to its stated optimization efficiency and its ability to handle all use cases. 
-Additionally, the TPE sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large. \cite{optuna_2019}
+Additionally, the TPE sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large\cite{optuna_2019}.
 
 The pruner is responsible for stopping unpromising trials early, to reduce the computational costs of the optimization process and is initialized in line~\ref{step:initialize_pruner}.
 Similar to the sampler, there exist several options for the choice of pruner.
