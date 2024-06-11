@@ -1,0 +1,165 @@
+\subsection{Optimization Framework}\label{sec:optimization_framework}
+One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators. \citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses. 
+In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide. 
+The complexity of the problem is increased because different oxides require different models, and the optimal preprocessing techniques will depend on both the model and the specific oxide being predicted. 
+Due to the challenges highligted in \ref{subsec:challenges}, namely high dimensionality, multicollinearity, and matrix effects, it is difficult to determine which configuration is optimal.
+Selecting the appropriate preprocessing steps for each base estimator is essential, as incorrect preprocessing can significantly degrade performance and undermine the model's effectiveness
+Furthermore, choosing the right hyperparameters for each base estimator introduces additional complexity, as these decisions also significantly impact model performance and must be carefully tuned for each specific oxide. 
+Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide. 
+For instance, simpler approaches like \gls{enet} and ridge regression may quickly reach their optimal performance with minimal hyperparameter adjustments. However, due to their simplicity, they often fail to capture the complex patterns in the data that more advanced models can, making them less competitive despite their ease of tuning.
+In contrast, more complex models like \gls{cnn} or \gls{gbr} involve both a larger number of hyperparameters and architectural considerations that need fine-tuning to perform well.
+The extent of tuning required is also influenced by the characteristics of the target oxide, such as its data distribution, noise levels, and feature interactions. 
+These factors can affect how sensitive an estimator is to its hyperparameters.
+Finally, hyperparameters cannot be considered in isolation, because depending on the preprocessing steps applied to the data, the optimal hyperparameters may vary.
+Given these complexities, we need a systematic approach to determine the optimal configuration of hyperparameters and preprocessing steps tailored to each estimator and oxide.
+
+To guide this process we have developed a working assumption.
+Specifically, we assume that selecting the top-$n$ best pipelines for each oxide, considering different preprocessors and models for each pipeline, will result in the best pipelines for a given oxide in our stacking ensemble.
+Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{subsec:evaluation_metrics}.
+Additionaly, each permutation will utilize our proposed data partitioning and cross-validation strategy outlined in Section~\ref{subsec:validation_testing_procedures}.
+Utilizing our proposed data partitioning and cross-validation strategy, along with the aformentioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem_definition}.
+This narrows our focus to three key tasks: selecting suitable preprocessors and models, finding the optimal hyperparameters, and devising a guided search strategy to evaluate various permutations and identify the top-$n$ pipelines for each oxide.
+First, we curated a diverse set of models and preprocessing techniques, as detailed in Section~\ref{sec:model-selection}.
+Next, we developed an optimization framework to systematically explore and optimize these pipeline configurations, which will be described in the following section.
+
+\subsubsection{The Framework}
+To systematically explore and optimize pipeline configurations, the search process should be guided by an ojective function.
+Based on the evaluation process outlined in Section~\ref{subsec:validation_testing_procedures}, whereby we argue that solely evaluating on the \gls{rmsep} may lead to misleading and poor results, we define the objective function we wish to optimize as a multi-objective optimization on minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}. 
+
+Given these goals, traditional methods like grid search and random search could be used, but they often fall short due to several inherent limitations. 
+Grid search involves exhaustively evaluating all possible combinations of hyperparameters within specified ranges. 
+While thorough, this method quickly becomes computationally prohibitive as the number of hyperparameters increases. The expansion of the search space, driven by the increasing number and finer granularity of hyperparameters, renders the approach impractical.
+
+Random search, on the other hand, selects hyperparameter values at random within predefined ranges. 
+It is generally more efficient than grid search and can cover a broader area of the hyperparameter space. 
+However, random search can miss optimal regions, especially in high-dimensional spaces where the probability of sampling near-optimal configurations by chance is low. 
+
+These limitations make the traditional methods unsuitable for our problem and highlight the need for a more sophisticated optimization method.
+Both grid search and random search could be enhanced using adaptive techniques, such as Bayesian optimization, to greatly improve on these approaches.
+However, while very feasible, implementing such enhancements and integrating it with our existing tooling would be too time-consuming.
+The ambition was therefore to find tools that would provide similar or better hyperparameter optimization capabilities, while being easy to integrate with our existing framework.
+For this reason we chose to use Optuna as the basis for our optimization framework\cite{optuna_2019}.
+
+Optuna provides well-defined abstraction which allowed us to more quickly construct a framework that helped us efficiently explore and optimize pipeline configurations.
+Optuna provides Bayesian optimization search algorithms, but with additional configurable parameters that allowed us to customize the search process to our specific needs.
+
+Using Optuna as the foundation for our optimization framework, we designed a comprehensive system for \gls{libs} data that handles the entire process, from \gls{ccs} data to partitioning, cross-validation, and hyperparameter optimization.
+Using this framework, it is possible to find the best configurations by optimizing the objective function: minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
+
+The framework we developed can be divided into two main components.
+A function responsible for running and managing the optimization process, as seen in Algorithm~\ref{alg:study_function}(\nameref{alg:study_function}), and a function responsible for measuring the objective, as seen in Algorithm~\ref{alg:combined_objective}(\nameref{alg:combined_objective}).
+
+The purpose of the \nameref{alg:study_function} is to perform and facilitate the optimization process, doing so for each oxide and model combination.
+By managing the optimization process in this way, we obtain the flexibility to evaluate each model separately with different preprocessors and hyperparameters.
+This means that each model is evaluated fairly against each oxide and that the resulting configurations are optimized specifically for the model and oxide in question.
+Our assumption is that this approach will best identify the top-$n$ pipelines for use in our stacking ensemble.
+
+To manage the optimization process, the function receives the number of trials to run, a list of models, and a list of oxides, as seen in line~\ref{step:initialize_run_process}, and initializes the sampler, as seen in line~\ref{step:initialize_sampler}.
+
+The sampler is responsible for managing the search space of the hyperparameters for the optimization process.
+This means that any hyperparameters being evaluated, for any preprocessor or model, will be managed by this sampler, which allows us to optimize for all hyperparameters at the same time.
+Optuna provides several options for samplers that have different characteristics and each have their strengths and weaknesses.
+However, because we require multi-objective optimization, this naturally limits the choice of sampler to those that support this.
+For our framework, we chose to use the \gls{tpe} sampler due to its stated optimization efficiency and its ability to handle all use cases.
+Additionally, the \gls{tpe} sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large\cite{optuna_2019}.
+
+Guiding the optimization process is the \nameref{alg:combined_objective} function, which evaluates the performance of each trial.
+In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}, as mentioned previously.
+
+The role of the \nameref{alg:combined_objective} function is to provide the metric data to an $optimize$ function, seen in Line~\ref{step:optimize_objective}.
+As we step through each oxide and model in Lines~\ref{step:oxide_loop} to~\ref{step:model_loop}, we call the \texttt{optimize} function with the number of trials to run and the \nameref{alg:combined_objective} function.
+The number of trials is an important parameter, as it specifies the number of iterations the optimization framework will execute to refine and optimize a given model.
+In an ideal scenario, this number would be very high to ensure that the optimization process has identified the best possible configuration.
+However, depending on the number of models in consideration, a high number of trials can quickly become computationally prohibitive with our approach.
+The \texttt{optimize} function uses the number of trials and the objective of minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv} to manage the optimization process and mediating the metrics returned by the \nameref{alg:combined_objective} function to the sampler. 
+
+This leads us to the \nameref{alg:combined_objective} function which, as previously mentioned, returns the evaluation metrics for the given trial.
+
+To this function we supply the current model $m$, the target oxide $o$, and the sampler.
+
+In Lines~\ref{step:sample_hyperparameters} to~\ref{step:instantiate_dim_reduction}, we instantiate the model and the preprocessors with the hyperparameters sampled by the sampler.
+The sampling process is being guided by the objective function via the returned metrics from the previous trial.
+In our setup, we always require that a scaler is instantiated to ensure that the data is correctly scaled.
+However, to measure the impact of data transformation and dimensionality reduction, we allow for these to be initialized as an identity function, which does not modify the data.
+Whether to instantiate a specific preprocessor or an identity function is determined by the sampler.
+
+Once the preprocessors are instantiated, we construct a pipeline of these to ensure that the data is processed in the order they are defined, seen in Line~\ref{step:construct_pipeline}.
+The order of preprocessing steps is crucial due to their interdependence: scaling standardizes the feature ranges, ensuring that subsequent transformations are applied uniformly.
+Similarly, dimensionality reduction techniques typically also produce better results if the data has been scaled.
+However, it may not always be advantageous or yield better results if the data has already been transformed.
+As such, we allow for the optimization framework to optionally use these if they are deemed to be beneficial.
+
+In Lines~\ref{step:get_data} to~\ref{step:apply_pipeline}, we fetch the data, apply our data partitioning strategy to generate four cross-validation sets, a training set and a test set, and apply the preprocessing to the datasets.
+The purpose of fetching the data for each trial is to ensure no modifications leak through trials, corrupting the dataset over time.
+This prevents any form of double preprocessing from occuring, which would lead to potential issues.
+
+As mentioned in Section~\ref{subsec:validation_testing_procedures}, we use both cross-validation and a test set to evaluate the model.
+This can be seen in line Line~\ref{step:cross_validate} and Lines~\ref{step:train_model} to~\ref{step:evaluate_model}, where cross-validation, training, and evaluation are performed with respect to the current oxide.
+It is important to note that in practice, the model $m$ is being reinstantiated in each iteration of the cross-validation, and again before the model is trained, so no learned parameters are carried over between them.
+
+Once a trial is complete, the metrics are returned in Line~\ref{step:return_metrics} to the \texttt{optimize} function in the \nameref{alg:study_function}, which then determines the next steps in the optimization process.
+
+In summary, using this framework we are able to systematically explore and optimize preprocessing, model and hyperparameter configurations for each model on a per-oxide basis.
+This allows us to identify the top-$n$ pipelines for each oxide, which we can then use in our stacking ensemble. 
+
+\begin{algorithm}
+\caption{Optimizer}
+\label{alg:study_function}
+\begin{algorithmic}[1]
+\Require Number of Trials $N$, List of Models $M$, List of Target Oxides $O$ \label{step:initialize_run_process}
+\Ensure The optimization process is run for each model and oxide. 
+\State \textbf{Initialize:} $\texttt{sampler} \gets \texttt{Sampler(\texttt{sampler\_params})}$ \label{step:initialize_sampler}
+
+\For{each oxide $o$ in $O$} \label{step:oxide_loop}
+    \For{each model $m$ in $M$} \label{step:model_loop}
+        \State \texttt{optimize}($N$, $\texttt{lambda}()$ 
+            \State \hspace{1.5em} return\texttt{ objective(}
+                \State \hspace{2.5em} $m$, \label{step:model_param_study}
+                \State \hspace{2.5em} $o$, \label{step:oxide_param_study}
+                \State \hspace{2.5em} \texttt{sampler} \label{step:sampler_param_study}
+            \State \texttt{))} \label{step:optimize_combined_objective}
+    \EndFor
+\EndFor
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Objective}
+\label{alg:combined_objective}
+\begin{algorithmic}[1]
+\Require Model $m$, Target Oxide $o$, Sampler \texttt{sampler} \label{step:combined_objective_params}
+\Ensure Returns $rmse_{cv}$ and $std\_dev_{cv}$ for each trial
+
+\State $hp \gets \texttt{sample\_hyperparameters}(\texttt{sampler})$ \label{step:sample_hyperparameters}
+\State $m \gets \texttt{instantiate\_model}(m, hp)$ \label{step:instantiate_model}
+\Statex
+\State $s\_params \gets \texttt{sample\_scaler\_params}(\texttt{sampler})$ \label{step:sample_scaler_params}
+\State $s \gets \texttt{instantiate\_scaler}(s\_params)$ \label{step:instantiate_scaler}
+\State $t\_params \gets \texttt{sample\_transformer\_params}(\texttt{sampler})$ \label{step:sample_transformer_params}
+\State $t \gets \texttt{instantiate\_transformer}(t\_params)$ \label{step:instantiate_transformer}
+\Statex \hspace{3em} \textbf{or} \texttt{Identity}
+\State $dim\_params \gets \texttt{sample\_dim\_reduction\_params}(\texttt{sampler})$ \label{step:sample_dim_reduction_params}
+\State $dim \gets \texttt{instantiate\_dim\_reduction}(dim\_params)$ \label{step:instantiate_dim_reduction}
+\Statex \hspace{3em} \textbf{or} \texttt{Identity}
+\Statex     
+\State $pipeline \gets [s, t, dim]$ \label{step:construct_pipeline}
+\Statex
+\State \textbf{Dataset: }$D \gets \texttt{get\_data}()$ \label{step:get_data} 
+\State $T_{cv}, D_{train}, D_{test} \gets \text{apply data partitioning to } D$ \label{step:data_partitioning}
+\Statex
+\State $T_{cv}, D_{train}, D_{test} \gets \text{apply pipeline to } T_{cv}, D_{train}, D_{test}$ \label{step:apply_pipeline}
+\Statex
+\State $CV_{metrics} \gets \texttt{cross\_validate}(m, T_{cv}, o)$ \label{step:cross_validate}
+\State $rmse_{cv} \gets \texttt{mean}(CV_{metrics}.\texttt{rmse\_values})$ \label{step:mean_rmse_cv}
+\State $std\_dev_{cv} \gets \texttt{std}(CV_{metrics}.\texttt{rmse\_values})$ \label{step:std_dev_cv}
+\Statex
+\State $m' \gets \texttt{train}(m, D_{train}, o)$ \label{step:train_model}
+\State $rmsep, std\_dev_{test} \gets \texttt{evaluate}(m', D_{test}, o)$ \label{step:evaluate_model}
+\Statex
+\State \texttt{store\_metrics}($t$, $m$, $pipeline$, $rmse_{cv}$, 
+\Statex \hspace{8em} $std\_dev_{cv}$, $rmsep$, $std\_dev_{test}$) \label{step:store_metrics}
+\Statex
+\State \Return $rmse_{cv}$, $std\_dev_{cv}$ \label{step:return_metrics}
+\end{algorithmic}
+\end{algorithm}
