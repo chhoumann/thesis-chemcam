@@ -38,7 +38,7 @@ These limitations make the traditional methods unsuitable for our problem and hi
 Both grid search and random search could be enhanced using adaptive techniques, such as Bayesian optimization, to greatly improve on these approaches.
 However, while very feasible, implementing such enhancements and integrating it with our existing tooling would be too time-consuming.
 The ambition was therefore to find tools that would provide similar or better hyperparameter optimization capabilities, while being easy to integrate with our existing framework.
-For this reason we chose to use Optuna as the basis for our optimization framework.
+For this reason we chose to use Optuna as the basis for our optimization framework\cite{optuna_2019}.
 
 Optuna provides well-defined abstraction which allowed us to more quickly construct a framework that helped us efficiently explore and optimize pipeline configurations\cite{optuna_2019}.
 Optuna provides Bayesian optimization search algorithms, but with additional configurable parameters that allowed us to customize the search process to our specific needs.
