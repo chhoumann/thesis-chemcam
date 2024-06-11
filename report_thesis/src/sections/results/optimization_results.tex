@@ -41,7 +41,11 @@ We note that \texttt{PowerTransformer} was used in 5277 trials, with and no tran
 
 \input{sections/results/oxide_comparison_table.tex}
 
-We wish to examine how the top 100 trials performed for each configuration.
+We chose to examine the top 100 trials for each configuration to provide a clearer understanding of the performance variance among the best configurations.
+Given the wide range of configurations and their varying sensitivity to tuning, data distributions, and other factors, examining all trials would result in misleading descriptive statistics.
+By focusing on the top 100 trials, we can more accurately identify which configurations perform well.
+While a quantitative analysis of the top 10\% of trials based on metrics like \gls{rmsecv}, \gls{rmsep}, and other factors was feasible, selecting the top 100 trials for each oxide made it easier to see how many trials were present for each oxide.
+This approach helps us avoid the 'best of the worst' scenario and ensures that we are analyzing a representative set of good configurations.
 We present the results in Figure~\ref{fig:top100_models}, \ref{fig:top100_scalers}, \ref{fig:top100_transformers}, and \ref{fig:top100_pca}.
 These figures and their corresponding subplots illustrate the performance of various configuration elements (models, scalers, transformers, PCA techniques) for each oxide, based on their \gls{rmsecv}.
 Any elements that do not appear in a subplot were not used in the top 100 trials for the given oxide.
