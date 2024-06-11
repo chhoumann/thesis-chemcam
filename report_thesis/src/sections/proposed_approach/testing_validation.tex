@@ -43,7 +43,7 @@ Conversely, if the scarce extreme values are disproportionately assigned to the 
 This means the model might perform well on the training set, including the extreme values, but fail to generalize effectively to new, unseen data, especially if the test set does not contain similar extreme values.
 This could result in an inaccurate assessment of the model's performance, as the test set would not adequately challenge the model's ability to predict across the full range of data variability.
 
-\begin{figure*}[h!]
+\begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{images/oxide_distributions.png}
     \caption{Distributions of various oxide concentrations in the dataset. The histograms show the frequency of concentration values for \ce{SiO2}, \ce{TiO2}, \ce{Al2O3}, \ce{FeO_T}, \ce{MgO}, \ce{CaO}, \ce{Na2O}, and \ce{K2O}.}
@@ -59,7 +59,7 @@ These distributions confirm the presence of extreme values across all oxides, wh
 This necessitates careful dataset partitioning to ensure that the model training process accounts for these challenges, improving the generalizability and robustness of the models.
 
 \subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
-To ensure rigorous evaluation of our models and to address the challenges of data leakage and uneven distribution of extreme values, we have implemented a customized k-fold data partitioning procedure. 
+To ensure rigorous evaluation of our models and to address the challenges of data leakage and uneven distribution of extreme values, we have implemented a customized k-fold data partitioning procedure.
 This approach divides the dataset into $k$ folds, which are used to define cross-validation datasets, as well as a training set and a test set.
 The procedure ensures that all data points from a given target are only present in one of the $k$ folds, effectively preventing the aforementioned data leakage.
 Additionally, it ensures that extreme values are handled by redistributing them evenly across the training folds, preventing any single fold from being disproportionately influenced by these values.
@@ -108,12 +108,12 @@ The fold assignments are then merged into the original dataset, as described in 
 Essentially, this step enables the partitioning steps that follow, by ensuring each data item has an associated fold number.
 Following this, the dataset is divided into a train and test set, as outlined in Line~\ref{line:split_dataset}.
 The test set consists of the data points assigned to fold $k-1$, and the remaining folds forms the training set.
-The training data is further divided into $k-1$ sets for cross-validation. 
+The training data is further divided into $k-1$ sets for cross-validation.
 For each fold $i$ where $i \in \{0, 1, \ldots, k-2\}$, we create a cross-validation training set $\mathbf{T}_\text{train}[i]$ by excluding the $i$-th fold from the set of $k-1$ folds, and use the $i$-th fold as the validation set $\mathbf{T}_\text{val}[i]$.
 These pairs of training and validation sets are then appended to the list of cross-validation sets $\mathbf{T}_\text{cv}$ (Line~\ref{line:create_folds}).
 
 Finally, the fold indicator column is removed from all datasets before returning the final partitions (Line~\ref{line:remove_fold_column}).
-The fold indicator column was added to keep track of which data points belong to which folds, which is crucial for ensuring that data points are correctly partitioned into their respective training and test sets during cross-validation. 
+The fold indicator column was added to keep track of which data points belong to which folds, which is crucial for ensuring that data points are correctly partitioned into their respective training and test sets during cross-validation.
 This cleanup step ensures that the fold information does not interfere with subsequent data processing or model training.
 
 The final output of this procedure consists of:
@@ -148,7 +148,7 @@ The metric used to evaluate the accuracy of the models is the \gls{rmse}:
 \[
 \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\mathbf{v}_i - \hat{\mathbf{v}}_i)^2}
 \]
-where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples. 
+where \( \mathbf{v}_i \) is the vector of actual oxide concentrations for the \( i \)-th sample, \( \hat{\mathbf{v}}_i \) is the corresponding vector of predicted oxide concentrations, and \( n \) is the total number of samples.
 This measure quantifies the average magnitude of the prediction error across all predicted values.
 
 Robustness is evaluated using the sample standard deviation of prediction errors:

@@ -1,4 +1,4 @@
-\subsection{Baseline \& Replica}\label{sec:baseline_replica}
+\section{Baseline \& Replica}\label{sec:baseline_replica}
 For analyzing Martian geological samples, the \gls{chemcam} team currently uses the \gls{moc} model~\cite{cleggRecalibrationMarsScience2017}.
 This model integrates \gls{pls} and \gls{ica} to predict the composition of major oxides.
 
@@ -48,6 +48,13 @@ The results show that the \gls{rmse}s of our replicas exhibit similar tendencies
 However, in some cases, our replicas have a lower \gls{rmse} than the original models, and in others, they have a higher \gls{rmse}.
 These differences are due to a number of factors.
 
+\begin{figure*}
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/rmse_historgram.png}
+	\caption{Grouped histogram of the \gls{rmse}s of the original and our replicas of the \gls{pls1-sm}, \gls{ica}, and \gls{moc} models.}
+	\label{fig:rmse_histograms}
+\end{figure*}
+
 Firstly, the original models were trained with datasets from 1600mm and 3000mm standoff distances~\cite{cleggRecalibrationMarsScience2017}, while we only had access to the 1600mm dataset for our replicas.
 Additionally, we automated the outlier removal for the PLS1-SM phase, unlike the original manual process.
 As mentioned, the original authors manually curated their training and test sets, ensuring a broad elemental range, while we implemented an automatic process for our replicas due to lack of domain expertise.
@@ -72,13 +79,6 @@ Differences might also stem from varied implementation specifics, such as progra
 	\caption{\gls{rmse}s of the original and our replicas of the \gls{pls1-sm}, \gls{ica}, and \gls{moc} models.}
 	\label{tab:replica_results_rmses}
 \end{table*}
-
-\begin{figure*}
-	\centering
-	\includegraphics[width=0.85\textwidth]{images/rmse_historgram.png}
-	\caption{Grouped histogram of the \gls{rmse}s of the original and our replicas of the \gls{pls1-sm}, \gls{ica}, and \gls{moc} models.}
-	\label{fig:rmse_histograms}
-\end{figure*}
 
 Through a series of comparative experiments, we showed that the model selection was the primary cause of these limitations, and we showed how both \gls{ann} and \gls{gbr} methods could be used to improve the model's predictive accuracy and robustness.
 This is further underscored by work from the SuperCam team.
