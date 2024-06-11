@@ -22,10 +22,26 @@ After the filtering process, we are left with a total of 15245 trials to analyze
 Given that we stored the configurations as well as each hyperparameter value for the trials, we had \~100 variables to consider during our analysis.
 Of these, the primary variables of interest are the metrics, as well as overall configuration variables, namely \texttt{Model Type}, \texttt{Scaler Type}, \texttt{PCA Type}, \texttt{Transformer Type}.
 
-% - Show figures/tables showing how the various configuration elements fared
-% - Show table with Optuna model, preprocessor, etc., counts
-% 	- The larger, more granular versions may be excessive. We could just show the total counts across oxides and preprocessing methods.
-% - Present best model configurations
+As we described in Section~\ref{sec:optimization_framework}, our optimization system searches for the best configurations by through multi-objective optimization.
+The optimization process is facilitated by adjusting the configuration and hyperparameters of the machine learning model and preprocessing pipeline, therefore minimizing the objective.
+Because the sampler will do initial exploration, and then attempt to find the optimal configuration through exploitation, we'll see that the values of variables that frequently appear in the results are the ones that are most likely to be optimal.
+Looking at the results in tables \ref{tab:scalers_comparison}, \ref{tab:pca_comparison}, and \ref{tab:transformers_comparison}, we can see these values for the various preprocessors.
+The optimization results show that the configurations with the highest total values across oxides are indicative of being the most frequently exploited, hence most likely to optimize performance. 
+\texttt{Norm3Scaler} was used in 5090 trials, and therefore appears to be the most effective scaler.
+This was somewhat expected, given the method was created for this particular type of \gls{libs} dataset, as discussed in Section~\ref{sec:norm3}.
+For dimensionality reduction, we see that \texttt{None}, indicating no \gls{pca}, was used in 9419 trials, which is \~59\% of all trials.
+This suggests that either no dimensionality reduction is optimal, or a better method should be identified.
+Neither \gls{pca} nor \gls{kernel-pca} are very effective for this dataset.
+\texttt{QuantileTransformer} was used in 5710 trials, and therefore seems to be the most optimal transformer.
+We note that \texttt{PowerTransformer} was used in 5277 trials, with and no transformer in 4956. As opposed to the other preprocessing method types, there does not seem to be a clear winner for the transformers.
+
+\input{sections/results/oxide_comparison_table.tex}
+
+
+
+% - [ ] Show figures/tables showing how the various configuration elements fared
+% - [x] Show table with Optuna model, preprocessor, etc., counts
+% - [ ] Present best model configurations
 % 	- Already have these in the appendix. May want to just include them in the main report.
 % 	- Need to clarify in the text that they represent the single best performing configuration for each oxide as measured by RMSECV.
 
