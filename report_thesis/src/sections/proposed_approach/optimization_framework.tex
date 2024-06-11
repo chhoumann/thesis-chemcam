@@ -89,7 +89,7 @@ Similarly, dimensionality reduction techniques typically also produce better res
 However, it may not always be advantageous or yield better results if the data has already been transformed.
 As such, we allow for the optimization framework to optionally use these if they are deemed to be beneficial.
 
-In Line~\ref{step:get_data} to~\ref{step:apply_pipeline} we fetch the data, apply our data partitioning strategy to generate four cross-validation sets, a training set and a test set, and apply the preprocessing to the datasets.
+In Lines~\ref{step:get_data} to~\ref{step:apply_pipeline}, we fetch the data, apply our data partitioning strategy to generate four cross-validation sets, a training set and a test set, and apply the preprocessing to the datasets.
 The purpose of fetching the data for each trial is to ensure no modifications leak through trials, corrupting the dataset over time.
 This prevents any form of double preprocessing from occuring, leading to potential issues.
 
