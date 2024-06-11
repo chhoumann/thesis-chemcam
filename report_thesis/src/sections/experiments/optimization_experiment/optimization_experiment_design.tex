@@ -1,0 +1,19 @@
+\subsection{Optimization Experiment Design}\label{subsec:optimization_experiment_design}
+Using the remaining ten models, we conducted an extended experiment to further refine their performance for each oxide. 
+The goal was to identify which preprocessing techniques and hyperparameters would yield the best performance for each model, by doing a thorough search for each configuration.
+To achieve this, we evaluated multiple permutations of each model with various preprocessors and hyperparameter configurations. 
+Each configuration included a mandatory scaler, while data transformation and dimensionality reduction techniques were optional.
+The optimization process was conducted using our optimization framework, outlined in Section~\ref{subsec:optimization_framework}.
+
+To obtain a fair assesment of each configuration, we needed to strike a balance between doing enough iterations for the optimization to converge and what was feasible given the time constraints.
+Therefore, we decided to do 200 iterations per model for each oxide, totalling 16000 iterations given ten models and eight oxides. 
+This we deemed to be a reasonable number of iterations to get a good indication of the performance of each configuration.
+As mentioned in Section~\ref{subsec:optimization_framework}, we used the \gls{tpe} algorithm for the optimization process.
+This sampler has multiple parameters, but we used the default values for all, except the number of startup trials and the amount of candidate hyperparameters that the sampler considers as potential choices for the next iteration.
+The number of startup trials controls the number of random samples that are drawn before the \gls{tpe} sampler engages.
+In this experiment we set that number to 25\%, meaning the first quarter of the experiments would be reserved for exploration.
+We believed that this would allow the sampler enough time to explore the search space, while still providing enough iterations for refinement.
+For the second parameters we chose to consider 20 candidates for each iteration.
+This number is somewhat counterintuitive, given the large search space, as a higher number would allow the sampler to evaluate more configurations per iteration.
+However, a larger number also increases the time it would take to evaluate each iteration.
+Understanding the trade-off between finding the best possible configuration and finishing the optimization experiment in a reasonable time frame, we decided to use 20 candidates per iteration.
