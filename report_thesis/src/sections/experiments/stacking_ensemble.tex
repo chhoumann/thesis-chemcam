@@ -41,7 +41,7 @@ The cross-validation process involved splitting the data into training and testi
 The final estimator was then trained on these meta-features.
 Performance metrics were computed using various evaluation functions to assess the ensemble's effectiveness.
 
-\subsection{Performance of Meta-Learners}
+\subsubsection{Performance of Meta-Learners}
 
 Our investigation revealed that different meta-learners exhibited varying performance levels across different oxides.
 This was particularly evident from the 1:1 prediction plots, which highlighted the critical importance of selecting an appropriate meta-learner.
@@ -51,11 +51,11 @@ This consistency suggests either a systematic issue that we have yet to identify
 Specifically, we identified potential issues with small value predictions.
 For example, most values for \ce{TiO2} fell between 0 and 2.5, as shown in the distribution plot in the Testing-Validation section.
 The regularization term likely dominated the fitting process, leading to underfitting and nearly constant predictions.
-This hypothesis was confirmed by adjusting the regularization parameters in the Elastic Net Regression.
+This hypothesis was confirmed by adjusting the regularization parameters in the \gls{enet} Regression.
 Lowering these parameters produced better outcomes, indicating that regularization adversely affected the predicted values.
 
 
-\subsection{Results}
+\subsubsection{Results}
 
 For each major oxide, we ran the stacking ensemble and evaluated its performance.
 The results, including \gls{rmsep} and standard deviations, were logged and visualized using actual versus predicted plots.
@@ -64,7 +64,7 @@ The stacking approach demonstrated significant improvements in prediction accura
 % Show results for each meta-learner
 % Show 1:1 plots for each meta-learner
 
-\subsection{Conclusion}
+\subsubsection{Conclusion}
 
 Our approach to stacking, leveraging category-based model selection and pipeline optimization, proved effective in enhancing prediction accuracy for different oxides.
 Future work will focus on further exploring the impact of different meta-learners and refining the grid search for hyperparameter tuning.
