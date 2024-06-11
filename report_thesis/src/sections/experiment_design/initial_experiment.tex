@@ -4,7 +4,7 @@ These experiments aimed to provide a preliminary assessment of the models' perfo
 All models were trained on the same preprocessed data using the Norm 3 preprocessing method described in Section~\ref{sec:norm3}.
 This ensured that the models' performance could be evaluated under consistent and comparable conditions.
 
-All models were trained using our data partitioning and cross-validation strategy, as described in Section~\ref{subsec:validation_testing_procedures}. 
+Furthermore, all experiments used our data partitioning and were evaluated using our testing and validation strategy, as described in Section~\ref{subsec:validation_testing_procedures}.
 To ensure as fair of a comparison between models as possible, all models were trained using as many default hyperparameters as possible, and those hyperparameters that did not have default options were selected based on values found in the literature.
 However, due to the nature of the neural network models' architecture, some extra time was spent on tuning the models to ensure a fair comparison.
 This included using batch normalization for the \gls{cnn} model, as early assesments showed that this was necessary to produce reasonable results.
