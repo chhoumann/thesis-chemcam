@@ -61,7 +61,7 @@ This means that any hyperparameters being evaluated, for any preprocessor or mod
 Optuna provides several options for samplers that have different characteristics and each have their strengths and weaknesses.
 However, because we require multi-objective optimization, this naturally limits the choice of sampler to those that support this.
 For our framework, we chose to use the \gls{tpe} sampler due to its stated optimization efficiency and its ability to handle all use cases.
-Additionally, the TPE sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large\cite{optuna_2019}.
+Additionally, the \gls{tpe} sampler allows us to control how many of the trials to be reserved for exploration, which is beneficial when the search space is large\cite{optuna_2019}.
 
 Guiding the optimization process is the \nameref{alg:combined_objective} function, which evaluates the performance of each trial.
 In our case we are seeking to minimize the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}, as mentioned previously.
