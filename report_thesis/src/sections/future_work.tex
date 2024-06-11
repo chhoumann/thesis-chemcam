@@ -1,11 +1,13 @@
 \section{Future Work}\label{sec:future_work}
-The findings of this study open several avenues for future research.
-Firstly, for our data partitioning algorithm, described in Section~\ref{subsubsec:dataset_partitioning}, we noted that finding the optimal percentile value $p$ that minimizes extreme values in the test set, while maintaining its general representativeness, is important.
-Future work should consider methods of quantitatively assesing and finding this value.
-Such methods could include supplementary extreme value testing to the data partitioning algorithm, where after the primary evaluation, additional testing is conducted using a small, separate subset of extreme values to assess the model's performance on these critical cases.
-For example, this could involve slightly reducing the percentile value $p$ and using the extreme values that fall within this reduced range to evaluate the model.
+The findings of this study present several opportunities for future research.
+Firstly, regarding our data partitioning algorithm detailed in Section~\ref{subsubsec:dataset_partitioning}, we observed the significance of identifying the optimal percentile value $p$. 
+This value is crucial for minimizing extreme values in the test set while preserving its overall representativeness.
+Future work should explore quantitative methods for determining this optimal value.
+Such methods could involve incorporating supplementary extreme value testing into the data partitioning algorithm. 
+After the primary evaluation, additional testing could be conducted using a small, separate subset of extreme values to assess the model's performance in these critical scenarios.
+For example, this might involve slightly reducing the percentile value $p$ and using the extreme values that fall within this reduced range to evaluate the model's effectiveness.
 
-Another point of interest is limited data availability.
+Another point of interest is the limited data availability.
 The small dataset size naturally limits the amount of how many extreme values are present.
 These extreme values are an essential part of improving the model's generalizability, as they are the most challenging cases to predict.
 Future work should investigate methods of augmenting the dataset with synthetic extreme value data to provide the model with more exposure to these cases during training.
