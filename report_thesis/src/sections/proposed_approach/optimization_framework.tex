@@ -84,7 +84,7 @@ However, to measure the impact of data transformation and dimensionality reducti
 Whether to instantiate a specific preprocessor or an identity function is determined by the sampler.
 
 Once the preprocessors are instantiated, we construct a pipeline of these to ensure that the data is processed in the order they are defined, seen in Line~\ref{step:construct_pipeline}.
-The order is important, as the preprocessing steps are to a degree interdependent: scaling ensures that all features are on a similar range, which is ensures that transformations are applied uniformly.
+The order of preprocessing steps is crucial due to their interdependence: scaling standardizes the feature ranges, ensuring that subsequent transformations are applied uniformly.
 Similarly, dimensionality reduction techniques typically also produce better results if the data has been scaled.
 However, it may not always be advantageous or yield better results if the data has already been transformed.
 As such, we allow for the optimization framework to optionally use these if they are deemed to be beneficial.
