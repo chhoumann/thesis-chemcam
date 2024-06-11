@@ -1,0 +1,21 @@
+\begin{table*}[htbp]
+\centering
+\begin{tabular}{llllllll}
+\toprule
+\ce{CaO} & Model Type & Transformer Type & PCA Type & Scaler Type & \gls{rmsecv} & Std. dev. CV & \gls{rmsep} \\
+\midrule
+ & \texttt{svr} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{min\_max\_scaler} & 1.193 & 1.192 & 1.600 \\
+ & \texttt{pls} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{max\_abs\_scaler} & 1.270 & 1.263 & 1.768 \\
+ & \texttt{gbr} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 1.281 & 1.280 & 1.793 \\
+ & \texttt{extra\_trees} & \texttt{none} & \texttt{none} & \texttt{norm3\_scaler} & 1.308 & 1.309 & 1.829 \\
+ & \texttt{xgboost} & \texttt{power\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 1.363 & 1.361 & 1.913 \\
+ & \texttt{elasticnet} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 1.384 & 1.377 & 1.634 \\
+ & \texttt{ridge} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 1.406 & 1.400 & 1.623 \\
+ & \texttt{random\_forest} & \texttt{none} & \texttt{none} & \texttt{norm3\_scaler} & 1.439 & 1.435 & 1.737 \\
+ & \texttt{ngboost} & \texttt{none} & \texttt{none} & \texttt{robust\_scaler} & 1.488 & 1.481 & 1.920 \\
+ & \texttt{lasso} & \texttt{power\_transformer} & \texttt{none} & \texttt{min\_max\_scaler} & 1.529 & 1.514 & 1.684 \\
+\bottomrule
+\end{tabular}
+\caption{Overview of model types for \ce{CaO} oxide}
+\label{tab:CaO_overview}
+\end{table*}

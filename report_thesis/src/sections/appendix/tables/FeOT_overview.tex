@@ -1,0 +1,21 @@
+\begin{table*}[htbp]
+\centering
+\begin{tabular}{llllllll}
+\toprule
+\ce{FeO_T} & Model Type & Transformer Type & PCA Type & Scaler Type & \gls{rmsecv} & Std. dev. CV & \gls{rmsep} \\
+\midrule
+ & \texttt{svr} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 2.242 & 2.243 & 1.803 \\
+ & \texttt{pls} & \texttt{power\_transformer} & \texttt{none} & \texttt{standard\_scaler} & 2.701 & 2.669 & 2.063 \\
+ & \texttt{ridge} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 2.707 & 2.687 & 1.878 \\
+ & \texttt{gbr} & \texttt{power\_transformer} & \texttt{none} & \texttt{max\_abs\_scaler} & 2.749 & 2.750 & 1.793 \\
+ & \texttt{xgboost} & \texttt{none} & \texttt{none} & \texttt{max\_abs\_scaler} & 2.749 & 2.743 & 1.622 \\
+ & \texttt{elasticnet} & \texttt{power\_transformer} & \texttt{none} & \texttt{max\_abs\_scaler} & 2.862 & 2.831 & 1.773 \\
+ & \texttt{lasso} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 2.875 & 2.862 & 1.842 \\
+ & \texttt{extra\_trees} & \texttt{none} & \texttt{none} & \texttt{max\_abs\_scaler} & 2.900 & 2.903 & 1.870 \\
+ & \texttt{ngboost} & \texttt{none} & \texttt{none} & \texttt{robust\_scaler} & 2.980 & 2.953 & 1.773 \\
+ & \texttt{random\_forest} & \texttt{quantile\_transformer} & \texttt{none} & \texttt{norm3\_scaler} & 3.079 & 3.044 & 2.018 \\
+\bottomrule
+\end{tabular}
+\caption{Overview of model types for \ce{FeO_T} oxide}
+\label{tab:FeOT_overview}
+\end{table*}
