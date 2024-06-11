@@ -1,0 +1,41 @@
+\subsection{Optimization Experiment Design}\label{subsec:optimization_experiment_design}
+Using the remaining ten models, we conducted an extended experiment to further refine their performance for each oxide. 
+The goal was to identify which preprocessing techniques and hyperparameters would yield the best performance for each model by doing a thorough search for each configuration. 
+To achieve this, we evaluated multiple permutations of each model with various preprocessors and hyperparameter configurations. 
+Each configuration included a mandatory scaler, while data transformation and dimensionality reduction techniques were optional. 
+The optimization process was conducted using our optimization framework, outlined in Section~\ref{sec:optimization_framework}
+
+To ensure a fair assessment of each configuration, we needed to balance conducting enough iterations for the optimization to converge with the practical limitations imposed by our time constraints.
+Therefore, we decided to perform 200 iterations per model for each oxide, resulting in a total of 16,000 iterations across ten models and eight oxides.
+We deemed this to be a reasonable number of iterations to obtain a reliable indication of the performance of each configuration.
+As mentioned in Section~\ref{sec:optimization_framework}, we used the \gls{tpe} algorithm for the optimization process.
+For this sampler, we set the number of startup trials to 25\%.
+The number of startup trials determines the number of random samples drawn before the \gls{tpe} sampler engages.
+By choosing 25\%, we would reserved the first quarter of the iterations for exploration.
+We believed this approach would allow sufficient time for the sampler to explore the search space while still providing enough iterations for refinement.
+
+For the experiment, we defined a range or set of discrete values for each hyperparameter of the models and preprocessors.
+To determine these ranges, we used a combination of values reported in the literature, our own analysis, and the default values for each hyperparameter as a starting point.
+Our methodology involved expanding the hyperparameters with value ranges to include reasonable lower and upper extremes.
+For hyperparameters with a discrete set of possible values, we included all options. 
+As an example, for the \gls{pls} model, we used the elbow method to approximate the optimal number of components. 
+Based on this, we defined the lower extreme as 1 and the upper extreme as 30, as we believed that the optimal number of components would be somewhere within this range. 
+A similar approach was used for the preprocessor \gls{kernel-pca}, where we defined the number of components to be between 1 and 100.
+
+A different example is \gls{gbr}, for which we based the hyperparameters on their default values.
+The default value for the number of estimators is 100, so we defined this as the lower bound and set 1000 as the upper bound.
+Given the complexity of the patterns in \gls{libs} data, we believed that the ideal number of weak learners would likely be above 100.
+Therefore, we considered 100 to be a reasonable lower bound. 
+Determining the upper bound was more challenging, but we considered 1000 to be a reasonable upper bound, as it would allow the model to sufficiently capture the patterns in the data.
+Given that we allow for a relatively large number of estimators, we wanted to balance this with a relatively low bound for the learning rate. 
+We did this to ensure that the search space included a learning rate capable of scaling with the number of estimators, thereby reducing the likelihood of overfitting.
+The default value for the learning rate is 0.1, so we defined the lower bound as $10^{-3}$ and the upper bound as 1. 
+The max depth of each weak learner was set between 3 and 10, allowing for varying levels of complexity.
+The subsample parameter was set between 0.5 and 1.0, to accommodate random sampling of the data when fitting each weak learner. 
+Finally, the max features parameter was set to either \textit{sqrt} or \textit{log2}. Since this parameter has a discrete set of possible values, we included all options.
+
+Using this approach of considering reasonable lower and upper bounds for each hyperparameter or using all options for discrete hyperparameters, we defined the ranges for each model and preprocessor.
+
+The selected hyperparameter ranges for each model and preprocessor can be found in Table~\ref{tab:optuna_model_configurations} and Table~\ref{tab:optuna_preprocessing_configurations}, respectively.
+
+

@@ -1,0 +1,16 @@
+\section{Experiments \& Results}\label{sec:methodology}
+This section outlines the experimental design used to identify the top-$n$ models to be used for our stacking ensemble.
+We begin with a description of the prerequisite data preparation necessary for all experiments, followed by an overview of the hardware and software used.
+Next, we outline the design of our initial experiment, which provides a preliminary assessment of the models selected in Section~\ref{sec:model_selection}.
+The results of this initial experiment are then presented and discussed.
+We then describe the design of our main experiment.
+This experiment leverages our hyperparameter tuning framework to identify the top-$n$ models. 
+The results are then presented and discussed the results of this experiment.
+Finally, we use the identified models to construct a stacking ensemble, which is then evaluated and compared to the individual models.
+
+\input{sections/experiments/data_preparation}
+\input{sections/experiments/experimental_setup}
+\input{sections/experiments/inital_experiments/initial_experiment}
+\input{sections/experiments/inital_experiments/initial_results}
+\input{sections/experiments/optimization_experiment/optuna_ranges.tex}
+\input{sections/experiments/optimization_experiment/optimization_experiment_design}
