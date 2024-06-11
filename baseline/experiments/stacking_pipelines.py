@@ -1,7 +1,14 @@
+from ngboost import NGBRegressor
+from ngboost.distns import Normal
+from ngboost.scores import LogScore
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import KernelPCA
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
-from sklearn.linear_model import Ridge
+from sklearn.ensemble import (
+    ExtraTreesRegressor,
+    GradientBoostingRegressor,
+    RandomForestRegressor,
+)
+from sklearn.linear_model import ElasticNet, Lasso, Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (
     MaxAbsScaler,
@@ -12,6 +19,7 @@ from sklearn.preprocessing import (
     StandardScaler,
 )
 from sklearn.svm import SVR
+from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 
 from lib.norms import Norm3Scaler
@@ -86,7 +94,7 @@ def tio2():
             ("scaler", Norm3Scaler()),
             (
                 "transformer",
-                QuantileTransformer(subsample=60746.0, n_quantiles=941, random_state=42, output_distribution="uniform"),
+                QuantileTransformer(subsample=60746, n_quantiles=941, random_state=42, output_distribution="uniform"),
             ),
         ]
     )
@@ -143,7 +151,7 @@ def tio2():
     )
 
     # Combine the pipelines into a final "tio2" pipeline
-    return [("svr", tio2_svr_pipeline), ("gbr", tio2_gbr_pipeline), ("rf", tio2_rf_pipeline)]
+    return [("svr", tio2_svr_pipeline), ("rf", tio2_rf_pipeline)]
 
 
 def al2o3():
@@ -158,8 +166,8 @@ def al2o3():
                     reg_lambda=0.0034397452764153,
                     colsample_bytree=0.5558889734016561,
                     reg_alpha=0.5011206377632488,
-                    n_estimators=761.0,
-                    max_depth=5.0,
+                    n_estimators=761,
+                    max_depth=5,
                     subsample=0.7374993842567144,
                     gamma=0.157189926185756,
                 ),
@@ -554,4 +562,177 @@ def make_oxide_pipelines():
         "CaO": cao(),
         "Na2O": na2o(),
         "K2O": k2o(),
+    }
+
+
+def tio2_instantiate_all_models():
+    tio2_svr_pipeline = Pipeline(
+        [
+            ("scaler", Norm3Scaler()),
+            ("transformer", PowerTransformer(method="yeo-johnson", standardize=True)),
+            (
+                "svr",
+                SVR(
+                    C=0.0092802848242038,
+                    kernel="poly",
+                    degree=3,
+                    gamma="scale",
+                    coef0=8.63601100525176,
+                    epsilon=0.0028037787477313,
+                    max_iter=20000000,
+                ),
+            ),
+        ]
+    )
+
+    tio2_gbr_pipeline = Pipeline(
+        [
+            ("scaler", Norm3Scaler()),
+            ("transformer", PowerTransformer(method="yeo-johnson", standardize=True)),
+            (
+                "gbr",
+                GradientBoostingRegressor(
+                    learning_rate=0.0285922209309325,
+                    subsample=0.5585632955924456,
+                    max_depth=5,
+                    max_features="sqrt",
+                    n_estimators=898,
+                ),
+            ),
+        ]
+    )
+
+    tio2_xgboost_pipeline = Pipeline(
+        [
+            ("scaler", RobustScaler(with_centering=False, quantile_range=(10.0, 90.0))),
+            ("transformer", PowerTransformer(method="yeo-johnson", standardize=True)),
+            (
+                "xgboost",
+                XGBRegressor(
+                    subsample=0.7798713184915369,
+                    n_estimators=869,
+                    gamma=0.0031737462767576,
+                    reg_lambda=73.91710980996292,
+                    max_depth=4,
+                    reg_alpha=1.5161132976594662,
+                    colsample_bytree=0.7459805041517973,
+                    learning_rate=0.2118592173320599,
+                ),
+            ),
+        ]
+    )
+
+    tio2_rf_pipeline = Pipeline(
+        [
+            ("scaler", Norm3Scaler()),
+            (
+                "transformer",
+                QuantileTransformer(
+                    subsample=60746,
+                    n_quantiles=941,
+                    random_state=42,
+                    output_distribution="uniform",
+                ),
+            ),
+            (
+                "rf",
+                RandomForestRegressor(
+                    min_samples_split=2,
+                    n_estimators=136,
+                    max_depth=15,
+                    min_samples_leaf=4,
+                    max_features="sqrt",
+                ),
+            ),
+        ]
+    )
+
+    tio2_elasticnet_pipeline = Pipeline(
+        [
+            ("scaler", RobustScaler(with_centering=False, quantile_range=(30.0, 70.0))),
+            (
+                "elasticnet",
+                ElasticNet(
+                    alpha=0.0055549914560849,
+                    l1_ratio=0.956977743865204,
+                ),
+            ),
+        ]
+    )
+
+    tio2_extra_trees_pipeline = Pipeline(
+        [
+            ("scaler", StandardScaler(with_mean=False, with_std=True)),
+            ("transformer", PowerTransformer(method="yeo-johnson", standardize=True)),
+            (
+                "extra_trees",
+                ExtraTreesRegressor(
+                    max_depth=10,
+                    max_features="sqrt",
+                    n_estimators=253,
+                    min_samples_leaf=8,
+                    min_samples_split=16,
+                ),
+            ),
+        ]
+    )
+
+    tio2_ridge_pipeline = Pipeline(
+        [
+            ("scaler", MinMaxScaler(feature_range=(0, 1))),
+            ("ridge", Ridge(alpha=15.42781290775932)),
+        ]
+    )
+
+    tio2_lasso_pipeline = Pipeline(
+        [
+            ("scaler", StandardScaler(with_mean=True, with_std=True)),
+            ("transformer", PowerTransformer(method="yeo-johnson", standardize=False)),
+            ("lasso", Lasso(alpha=0.0042933899289021)),
+        ]
+    )
+
+    tio2_ngboost_pipeline = Pipeline(
+        [
+            ("scaler", RobustScaler(with_centering=False, quantile_range=(10.0, 90.0))),
+            (
+                "ngboost",
+                NGBRegressor(
+                    Base=DecisionTreeRegressor(criterion="friedman_mse", max_depth=5),
+                    early_stopping_rounds=35,
+                    tol=4.632404980337404e-05,
+                    validation_fraction=0.3334598250889427,
+                    Score=LogScore,
+                    minibatch_frac=0.5167535109935842,
+                    col_sample=0.925771065801381,
+                    Dist=Normal,
+                    n_estimators=440,
+                    random_state=42,
+                    learning_rate=0.0160575135646587,
+                    natural_gradient=True,
+                ),
+            ),
+        ]
+    )
+
+    tio2_pls_pipeline = Pipeline(
+        [
+            ("scaler", RobustScaler(with_centering=False, quantile_range=(35.0, 65.0))),
+            ("transformer", PowerTransformer(method="yeo-johnson", standardize=True)),
+            ("pca", KernelPCA(n_components=84, degree=2, gamma=0.0209817826971638, kernel="cosine")),
+            ("pls", PLSRegression(n_components=18)),
+        ]
+    )
+
+    return {
+        "svr": tio2_svr_pipeline,
+        "gbr": tio2_gbr_pipeline,
+        "xgboost": tio2_xgboost_pipeline,
+        "rf": tio2_rf_pipeline,
+        "elasticnet": tio2_elasticnet_pipeline,
+        "extra_trees": tio2_extra_trees_pipeline,
+        "ridge": tio2_ridge_pipeline,
+        "lasso": tio2_lasso_pipeline,
+        "ngboost": tio2_ngboost_pipeline,
+        "pls": tio2_pls_pipeline,
     }
