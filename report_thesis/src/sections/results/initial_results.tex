@@ -1,0 +1,88 @@
+\subsection{Initial Results}
+Table~\ref{tab:init_results} presents the results of the initial experiments, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, and standard deviation of cross-validation prediction errors for each model across all oxides.
+The means of each metric are also provided to give an overall indication of the models' performance.
+Furthermore, we present an overview of these mean values in Figure~\ref{fig:init_results_rmses} to facilitate a visual comparison of the models' general performance.
+
+The results indicate that the gradient boosting models, \gls{xgboost}, \gls{gbr}, and \gls{ngboost}, consistently perform well across all oxides, with \gls{xgboost} generally outperforming the other two gradient boosting models.
+Interestingly, \gls{gbr} has the lowest \gls{rmsep}, while \gls{xgboost} achieves the lowest \gls{rmsecv}, suggesting that the regularization in \gls{xgboost} may improve the model's generalizability.
+These models exhibit both low mean \gls{rmsep} and \gls{rmsecv} values, indicating high accuracy, as well as low standard deviation values, underscoring their robustness.
+\gls{svr} is also among the top-performing models, with mean \gls{rmsep} and \gls{rmsecv} values close to those of \gls{xgboost} and low standard deviation values.
+
+While usually outperformed by gradient boosting models and \gls{svr}, the other ensemble models, \gls{rf} and \gls{etr}, also exhibit good performance.
+The \gls{pls}, ridge, \gls{lasso}, and \gls{enet} models typically seem to perform worse than the other models, with higher mean \gls{rmsep} and \gls{rmsecv} values and higher standard deviation values.
+We observe that \gls{enet} performs between ridge and \gls{lasso} in terms of both error and standard deviation, which aligns with expectations since \gls{enet} combines the regularization techniques of both models.
+
+The \gls{cnn} and \gls{ann} models perform the worst across all oxides, exhibiting the highest mean \gls{rmsep} and \gls{rmsecv} values, as well as the highest standard deviation values.
+This poor performance is further highlighted in Table~\ref{tab:relative_performance}, which shows the relative performance of each model compared to the best-performing model, \gls{xgboost}.
+The table also includes the difference in performance relative to the next best model, with \gls{xgboost} serving as the baseline for comparison, assigned a relative performance of 100\%.
+From this table, it is evident that the \gls{cnn} and \gls{ann} models experience notable drops in performance compared to the top-performing models.
+While deep learning models such as these have the theoretical potential to perform well with \gls{libs} data, given their ability to learn complex patterns and relationships, the relatively small size of our dataset may limit their efficacy.
+Furthermore, achieving optimal performance with these models necessitates extensive tuning of both their architectures and hyperparameters, which involves exploring a vast space of potential configurations and design choices.
+Although methods for systematic hyperparameter optimization, as detailed in Section~\ref{sec:optimization_framework}, could be employed, the associated computational cost would be prohibitively high.
+Additionally, there are numerous architectural design decisions and advanced techniques that could potentially enhance model performance, but their inclusion would expand the scope of this study beyond feasible limits.
+For these reasons, we decided to exclude the \gls{cnn} and \gls{ann} models from further experimentation.
+
+Tables~\ref{tab:best_results} and \ref{tab:best_model_occurrences} list the best-performing model for each oxide and the frequency with which each model achieves top performance according to various metrics, respectively.
+These tables are intended to provide an overview of model performance rather than to determine an overall 'winner by majority'.
+Their purpose is to illustrate the general trends and behavior of different models across various metrics and oxides.
+Although \gls{xgboost} and \gls{svr} appear the most frequently in Table~\ref{tab:best_model_occurrences}, this does not imply that they are the best models for every oxide.
+For example, if one were to only consider the mean of the performance metrics, \gls{pls} would be considered among the worst performing models, as shown in Figure~\ref{fig:init_results_rmses}.
+However, inspecting Table~\ref{tab:best_results} reveals that \gls{pls} exhibits the lowest \gls{rmsecv} and standard deviation of prediction errors for both \ce{MgO} and \ce{Na2O}.
+This indicates that \gls{pls} is the most accurate and robust model for these oxides, underscoring the importance of evaluating model performance on a per-oxide basis, as discussed in Section~\ref{sec:proposed_approach}.
+Moreover, for some oxides, multiple models perform similarly well, such as \gls{xgboost}, \gls{gbr}, and ridge for \ce{CaO}.
+This observation suggests the potential benefit of leveraging the strengths of multiple models, provided they do not make similar types of errors, which warrants further investigation.
+
+To summarize, the initial results indicate that gradient boosting models, particularly \gls{xgboost}, demonstrated the most consistent and accurate performance across all oxides.
+\gls{svr} also performed well, with similar accuracy and robustness to the gradient boosting models.
+In contrast, deep learning models such as \gls{cnn} and \gls{ann} underperformed, likely due to the small dataset size and insufficient tuning of their architectures and hyperparameters.
+Inspecting the model performances per oxide revealed that the best model varied depending on the oxide, and several models performed well for each oxide.
+This emphasizes the need for further evaluation of model performances on a per-oxide basis to identify suitable configurations for our stacking ensemble approach, which aims to leverage the strengths of multiple models.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/init_results_means.png}
+    \caption{Mean \gls{rmsep}, \gls{rmsecv}, standard deviation of prediction errors, and standard deviation of cross-validation prediction errors for each model across all oxides.}
+    \label{fig:init_results_rmses}
+\end{figure*}
+
+\begin{table}[ht]
+\begin{tabular}{lrr}
+\toprule
+Model & Relative Performance (\%) & Diff. vs Prev. \\
+\midrule
+XGB & 100.00 & - \\
+SVR & 100.85 & 0.85 \\
+GBR & 103.07 & 2.22 \\
+NGB & 103.94 & 0.87 \\
+RandomForest & 104.45 & 0.51 \\
+ExtraTrees & 104.84 & 0.39 \\
+Ridge & 105.04 & 0.20 \\
+PLS & 111.66 & 6.61 \\
+ElasticNet & 114.12 & 2.46 \\
+LASSO & 114.30 & 0.19 \\
+ANN & 127.82 & 13.52 \\
+CNN & 143.18 & 15.36 \\
+\bottomrule
+\end{tabular}
+\caption{Relative performance of each model compared to the best performing model, measured by normalized RMSECV and multiplied by 100 for percentage. A higher percentage indicates worse performance. The 'Diff. vs Prev.' column shows the difference in performance compared to the next best model, measured in percentage points.}
+\label{tab:relative_performance}
+\end{table}
+
+\input{sections/results/init_results_table.tex}
+
+\begin{table*}[h]
+\centering
+\begin{minipage}{.7\textwidth}
+  \centering
+  \input{sections/results/best_results_table.tex}
+  \caption{Lowest metric and corresponding model for each oxide.}
+  \label{tab:best_results}
+\end{minipage}%
+\hspace{0.03\textwidth}
+\begin{minipage}{.25\textwidth}
+  \centering
+  \input{sections/results/best_model_occurrences_table.tex}
+  \caption{Occurrences of the best model for each oxide.}
+  \label{tab:best_model_occurrences}
+\end{minipage}
+\end{table*}
