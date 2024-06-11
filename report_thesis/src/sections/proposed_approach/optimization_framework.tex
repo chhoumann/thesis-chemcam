@@ -6,7 +6,7 @@ Due to the challenges highligted in \ref{subsec:challenges}, namely high dimensi
 Selecting the appropriate preprocessing steps for each base estimator is essential, as incorrect preprocessing can significantly degrade performance and undermine the model's effectiveness
 Furthermore, choosing the right hyperparameters for each base estimator introduces additional complexity, as these decisions also significantly impact model performance and must be carefully tuned for each specific oxide. 
 Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide. 
-For instance, simpler models like \gls{enet} and Ridge Regression may quickly reach their optimal performance with minimal hyperparameter adjustments. However, due to their simplicity, they often fail to capture the complex patterns in the data that more advanced models can, making them less competitive despite their ease of tuning.
+For instance, simpler approaches like \gls{enet} and ridge regression may quickly reach their optimal performance with minimal hyperparameter adjustments. However, due to their simplicity, they often fail to capture the complex patterns in the data that more advanced models can, making them less competitive despite their ease of tuning.
 In contrast, more complex models like \gls{cnn} or \gls{gbr} involve both a larger number of hyperparameters and architectural considerations that need fine-tuning to perform well.
 The extent of tuning required is also influenced by the characteristics of the target oxide, such as its data distribution, noise levels, and feature interactions. 
 These factors can affect how sensitive an estimator is to its hyperparameters.
