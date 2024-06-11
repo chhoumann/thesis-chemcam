@@ -1,0 +1,64 @@
+\begin{table*}
+    \centering
+    \begin{tabular}{lccccccccc}
+        \toprule
+        \textbf{Oxide} & \texttt{MaxAbsScaler} & \texttt{MinMaxScaler} & \texttt{Norm3Scaler} & \texttt{RobustScaler} & \texttt{StandardScaler} \\
+        \midrule
+        \ce{Al2O3}               & 336  & 476  & 495  & 453  & 240 \\
+        \ce{CaO}                 & 310  & 362  & 681  & 338  & 309 \\
+        \ce{FeO_T}               & 498  & 287  & 561  & 339  & 315 \\
+        \ce{K2O}                 & 258  & 320  & 622  & 430  & 370 \\
+        \ce{MgO}                 & 239  & 340  & 646  & 413  & 305 \\
+        \ce{Na2O}                & 316  & 327  & 748  & 320  & 289 \\
+        \ce{SiO2}                & 221  & 421  & 830  & 309  & 219 \\
+        \ce{TiO2}                & 280  & 322  & 507  & 565  & 326 \\
+        Total across oxides      & 2458 & 2855 & 5090 & 3167 & 2373 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of different scalers across the eight major oxides.}
+    \label{tab:scalers_comparison}
+\end{table*}
+
+
+\begin{table*}
+    \centering
+    \begin{tabular}{lccccccccc}
+        \toprule
+        \textbf{Oxide} & \texttt{None} & \texttt{KernelPCA} & \texttt{PCA} \\
+        \midrule
+        \ce{Al2O3}               & 1243  & 389  & 368 \\
+        \ce{CaO}                 & 1246  & 374  & 380 \\
+        \ce{FeO_T}               & 1217  & 382  & 401 \\
+        \ce{K2O}                 & 1250  & 373  & 377 \\
+        \ce{MgO}                 & 1037  & 543  & 363 \\
+        \ce{Na2O}                & 1167  & 382  & 451 \\
+        \ce{SiO2}                & 1096  & 457  & 447 \\
+        \ce{TiO2}                & 1163  & 468  & 369 \\
+        Total across oxides      & 9419  & 3368 & 3156 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of different PCA types across the eight major oxides.}
+    \label{tab:pca_comparison}
+\end{table*}
+
+
+\begin{table*}
+    \centering
+    \begin{tabular}{lccccccccc}
+        \toprule
+        \textbf{Oxide} & \texttt{None} & \texttt{PowerTransformer} & \texttt{QuantileTransformer} \\
+        \midrule
+        \ce{Al2O3}               & 442  & 649  & 909 \\
+        \ce{CaO}                 & 673  & 595  & 732 \\
+        \ce{FeO_T}               & 633  & 644  & 723 \\
+        \ce{K2O}                 & 504  & 822  & 674 \\
+        \ce{MgO}                 & 725  & 701  & 517 \\
+        \ce{Na2O}                & 441  & 583  & 976 \\
+        \ce{SiO2}                & 760  & 566  & 674 \\
+        \ce{TiO2}                & 778  & 717  & 505 \\
+        Total across oxides      & 4956 & 5277 & 5710 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of different transformers across the eight major oxides.}
+    \label{tab:transformers_comparison}
+\end{table*}
