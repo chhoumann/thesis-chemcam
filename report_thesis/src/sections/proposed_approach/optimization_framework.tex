@@ -2,8 +2,8 @@
 One of the primary challenges in developing a stacking ensemble is determining the optimal choice of base estimators. \citet{wolpertstacked_1992} highlighted that this can be considered a 'black art' and that the choice usually relies on intelligent guesses.
 In our case, this problem is further exacerbated by the fact that the optimal choice of base estimator may vary depending on the target oxide.
 The complexity of the problem is increased because different oxides require different models, and the optimal preprocessing techniques will depend on both the model and the specific oxide being predicted.
-Due to the challenges highligted in \ref{subsec:challenges}, namely high dimensionality, multicollinearity, and matrix effects, it is difficult to determine which configuration is optimal.
-Selecting the appropriate preprocessing steps for each base estimator is essential, as incorrect preprocessing can significantly degrade performance and undermine the model's effectiveness
+Due to the challenges highlighted in \ref{subsec:challenges}, namely high dimensionality, multicollinearity, and matrix effects, it is difficult to determine which configuration is optimal.
+Selecting the appropriate preprocessing steps for each base estimator is essential, as incorrect preprocessing can significantly degrade performance and undermine the model's effectiveness.
 Furthermore, choosing the right hyperparameters for each base estimator introduces additional complexity, as these decisions also significantly impact model performance and must be carefully tuned for each specific oxide.
 Some estimators might require very little tuning to achieve accurate and robust predictions, while others might require extensive tuning, depending on the target oxide.
 For instance, simpler approaches like \gls{enet} and ridge regression may quickly reach their optimal performance with minimal hyperparameter adjustments. However, due to their simplicity, they often fail to capture the complex patterns in the data that more advanced models can, making them less competitive despite their ease of tuning.
@@ -16,14 +16,14 @@ Given these complexities, we need a systematic approach to determine the optimal
 To guide this process we have developed a working assumption.
 Specifically, we assume that selecting the top-$n$ best pipelines for each oxide, considering different preprocessors and models for each pipeline, will result in the best pipelines for a given oxide in our stacking ensemble.
 Here, $n$ is a heuristic based on the results and \textit{best} is evaluated in terms of the metrics outlined in Section~\ref{subsec:evaluation_metrics}.
-Additionaly, each permutation will utilize our proposed data partitioning and cross-validation strategy outlined in Section~\ref{subsec:validation_testing_procedures}.
-Utilizing our proposed data partitioning and cross-validation strategy, along with the aformentioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem_definition}.
+Additionally, each permutation will utilize our proposed data partitioning and cross-validation strategy outlined in Section~\ref{subsec:validation_testing_procedures}.
+Utilizing our proposed data partitioning and cross-validation strategy, along with the aforementioned evaluation metrics, will ensure that the top-$n$ pipelines align with our goals of generalization, robustness, and accuracy outlined in Section~\ref{sec:problem_definition}.
 This narrows our focus to three key tasks: selecting suitable preprocessors and models, finding the optimal hyperparameters, and devising a guided search strategy to evaluate various permutations and identify the top-$n$ pipelines for each oxide.
 First, we curated a diverse set of models and preprocessing techniques, as detailed in Section~\ref{sec:model_selection}.
 Next, we developed an optimization framework to systematically explore and optimize these pipeline configurations, which will be described in the following section.
 
 \subsubsection{The Framework}
-To systematically explore and optimize pipeline configurations, the search process should be guided by an ojective function.
+To systematically explore and optimize pipeline configurations, the search process should be guided by an objective function.
 Based on the evaluation process outlined in Section~\ref{subsec:validation_testing_procedures}, whereby we argue that solely evaluating on the \gls{rmsep} may lead to misleading and poor results, we define the objective function we wish to optimize as a multi-objective optimization on minimizing the \texttt{rmse\_cv} and \texttt{std\_dev\_cv}.
 
 Given these goals, traditional methods like grid search and random search could be used, but they often fall short due to several inherent limitations.
