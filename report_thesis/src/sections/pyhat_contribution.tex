@@ -4,7 +4,7 @@ We describe these contributions here.
 \gls{pyhat} offers a user-friendly interface designed for performing machine learning and data analysis tasks specifically for hyperspectral data.
 Our collaboration was initiated through a series of discussions with two members from \gls{usgs} that are responsible for \gls{pyhat}, wherein we identified mutual challenges and opportunities for integrating our solutions into the tool.
 
-The largest contribution involved the integration of an automatic outlier detection method into the library's \gls{pls} implementation. 
+The largest contribution involved the integration of an automatic outlier detection method into \gls{pyhat}.
 This method calculates the Mahalanobis distance for each data point and uses the chi-squared distribution to establish a threshold.
 Any datapoint exceeding this threshold is considered an out and removed from the dataset.
 Utilizing two intermediary \gls{pls} models, one as a reference and the other to evaluate the impact of outlier removal, the method iteratively identifies and eliminates outliers while assessing the performance of the second model against the reference model. 
