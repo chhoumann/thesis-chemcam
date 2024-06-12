@@ -56,7 +56,7 @@ Therefore, we prioritize the analysis of the top-performing trials and examine a
 From Figure~\ref{fig:top100_models}, it is evident that \gls{svr}, gradient boosting methods, and \gls{pls} demonstrate the best performance.
 Figure~\ref{fig:top100_pca} confirms our earlier hypothesis that not using any \gls{pca} or \gls{kernel-pca} yields the lowest \gls{rmsecv} values.
 However, we do observe that either \gls{pca} or \gls{kernel-pca} appear in four of the plots, with \gls{kernel-pca} being the most frequently used among them.
-This indicates that they are indeed used in some top-performing configurations. 
+This indicates that they are indeed used in some top-performing configurations.
 However, based on the results in Table~\ref{tab:pca_comparison}, we did not expect them to be as prevalent as they are, suggesting that while they are not the most frequently used, they can still be highly effective in specific scenarios.
 Interestingly, Figure~\ref{fig:top100_scalers} shows that, although \texttt{Norm3Scaler} is the most frequently used and best-performing scaler, this is not always the case.
 Min-Max normalization appears to yield better results for \ce{SiO2} and \ce{CaO}, while robust scaling seems more effective for \ce{MgO}.
@@ -69,7 +69,7 @@ These results further reinforce our hypothesis that a tailored configuration is 
 \input{sections/results/top100.tex}
 
 We conclude our analysis by presenting the best configurations for each oxide in Section~\ref{subsec:best_model_configurations}.
-The section shows the single top-performing configurations for each model for each oxide, presented in Tables~\ref{tab:SiO2_best_configurations} through~\ref{tab:K2O_best_configurations}.
+The section shows the single top-performing configurations for each model for each oxide, presented in Tables~\ref{tab:SiO2_overview} through~\ref{tab:K2O_overview}.
 Similar to the previous plots, we use the \gls{rmsecv} values to determine the best configurations.
 Notably, these tables illustrate how certain configurations may exhibit low \gls{rmsecv} values but relatively high \gls{rmsep} values.
 This observation could suggest that they generalize well to the dataset containing extreme values but struggle with values closer to the mean.
