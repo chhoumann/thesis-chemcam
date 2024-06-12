@@ -8,12 +8,12 @@ After the primary evaluation, additional testing could be conducted using a smal
 For example, this might involve slightly reducing the percentile value $p$ and using the extreme values that fall within this reduced range to evaluate the model's effectiveness.
 
 Another point of interest is the limited data availability.
-The small dataset size naturally limits the amount of how many extreme values are present.
-These extreme values are an essential part of improving the model's generalizability, as they are the most challenging cases to predict.
-Future work should investigate methods of augmenting the dataset with synthetic extreme value data to provide the model with more exposure to these cases during training.
+The small dataset size inherently restricts the number of extreme values present.
+These extreme values are crucial for enhancing the model's generalizability, as they represent the most challenging cases to predict.
+Future research should investigate methods for augmenting the dataset with synthetic extreme value data to provide the model with more exposure to these cases during training.
 
 Future work should also consider further experimentation with the choices of base estimators and meta-learners.
-Our study highlighted that multiple model and preprocessor configurations perform well.
-However, determining which configurations and meta-learner is optimal for a given oxide is a challenging task.
-In this study, we used a simple grouping to ensure diversity in our base estimator selection, chosen from the top-performing configurations.
-This approach could be improved upon by, for example, developing more advanced selection methods that consider the base estimators and meta-learners in conjunction. 
+Our study demonstrated that various model and preprocessor configurations perform well.
+However, identifying the optimal configurations and meta-learner for a specific oxide remains a challenging task.
+In this study, we used a simple grouping method to ensure diversity in our base estimator selection, choosing from the top-performing configurations.
+This approach could be improved upon by, for example, developing more advanced selection methods that consider the interactions between base estimators and meta-learners.
