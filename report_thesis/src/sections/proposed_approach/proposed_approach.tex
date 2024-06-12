@@ -41,13 +41,13 @@ We present the metrics we use to evaluate the performance of our models in Secti
 These metrics include the \gls{rmse} for accuracy and the sample standard deviation of prediction errors for robustness.
 By evaluating both cross-validation and test set metrics, we ensure a thorough assessment of the models' generalizability and performance on unseen data.
 
-Next, we implemented an experimental framework using the Optuna optimization library~\cite{optuna_2019}.
+Next, we implemented an optimization framework using Optuna as a foundation~\cite{optuna_2019}.
 This framework facilitates automated hyperparameter optimization, allowing us to efficiently explore a vast search space of model and preprocessing configurations.
 The specifics of this framework are discussed in Section~\ref{sec:optimization_framework}.
 
 Finally, the top-performing configurations are used to construct a stacking ensemble.
 This ensemble leverages the strengths of multiple models, with a meta-learner trained to optimize the final predictions.
-The process of constructing and validating this stacking ensemble is described in Section~\ref{sec:final_stacking_pipeline}.
+The process of constructing and validating this stacking ensemble is described in Section~\ref{subsec:stacking_ensemble}.
 
 By following this structured approach, we aim to enhance the prediction accuracy and robustness for major oxides in \gls{libs} data, ultimately leading to more reliable and generalizable models.
 

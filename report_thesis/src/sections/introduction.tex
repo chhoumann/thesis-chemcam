@@ -1,9 +1,9 @@
 \section{Introduction}\label{sec:introduction}
-NASA has been studying the Martian environment for decades through a series of missions, including the Viking missions~\cite{marsnasagov_vikings}, the \gls{mer} mission~\cite{marsnasagov_observer, marsnasagov_spirit_opportunity}, and the \gls{msl} mission~\cite{marsnasagov_msl}, each building on the knowledge gained from the previous ones.
+\gls{nasa} has been studying the Martian environment for decades through a series of missions, including the Viking missions~\cite{marsnasagov_vikings}, the \gls{mer} mission~\cite{marsnasagov_observer, marsnasagov_spirit_opportunity}, and the \gls{msl} mission~\cite{marsnasagov_msl}, each building on the knowledge gained from the previous ones.
 Today, the rovers exploring Mars are equipped with sophisticated instruments for analyzing the chemical composition of Martian soil in search of past life and habitable environments.
 
 Part of this research is facilitated through interpretation of spectral data gathered by \gls{libs} instruments, which fire a high-powered laser at soil samples to create a plasma.
-The emitted light is captured by spectrometers and analyzed using machine learning models to assess the presence and concentration of certain major oxides, informing NASA's understanding of Mars' geology~\cite{cleggRecalibrationMarsScience2017}.
+The emitted light is captured by spectrometers and analyzed using machine learning models to assess the presence and concentration of certain major oxides, informing \gls{nasa}'s understanding of Mars' geology~\cite{cleggRecalibrationMarsScience2017}.
 
 However, predicting major oxide compositions from \gls{libs} data still presents significant computational challenges.
 These include the high dimensionality and non-linearity of the data, compounded by issues of multicollinearity and matrix effects~\cite{andersonImprovedAccuracyQuantitative2017}.
@@ -40,21 +40,22 @@ Our key contributions are as follows:
     \item We have contributed directly to the development of \gls{pyhat}, a Python-based toolset by \gls{usgs} for machine learning and data analysis on hyperspectral data. Our work has been integrated into the toolset, further enhancing its capabilities for the scientific community.
 \end{itemize}
 
-
-% TODO: Add remaining sections
-The remainder of this paper is organized as follows:
-Section~\ref{sec:background} provides background on the onoging Mars exploration missions, the \gls{libs} technique, and the baseline \gls{moc} model.
-Section~\ref{sec:problem_definition} formally defines the problem addressed in this work.
-Section~\ref{sec:methodology} describes our proposed methodology, including data preprocessing, dimensionality reduction, and machine learning models.
-Section~\ref{sec:methodology} presents our experimental design and setup.
-Section~\ref{sec:results} presents the results of our experiments.
-Section~\ref{sec:future_work} discusses potential future work.
-Finally, Section~\ref{sec:conclusion} concludes the paper by summarizing our findings and discussing the implications of our work.
+In the following sections, we provide a comprehensive exploration of our research.
+Section~\ref{sec:related-work} reviews the existing literature on \gls{libs} data analysis and machine learning models, highlighting previous approaches and their limitations.
+Section~\ref{sec:problem_definition} formally defines the problem we address, focusing on the challenges of high dimensionality, multicollinearity, and matrix effects in \gls{libs} data.
+Section~\ref{sec:background} offers background information on the data, as well as the preprocessing techniques and machine learning models that were used.
+In Section~\ref{sec:baseline_replica}, we describe the baseline model used for Martian geological sample analysis, our efforts to replicate it, and the modifications made to improve its performance.
+This was then used as a baseline to evaluate our proposed stacking ensembles against.
+Section~\ref{sec:proposed_approach} presents our proposed approach for optimizing pipeline configurations, detailing the selection of models and preprocessing techniques, our approach to data partitioning, validation and testing procedures, and the implementation of the hyperparameter optimization framework.
+Section~\ref{sec:methodology} presents the design and results of our experiments, as well as the analysis of the results.
+Our experiments include initial model selection, hyperparameter optimization, and the final evaluation of our proposed stacking ensemble.
+Finally, Section~\ref{sec:conclusion} summarizes our key findings and contributions, while Section~\ref{sec:future_work} discusses potential future research directions and improvements.
 
 Due to the overlapping nature of terminology used in \gls{libs} data analysis and machine learning, we provide a list of terms in Table~\ref{tab:terms} to clarify their meaning.
 
 \begin{table}
 \centering
+\caption{Table of terminology.}
 \begin{tabularx}{\columnwidth}{lX} % l for left, X for the cell that should be wrapped
 \toprule
 Term & Definition \\
@@ -65,6 +66,5 @@ Target & Refers to the variable that a machine learning model is trained to pred
 Extreme Concentration Values & The concentration values of oxides in the targets that are significantly higher or lower than the majority of the data. \\
 \bottomrule
 \end{tabularx}
-\caption{Table of Terms}
 \label{tab:terms}
 \end{table}

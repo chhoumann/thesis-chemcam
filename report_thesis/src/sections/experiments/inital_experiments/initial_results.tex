@@ -1,5 +1,5 @@
 \subsection{Initial Results}
-Table~\ref{tab:init_results} presents the results of the initial experiments, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, and standard deviation of cross-validation prediction errors for each model across all oxides.
+Table~\ref{tab:init_results} presents the results of the initial experiment, including the \gls{rmsep}, \gls{rmsecv}, standard deviation, and standard deviation of cross-validation prediction errors for each model across all oxides.
 The means of each metric are also provided to give an overall indication of the models' performance.
 Furthermore, we present an overview of these mean values in Figure~\ref{fig:init_results_rmses} to facilitate a visual comparison of the models' general performance.
 
@@ -46,6 +46,7 @@ This emphasizes the need for further evaluation of model performances on a per-o
 \end{figure*}
 
 \begin{table}
+\caption{Relative performance of each model compared to the best performing model, measured by normalized RMSECV and multiplied by 100 for percentage. A higher percentage indicates worse performance. The 'Diff. vs Prev.' column shows the difference in performance compared to the next best model, measured in percentage points.}
 \begin{tabular}{lrr}
 \toprule
 Model & Relative Performance (\%) & Diff. vs Prev. \\
@@ -64,7 +65,6 @@ ANN & 127.82 & 13.52 \\
 CNN & 143.18 & 15.36 \\
 \bottomrule
 \end{tabular}
-\caption{Relative performance of each model compared to the best performing model, measured by normalized RMSECV and multiplied by 100 for percentage. A higher percentage indicates worse performance. The 'Diff. vs Prev.' column shows the difference in performance compared to the next best model, measured in percentage points.}
 \label{tab:relative_performance}
 \end{table}
 
@@ -74,15 +74,15 @@ CNN & 143.18 & 15.36 \\
 \centering
 \begin{minipage}{.7\textwidth}
   \centering
-  \input{sections/experiments/inital_experiments/best_results_table.tex}
   \caption{Lowest metric and corresponding model for each oxide.}
+  \input{sections/experiments/inital_experiments/best_results_table.tex}
   \label{tab:best_results}
 \end{minipage}%
 \hspace{0.03\textwidth}
 \begin{minipage}{.25\textwidth}
   \centering
-  \input{sections/experiments/inital_experiments/best_model_occurrences_table.tex}
   \caption{Occurrences of the best model for each oxide.}
+  \input{sections/experiments/inital_experiments/best_model_occurrences_table.tex}
   \label{tab:best_model_occurrences}
 \end{minipage}
 \end{table*}

@@ -1,15 +1,20 @@
-\section*{Appendix}
-\addcontentsline{toc}{section}{Appendix}
+\onecolumn
+\section{Appendix}
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thefigure}{\Alph{section}.\arabic{figure}}
+\renewcommand{\thetable}{\Alph{section}.\arabic{table}}
+\setcounter{figure}{0}
+\setcounter{table}{0}
 
 \subsection{Web-Based Platform for Data Partitioning Evaluation}\label{subsec:web_platform}
-
-\begin{figure*}
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.7\textwidth]{images/web_platform.png}
+    \includegraphics[width=0.585\textwidth]{images/web_platform.png}
     \caption{Web-based platform used to determine the optimal value of $p$ for the data partitioning algorithm.}
     \label{fig:web_platform}
-\end{figure*}
+\end{figure}
 
+\newpage
 \FloatBarrier
 
 \subsection{Cross-Validation Fold Plots for Major Oxides}\label{subsec:cv_plots}
@@ -18,40 +23,41 @@
 \foreach \oxide in {SiO2, TiO2, Al2O3, FeOT, MgO, CaO, Na2O, K2O} {
     \subsubsection{\oxide}
 
-    \begin{figure*}
+    \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/histogram_grid_plot.png}
         \caption{Histogram and \gls{kde} of \ce{\oxide} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{\oxide} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
         \label{fig:histogram_grid_plot_\oxide}
-    \end{figure*}
+    \end{figure}
 
-    \begin{figure*}
+    \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/histogram_kde_plot.png}
         \caption{Combined Histogram and \gls{kde} of \ce{\oxide} distribution in each fold. The y-axis represents the count of samples per bin, and the x-axis represents \ce{\oxide} concentration. The notation in the legend indicates the amount of instances in the training/validation sets.}
         \label{fig:histogram_kde_plot_\oxide}
-    \end{figure*}
+    \end{figure}
 
-    \begin{figure*}
+    \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/original_and_post_fold.png}
         \caption{Distribution of \ce{\oxide} concentrations before and after fold assignment. The left plot shows the original distribution of \ce{\oxide}, while the right plot shows the distribution with folds assigned, color-coded to indicate the different folds.}
         \label{fig:original_and_post_fold_plot_\oxide}
-    \end{figure*}
+    \end{figure}
 
-    \begin{figure*}
+    \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{images/\oxide/distribution_plot.png}
         \caption{Distribution of \ce{\oxide} concentrations across cross-validation folds, training set, test set, and the entire dataset. The mean and standard deviation statistics for each partition are indicated figure.}
         \label{fig:distribution_plot_\oxide}
-    \end{figure*}
+    \end{figure}
 }
 
 \FloatBarrier
 
 \subsection{Initial Experiment: Model Hyperparameters}\label{subsec:initial_experiment_hyperparameters}
-\begin{table*}
+\begin{table}[!htb]
 \centering
+\caption{Explictly set hyperparameters for the \gls{pls}, \gls{svr}, ridge, \gls{lasso}, \gls{enet}, \gls{rf}, and \gls{etr} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used.}
 \begin{tabular}{@{}llp{0.5\textwidth}@{}}
 \toprule
 \textbf{Model} & \textbf{Hyperparameter} & \textbf{Value} \\
@@ -101,14 +107,14 @@
 & \texttt{random\_state} & 42 \\
 \midrule
 \end{tabular}
-\caption{Explictly set hyperparameters for the \gls{pls}, \gls{svr}, ridge, \gls{lasso}, \gls{enet}, \gls{rf}, and \gls{etr} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used.}
 \label{tab:combined_hyperparameters}
-\end{table*}
+\end{table}
 
 \FloatBarrier
 
-\begin{table*}
+\begin{table}[!htb]
 \centering
+\caption{Explictly set hyperparameters for the \gls{gbr} and \gls{xgboost} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used. The \gls{ngboost} model does not have any explicitly set hyperparameters.}
 \begin{tabular}{@{}llp{0.5\textwidth}@{}}
 \toprule
 \textbf{Model} & \textbf{Hyperparameter} & \textbf{Value} \\
@@ -148,13 +154,12 @@
 & \texttt{eval\_metric} & rmse \\
 \bottomrule
 \end{tabular}
-\caption{Explictly set hyperparameters for the \gls{gbr} and \gls{xgboost} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used. The \gls{ngboost} model does not have any explicitly set hyperparameters.}
 \label{tab:combined_hyperparameters}
-\end{table*}
+\end{table}
 
 \FloatBarrier
 
-\begin{table*}
+\begin{table}[!htb]
   \centering
   \begin{tabular}{lll}
     \toprule
@@ -172,12 +177,15 @@
     \multicolumn{3}{l}{\textbf{Learning Rate:} 0.001} \\
     \bottomrule
   \end{tabular}
-  \caption{Summary of the Neural Network Architecture}
+  \caption{Summary of the \gls{ann} architecture.}
   \label{tab:nn_architecture}
-\end{table*}
+\end{table}
 
-\begin{table*}
+\FloatBarrier
+
+\begin{table}[!htb]
   \centering
+  \caption{Summary of the \gls{cnn} architecture.}
   \begin{tabular}{lll}
     \toprule
     \textbf{Layer} & \textbf{Output Shape} & \textbf{Hyperparameter} \\ \midrule
@@ -208,11 +216,12 @@
     \multicolumn{3}{l}{\textbf{Learning Rate:} 0.001} \\
     \bottomrule
   \end{tabular}
-  \caption{Summary of the Convolutional Neural Network Architecture}
   \label{tab:cnn_architecture}
-\end{table*}
+\end{table}
 
 \FloatBarrier
+
+\clearpage
 
 \subsection{Overview of best performing model configurations}\label{subsec:best_model_configurations}
 \input{sections/appendix/tables/SiO2_overview.tex}
@@ -223,108 +232,3 @@
 \input{sections/appendix/tables/CaO_overview.tex}
 \input{sections/appendix/tables/Na2O_overview.tex}
 \input{sections/appendix/tables/K2O_overview.tex}
-
-\FloatBarrier
-
-\subsection{Stacking Ensemble 1:1 Plots}\label{subsec:1_1_plots}
-\begin{figure*}
-    \centering
-    \resizebox{0.75\textwidth}{!}{
-        \begin{tabular}{cc}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/SiO2.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/TiO2.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/Al2O3.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/FeOT.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/MgO.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/CaO.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/Na2O.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/elasticnet/K2O.png}
-            \end{subfigure}
-        \end{tabular}
-    }
-    \caption{One-to-one plots for the stacking ensemble model with the \gls{enet} as the meta-learner with $\alpha = 1$}
-    \label{fig:elasticnet_one_to_one}
-\end{figure*}
-
-\begin{figure*}
-    \centering
-    \resizebox{0.75\textwidth}{!}{
-        \begin{tabular}{cc}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/SiO2.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/TiO2.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/Al2O3.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/FeOT.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/MgO.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/CaO.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/Na2O.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/enetalpha01/K2O.png}
-            \end{subfigure}
-        \end{tabular}
-    }
-    \caption{One-to-one plots for the stacking ensemble model with the \gls{enet} as the meta-learner with $\alpha = 0.1$.}
-    \label{fig:enetalpha01_one_to_one}
-\end{figure*}
-
-\begin{figure*}
-    \centering
-    \resizebox{0.75\textwidth}{!}{
-        \begin{tabular}{cc}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/SiO2.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/TiO2.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/Al2O3.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/FeOT.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/MgO.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/CaO.png}
-            \end{subfigure} \\
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/Na2O.png}
-            \end{subfigure} & \hspace{3cm}
-            \begin{subfigure}{0.5\textwidth}
-                \includegraphics[width=\textwidth]{images/one_to_one/svr/K2O.png}
-            \end{subfigure}
-        \end{tabular}
-    }
-    \caption{One-to-one plots for the stacking ensemble model with the \gls{svr} as the meta-learner}
-    \label{fig:svr_one_to_one}
-\end{figure*}
