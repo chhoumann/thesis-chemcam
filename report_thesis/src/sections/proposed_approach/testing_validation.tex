@@ -213,7 +213,7 @@ In our initial and optimization experiments, we prioritize cross-validation metr
 This strategy mitigates the risk of overfitting to the test set by avoiding a bias towards lower \gls{rmsep} values.
 Conversely, for the stacking ensemble experiment, we emphasize test set metrics to comprehensively assess the ensemble's performance, while still considering cross-validation metrics.
 This approach aligns with standard machine learning conventions\cite{geronHandsonMachineLearning2023}.
-In the initial experiments, cross-validation metrics serve as thresholds for model selection.
+In the initial experiment, cross-validation metrics serve as thresholds for model selection.
 During the optimization phase, only cross-validation metrics guide the search for optimal hyperparameters.
 For the stacking ensemble experiment, both cross-validation and test set metrics are evaluated, with a primary focus on the \gls{rmsep} metric.
 This approach aims to make our final model accurate, robust, and generalizable to unseen data, providing a balanced evaluation through both cross-validation and test set metrics.
