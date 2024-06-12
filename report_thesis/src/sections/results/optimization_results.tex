@@ -59,7 +59,7 @@ However, we do observe that either \gls{pca} or \gls{kernel-pca} appear in four 
 This indicates that they are indeed used in some top-performing configurations. 
 However, based on the results in Table~\ref{tab:pca_comparison}, we did not expect them to be as prevalent as they are, suggesting that while they are not the most frequently used, they can still be highly effective in specific scenarios.
 Interestingly, Figure~\ref{fig:top100_scalers} shows that, although \texttt{Norm3Scaler} is the most frequently used and best-performing scaler, this is not always the case.
-Min-max scaling appears to yield better results for \ce{SiO2} and \ce{CaO}, while robust scaling seems more effective for \ce{MgO}.
+Min-Max normalization appears to yield better results for \ce{SiO2} and \ce{CaO}, while robust scaling seems more effective for \ce{MgO}.
 For \ce{Al2O3}, Norm 3 scaling exhibits the lowest \gls{rmsecv} values but a higher mean \gls{rmsecv} value compared to the other scalers.
 Finally, Figure~\ref{fig:top100_transformers} reveals another nuanced finding.
 Power transformations appear to most frequently yield the best results across oxides, while quantile transformation or no transformation show the lowest \gls{rmsecv} values for the remaining oxides.
