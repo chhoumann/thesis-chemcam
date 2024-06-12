@@ -35,22 +35,21 @@ These pipelines represent the optimal configurations for each oxide, and are use
 This approach systematically evaluates combinations of top-performing models to determine the best ensemble based on cross-validation metrics.
 
 The grid search process begins by generating all possible combinations of the selected models.
-Specifically, we generate combinations of models with at least two models, and a configurable maximum number of models.
+Specifically, we generate combinations with at least two models, up to a configurable maximum number of models.
 
 For each oxide, we constructed a pipeline for each of the top model configurations identified in Section~\ref{sec:optimization_results}.
 The evaluation function iterates over each combination of base estimators, constructs a stacking ensemble pipeline, and assesses its performance using cross-validation.
 
 The evaluation function prepares the pipeline with the current combination of base estimators and splits the data into training and testing sets using our data partitioning method.
-The stacking ensemble is then fitted on the training set.
-The meta-features generated from the base estimators are used to train the final estimator.
+The stacking ensemble is then fitted on the training set, and the meta-features generated from the base estimators are used to train the final estimator.
 
 We compute the evaluation metrics to assess the ensemble's effectiveness.
 The best combination is identified based on the lowest \gls{rmsecv} value.
 
-It is possible to vary the meta-learner for this process, which represents another variable to tune as part of the search process.
+It is possible to vary the meta-learner in this process, adding another variable to tune as part of the search process.
 
 While our grid search implementation was limited to the \ce{TiO2} oxide, the methodology demonstrates the potential for identifying optimal stacking ensembles by systematically evaluating model combinations and their configurations.
-We chose not to further pursue this method due to the time constraints of this project, but believe that it is a promising approach for future work.
+We chose not to pursue this method further due to the time constraints of this project, but believe it is a promising approach for future work.
 
 
 \subsubsection{Results}\label{subsec:stacking_ensemble_results}
