@@ -77,10 +77,6 @@ The \gls{svr} meta-learner shows the best performance for several oxides, partic
 We generally observe that the standard deviation metrics are close to the corresponding \gls{rmse} values, indicating low variability in the prediction errors.
 This suggests robustness of the predictions.
 
-The results presented above indicate a strong performance from the stacking ensemble approach.
-However, it is important to note that some evaluation metrics are worse in the stacking approach than in certain individual configurations.
-We believe that further tuning, particularly of the meta-learner's hyperparameters, could substantially improve these results.
-
 A notable observation from our results is that different meta-learners exhibited varying performance levels across oxides.
 We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions nonsensical if the wrong meta-learner was chosen.
 Specifically, for \ce{TiO2}, we observed that predictions remained near-constant values despite varying the combination of model configurations in the \ce{TiO2} ensemble.
@@ -107,6 +103,10 @@ For instance, the \gls{rmsep} for \ce{SiO2} is reduced from 5.61 (\gls{moc} (rep
 Similarly, \ce{TiO2} shows a reduction from 0.61 (\gls{moc} (replica)) to 0.32 (\gls{enet} with $\alpha = 0.1$).
 The improvements are consistent across most oxides, with \gls{enet} and \gls{svr} models both outperforming the \gls{moc} (replica) model.
 This shows that the ensemble approach, particularly with these meta-learners, enhances prediction accuracy for the oxides we tested.
+
+The results presented above indicate a strong performance from the stacking ensemble approach.
+However, it is important to note that some evaluation metrics are worse in the stacking approach than in certain individual configurations.
+We believe that further tuning, particularly of the meta-learner's hyperparameters, could substantially improve these results.
 
 \begin{table}
 \centering
