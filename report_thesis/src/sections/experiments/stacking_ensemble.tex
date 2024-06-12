@@ -72,13 +72,21 @@ Lowering \texttt{alpha} produced better outcomes, indicating that regularization
 The 1:1 plot in Figure~\ref{fig:elasticnet_one_to_one} shows the near-constant predictions for \ce{TiO2} when using a \gls{enet} meta-learner, and Figure~\ref{fig:enetalpha01_one_to_one} shows the improved predictions with \texttt{alpha} = 0.1.
 This leads us to conclude that the meta-learner's choice significantly impacts the \gls{rmsecv} and prediction outcomes.
 
-The stacking approach demonstrated significant improvements in prediction accuracy compared to the baseline described in Section~\ref{sec:baseline_replica}, validating the efficacy of our methodology.
+The stacking approach demonstrated strong improvements in prediction accuracy compared to the baseline described in Section~\ref{sec:baseline_replica}, validating the efficacy of our methodology.
 We measured this improvement using \gls{rmsep}, which provides the fairest comparison between the baseline and the stacking approach.
 As mentioned, \gls{rmsep} evaluates the model's performance on the test set.
 In Section~\ref{sec:baseline_replica}, we described how the baseline test set was constructed by sorting extreme concentration values into the training set, and then performing a random split.
 As noted in Section~\ref{subsec:validation_testing_procedures}, required a more sophisticated procedure to support the testing and validation strategy in this work.
 Despite the differences in test set construction, the test sets remained similar in composition\footnote{The analysis of this can be found on our GitHub repository: \url{https://github.com/chhoumann/thesis-chemcam}}, which allowed us to use \gls{rmsep} as a fair comparison metric.
+Table~\ref{tab:stacking_ensemble_vs_moc} compares the \gls{rmsep} values of different oxides for the \gls{moc} (replica) model with three stacking ensemble models: \gls{enet} with $\alpha = 1$, \gls{enet} with $\alpha = 0.1$, and \gls{svr}.
+Overall, the stacking ensemble models tend to produce lower \gls{rmsep} values compared to the \gls{moc} (replica) model.
+Notably, \ce{SiO2}, \ce{TiO2}, \ce{Na2O}, and \ce{K2O} show large improvements across all stacking ensemble models.
+For instance, the \gls{rmsep} for \ce{SiO2} is reduced from 5.61 (\gls{moc} (replica)) to around 3.59 (\gls{enet} with $\alpha = 1$) and further to 3.47 (\gls{svr}).
+Similarly, \ce{TiO2} shows a reduction from 0.61 (\gls{moc} (replica)) to 0.32 (\gls{enet} with $\alpha = 0.1$).
+The improvements are consistent across most oxides, with \gls{enet} and \gls{svr} models both outperforming the \gls{moc} (replica) model.
+This shows that the ensemble approach, particularly with these meta-learners, enhances prediction accuracy for the oxides we tested.
 
+The results presented above indicate a strong performance from the stacking ensemble approach.
 However, it is important to note that some evaluation metrics are worse in the stacking approach than in certain individual configurations.
 We believe that further tuning, particularly of the meta-learner's hyperparameters, could substantially improve these results.
 
@@ -176,7 +184,6 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
     \label{fig:elasticnet_one_to_one}
 \end{figure*}
 
-
 \begin{table}
 \centering
 \caption{Comparison of \gls{rmsep} values for the \gls{moc} (replica) model and various stacking ensemble models.}
@@ -198,16 +205,6 @@ Oxide          & \gls{moc} (replica) & \gls{enet} ($\alpha = 1$) & \gls{enet} ($
 }
 \label{tab:stacking_ensemble_vs_moc}
 \end{table}
-
-Table~\ref{tab:stacking_ensemble_vs_moc} compares the \gls{rmsep} values of different oxides for the \gls{moc} (replica) model with three stacking ensemble models: \gls{enet} with $\alpha = 1$, \gls{enet} with $\alpha = 0.1$, and \gls{svr}.
-
-Overall, the stacking ensemble models tend to produce lower \gls{rmsep} values compared to the \gls{moc} (replica) model.
-Notably, \ce{SiO2}, \ce{TiO2}, \ce{Na2O}, and \ce{K2O} show large improvements across all stacking ensemble models.
-For instance, the \gls{rmsep} for \ce{SiO2} is reduced from 5.61 (\gls{moc} (replica)) to around 3.59 (\gls{enet} with $\alpha = 1$) and further to 3.47 (\gls{svr}).
-Similarly, \ce{TiO2} shows a reduction from 0.61 (\gls{moc} (replica)) to 0.32 (\gls{enet} with $\alpha = 0.1$).
-
-The improvements are consistent across most oxides, with \gls{enet} and \gls{svr} models both outperforming the \gls{moc} (replica) model.
-This shows that the ensemble approach, particularly with these meta-learners, enhances prediction accuracy for the oxides we tested.
 
 \begin{figure*}
     \centering
