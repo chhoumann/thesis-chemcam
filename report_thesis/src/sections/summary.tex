@@ -27,7 +27,7 @@ Additionally, we investigate various preprocessing techniques, including scaling
 We developed a k-fold data partitioning algorithm to ensure rigorous evaluation and prevent data leakage.
 This method involved assigning fold numbers sequentially using a modulo operation for a random-like distribution and handling extreme values by redistributing them evenly across the training folds.
 Additionally, we managed extreme concentration values by identifying them at specific percentiles and ensuring they were distributed evenly across the training folds, preventing any single fold from being disproportionately influenced.
-We created a web application with a slider to determine the percentile value for handling extreme values and dropdown menus to select the target oxide and the cross-validation method, which would then plots to visualize the distribution of extreme values across the folds.
+We created a web application that allows users to determine percentile values for handling extreme values and select the target oxide and cross-validation method. The application then visualizes the distribution of extreme values across the folds.
 Our cross-validation framework systematically evaluated model performance using these partitions, providing robust estimates of accuracy and generalizability.
 To identify the most effective combinations of models and preprocessing techniques, we employed an automated hyperparameter optimization framework, Optuna, which systematically searched for optimal hyperparameters for each regression target.
 
