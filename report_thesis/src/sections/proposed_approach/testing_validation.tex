@@ -64,6 +64,7 @@ In this process, we also employ a rudimentary procedure to prevent data leakage,
 The baseline did not employ cross-validation, as our goal was to replicate the \gls{moc} model that was presented in \citet{cleggRecalibrationMarsScience2017}.
 We note that this procedure is insufficient to support the testing and validation strategy we have laid out above, as it does not support $k$-fold cross-validation.
 A random $k$-fold split of the training data would not account for the uneven distribution of extreme values across the folds, and would furthermore cause data leakage between the folds.
+Moreover, the procedure failed to consider the concentration of each oxide individually, instead aggregating concentrations across all oxides. This represents a significant limitation, as it attempts to generate a uniform test set for each oxide, thereby neglecting the unique distribution characteristics of individual oxides.
 Therefore, a more sophisticated procedure is needed to ensure that the data partitioning accounts for these challenges.
 
 \subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
