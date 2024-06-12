@@ -72,14 +72,9 @@ We decided to investigate further, and identified potential issues with small va
 For example, most values for \ce{TiO2} fell between 0 and 2.5, as shown in Figure~\ref{fig:oxide_distributions}.
 The regularization term likely dominated the fitting process, leading to underfitting, which resulted in nearly constant predictions.
 This hypothesis was confirmed by adjusting the regularization parameter, \texttt{alpha}, in the \gls{enet}.
-The 1:1 plot in Figure~\ref{fig:elasticnet_one_to_one} shows the near-constant predictions for \ce{TiO2} when using a \gls{enet} meta-learner, and Figure~\ref{fig:enetalpha01_one_to_one} shows the improved predictions with \texttt{alpha} = 0.1.
 Lowering \texttt{alpha} produced better outcomes, indicating that regularization adversely affected the predicted values.
-
+The 1:1 plot in Figure~\ref{fig:elasticnet_one_to_one} shows the near-constant predictions for \ce{TiO2} when using a \gls{enet} meta-learner, and Figure~\ref{fig:enetalpha01_one_to_one} shows the improved predictions with \texttt{alpha} = 0.1.
 This leads us to conclude that the meta-learner's choice significantly impacts the \gls{rmsecv} and prediction outcomes.
-
-
-
-
 
 The stacking approach demonstrated significant improvements in prediction accuracy, validating the efficacy of our methodology.
 % WIP
@@ -245,8 +240,3 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
     \caption{One-to-one plots for the stacking ensemble model with the \gls{svr} as the meta-learner}
     \label{fig:svr_one_to_one}
 \end{figure*}
-
-\subsubsection{Conclusion}
-
-Our approach to stacking, leveraging category-based model selection and pipeline optimization, proved effective in enhancing prediction accuracy for different oxides.
-Future work will focus on further exploring the impact of different meta-learners and refining the grid search for hyperparameter tuning.
