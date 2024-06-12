@@ -79,6 +79,7 @@ We believe that further tuning, particularly of the meta-learner's hyperparamete
 
 \begin{table}
 \centering
+\caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with default hyperparameters.}
 \begin{tabular}{lcccc}
 \toprule
 Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
@@ -94,11 +95,11 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
 \bottomrule
 \end{tabular}
 \label{tab:stacking_ensemble_results_enet}
-\caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with default hyperparameters.}
 \end{table}
 
 \begin{table}
 \centering
+\caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with $\alpha = 0.1$.}
 \begin{tabular}{lcccc}
 \toprule
 Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
@@ -114,11 +115,11 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
 \bottomrule
 \end{tabular}
 \label{tab:stacking_ensemble_results_enet_01}
-\caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with $\alpha = 0.1$.}
 \end{table}
 
 \begin{table}
 \centering
+\caption{Stacking ensemble results using the \gls{svr} model as the meta-learner with default hyperparameters.}
 \begin{tabular}{lcccc}
 \toprule
 Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
@@ -134,7 +135,6 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
 \bottomrule
 \end{tabular}
 \label{tab:stacking_ensemble_results_svr}
-\caption{Stacking ensemble results using the \gls{svr} model as the meta-learner with default hyperparameters.}
 \end{table}
 
 \begin{figure*}
