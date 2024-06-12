@@ -176,6 +176,41 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
     \label{fig:elasticnet_one_to_one}
 \end{figure*}
 
+
+\begin{table}
+\centering
+\caption{Comparison of \gls{rmsep} values for the \gls{moc} (replica) model and various stacking ensemble models.}
+\resizebox{0.45\textwidth}{!}{
+\begin{tabular}{lccccc}
+\toprule
+Oxide          & \gls{moc} (replica) & \gls{enet} ($\alpha = 1$) & \gls{enet} ($\alpha = 0.1$) & \gls{svr} \\
+\midrule
+\ce{SiO2}      & 5.61          & 3.588              & 3.598                & \textbf{3.473} \\
+\ce{TiO2}      & 0.61          & 0.571              & \textbf{0.319}       & 0.340 \\
+\ce{Al2O3}     & 2.47          & \textbf{1.656}     & 1.658                & 1.729 \\
+\ce{FeO_T}     & 1.82          & 1.794              & 1.841                & \textbf{1.693} \\
+\ce{MgO}       & 1.56          & \textbf{0.711}     & 0.768                & 0.819 \\
+\ce{CaO}       & 2.09          & \textbf{1.636}     & 1.647                & 1.594 \\
+\ce{Na2O}      & 1.33          & 0.470              & 0.442                & \textbf{0.369} \\
+\ce{K2O}       & 1.91          & \textbf{0.476}     & 0.494                & 0.511 \\
+\bottomrule
+\end{tabular}
+}
+\label{tab:stacking_ensemble_vs_moc}
+\end{table}
+
+Table~\ref{tab:stacking_ensemble_vs_moc} compares the \gls{rmsep} values of different oxides for the \gls{moc} (replica) model with three stacking ensemble models: \gls{enet} with $\alpha = 1$, \gls{enet} with $\alpha = 0.1$, and \gls{svr}.
+
+Overall, the stacking ensemble models tend to produce lower \gls{rmsep} values compared to the \gls{moc} (replica) model. Notably, \ce{SiO2}, \ce{TiO2}, \ce{Na2O}, and \ce{K2O} show significant improvements across all stacking ensemble models. For instance, the \gls{rmsep} for \ce{SiO2} is reduced from 5.61 (\gls{moc} (replica)) to around 3.588-3.598 (\gls{enet} with $\alpha = 1$) and further to 3.473 (\gls{svr}). Similarly, \ce{TiO2} shows a reduction from 0.61 (\gls{moc} (replica)) to 0.319-0.340 (\gls{enet} with $\alpha = 1$). 
+
+The improvements are consistent across most oxides, with \gls{enet} and \gls{svr} models both outperforming the \gls{moc} (replica) model. This suggests that the ensemble approach, particularly with these meta-learners, enhances prediction accuracy for the oxides tested.
+
+
+
+
+
+
+
 \begin{figure*}
     \centering
     \resizebox{0.75\textwidth}{!}{
