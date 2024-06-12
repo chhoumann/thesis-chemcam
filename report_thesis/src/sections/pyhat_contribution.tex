@@ -1,0 +1,21 @@
+\section{PyHAT Contribution}\label{sec:pyhat_contribution}
+As part of our research, we have made several contributions to \gls{pyhat}, which offers a user-friendly interface designed for performing machine learning and data analysis tasks specifically for hyperspectral data.
+This collaboration was initiated through a series of discussions with two members \gls{usgs} responsible for managing \gls{pyhat}, wherein we identified mutual challenges and opportunities for integrating our solutions into the library.
+
+The largest contribution involved the integration of an automatic outlier detection method into the library's \gls{pls} implementation. 
+This method calculates the Mahalanobis distance for each data point and uses the chi-squared distribution to establish a threshold.
+Any datapoint exceeding this threshold is considered an out and removed from the dataset.
+Utilizing two intermediary \gls{pls} models, one as a reference and the other to evaluate the impact of outlier removal, the method iteratively identifies and eliminates outliers while assessing the performance of the second model against the reference model. 
+If the second model demonstrates improved performance compared to the reference model, it replaces the reference model, and the process continues until no further significant improvement is detected. 
+To conserve computational resources, the method halts if the error of the second model increases relative to the reference model, thus providing an early stopping mechanism.
+
+This contribution also included the development of a graphical user interface (GUI) component for the existing \gls{pyhat} GUI to visualize the outlier removal process in real-time.
+This included utilities to select a threshold, select a given oxide for which to perform outlier removal, and a logging mechanism to display the number of outliers removed at each iteration in the GUI.
+
+Another contribution made to \gls{pyhat} involved a fix of an important functionality in their Joint Approximation Diagonalization of Eigen-matrices (JADE) implementation.
+The fix provided the ability to properly identify which of the original data points has the highest correlation with each independent component produced by JADE.
+The correlation scores produced by this functionality can be used in a regression context, where a linear model learns the coefficients that best fit the relationship between the independent components and the original data points.
+
+Finally, contribution were made to improve the performance of various processes in \gls{pyhat}.
+
+ 
