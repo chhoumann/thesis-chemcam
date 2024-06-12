@@ -15,7 +15,7 @@ The category-based method organizes models into the following groups:
 \begin{itemize}
     \item Gradient Boosting: \gls{gbr}, \gls{xgboost}, \gls{ngboost}
     \item Tree-Based: \gls{etr}, \gls{rf}
-    \item Linear and Regularized Models: \gls{lasso}, ridge, \gls{enet}
+    \item Linear and Regularized Models: \gls{lasso}, Ridge, \gls{enet}
     \item SVM: \gls{svr}
     \item PLS: \gls{pls}
 \end{itemize}
@@ -55,9 +55,32 @@ We chose not to further pursue this method due to the time constraints of this p
 
 
 \subsubsection{Results}\label{subsec:stacking_ensemble_results}
-
 For each major oxide, we ran the stacking ensemble and evaluated its performance.
-The results, including \gls{rmsep} and standard deviations, were logged and visualized using actual versus predicted plots.
+We evaluated the stacking ensemble using the same configurations, varying only the meta-learner between runs.
+We present the results for the \gls{enet} meta-learner, as well as the results for \gls{enet} meta-learner with \texttt{alpha} = 0.1.
+We also present the results for \gls{svr} meta-learner, for which we used the default hyperparameters supplied by \texttt{scikit-learn}.
+
+The evaluation metrics are shown in Table~\ref{tab:stacking_ensemble_results_enet}, Table~\ref{tab:stacking_ensemble_results_enet_01}, and Table~\ref{tab:stacking_ensemble_results_svr}.
+We also provide 1:1 plots for each ensemble in Figures~\ref{fig:elasticnet_one_to_one}, \ref{fig:enetalpha01_one_to_one}, and \ref{fig:svr_one_to_one}, showing the actual versus predicted values for each oxide.
+
+A notable observation from our results is that different meta-learners exhibited varying performance levels across oxides.
+We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions nonsensical, if the wrong meta-learner was chosen.
+This observation was made because we observed \ce{TiO2} predictions that were consistently near-constant values, despite varying the combination of model configurations in the \ce{TiO2} ensemble.
+In fact, this was the reason for our implementation of the grid search process.
+The consistency we observed suggested that our hypothesis is correct: changing only the meta-learner significantly impacts the \gls{rmsecv} and prediction outcomes.
+We decided to investigate further, and identified potential issues with small value predictions when using a \gls{enet} meta-learner.
+For example, most values for \ce{TiO2} fell between 0 and 2.5, as shown in Figure~\ref{fig:oxide_distributions}.
+The regularization term likely dominated the fitting process, leading to underfitting, which resulted in nearly constant predictions.
+This hypothesis was confirmed by adjusting the regularization parameter, \texttt{alpha}, in the \gls{enet}.
+The 1:1 plot in Figure~\ref{fig:elasticnet_one_to_one} shows the near-constant predictions for \ce{TiO2} when using a \gls{enet} meta-learner, and Figure~\ref{fig:enetalpha01_one_to_one} shows the improved predictions with \texttt{alpha} = 0.1.
+Lowering \texttt{alpha} produced better outcomes, indicating that regularization adversely affected the predicted values.
+
+This leads us to conclude that the meta-learner's choice significantly impacts the \gls{rmsecv} and prediction outcomes.
+
+
+
+
+
 The stacking approach demonstrated significant improvements in prediction accuracy, validating the efficacy of our methodology.
 % WIP
 
@@ -120,18 +143,6 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
 \label{tab:stacking_ensemble_results_svr}
 \caption{Stacking ensemble results using the \gls{svr} model as the meta-learner with default hyperparameters.}
 \end{table}
-
-Our investigation revealed that different meta-learners exhibited varying performance levels across different oxides.
-We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions unreliable, if the wrong meta-learner was chosen.
-This observation was made because we observed \ce{TiO2} predictions that were consistently near-constant values, despite varying the combination of model configurations in the \ce{TiO2} ensemble.
-In fact, this was the reason for our implementation of the grid search process.
-The consistency we observed suggests that our hypothesis is correct: changing only the meta-learner significantly impacts the \gls{rmsecv} and prediction outcomes.
-Specifically, we identified potential issues with small value predictions when using a \gls{enet} meta-learner.
-For example, most values for \ce{TiO2} fell between 0 and 2.5, as shown in Figure~\ref{fig:oxide_distributions}.
-The regularization term likely dominated the fitting process, leading to underfitting, which resulted in nearly constant predictions.
-This hypothesis was confirmed by adjusting the regularization parameter, \texttt{alpha}, in the \gls{enet} Regression.
-Lowering \texttt{alpha} produced better outcomes, indicating that regularization adversely affected the predicted values.
-This leads us to conclude that the meta-learner's choice significantly impacts the \gls{rmsecv} and prediction outcomes.
 
 \begin{figure*}
     \centering
