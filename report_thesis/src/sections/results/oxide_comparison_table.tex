@@ -1,5 +1,6 @@
 \begin{table*}
     \centering
+    \caption{Comparison of different scalers across the eight major oxides.}
     \begin{tabular}{lccccccccc}
         \toprule
         \textbf{Oxide} & \texttt{MaxAbsScaler} & \texttt{MinMaxScaler} & \texttt{Norm3Scaler} & \texttt{RobustScaler} & \texttt{StandardScaler} \\
@@ -15,13 +16,13 @@
         Total across oxides      & 2458 & 2855 & 5090 & 3167 & 2373 \\
         \bottomrule
     \end{tabular}
-    \caption{Comparison of different scalers across the eight major oxides.}
     \label{tab:scalers_comparison}
 \end{table*}
 
 
 \begin{table*}
     \centering
+    \caption{Comparison of different PCA types across the eight major oxides.}
     \begin{tabular}{lccccccccc}
         \toprule
         \textbf{Oxide} & \texttt{None} & \texttt{KernelPCA} & \texttt{PCA} \\
@@ -37,13 +38,13 @@
         Total across oxides      & 9419  & 3368 & 3156 \\
         \bottomrule
     \end{tabular}
-    \caption{Comparison of different PCA types across the eight major oxides.}
     \label{tab:pca_comparison}
 \end{table*}
 
 
 \begin{table*}
     \centering
+    \caption{Comparison of different transformers across the eight major oxides.}
     \begin{tabular}{lccccccccc}
         \toprule
         \textbf{Oxide} & \texttt{None} & \texttt{PowerTransformer} & \texttt{QuantileTransformer} \\
@@ -59,6 +60,5 @@
         Total across oxides      & 4956 & 5277 & 5710 \\
         \bottomrule
     \end{tabular}
-    \caption{Comparison of different transformers across the eight major oxides.}
     \label{tab:transformers_comparison}
 \end{table*}
