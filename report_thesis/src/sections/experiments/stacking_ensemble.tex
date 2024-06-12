@@ -72,8 +72,8 @@ Lowering \texttt{alpha} produced better outcomes, indicating that regularization
 The 1:1 plot in Figure~\ref{fig:elasticnet_one_to_one} shows the near-constant predictions for \ce{TiO2} when using a \gls{enet} meta-learner, and Figure~\ref{fig:enetalpha01_one_to_one} shows the improved predictions with \texttt{alpha} = 0.1.
 This leads us to conclude that the meta-learner's choice significantly impacts the \gls{rmsecv} and prediction outcomes.
 
-The stacking approach demonstrated significant improvements in prediction accuracy as compared to the baseline we described in Section~\ref{sec:baseline_replica}, validating the efficacy of our methodology.
-We measured this by \gls{rmsep}, as it provides the fairest comparison between the baseline and the stacking approach.
+The stacking approach demonstrated strong improvements in prediction accuracy compared to the baseline described in Section~\ref{sec:baseline_replica}, validating the efficacy of our methodology.
+We measured this improvement using \gls{rmsep}, which provides the fairest comparison between the baseline and the stacking approach.
 As mentioned, \gls{rmsep} evaluates the model's performance on the test set.
 In Section~\ref{sec:baseline_replica}, we described how the baseline test set was constructed by sorting extreme concentration values into the training set, and then performing a random split.
 As noted in Section~\ref{subsec:validation_testing_procedures}, required a more sophisticated procedure to support the testing and validation strategy in this work.
