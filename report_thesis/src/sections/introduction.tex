@@ -41,13 +41,16 @@ Our key contributions are as follows:
 \end{itemize}
 
 The remainder of this paper is organized as follows:
-In Section~\ref{sec:related-work}, we review the related work on quantitative analysis in the field of \gls{libs} data analysis.
-Section~\ref{sec:problem_definition} formally defines the problem addressed in this work.
-Section~\ref{sec:background} provides an overview of the data used in this work, the preprocessing techniques, and the machine learning models and techniques employed in our proposed pipeline.
-In Section~\ref{sec:baseline_replica}, we present a brief introduction to the \gls{moc} model and our previous work on replicating it. The results are used as a baseline comparison for our stacking ensemble.
-Section~\ref{sec:proposed_approach} introduces our proposed approach to addressing the problem definition, including model and preprocessing selection, data partitioning and cross-validation strategy, and our optimization framework.
-Section~\ref{sec:methodology} details our experimental design and presents the results of the experiments conducted in this work, including those of our stacking ensemble.
-Finally, Sections~\ref{sec:conclusion} and \ref{sec:future_work} conclude the paper by summarizing our findings, discussing the implications of our work, and providing suggestions for future research.
+In the following sections, we provide a comprehensive exploration of our research.
+Section~\ref{sec:related-work} reviews the existing literature on \gls{libs} data analysis and machine learning models, highlighting previous approaches and their limitations.
+Section~\ref{sec:problem_definition} formally defines the problem we address, focusing on the challenges of high dimensionality, multicollinearity, and matrix effects in \gls{libs} data.
+Section~\ref{sec:background} offers background information on the data, as well as the preprocessing techniques and machine learning models that were used.
+In Section~\ref{sec:baseline_replica}, we describe the baseline model used for Martian geological sample analysis, our efforts to replicate it, and the modifications made to improve its performance.
+This was then used as a baseline to evaluate our proposed stacking ensembles against.
+Section~\ref{sec:proposed_approach} presents our proposed approach for optimizing pipeline configurations, detailing the selection of models and preprocessing techniques, our approach to data partitioning, validation and testing procedures, and the implementation of the hyperparameter optimization framework.
+Section~\ref{sec:methodology} presents the design and results of our experiments, as well as the analysis of the results.
+Our experiments include initial model selection, hyperparameter optimization, and the final evaluation of our proposed stacking ensemble.
+Finally, Section~\ref{sec:conclusion} summarizes our key findings and contributions, while Section~\ref{sec:future_work} discusses potential future research directions and improvements.
 
 Due to the overlapping nature of terminology used in \gls{libs} data analysis and machine learning, we provide a list of terms in Table~\ref{tab:terms} to clarify their meaning.
 
