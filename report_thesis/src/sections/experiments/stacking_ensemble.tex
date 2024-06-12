@@ -54,15 +54,15 @@ We chose not to pursue this method further due to the time constraints of this p
 
 \subsubsection{Results}\label{subsec:stacking_ensemble_results}
 For each major oxide, we ran the stacking ensemble and evaluated its performance.
-We evaluated the stacking ensemble using the same configurations, varying only the meta-learner between runs.
-We present the results for the \gls{enet} meta-learner, as well as the results for \gls{enet} meta-learner with \texttt{alpha} = 0.1.
-We also present the results for \gls{svr} meta-learner, for which we used the default hyperparameters supplied by \texttt{scikit-learn}.
+The evaluations were conducted using the same configurations, varying only the meta-learner between runs.
+We present the results for the \gls{enet} meta-learner with \texttt{alpha} = 1.0, as well as for the \gls{enet} meta-learner with \texttt{alpha} = 0.1.
+Additionally, we present the results for the \gls{svr} meta-learner, using the default hyperparameters provided by \texttt{scikit-learn}.
 
 The evaluation metrics are shown in Table~\ref{tab:stacking_ensemble_results_enet}, Table~\ref{tab:stacking_ensemble_results_enet_01}, and Table~\ref{tab:stacking_ensemble_results_svr}.
-We also provide 1:1 plots for each ensemble in Figures~\ref{fig:elasticnet_one_to_one}, \ref{fig:enetalpha01_one_to_one}, and \ref{fig:svr_one_to_one}, showing the actual versus predicted values for each oxide.
+Additionally, we provide 1:1 plots for each ensemble in Figures~\ref{fig:elasticnet_one_to_one}, \ref{fig:enetalpha01_one_to_one}, and \ref{fig:svr_one_to_one}, showing the actual versus predicted values for each oxide.
 
 A notable observation from our results is that different meta-learners exhibited varying performance levels across oxides.
-We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions nonsensical, if the wrong meta-learner was chosen.
+We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions nonsensical if the wrong meta-learner was chosen.
 This observation was made because we observed \ce{TiO2} predictions that were consistently near-constant values, despite varying the combination of model configurations in the \ce{TiO2} ensemble.
 In fact, this was the reason for our implementation of the grid search process.
 The consistency we observed suggested that our hypothesis is correct: changing only the meta-learner significantly impacts the \gls{rmsecv} and prediction outcomes.
