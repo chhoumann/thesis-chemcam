@@ -3,17 +3,21 @@ The findings of this study present several opportunities for future research.
 Firstly, regarding our data partitioning algorithm detailed in Section~\ref{subsubsec:dataset_partitioning}, we observed the significance of identifying the optimal percentile value $p$. 
 This value is crucial for minimizing extreme values in the test set while preserving its overall representativeness.
 Future work should explore quantitative methods for determining this optimal value.
-Such methods could involve incorporating supplementary extreme value testing into the data partitioning algorithm. 
-After the primary evaluation, additional testing could be conducted using a small, separate subset of extreme values to assess the model's performance in these critical scenarios.
+
+Another potential improvement to the validation and testing approach we delineate is incorporating supplementary extreme value testing after the preimary evaluation.
+This type of testing could be conducted using a small, separate subset of extreme values to assess the model's performance in these critical scenarios.
 For example, this might involve slightly reducing the percentile value $p$ and using the extreme values that fall within this reduced range to evaluate the model's effectiveness.
 
-Another point of interest is the limited data availability.
+Tackling the challenges of limited data availability has proven important, as we mention throughout our report.
 The small dataset size inherently restricts the number of extreme values present.
 These extreme values are crucial for enhancing the model's generalizability, as they represent the most challenging cases to predict.
-Future research should investigate methods for augmenting the dataset with synthetic extreme value data to provide the model with more exposure to these cases during training.
+Future research could investigate methods for augmenting the dataset with synthetic data, including extreme values, to provide the model with more exposure to these cases during training.
+This is a hard task, as it requires the production of synthethic data for a physics-based process.
+We contemplate that some approximation may be sufficient, and could be used, for instance, as part of a transfer-learning project as inital training material.
 
 Future work should also consider further experimentation with the choices of base estimators and meta-learners.
 Our study demonstrated that various model and preprocessor configurations perform well.
 However, identifying the optimal configurations and meta-learner for a specific oxide remains a challenging task.
 In this study, we used a simple grouping method to ensure diversity in our base estimator selection, choosing from the top-performing configurations.
-This approach could be improved upon by, for example, developing more advanced selection methods that consider the interactions between base estimators and meta-learners.
+We also experimented briefly with a grid search approach, which could be examined further.
+However, using a variation of the optimization framework we presented is likely to provide better trade-offs, as we have discussed.
