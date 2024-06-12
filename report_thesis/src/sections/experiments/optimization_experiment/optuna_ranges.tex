@@ -1,5 +1,6 @@
 \begin{table*}
 \centering
+\caption{Optuna preprocessing configuration ranges.}
 \begin{tabular}{@{}l>{\ttfamily}lp{0.5\textwidth}@{}}
 \toprule
 \textbf{Model}                       & \textbf{Parameter}                & \textbf{Range}                           \\ \midrule
@@ -22,13 +23,13 @@ MinMaxScaler                         & feature\_range                    & \{0,1
 MaxAbsScaler                         & -                                 & -                                        \\ \midrule
 Norm3Scaler                          & -                                 & -                                        \\ \midrule
 \end{tabular}
-\caption{Optuna preprocessing configuration ranges.}
 \label{tab:optuna_preprocessing_configurations}
 \end{table*}
 
 
 \begin{table*}
 \centering
+\caption{Optuna model configuration ranges.}
 \begin{tabular}{@{}l>{\ttfamily}lp{0.5\textwidth}@{}}
 \toprule
 \textbf{Model}                 & \textbf{Parameter}          & \textbf{Range}                           \\ \midrule
@@ -76,6 +77,5 @@ Ridge                          & alpha                       & $10^{-3}$ - $10^{
                                & min\_samples\_leaf          & 1 - 10                                    \\ \cmidrule{2-3}
                                & max\_features               & \{sqrt, log2\}                            \\ \bottomrule
 \end{tabular}
-\caption{Optuna model configuration ranges.}
 \label{tab:optuna_model_configurations}
 \end{table*}
