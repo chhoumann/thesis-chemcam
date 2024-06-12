@@ -59,6 +59,25 @@ Additionally, we present the results for the \gls{svr} meta-learner, using the d
 The evaluation metrics are shown in Table~\ref{tab:stacking_ensemble_results_enet}, Table~\ref{tab:stacking_ensemble_results_enet_01}, and Table~\ref{tab:stacking_ensemble_results_svr}.
 Additionally, we provide 1:1 plots for each ensemble in Figures~\ref{fig:elasticnet_one_to_one}, \ref{fig:enetalpha01_one_to_one}, and \ref{fig:svr_one_to_one}, showing the actual versus predicted values for each oxide.
 
+For the \gls{enet} meta-learner with $\alpha = 1$, the \gls{rmsep} values range from 0.470 for \ce{Na2O} to 3.588 for \ce{SiO2}.
+The \gls{rmsecv} values are generally higher, which could initially suggest overfitting.
+However, considering our testing and validation strategy, this discrepancy is expected.
+Our method for partitioning ensures that extreme values are included in the training folds but not in the test set, making the test set easier to predict.
+This results in lower \gls{rmsep} values compared to \gls{rmsecv} values, which is a deliberate trade-off to provide a fairer assessment of the model's generalization performance.
+The standard deviations of the \gls{rmsecv} are relatively low, suggesting consistent performance across folds.
+However, the \gls{rmsep} values indicate that the model's performance on the test set is not as robust, particularly for \ce{SiO2} and \ce{FeO_T}.
+
+When the \gls{enet} meta-learner's $\alpha$ is reduced to 0.1, there is a noticeable improvement in the \gls{rmsep} for \ce{TiO2}, dropping from 0.571 to 0.319.
+This suggests that reducing the regularization parameter helps in better capturing the variance in the data.
+The \gls{rmsecv} values also show a slight improvement, indicating better generalization.
+However, the standard deviations remain similar, suggesting that the model's consistency across folds is maintained.
+
+The \gls{svr} meta-learner shows the best performance for several oxides, particularly \ce{SiO2} and \ce{Na2O}, with \gls{rmsep} values of 3.473 and 0.369, respectively.
+
+The results presented above indicate a strong performance from the stacking ensemble approach.
+However, it is important to note that some evaluation metrics are worse in the stacking approach than in certain individual configurations.
+We believe that further tuning, particularly of the meta-learner's hyperparameters, could substantially improve these results.
+
 A notable observation from our results is that different meta-learners exhibited varying performance levels across oxides.
 We observed that the final predictions were strongly affected by the meta-learner, going as far as rendering some predictions nonsensical if the wrong meta-learner was chosen.
 Specifically, for \ce{TiO2}, we observed that predictions remained near-constant values despite varying the combination of model configurations in the \ce{TiO2} ensemble.
@@ -85,10 +104,6 @@ For instance, the \gls{rmsep} for \ce{SiO2} is reduced from 5.61 (\gls{moc} (rep
 Similarly, \ce{TiO2} shows a reduction from 0.61 (\gls{moc} (replica)) to 0.32 (\gls{enet} with $\alpha = 0.1$).
 The improvements are consistent across most oxides, with \gls{enet} and \gls{svr} models both outperforming the \gls{moc} (replica) model.
 This shows that the ensemble approach, particularly with these meta-learners, enhances prediction accuracy for the oxides we tested.
-
-The results presented above indicate a strong performance from the stacking ensemble approach.
-However, it is important to note that some evaluation metrics are worse in the stacking approach than in certain individual configurations.
-We believe that further tuning, particularly of the meta-learner's hyperparameters, could substantially improve these results.
 
 \begin{table}
 \centering
