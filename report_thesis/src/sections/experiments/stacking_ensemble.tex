@@ -74,6 +74,9 @@ However, the standard deviations remain similar, suggesting that the model's con
 
 The \gls{svr} meta-learner shows the best performance for several oxides, particularly \ce{SiO2} and \ce{Na2O}, with \gls{rmsep} values of 3.473 and 0.369, respectively.
 
+We generally observe that the standard deviation metrics are close to the corresponding \gls{rmse} values, indicating low variability in the prediction errors.
+This suggests robustness of the predictions.
+
 The results presented above indicate a strong performance from the stacking ensemble approach.
 However, it is important to note that some evaluation metrics are worse in the stacking approach than in certain individual configurations.
 We believe that further tuning, particularly of the meta-learner's hyperparameters, could substantially improve these results.
@@ -110,7 +113,7 @@ This shows that the ensemble approach, particularly with these meta-learners, en
 \caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with $\alpha = 1$.}
 \begin{tabular}{lcccc}
 \toprule
-Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
+Oxide          & \gls{rmsep} & Std. Dev. & \gls{rmsecv}         & Std. Dev. CV          \\
 \midrule
 \ce{SiO2}      & 3.588       & 3.582  & 4.680 $\pm$ 0.500    & 4.670 $\pm$ 0.516     \\
 \ce{TiO2}      & 0.571       & 0.565  & 0.818 $\pm$ 0.111    & 0.814 $\pm$ 0.117     \\
@@ -130,7 +133,7 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
 \caption{Stacking ensemble results using the \gls{enet} model as the meta-learner with $\alpha = 0.1$.}
 \begin{tabular}{lcccc}
 \toprule
-Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
+Oxide          & \gls{rmsep} & Std. Dev. & \gls{rmsecv}         & Std. Dev. CV          \\
 \midrule
 \ce{SiO2}      & 3.598       & 3.591  & 4.686 $\pm$ 0.489    & 4.677 $\pm$ 0.505     \\
 \ce{TiO2}      & 0.319       & 0.310  & 0.450 $\pm$ 0.083    & 0.448 $\pm$ 0.083     \\
@@ -150,7 +153,7 @@ Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV     
 \caption{Stacking ensemble results using the \gls{svr} model as the meta-learner with default hyperparameters.}
 \begin{tabular}{lcccc}
 \toprule
-Oxide          & \gls{rmsep} & STDDEV & \gls{rmsecv}         & Std. Dev. CV          \\
+Oxide          & \gls{rmsep} & Std. Dev. & \gls{rmsecv}         & Std. Dev. CV          \\
 \midrule
 \ce{SiO2}      & 3.473       & 3.478  & 5.064 $\pm$ 0.932    & 5.061 $\pm$ 0.926     \\
 \ce{TiO2}      & 0.340       & 0.333  & 0.442 $\pm$ 0.087    & 0.442 $\pm$ 0.087     \\
