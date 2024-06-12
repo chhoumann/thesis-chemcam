@@ -1,0 +1,55 @@
+\section*{Summary}
+In our thesis, we aim to enhance the quantitative analysis of \gls{libs} data for predicting major oxide compositions in geological samples.
+Our study integrates machine learning techniques and ensemble regression models to tackle challenges such as high dimensionality, multicollinearity, and limited data availability.
+Key innovations include the use of stacked generalization for improved model performance and an automated hyperparameter optimization framework, which enhances the accuracy and robustness of predictions.
+
+\vspace{0.5em}
+
+NASA has utilized rovers equipped with sophisticated instruments for decades to analyze the Martian environment.
+Techniques like \gls{libs}, which involve firing high-powered lasers at soil samples to create plasma, play a crucial role in these missions.
+The emitted light is captured by spectrometers and the resulting spectra can be analyzed using machine learning models to determine the presence and concentration of major oxides, providing insights into Mars' geology.
+However, predicting oxide compositions from \gls{libs} data presents significant computational challenges due to the data's high dimensionality, non-linearity, and multicollinearity.
+Additionally, the high cost of data collection often results in small datasets, making it difficult to build accurate and robust models.
+
+\vspace{0.5em}
+
+Previous research has attempted to improve predictions using regression techniques and dimensionality reduction methods, enhancing both accuracy and interpretability.
+However, the complex, nonlinear nature of \gls{libs} data remains a significant challenge, necessitating more adaptive and robust machine learning strategies.
+Our thesis aims to build upon previous work by developing a machine learning pipeline tailored to the unique characteristics of \gls{libs} data, aiming for higher prediction accuracy and robustness.
+
+\vspace{0.5em}
+
+To achieve these objectives, we systematically explore ten different machine learning models identified through extensive literature review and the consideration of unconventional approaches.
+These models fall into three categories: ensemble learning models, linear and regularization models, and neural network models.
+Additionally, we investigate various preprocessing techniques, including scaling, dimensionality reduction, and data transformation.
+An automated hyperparameter optimization framework, Optuna, is used to determine the most effective combinations of preprocessing methods and models for each regression target.
+
+\vspace{0.5em}
+
+The result is a comprehensive catalog of models and preprocessing techniques for predicting major oxide compositions in \gls{libs} data.
+This catalog features highly effective configurations for each of the eight major oxides examined in our study.
+To further enhance performance, we experiment with stacking ensemble methods using the best-performing configurations for each oxide and three different meta-learners, demonstrating improved performance of approximately 24\%-34\% over baseline \gls{rmsep}.
+
+\vspace{0.5em}
+
+Our study makes several key contributions.
+Firstly, it provides a comprehensive catalog of machine learning models and preprocessing techniques for predicting major oxide compositions in \gls{libs} data.
+This catalog presents highly effective configurations, allowing for a more informed selection of models and preprocessing techniques in future work.
+Secondly, we contribute directly to the development of \gls{pyhat}, a Python-based toolset by the \gls{usgs} for machine learning and data analysis on hyperspectral data.
+The integration of our findings into \gls{pyhat} enhances its capabilities for the scientific community.
+
+\vspace{0.5em}
+
+In our experiments, we demonstrate the effectiveness of various machine learning models in predicting major oxide compositions from \gls{libs} data.
+We also show that preprocessing techniques such as scaling, dimensionality reduction, and data transformation can significantly enhance model performance.
+Additionally, we present evidence that the optimal combination of model and preprocessing technique varies significantly depending on the specific oxide being predicted.
+Systematic evaluation through cross-validation and hyperparameter tuning is essential to fine-tune the models for optimal performance on specific oxides.
+We therefore propose a stacking ensemble methodology, integrating multiple models and preprocessing steps tailored to the specific characteristics of the data and the oxide being predicted.
+
+\vspace{0.5em}
+
+Based on the findings of our study, we propose several avenues for future research.
+This includes exploring quantitative methods for determining optimal percentile values for data partitioning, incorporating supplementary extreme value testing, and investigating methods for augmenting datasets with synthetic data.
+We also highlight the importance of further experimentation with different base estimators and meta-learners to improve model performance.
+
+\glsresetall
