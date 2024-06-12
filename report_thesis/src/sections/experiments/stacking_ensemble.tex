@@ -4,8 +4,8 @@ As with all our experiments, we follow the procedure outlined in Section~\ref{su
 
 For each oxide, we first identified the top-performing configurations to use in the stacking ensemble.
 To identify the top-performing configurations for use in the stacking ensemble, we developed a category-based method that groups models into distinct categories for systematic comparison.
-This approach aids in selecting models that perform optimally for specific tasks, and ensures diversity in the ensemble.
-We also briefly developed and employed a grid search to find the optimal ensemble of configurations, but time constraints prevented its full implementation.
+This approach helps in selecting models that perform optimally for specific tasks while ensuring diversity within the ensemble.
+Additionally, we developed and employed a grid search to identify the optimal ensemble configurations, but time constraints prevented us from fully completing this process.
 Finally, we employed the stacking model and evaluated its performance.
 We present the results as well as the 1:1 plots in Section~\ref{subsec:stacking_ensemble_results}.
 
@@ -20,7 +20,7 @@ The category-based method organizes models into the following groups:
     \item PLS: \gls{pls}
 \end{itemize}
 
-We use the top-performing configurations that we identified in Section~\ref{sec:optimization_results} to identify configurations for the stacking ensemble.
+We used the top-performing configurations identified in Section~\ref{sec:optimization_results} to select configurations for the stacking ensemble.
 
 For each oxide, we filtered the trial data from the optimization experiment to create a dataset containing configuration information and performance metrics.
 These datasets were sorted by \gls{rmsecv}.
