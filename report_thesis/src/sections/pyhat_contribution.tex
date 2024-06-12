@@ -21,7 +21,7 @@ Users can select their dataset and regression target, configure the method, and 
 This contribution also included the development of a \gls{gui} component for the existing \gls{pyhat} \gls{gui} to configure and visualize the outlier removal process.
 This included utilities to select a threshold, select a given oxide for which to perform outlier removal, and a logging mechanism to display the number of outliers removed at each iteration in the \gls{gui}.
 
-We also contributed by resolving a critical issue in the \gls{ica} \gls{jade} implementation within \gls{pyhat}.
+We also contributed by resolving a critical issue in the \gls{jade} implementation within \gls{pyhat}.
 The fix provided the ability to properly identify which of the original data points has the highest correlation with each independent component produced by the \gls{jade} algorithm.
 The correlation scores produced by this functionality can be used in a regression context, where a linear model learns the coefficients that best fit the relationship between the independent components and the original data points.
 
