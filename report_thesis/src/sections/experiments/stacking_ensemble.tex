@@ -76,7 +76,7 @@ The stacking approach demonstrated strong improvements in prediction accuracy co
 We measured this improvement using \gls{rmsep}, which provides the fairest comparison between the baseline and the stacking approach.
 As mentioned, \gls{rmsep} evaluates the model's performance on the test set.
 In Section~\ref{sec:baseline_replica}, we described how the baseline test set was constructed by sorting extreme concentration values into the training set, and then performing a random split.
-As noted in Section~\ref{subsec:validation_testing_procedures}, required a more sophisticated procedure to support the testing and validation strategy in this work.
+As noted in Section~\ref{subsec:validation_testing_procedures}, a more sophisticated procedure is required to support the testing and validation strategy in this work.
 Despite the differences in test set construction, the test sets remained similar in composition\footnote{The analysis of this can be found on our GitHub repository: \url{https://github.com/chhoumann/thesis-chemcam}}, which allowed us to use \gls{rmsep} as a fair comparison metric.
 Table~\ref{tab:stacking_ensemble_vs_moc} compares the \gls{rmsep} values of different oxides for the \gls{moc} (replica) model with three stacking ensemble models: \gls{enet} with $\alpha = 1$, \gls{enet} with $\alpha = 0.1$, and \gls{svr}.
 Overall, the stacking ensemble models tend to produce lower \gls{rmsep} values compared to the \gls{moc} (replica) model.
