@@ -6,27 +6,28 @@ Our research confronted and addressed critical challenges, including the complex
 These issues traditionally hinder the accurate prediction of major oxides from spectral data, necessitating the development of robust and adaptive computational methodologies.
 
 Throughout our study, we systematically explored a diverse range of machine learning models, categorized into ensemble learning models, linear and regularization models, and neural network models.
-By implementing a rigorous evaluation framework, we identified the strengths and limitations of each model within the context of \gls{libs} data analysis.
+Using the developed evaluation framework, we identified the strengths and limitations of each model in relation to predicting major oxides within the context of \gls{libs} data analysis.
 
 Normalization and transformation techniques played a crucial role in our approach.
 We investigated and employed various methods such as Z-Score standardization, Max Absolute scaling, Min-Max normalization, robust scaling, Norm 3, power transformation, and quantile transformation.
 These techniques proved vital for standardizing the data, managing different scales, and ultimately enhancing the performance of our models.
 
-Dimensionality reduction methods like \gls{pca} and \gls{kernel-pca} seemed promising in addressing the high dimensionality of the spectral data, but did not conclusive results regarding their efficacy.
+Dimensionality reduction techniques such as \gls{pca} and \gls{kernel-pca} showed potential in managing the high dimensionality of the spectral data; however, their efficacy was not conclusively demonstrated.
 
 One of the key innovations in our approach was the use of stacked generalization.
+Such an approach has seen limited use in the field \gls{libs} data analysis and our work demonstrated its potential in this context.
 This ensemble method combined the predictions of multiple base models, each trained on the same data, to form a meta-learner.
-This technique leveraged the strengths of various models, mitigated their individual weaknesses, and significantly improved generalization on unseen data.
+By leveraging the strengths of various models and mitigating their individual weaknesses, this technique significantly improved generalization on unseen data.
 
-We also designed and implemented a framework using the automated hyperparameter optimization tool, Optuna.
-This framework allowed us to identify the most effective combinations of preprocessing methods and models tailored to the specific characteristics of each oxide, ensuring optimal performance.
+We also designed and implemented a framework, using the automated hyperparameter optimization tool Optuna as its foundation.
+This framework allowed us to identify the most effective combinations of preprocessing methods and models tailored to the specific characteristics of each oxide, ensuring highly effective performance.
 
-Finally, we also designed and implemented a method for data partitioning that addresses the challenges of data leakage and uneven distribution of extreme values, ensuring robust and reliable model evaluation.
+Finally, we designed and implemented a data partitioning method that addresses the challenges of data leakage and uneven distribution of extreme values, ensuring robust and reliable model evaluation.
 
 The outcome of our work is a comprehensive catalog of machine learning models and preprocessing techniques for predicting major oxide compositions in \gls{libs} data.
-This catalog, featuring highly effective configurations, provides a resource for future research and model selection.
+This catalog, featuring highly effective configurations, provides a resource for future research and model and preprocessor selection.
 
 Moreover, our contributions extend beyond this thesis.
-We integrated our findings into the \gls{pyhat} developed by the \gls{usgs}, enhancing its capabilities for the scientific community.
+We integrated our findings into the \gls{pyhat} library developed by the \gls{usgs}, thereby enhancing its capabilities for the scientific community.
 
 In conclusion, by addressing the inherent challenges and developing a robust computational framework, this thesis has laid groundwork for future advancements in geochemical analysis and planetary exploration using \gls{libs} data.
