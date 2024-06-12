@@ -65,7 +65,6 @@ However, considering our testing and validation strategy, this discrepancy is ex
 Our method for partitioning ensures that extreme values are included in the training folds but not in the test set, making the test set easier to predict.
 This results in lower \gls{rmsep} values compared to \gls{rmsecv} values, which is a deliberate trade-off to provide a fairer assessment of the model's generalization performance.
 The standard deviations of the \gls{rmsecv} are relatively low, suggesting consistent performance across folds.
-However, the \gls{rmsep} values indicate that the model's performance on the test set is not as robust, particularly for \ce{SiO2} and \ce{FeO_T}.
 
 When the \gls{enet} meta-learner's $\alpha$ is reduced to 0.1, there is a noticeable improvement in the \gls{rmsep} for \ce{TiO2}, dropping from 0.571 to 0.319.
 This suggests that reducing the regularization parameter helps in better capturing the variance in the data.
