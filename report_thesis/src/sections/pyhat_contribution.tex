@@ -1,0 +1,28 @@
+\section{PyHAT Contribution}\label{sec:pyhat_contribution}
+As part of our work, we have made several contributions to \gls{pyhat}. 
+We describe these contributions here.
+\gls{pyhat} offers a user-friendly interface designed for performing machine learning and data analysis tasks specifically for hyperspectral data.
+Our collaboration was initiated through a series of discussions with two members from \gls{usgs} that are responsible for \gls{pyhat}, wherein we identified mutual challenges and opportunities for integrating our solutions into the tool.
+
+We implemented an outlier detection method in \gls{pyhat} that uses the Mahalanobis distance and the chi-squared test.
+This statistical approach identifies outliers without relying on qualitative assessments.
+The process involves computing leverage, which measures a sample's influence, and spectral residuals, which are the differences between observed and predicted values, for each sample using a \gls{pls} model.
+These metrics are combined into a two-dimensional dataset, and the Mahalanobis distance for each sample is calculated.
+Samples are classified as outliers if their Mahalanobis distance exceeds a chi-squared critical value at a confidence level based on the threshold.
+Outliers are then excluded, and the model is retrained iteratively until no further performance improvement is observed.
+We developed this method as a part of our work on the \gls{moc} model replica presented in \citet{p9_paper}, where it served as an automated version of the one presented by \citet{andersonImprovedAccuracyQuantitative2017}.
+
+This method was integrated into \gls{pyhat}'s library and GUI, allowing users to configure the chi-squared threshold, number of \gls{pls} components, and maximum iterations.
+Users can select their dataset and regression target, configure the method, and run it through the GUI.
+
+This contribution also included the development of a graphical user interface (GUI) component for the existing \gls{pyhat} GUI to configure and visualize the outlier removal process.
+This included utilities to select a threshold, select a given oxide for which to perform outlier removal, and a logging mechanism to display the number of outliers removed at each iteration in the GUI.
+
+We also contributed by resolving a critical issue in the \gls{jade} implementation within \gls{pyhat}.
+The fix provided the ability to properly identify which of the original data points has the highest correlation with each independent component produced by \gls{jade}. 
+The correlation scores produced by this functionality can be used in a regression context, where a linear model learns the coefficients that best fit the relationship between the independent components and the original data points.
+
+Finally, we made some contributions to improve the performance of various processes in \gls{pyhat}.
+At the time of writing, all contributions has been demonstrated to work as intended to the two \gls{usgs} members responsible for managing \gls{pyhat} and are undergoing final review.
+
+ 

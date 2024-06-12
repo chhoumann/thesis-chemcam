@@ -58,6 +58,15 @@ These distributions confirm the presence of extreme values across all oxides, wh
 
 This necessitates careful dataset partitioning to ensure that the model training process accounts for these challenges, improving the generalizability and robustness of the models.
 
+In Section~\ref{sec:baseline_replica}, we described how we ensured representation of extreme compositions in both the training and testing sets by automatically identifying the $n$ largest and smallest samples by concentration range for each oxide and reserving them for the training set.
+We then performed a random split on the remaining dataset, resulting in a final train/test split of 80\%/20\%.
+In this process, we also employ a rudimentary procedure to prevent data leakage, ensuring that each target was only present once in the training set.
+The baseline did not employ cross-validation, as our goal was to replicate the \gls{moc} model that was presented in \citet{cleggRecalibrationMarsScience2017}.
+We note that this procedure is insufficient to support the testing and validation strategy we have laid out above, as it does not support $k$-fold cross-validation.
+A random $k$-fold split of the training data would not account for the uneven distribution of extreme values across the folds, and would furthermore cause data leakage between the folds.
+Moreover, the procedure failed to consider the concentration of each oxide individually, instead aggregating concentrations across all oxides. This represents a significant limitation, as it attempts to generate a uniform test set for each oxide, thereby neglecting the unique distribution characteristics of individual oxides.
+Therefore, a more sophisticated procedure is needed to ensure that the data partitioning accounts for these challenges.
+
 \subsubsection{Dataset Partitioning}\label{subsubsec:dataset_partitioning}
 To ensure rigorous evaluation of our models and to address the challenges of data leakage and uneven distribution of extreme values, we have implemented a customized k-fold data partitioning procedure.
 This approach divides the dataset into $k$ folds, which are used to define cross-validation datasets, as well as a training set and a test set.

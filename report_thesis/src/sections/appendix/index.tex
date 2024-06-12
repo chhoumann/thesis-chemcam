@@ -1,6 +1,10 @@
 \onecolumn
 \section{Appendix}
-\addcontentsline{toc}{section}{Appendix}
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thefigure}{\Alph{section}.\arabic{figure}}
+\renewcommand{\thetable}{\Alph{section}.\arabic{table}}
+\setcounter{figure}{0}
+\setcounter{table}{0}
 
 \subsection{Web-Based Platform for Data Partitioning Evaluation}\label{subsec:web_platform}
 \begin{figure}[!htb]
