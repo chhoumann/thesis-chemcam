@@ -1,5 +1,10 @@
 \onecolumn
-\section*{Appendix}
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thefigure}{\Alph{section}.\arabic{figure}}
+\renewcommand{\thetable}{\Alph{section}.\arabic{table}}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\section{Appendix}
 \addcontentsline{toc}{section}{Appendix}
 
 \subsection{Web-Based Platform for Data Partitioning Evaluation}\label{subsec:web_platform}
@@ -53,6 +58,7 @@
 \subsection{Initial Experiment: Model Hyperparameters}\label{subsec:initial_experiment_hyperparameters}
 \begin{table}[!htb]
 \centering
+\caption{Explictly set hyperparameters for the \gls{pls}, \gls{svr}, ridge, \gls{lasso}, \gls{enet}, \gls{rf}, and \gls{etr} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used.}
 \begin{tabular}{@{}llp{0.5\textwidth}@{}}
 \toprule
 \textbf{Model} & \textbf{Hyperparameter} & \textbf{Value} \\
@@ -102,7 +108,6 @@
 & \texttt{random\_state} & 42 \\
 \midrule
 \end{tabular}
-\caption{Explictly set hyperparameters for the \gls{pls}, \gls{svr}, ridge, \gls{lasso}, \gls{enet}, \gls{rf}, and \gls{etr} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used.}
 \label{tab:combined_hyperparameters}
 \end{table}
 
@@ -110,6 +115,7 @@
 
 \begin{table}[!htb]
 \centering
+\caption{Explictly set hyperparameters for the \gls{gbr} and \gls{xgboost} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used. The \gls{ngboost} model does not have any explicitly set hyperparameters.}
 \begin{tabular}{@{}llp{0.5\textwidth}@{}}
 \toprule
 \textbf{Model} & \textbf{Hyperparameter} & \textbf{Value} \\
@@ -149,7 +155,6 @@
 & \texttt{eval\_metric} & rmse \\
 \bottomrule
 \end{tabular}
-\caption{Explictly set hyperparameters for the \gls{gbr} and \gls{xgboost} models. When not explicitly set, the default hyperparameters provided by the libraries listed in Section~\ref{sec:experimental_setup} are used. The \gls{ngboost} model does not have any explicitly set hyperparameters.}
 \label{tab:combined_hyperparameters}
 \end{table}
 
@@ -173,7 +178,7 @@
     \multicolumn{3}{l}{\textbf{Learning Rate:} 0.001} \\
     \bottomrule
   \end{tabular}
-  \caption{Summary of the Neural Network Architecture}
+  \caption{Summary of the \gls{ann} architecture.}
   \label{tab:nn_architecture}
 \end{table}
 
@@ -181,6 +186,7 @@
 
 \begin{table}[!htb]
   \centering
+  \caption{Summary of the \gls{cnn} architecture.}
   \begin{tabular}{lll}
     \toprule
     \textbf{Layer} & \textbf{Output Shape} & \textbf{Hyperparameter} \\ \midrule
@@ -211,7 +217,6 @@
     \multicolumn{3}{l}{\textbf{Learning Rate:} 0.001} \\
     \bottomrule
   \end{tabular}
-  \caption{Summary of the Convolutional Neural Network Architecture}
   \label{tab:cnn_architecture}
 \end{table}
 

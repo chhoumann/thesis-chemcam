@@ -1,10 +1,11 @@
 \section{Future Work}\label{sec:future_work}
 The findings of this study present several opportunities for future research.
-Firstly, regarding our data partitioning algorithm detailed in Section~\ref{subsubsec:dataset_partitioning}, we observed the significance of identifying the optimal percentile value $p$. 
+
+Firstly, regarding our data partitioning algorithm detailed in Section~\ref{subsubsec:dataset_partitioning}, we observed the significance of identifying the optimal percentile value $p$.
 This value is crucial for minimizing extreme values in the test set while preserving its overall representativeness.
 Future work should explore quantitative methods for determining this optimal value.
 
-Another potential improvement to the validation and testing approach we delineate is incorporating supplementary extreme value testing after the preimary evaluation.
+Another potential improvement to the validation and testing approach we delineate is incorporating supplementary extreme value testing after the primary evaluation.
 This type of testing could be conducted using a small, separate subset of extreme values to assess the model's performance in these critical scenarios.
 For example, this might involve slightly reducing the percentile value $p$ and using the extreme values that fall within this reduced range to evaluate the model's effectiveness.
 
@@ -12,8 +13,8 @@ Tackling the challenges of limited data availability has proven important, as we
 The small dataset size inherently restricts the number of extreme values present.
 These extreme values are crucial for enhancing the model's generalizability, as they represent the most challenging cases to predict.
 Future research could investigate methods for augmenting the dataset with synthetic data, including extreme values, to provide the model with more exposure to these cases during training.
-This is a hard task, as it requires the production of synthethic data for a physics-based process.
-We contemplate that some approximation may be sufficient, and could be used, for instance, as part of a transfer-learning project as inital training material.
+This is a particularly challenging task, as it requires the production of synthetic data for a physics-based process.
+We contemplate that some approximation may be sufficient and could be used, for instance, as part of a transfer-learning project as initial training material.
 
 Future work should also consider further experimentation with the choices of base estimators and meta-learners.
 Our study demonstrated that various model and preprocessor configurations perform well.

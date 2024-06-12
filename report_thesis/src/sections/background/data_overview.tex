@@ -1,10 +1,11 @@
 \subsection{Data Overview}\label{sec:data-overview}
-Similarly to our previous work (\citet{p9_paper}), we used the publicly available \gls{ccs} data from NASA's \gls{pds}~\cite{PDSGeoscienceNode}.
+Similarly to our previous work (\citet{p9_paper}), we used the publicly available \gls{ccs} data from \gls{nasa}'s \gls{pds}~\cite{PDSGeoscienceNode}.
 \gls{ccs} refers to \gls{libs} data that has been through a series of preprocessing steps such as subtracting the ambient light background, noise removal and removing the electron continuum to derive data that is more suitable for quantitative analysis.
 A comprehensive description of this preprocessing procedure is available in \citet{wiensPreflightCalibrationInitial2013}.
 
 \begin{table*}
 \centering
+\caption{Example of CCS data for a single location (from \citet{p9_paper}).}
 \begin{tabular}{llllllll}
 \toprule
      wave &         shot1 &         shot2 &  $\cdots$ &        shot49 &       shot50  & median        & mean          \\
@@ -16,7 +17,6 @@ $\vdots$  & $\vdots$      & $\vdots$      & $\cdots$  & $\vdots$      & $\vdots$
 905.57349 & 1.9864713e+10 & 1.2956832e+10 & $\cdots$  & 1.9785415e+10 & 7.1994239e+09 & 1.1311150e+10 & 1.2201224e+10 \\
 \bottomrule
 \end{tabular}
-\caption{Example of CCS data for a single location (from \citet{p9_paper})}
 \label{tab:ccs_data_example}
 \end{table*}
 

@@ -1,5 +1,5 @@
 \subsection{Design for Initial Experiment}\label{sec:initial-experiment}
-As described in Section~\ref{sec:proposed_approach}, we conducted a series of initial experiments to evaluate the performance of various machine learning models on the prediction of major oxide compositions from our \gls{libs} dataset.
+As described in Section~\ref{sec:proposed_approach}, we conducted an initial experiment to evaluate the performance of various machine learning models on the prediction of major oxide compositions from our \gls{libs} dataset.
 These experiments aimed to provide a preliminary assessment of the models' performance, allowing us to identify the most promising models for further evaluation and inclusion in our stacking ensemble.
 All models were trained on the same preprocessed data using the Norm 3 preprocessing method described in Section~\ref{sec:norm3}.
 This ensured that the models' performance could be evaluated under consistent and comparable conditions.
@@ -8,7 +8,7 @@ Furthermore, all experiments used our data partitioning and were evaluated using
 To ensure as fair of a comparison between models as possible, all models were trained using as many default hyperparameters as possible, and those hyperparameters that did not have default options were selected based on values found in the literature.
 However, due to the nature of the neural network models' architecture, some extra time was spent on tuning the models to ensure a fair comparison.
 This included using batch normalization for the \gls{cnn} model, as early assesments showed that this was necessary to produce reasonable results.
-Finally, we evaluated each model once per oxide given the selected configuration of hyperparameters. 
+Finally, we evaluated each model once per oxide given the selected configuration of hyperparameters.
 As stated, the goal of this experiment was merely to get an initial indication of the performance of the models.
 
 The hyperparameters used for the models in the initial experiment can be found in the Appendix~\ref{subsec:initial_experiment_hyperparameters}.

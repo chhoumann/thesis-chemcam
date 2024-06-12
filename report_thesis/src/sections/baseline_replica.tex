@@ -34,7 +34,7 @@ This approach, however, did not align with the original model's results, likely 
 Following this discovery, we modified the replica to instead use the datasets in the same way as in the \gls{pls1-sm} phase, which yielded results aligning more closely with the original model.
 
 Furthermore, our initial replica used a random train/test split for training, in contrast to the original model's manual curation to ensure representation of extreme compositions in both sets.
-This difference stemmed from the original authors' application of domain expertize in their dataset curation --- a process we could not directly replicate.
+This difference stemmed from the original authors' application of domain expertise in their dataset curation --- a process we could not directly replicate.
 Nevertheless, we found that automatically identifying extreme compositions and ensuring that they were present in both the training and testing sets brought us closer to the original model.
 We chose to pull out the $n$ largest and smallest samples by concentration range, for each oxide, and reserve them for the training set.
 Then we would do a random split on the remaining dataset, such that the final train/test split would be a $80\%/20\%$ split.
@@ -62,6 +62,7 @@ Differences might also stem from varied implementation specifics, such as progra
 
 \begin{table*}
 	\centering
+	\caption{\gls{rmse}s of the original and our replicas of the \gls{pls1-sm}, \gls{ica}, and \gls{moc} models.}
 	\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllllll}
 		\toprule
 		Element    & \gls{pls1-sm} (original) & PLS1-SM (replica) & \gls{ica} (original) & ICA (replica) & \gls{moc} (original) & \gls{moc} (replica) \\
@@ -76,7 +77,6 @@ Differences might also stem from varied implementation specifics, such as progra
 		\ce{K2O}   & 0.72                     & 0.72              & 0.98                 & 1.38          & 0.82                 & 1.91                \\
 		\bottomrule
 	\end{tabular*}
-	\caption{\gls{rmse}s of the original and our replicas of the \gls{pls1-sm}, \gls{ica}, and \gls{moc} models.}
 	\label{tab:replica_results_rmses}
 \end{table*}
 
