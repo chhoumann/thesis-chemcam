@@ -25,10 +25,10 @@ We used the top-performing configurations identified in Section~\ref{sec:optimiz
 For each oxide, we filtered the trial data from the optimization experiment to create a dataset containing configuration information and performance metrics.
 These datasets were sorted by \gls{rmsecv}.
 We then selected unique model types for further analysis, based on the categories above.
-Our process involved selecting a set number of configurations for each category, until a maximum number of configurations for the oxide's ensemble was reached.
+Our process involved selecting a set number of configurations for each category until a maximum number of configurations for the oxide's ensemble was reached.
 
-To ensure diversity and limit scope, we set a maximum of 1 models per category and 3 models per stacking ensemble, with one ensemble for each oxide.
-For each oxide, we developed pipelines to preprocess the data in accordance with the given configuration, as well as use the models with their optimal hyperparameters.
+To ensure diversity and limit scope, we set a maximum of one model per category and three models per stacking ensemble, with one ensemble for each oxide.
+For each oxide, we developed pipelines to preprocess the data according to the given configuration and to utilize the models with their optimal hyperparameters.
 These pipelines represent the optimal configurations for each oxide, and are used as base estimators in the stacking ensemble.
 
 \subsubsection{Grid Search}\label{subsec:grid_search}
