@@ -2,12 +2,11 @@
 This section outlines the experimental design used to identify the top-$n$ models to be used for our stacking ensemble.
 We begin with a description of the prerequisite data preparation necessary for all experiments, followed by an overview of the hardware and software used.
 Then we provide a visual and statistical analysis to confirm that our data partitioning method works as intended, and effectively separates the extreme and non-extreme values.
-Next, we outline the design of our initial experiment, which provides a preliminary assessment of the models selected in Section~\ref{sec:model_selection}.
-The results of this initial experiment are then presented and discussed.
-We then describe the design of our main experiment.
-This experiment leverages our hyperparameter tuning framework to identify the top-$n$ models. 
-The results are then presented and discussed the results of this experiment.
-Finally, we use the identified models to construct a stacking ensemble, which is then evaluated and compared to the individual models.
+Next, we outline the design of our initial experiment in Section~\ref{sec:initial-experiment}, which provides a preliminary assessment of the models selected in Section~\ref{sec:model_selection}.
+The results of this initial experiment are then presented and discussed in Section~\ref{sec:initial_results}.
+We then describe the design of our optimization experiment in Section~\ref{subsec:optimization_experiment_design}, which leverages our optimization framework to identify the top-$n$ models.
+The results are then presented and discussed in Section~\ref{sec:optimization_results}.
+Finally, we use the identified models to construct a stacking ensemble, which is then evaluated and compared to the individual models and our baseline in Section~\ref{subsec:stacking_ensemble}.
 
 \input{sections/experiments/data_preparation}
 \input{sections/experiments/experimental_setup}
