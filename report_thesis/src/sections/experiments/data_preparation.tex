@@ -3,7 +3,7 @@ The first step in our methodology is to prepare the datasets for model training 
 As mentioned in Section~\ref{sec:data-overview}, the data used in this study was obtained from \gls{nasa}'s \gls{pds} and consists of \gls{ccs} data and major oxide compositions for various samples.
 
 The initial five shots from each sample are excluded because they are usually contaminated by dust covering the sample, which is cleared away by the shock waves produced by the laser \cite{cleggRecalibrationMarsScience2017}.
-The remaining 45 shots from each location are then averaged, yielding a single spectrum $s$ per location $l$ in the Averaged Intensity Tensor\ref{matrix:averaged_intensity}, resulting in a total of five spectra for each sample.
+The remaining 45 shots from each location are then averaged, yielding a single spectrum $s$ per location $l$ in the \texttt{Averaged Intensity Tensor} (Tensor \ref{matrix:averaged_intensity}), resulting in a total of five spectra for each sample.
 
 At this stage, the data still contains noise at the edges of the spectrometers.
 These edges correspond to the boundaries of the three spectrometers, which collectively cover the \gls{uv}, \gls{vio}, and \gls{vnir} light spectra.
@@ -17,7 +17,7 @@ Similar to the noisy edges, these negative values are also masked by zeroing out
 
 We transpose the data so that each row represents a location and each column represents a wavelength feature.
 Each location is now represented as a vector of wavelengths, with the corresponding average intensity values for each wavelength.
-These vectors are then concatenated to form a tensor, giving us the full Averaged Intensity Tensor.
+These vectors are then concatenated to form a tensor, giving us the full \texttt{Averaged Intensity Tensor}.
 
 For each sample, we have a corresponding set of major oxide compositions in weight percentage (wt\%).
 These compositions are used as the target labels for the machine learning models.
