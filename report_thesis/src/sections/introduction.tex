@@ -1,5 +1,5 @@
 \section{Introduction}\label{sec:introduction}
-\gls{nasa} has been studying the Martian environment for decades through a series of missions, including the Viking missions~\cite{marsnasagov_vikings}, the \gls{mer} mission~\cite{marsnasagov_observer, marsnasagov_spirit_opportunity}, and the \gls{msl} mission~\cite{marsnasagov_msl}, each building on the knowledge gained from the previous ones.
+The \gls{nasa} has been studying the Martian environment for decades through a series of missions, including the Viking missions~\cite{marsnasagov_vikings}, the \gls{mer} mission~\cite{marsnasagov_observer, marsnasagov_spirit_opportunity}, and the \gls{msl} mission~\cite{marsnasagov_msl}, each building on the knowledge gained from the previous ones.
 Today, the rovers exploring Mars are equipped with sophisticated instruments for analyzing the chemical composition of Martian soil in search of past life and habitable environments.
 
 Part of this research is facilitated through interpretation of spectral data gathered by \gls{libs} instruments, which fire a high-powered laser at soil samples to create a plasma.
@@ -15,7 +15,7 @@ These methods have been used to enhance both the accuracy and interpretability o
 Tailored approaches have also been developed, where different models are selected based on their performance with specific spectral characteristics~\cite{rezaei_dimensionality_reduction, andersonPostlandingMajorElement2022}.
 Moreover, models incorporating physical principles have demonstrated improved accuracy by handling residuals that traditional models fail to explain~\cite{song_DF-K-ELM}.
 However, predicting oxide compositions remains challenging due to the complex, nonlinear nature of \gls{libs} data.
-This underscores the need for continued research into more adaptive and robust machine learning strategies to tackle these issues effectively.
+This underscores the need for continued research into more accurate and robust machine learning strategies to tackle these issues effectively.
 
 This thesis aims to improve upon previous work in the field of \gls{libs} data analysis.
 Our goal is to develop a machine learning pipeline that is tailored to the unique characteristics of \gls{libs} data, with the goal of achieving higher prediction accuracy and robustness.
@@ -49,6 +49,7 @@ This was then used as a baseline to evaluate our proposed stacking ensembles aga
 Section~\ref{sec:proposed_approach} presents our proposed approach for optimizing pipeline configurations, detailing the selection of models and preprocessing techniques, our approach to data partitioning, validation and testing procedures, and the implementation of the hyperparameter optimization framework.
 Section~\ref{sec:methodology} presents the design and results of our experiments, as well as the analysis of the results.
 Our experiments include initial model selection, hyperparameter optimization, and the final evaluation of our proposed stacking ensemble.
+Section~\ref{sec:pyhat_contribution} discusses our contribution to \gls{pyhat} and how our work has been integrated into the toolset.
 Finally, Section~\ref{sec:conclusion} summarizes our key findings and contributions, while Section~\ref{sec:future_work} discusses potential future research directions and improvements.
 
 Due to the overlapping nature of terminology used in \gls{libs} data analysis and machine learning, we provide a list of terms in Table~\ref{tab:terms} to clarify their meaning.
