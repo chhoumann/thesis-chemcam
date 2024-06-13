@@ -10,7 +10,7 @@ In addition to bootstrap sampling, random forests introduce an additional layer 
 This further decorrelates the trees, enhancing the model's robustness and reducing the risk of overfitting.
 By aggregating predictions from multiple trees, the model achieves better generalization and robustness.
 
-For a feature vector $x$, the prediction of a \gls{rf} model can be represeted as an aggregation of the predictions of individual trees:
+For a feature vector $x$, the prediction of a \gls{rf} model can be represented as an aggregation of the predictions of individual trees:
 
 $$
 f(x) = \frac{1}{M} \sum_{m=1}^{M} f_m(x),
@@ -22,5 +22,5 @@ This form of aggregation reduces the overall variance of the model, by averaging
 \gls{etr} extends the \gls{rf} model by introducing additional randomness in the tree-building process, specifically through random feature selection and random split points.
 While \gls{rf} uses bootstrap sampling and selects the best split from a random subset of features to create a set of diverse samples, \gls{etr} instead selects split points randomly within the chosen features, introducing additional randomness.
 This process results in even greater variability among the trees, aiming to reduce overfitting and improve the model's robustness.
-As a tradeoff, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
+As a trade-off, \gls{etr} is less interpretable than a single decision tree, as the added randomness can introduce more bias than \gls{rf}.
 However, it often achieves better generalization performance, especially in high-dimensional or noisy datasets.
