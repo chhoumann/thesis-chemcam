@@ -1,6 +1,6 @@
 \section{Baseline \& Replica}\label{sec:baseline_replica}
 For analyzing Martian geological samples, the \gls{chemcam} team currently uses the \gls{moc} model~\cite{cleggRecalibrationMarsScience2017}.
-This model integrates \gls{pls} and \gls{ica} to predict the composition of major oxides.
+This model integrates \gls{pls} and \gls{ica} via \gls{jade} to predict the composition of major oxides.
 
 As shown in figure \ref{fig:moc_pipeline}, the input to the \gls{moc} model is the \gls{ccs} data, mentioned in Section~\ref{sec:problem_definition}.
 This spectral data is collected on Earth in a laboratory setting simulating the Martian environment.
@@ -8,12 +8,12 @@ The instrument used to collect this data is a \gls{libs} instrument replicating 
 Both the \gls{chemcam} and laboratory instrument consist of three spectrometers, each producing 2048 channels.
 These spectrometers are used to capture the \gls{uv}, \gls{vio}, and \gls{vnir} regions of the spectrum.
 For each sample, five \gls{ccs} datasets are collected by firing 50 laser shots at five different locations on the sample and processing the raw spectral readings \cite{wiensPreflightCalibrationInitial2013}.
-Consequently, the \gls{ccs} data for each sample forms a high-dimensional Intensity Tensor $I$\ref{matrix:intensity} with dimensions $5 \times 50 \times 6144$.
+Consequently, the \gls{ccs} data for each sample forms a high-dimensional \texttt{Intensity Tensor} $I$ (Tensor \ref{matrix:intensity}) with dimensions $5 \times 50 \times 6144$.
 An entry in this matrix represents the intensity of a specific wavelength in nanometers.
 Complementing the data is the matrix of the corresponding major oxide concentrations for each sample $C$\ref{matrix:concentration}, which serves as the target variable for the model.
 For more details, refer to Section 5 in \citet{p9_paper}.
 
-The \gls{pls} and \gls{ica} phases of the \gls{moc} operate in parallel, and their predictions are blended to form the final predictions.
+The \gls{pls} and \gls{jade} phases of the \gls{moc} operate in parallel, and their predictions are blended to form the final predictions.
 Though the \gls{moc} model has proven useful, it suffers from limitations in predictive accuracy and robustness.
 An overview of the \gls{moc} model is shown in Figure~\ref{fig:moc_pipeline}.
 

@@ -3,7 +3,7 @@ To address the challenges in predicting major oxide compositions from \gls{libs}
 These issues complicate the accurate and robust prediction of elemental concentrations, necessitating advanced computational methodologies.
 
 Our approach aims to enhance the prediction accuracy and robustness for major oxides in \gls{libs} data by leveraging specific combinations of machine learning models and preprocessors that are particularly effective at predicting individual oxides.
-The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the Masked Intensity Tensor $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features.
+The models will use feature vectors $\mathbf{x} \in \mathbb{R}^N$ derived from the \texttt{Masked Intensity Tensor} $\mathbf{M}[\chi, l, \lambda]$ as input, where $N$ is the number of features.
 The output will be Estimated Concentration Vectors $\mathbf{v} \in \mathbb{R}^{n_o}$.
 
 As highlighted in Section~\ref{sec:related-work}, the literature suggests that various models and preprocessing techniques are adept at handling high-dimensional data, multi-collinearity, and matrix effects.
